@@ -1,2 +1,2 @@
 # Kirbo Mod Github Page
-I just wanted the mod icon :\
+I just wanted the mod icon :/
