@@ -1,0 +1,33 @@
+using Microsoft.Xna.Framework;
+using System;
+using Terraria;
+using Terraria.ID;
+using Terraria.ModLoader;
+
+namespace KirboMod.Projectiles
+{
+	public class MetalFighterSpike : ModProjectile
+	{
+		public override void SetStaticDefaults()
+		{
+			
+		}
+		public override void SetDefaults()
+		{
+			Projectile.width = 14;
+			Projectile.height = 14;
+			Projectile.friendly = true;
+			Projectile.DamageType = DamageClass.Melee;
+			Projectile.timeLeft = 120;
+			Projectile.tileCollide = true;
+			Projectile.penetrate = -1;
+			Projectile.scale = 1f;
+			Projectile.alpha = 50;
+			
+		}
+		public override void AI()
+		{
+			Projectile.rotation = Projectile.velocity.ToRotation();
+		}
+	}
+}

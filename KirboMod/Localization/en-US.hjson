@@ -1,0 +1,1460 @@
+Mods: {
+	KirboMod: {
+		Buffs: {
+			DarkFeeling: {
+				DisplayName: Dark Feeling
+				Description: This mirror is giving bad vibes...
+			}
+
+			Dreamy: {
+				DisplayName: Dreamy
+				Description: The fountain puts you at ease
+			}
+
+			FlyingNimbusMount: {
+				DisplayName: Flying Nimbus
+				Description: "'How is this a Kirby reference!?'"
+			}
+
+			HopesAndDreams: {
+				DisplayName: Hopes & Dreams
+				Description: The hopes and dreams of your friends empower them!
+			}
+
+			BioSparkBuff: {
+				DisplayName: Bio Spark
+				Description: A bio spark will fight for you
+			}
+
+			BurningLeoBuff: {
+				DisplayName: Burning Leo
+				Description: A burning leo will fight for you
+			}
+
+			ChillyBuff: {
+				DisplayName: Chilly
+				Description: A chilly will fight for you
+			}
+
+			GooeyBuff: {
+				DisplayName: Gooey
+				Description: Gooey will carry you through thick and thin
+			}
+
+			LeoAndChillyBuff: {
+				DisplayName: Burning Leo and Chilly
+				Description: A burning leo and a chilly will fight for you
+			}
+
+			ParosolBuff: {
+				DisplayName: Parasol Waddle Dee
+				Description: A parasol waddle dee will fight for you
+			}
+
+			WaddleDooBuff: {
+				DisplayName: Waddle Doo
+				Description: A waddle doo will fight for you
+			}
+
+			Nightmare: {
+				DisplayName: Nightmare!
+				Description: You are feeling bad thoughts
+			}
+
+			DarkMatterPetBuff: {
+				DisplayName: Dark Wanderer
+				Description: '''"It's attracted to the darkness within you."'''
+			}
+
+			KingDededePetBuff: {
+				DisplayName: Dee
+				Description: '''"The one to rule them all... one day...."'''
+			}
+
+			KrackoPetBuff: {
+				DisplayName: Lil' Krackle
+				Description: '''"It cries water every once in a while."'''
+			}
+
+			NightmarePetBuff: {
+				DisplayName: Shade Mage
+				Description: '''"What could it be hiding under those shades?"'''
+			}
+
+			WhispyPetBuff: {
+				DisplayName: Murmuring Woods
+				Description: '''"I think it's trying to whisper something into your ear..."'''
+			}
+
+			ZeroEyePetBuff: {
+				DisplayName: Zero's Eye
+				Description: '''"Is it in constant pain of not being able to blink...?"'''
+			}
+
+			ZeroPetBuff: {
+				DisplayName: Light Wanderer
+				Description: '''"Attracts darkness towards its hallowed core."'''
+			}
+		}
+
+		Items: {
+			KirbyBalloon: {
+				DisplayName: Pink Balloon
+				Tooltip: You can jump infinitely!
+			}
+
+			NightCloak: {
+				DisplayName: Night Cloak
+				Tooltip:
+					'''
+					Shoots stars in eight directions upon being hit
+					Stars deal as much damage as the item you're holding, minimum being 50 damage
+					'''
+			}
+
+			PeeWeePole: {
+				DisplayName: Peewee Pole
+				Tooltip: Summons a rideable nimbus
+			}
+
+			StarArrow: {
+				DisplayName: Star Arrow
+				Tooltip: Is unaffected by gravity
+			}
+
+			StarBullet: {
+				DisplayName: Star Bullet
+				Tooltip: Gracefully flies through the air
+			}
+
+			AirWalkerBreastplate: {
+				DisplayName: Air Walker Breastplate
+				Tooltip:
+					'''
+					20% more movement speed
+					20% more jump speed
+					'''
+			}
+
+			AirWalkerHelmet: {
+				DisplayName: Air Walker Helmet
+				Tooltip: Boosts jump speed by 20%
+			}
+
+			AirWalkerLeggings: {
+				DisplayName: Air Walker Leggings
+				Tooltip: 10% increased movement speed
+			}
+
+			BioSparkBanner: {
+				DisplayName: Bio Spark Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Bio Spark"
+			}
+
+			BirdonBanner: {
+				DisplayName: Birdon Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Birdon"
+			}
+
+			BladeKnightBanner: {
+				DisplayName: Blade Knight Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Blade Knight"
+			}
+
+			BonkersBanner: {
+				DisplayName: Bonkers Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Bonkers"
+			}
+
+			BrontoBurtBanner: {
+				DisplayName: Bronto Burt Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Bronto Burt"
+			}
+
+			BroomHatterBanner: {
+				DisplayName: Broom Hatter Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Broom Hatter"
+			}
+
+			BurningLeoBanner: {
+				DisplayName: Burning Leo Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Burning Leo"
+			}
+
+			CappyBanner: {
+				DisplayName: Cappy Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Cappy"
+			}
+
+			ChillyBanner: {
+				DisplayName: Chilly Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Chilly"
+			}
+
+			KabuBanner: {
+				DisplayName: Kabu Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Kabu"
+			}
+
+			KnuckleJoeBanner: {
+				DisplayName: Knuckle Joe Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Knuckle Joe"
+			}
+
+			MrFrostyBanner: {
+				DisplayName: Mr. Frosty Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Mr. Frosty"
+			}
+
+			ParosolWaddleDeeBanner: {
+				DisplayName: Parasol Waddle Dee Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Parasol Waddle Dee"
+			}
+
+			PlasmaWispBanner: {
+				DisplayName: Plasma Wisp Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Plasma Wisp"
+			}
+
+			PoppyBrosJrBanner: {
+				DisplayName: Poppy Bros Jr Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Poppy Bros. Jr."
+			}
+
+			ScarfyBanner: {
+				DisplayName: Scarfy Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Scarfy"
+			}
+
+			SirKibbleBanner: {
+				DisplayName: Sir Kibble Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Sir Kibble"
+			}
+
+			TwisterBanner: {
+				DisplayName: Twister Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Twister"
+			}
+
+			UFOBanner: {
+				DisplayName: UFO Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}UFO"
+			}
+
+			WaddleDeeBanner: {
+				DisplayName: Waddle Dee Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Waddle Dee"
+			}
+
+			WaddleDooBanner: {
+				DisplayName: Waddle Doo Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Waddle Doo"
+			}
+
+			BirdonFeather: {
+				DisplayName: Birdon Feather
+				Tooltip: ""
+			}
+
+			CrystalShard: {
+				DisplayName: Crystal Shard
+				Tooltip: A makeshift version of special otherworldy crystals
+			}
+
+			DarkMaterial: {
+				DisplayName: Dark Matter
+				Tooltip: Matter pulsating with terrible feelings and thoughts
+			}
+
+			DarkMatterBag: {
+				DisplayName: Treasure Bag
+				Tooltip: "{$CommonItemTooltip.RightClickToOpen}"
+			}
+
+			DarkMatterMask: {
+				DisplayName: Dark Matter Mask
+				Tooltip: ""
+			}
+
+			DarkMatterPetItem: {
+				DisplayName: Quivering Goop
+				Tooltip:
+					'''
+					Summons a dark wanderer
+					'I don't think you can use this as clay.'
+					'''
+			}
+
+			DarkMatterTrophy: {
+				DisplayName: Dark Matter Trophy
+				Tooltip: ""
+			}
+
+			DarkShield: {
+				DisplayName: Dark Shield
+				Tooltip:
+					'''
+					Allows the player to dash through enemies, dealing damage
+					Defense is increased while dashing
+					Double tap a direction
+					'''
+			}
+
+			DarkMirror: {
+				DisplayName: Dark Mirror
+				Tooltip:
+					'''
+					Left click to throw it out, walk up to it to collect it
+					'What would happen if you shot a beam of light at a dark reflection?'
+					'''
+			}
+
+			DededeBrooch: {
+				DisplayName: King's Brooch
+				Tooltip:
+					'''
+					Summons King Dedede
+					A phony of one of the king's life-saving pins
+					'''
+			}
+
+			DreamEssence: {
+				DisplayName: Dream Matter
+				Tooltip: Matter of the mind, the wishes and the dreams of all
+			}
+
+			HeartMatter: {
+				DisplayName: Heart Matter
+				Tooltip: Matter made from the loving care of the nice things in the universe
+			}
+
+			HeartStar: {
+				DisplayName: Heart Star
+				Tooltip: Love and compassion imbued with the power of the stars
+			}
+
+			KingDededeBag: {
+				DisplayName: Treasure Bag
+				Tooltip: "{$CommonItemTooltip.RightClickToOpen}"
+			}
+
+			KingDededeMask: {
+				DisplayName: King Dedede Mask
+				Tooltip: ""
+			}
+
+			KingDededePetItem: {
+				DisplayName: Golden Egg
+				Tooltip:
+					'''
+					Summons a dee
+					'Is this edible?'
+					'''
+			}
+
+			KingDededeTrophy: {
+				DisplayName: King Dedede Trophy
+				Tooltip: ""
+			}
+
+			RoyalSlippers: {
+				DisplayName: Royal Slippers
+				Tooltip:
+					'''
+					Hold DOWN in the air and fall for a bit to ground pound
+					Hold UP or JUMP to stop your descent
+					'Wait he doesn't wear shoes... Who's are these?'
+					'''
+			}
+
+			KrackoBag: {
+				DisplayName: Treasure Bag
+				Tooltip: "{$CommonItemTooltip.RightClickToOpen}"
+			}
+
+			KrackoMask: {
+				DisplayName: Kracko Mask
+				Tooltip: ""
+			}
+
+			KrackoPetItem: {
+				DisplayName: Pulsating Fluff
+				Tooltip:
+					'''
+					Summons a lil' kracko
+					'Feels spiky to touch.'
+					'''
+			}
+
+			KrackoTrophy: {
+				DisplayName: Kracko Trophy
+				Tooltip: ""
+			}
+
+			PersonalCloud: {
+				DisplayName: Personal Cloud
+				Tooltip: Summons a personal cloud to shock your enemies
+			}
+
+			MiracleMatter: {
+				DisplayName: Miracle Matter
+				Tooltip: Matter straight from a fallen angel
+			}
+
+			NightCloth: {
+				DisplayName: Night Cloth
+				Tooltip: The stuff nightmares are made of
+			}
+
+			NightmareBag: {
+				DisplayName: Treasure Bag
+				Tooltip: "{$CommonItemTooltip.RightClickToOpen}"
+			}
+
+			NightmareCrown: {
+				DisplayName: Nightmare Crown
+				Tooltip:
+					'''
+					Lets you press up to teleport
+					Gives you nightmares, making it risky to teleport for a short while
+					'''
+			}
+
+			NightmareMask: {
+				DisplayName: Nightmare Mask
+				Tooltip: ""
+			}
+
+			NightmarePetItem: {
+				DisplayName: Encased Dark Magic
+				Tooltip:
+					'''
+					Summons a shade mage
+					'Reeks of bad vibes.'
+					'''
+			}
+
+			NightmareTrophy: {
+				DisplayName: Nightmare Trophy
+				Tooltip: ""
+			}
+
+			PillarOfLight: {
+				DisplayName: Totem Of Light
+				Tooltip: Summons a great darkness upon your world
+			}
+
+			DarkMatterRelic: {
+				DisplayName: Dark Matter Relic
+				Tooltip: ""
+			}
+
+			KingDededeRelic: {
+				DisplayName: King Dedede Relic
+				Tooltip: ""
+			}
+
+			KrackoRelic: {
+				DisplayName: Kracko Relic
+				Tooltip: ""
+			}
+
+			NightmareRelic: {
+				DisplayName: Nightmare Relic
+				Tooltip: ""
+			}
+
+			WhispyWoodsRelic: {
+				DisplayName: Whispy Woods Relic
+				Tooltip: ""
+			}
+
+			ZeroRelic: {
+				DisplayName: Zero Relic
+				Tooltip: ""
+			}
+
+			FountainOfDreams: {
+				DisplayName: Fountain Of Dreams
+				Tooltip:
+					'''
+					Gives good dreams during the day
+					'Perfect place to attract nocturnal evil doers!'
+					'''
+			}
+
+			PurifiedMaterial: {
+				DisplayName: Purified Matter
+				Tooltip: Broken away fron darkness, this matter beams with happy thoughts and emotions
+			}
+
+			DesertDrop: {
+				DisplayName: Yellow Drop
+				Tooltip: The rainbow drop of the barren desert
+			}
+
+			EvilDrop: {
+				DisplayName: Red & Purple Drop
+				Tooltip: The rainbow drop of the evil infections
+			}
+
+			HellDrop: {
+				DisplayName: Orange Drop
+				Tooltip: The rainbow drop of the burning hellscape
+			}
+
+			JungleDrop: {
+				DisplayName: Green Drop
+				Tooltip: The rainbow drop of the lively jungle
+			}
+
+			OceanDrop: {
+				DisplayName: Indigo Drop
+				Tooltip: The rainbow drop of the serene shores
+			}
+
+			SnowDrop: {
+				DisplayName: Blue Drop
+				Tooltip: The rainbow drop of the snowy tundra
+			}
+
+			RareStone: {
+				DisplayName: Rare Stone
+				Tooltip: Used to evolve certain weapons
+			}
+
+			SkyBlanket: {
+				DisplayName: Sky Blanket
+				Tooltip:
+					'''
+					Calls on a Kracko Jr.
+					'I need my blankey!
+					'''
+			}
+
+			Starbit: {
+				DisplayName: Starbit
+				Tooltip: A physical fragment of a burning wish
+			}
+
+			ArcherBow: {
+				DisplayName: One Shot Bow
+				Tooltip:
+					'''
+					Converts star arrows into magic-star arrows
+					Converts all other arrows into jester's arrows
+					'''
+			}
+
+			BallsofMatter: {
+				DisplayName: Dark Petal
+				Tooltip: Springs out then moves towards mouse position
+			}
+
+			BeamStaff: {
+				DisplayName: Beam Staff
+				Tooltip: ""
+			}
+
+			Blado: {
+				DisplayName: Blado
+				Tooltip: Lands on the ground and then spins forward
+			}
+
+			BlizzardIce: {
+				DisplayName: Blizzard Ice Pot
+				Tooltip:
+					'''
+					Fires a volley of icicles
+					Icicles that touch any enemy cause them to grow ice on their body
+					Non-bosses killed by one condense into an ice cube
+					Icicles that land on the ground spike giant ice formations
+					'''
+			}
+
+			Bomb: {
+				DisplayName: Jolly Bomb
+				Tooltip: Detonate after a while or upon contact with an enemy
+			}
+
+			BuzzCutter: {
+				DisplayName: Buzz-Saw Cutter
+				Tooltip:
+					'''
+					Shoots a flying sawblade that bounces off nearby walls and grinds on enemies
+					Returns to the player if it can't hit any walls fast enough
+					Five can be out at a time
+					'''
+			}
+
+			ChainBomb: {
+				DisplayName: Chain Bomb
+				Tooltip:
+					'''
+					Detonate after a while or upon contact with an enemy
+					Links to nearby chain bombs, increasing power the more bombs are linked
+					Detonates linked chain bombs upon explosion
+					'''
+			}
+
+			ChakramCutter: {
+				DisplayName: Chakram Cutter
+				Tooltip:
+					'''
+					Comes back after a while
+					Only four can be out at a time
+					'''
+			}
+
+			CleaningBroom: {
+				DisplayName: Cleaning Broom
+				Tooltip:
+					'''
+					Swing on the ground to kick up dust at your enemies
+					'Sweep, sweep, sweep!'
+					'''
+			}
+
+			ClutterNeedle: {
+				DisplayName: Clutter Needle Ball
+				Tooltip: drops a bunch of clutter when expired
+			}
+
+			CrownOfClimate: {
+				DisplayName: Crown Of Climate
+				Tooltip: Summons a burning leo and chilly combo to fight for you
+			}
+
+			CrownOfFire: {
+				DisplayName: Crown Of Fire
+				Tooltip: Summons a burning leo to fight for you
+			}
+
+			CrownOfIce: {
+				DisplayName: Crown Of Ice
+				Tooltip: Summons a chilly to fight for you
+			}
+
+			CrystalGun: {
+				DisplayName: Crystal Gun
+				Tooltip:
+					'''
+					Consumes magic crystal shards
+					75% chance to not consume ammo
+					'''
+			}
+
+			CrystalNeedle: {
+				DisplayName: Crystal Needle Ball
+				Tooltip:
+					'''
+					leaves crystals along the ground
+					Shoots crystal spikes out when expired
+					'''
+			}
+
+			Cutter: {
+				DisplayName: Cutter
+				Tooltip:
+					'''
+					Flies in the opposite direction
+					Only two can be out at a time
+					'''
+			}
+
+			CyborgArcherBow: {
+				DisplayName: Bot Shot
+				Tooltip:
+					'''
+					Converts star arrows into a laser beam & four extra laser arrows
+					Converts all other arrows into laser arrows
+					'''
+			}
+
+			DarknessRay: {
+				DisplayName: Darkness Ray
+				Tooltip:
+					'''
+					Fires a dark laser that darts through the sky
+					Right click to fire a orb a darkness for more mana
+					'''
+			}
+
+			DarkSword: {
+				DisplayName: Dark Sword
+				Tooltip: Fire dark beams within a short range
+			}
+
+			DooStaff: {
+				DisplayName: Doo Staff
+				Tooltip: Summons a waddle doo to fight for you
+			}
+
+			DragonFire: {
+				DisplayName: Dragon Pot
+				Tooltip:
+					'''
+					Unleashes a flurry of shadow fire
+					Enemies hit by one will be set on strong shadow flames
+					'''
+			}
+
+			DreamRod: {
+				DisplayName: Dream Rod
+				Tooltip:
+					'''
+					Use the power of your friends to defeat evil doers!
+					Effectiveness of friends increases with the more minion slots you have
+					'''
+			}
+
+			FighterGlove: {
+				DisplayName: Fighter Glove
+				Tooltip:
+					'''
+					Right click to do a uppercut, sending you upwards
+					Punching many times RIGHT before uppercutting will make it stronger
+					'''
+			}
+
+			FinalCutter: {
+				DisplayName: Final Cutter
+				Tooltip:
+					'''
+					Flies in the opposite direction
+					Twenty can be out at a time
+					'''
+			}
+
+			Fire: {
+				DisplayName: Fire Pot
+				Tooltip:
+					'''
+					Sprays a flurry of fireballs
+					Enemies hit by one will catch on fire
+					'''
+			}
+
+			FleurTornado: {
+				DisplayName: Fleur Tornado Ring
+				Tooltip:
+					'''
+					Control a tornado by holding down the mouse
+					Splits into multiple feathers upon death
+					Drains mana while being used
+					'''
+			}
+
+			FrostyIce: {
+				DisplayName: Frosty Ice Pot
+				Tooltip:
+					'''
+					Sprays a flurry of snowballs that form snowmen
+					Enemies killed by one condense into an ice cube
+					Does not work on bosses
+					'''
+			}
+
+			GigantSword: {
+				DisplayName: Gigant Sword
+				Tooltip:
+					'''
+					Swings a giant slash ahead of the player
+					The slash becomes stronger if the player isn't airborne when it's swung
+					'''
+			}
+
+			GordoItem: {
+				DisplayName: Gordo
+				Tooltip:
+					'''
+					Wears down the more hits it racks up
+					'Side b lol'
+					'''
+			}
+
+			Hammer: {
+				DisplayName: Bonking Hammer
+				Tooltip:
+					'''
+					Hold right to slow and charge a firey swing
+					Left click to release when at full power
+					'''
+			}
+
+			HardenedFighter: {
+				DisplayName: Hardened Fighter Glove
+				Tooltip:
+					'''
+					Right click to slam the ground and shoot rocks!
+					Slam onto enemies to boost yourself
+					'''
+			}
+
+			HeroSword: {
+				DisplayName: Hero Sword
+				Tooltip: ""
+			}
+
+			HomingBomb: {
+				DisplayName: Homing Bomb
+				Tooltip:
+					'''
+					Activates homing capabilities after landing
+					Chases after enemies before detonation
+					Sets off other nearby homing bombs when detonated
+					'''
+			}
+
+			HunterArcherBow: {
+				DisplayName: Tri-Killer
+				Tooltip:
+					'''
+					Converts star arrows into five magic-star arrows
+					Converts all other arrows into three jester's arrows
+					'''
+			}
+
+			Ice: {
+				DisplayName: Ice Pot
+				Tooltip:
+					'''
+					Sprays a flurry of snowballs
+					Enemies killed by one condense into an ice cube
+					Does not work on bosses
+					'''
+			}
+
+			KirbyBall: {
+				DisplayName: Friend Ball
+				Tooltip: Bounces up and down, reversing direction on any walls hit
+			}
+
+			LaserBeam: {
+				DisplayName: Laser Beam Staff
+				Tooltip: Shoots multiple lasers in a row
+			}
+
+			LightBeam: {
+				DisplayName: Light Beam Staff
+				Tooltip:
+					'''
+					Rains holy rays down on your opponents
+					'I'm with you in the dark...'
+					'''
+			}
+
+			LoveLoveStick: {
+				DisplayName: Love Love Stick
+				Tooltip: A weapon crafted from nothing but love and the determination to defeat evil
+			}
+
+			MaskedHammer: {
+				DisplayName: Wild Fire Hammer
+				Tooltip:
+					'''
+					Hold left on the ground to swing fire tornados in the direction you're facing
+					Hold right click to charge a firey and invincible spin attack that launches you towards the cursor
+					Left click to release when at full power
+					Charging gives you a 35% damage reduction bonus
+					'''
+			}
+
+			MasterSword: {
+				DisplayName: Master Sword
+				Tooltip:
+					'''
+					While airborne, right-click a direction to do a powerful and invincible dash in that direction
+					You can only dash in the air once before having to land
+					'Is this the sword that seals the darkness?'
+					'''
+			}
+
+			MetaKnightSword: {
+				DisplayName: Galaxia
+				Tooltip: "'Well of course not the actual thing...'"
+			}
+
+			MetalFighter: {
+				DisplayName: Metal Fighter Glove
+				Tooltip:
+					'''
+					Right click and hold up to combo uppercuts!
+					Spike in on the ground and air by just holding right click!
+					'Fly like a ballistic missile and sting like a ballistic missile'
+					'''
+			}
+
+			Needle: {
+				DisplayName: Needle Ball
+				Tooltip: Slows down when not poking enemies
+			}
+
+			NewHammer: {
+				DisplayName: Ham-O-Matic
+				Tooltip:
+					'''
+					Swing on the ground to cause shockwaves and right click to fire missiles
+					'Now with 2x the clobbering power!'
+					'''
+			}
+
+			NobleRangerGun: {
+				DisplayName: Noble Fury
+				Tooltip:
+					'''
+					Shoots a flurry of star bubbles
+					Converts star bullets into faster star bubbles
+					'''
+			}
+
+			OrnateChest: {
+				DisplayName: Ornate Chest
+				Tooltip:
+					'''
+					Contains dark secrets
+					Use to unleash the dark fragments within
+					'''
+			}
+
+			Parosol: {
+				DisplayName: Parasol
+				Tooltip: Summons a parasol waddle dee to fight for you
+			}
+
+			Plasma: {
+				DisplayName: Plasma Charge
+				Tooltip:
+					'''
+					Sends out electric shocks with varying strength
+					Strength depends on how much you charge by pressing any directional input
+					Stronger blasts consume more mana
+					'''
+			}
+
+			RainbowSword: {
+				DisplayName: Rainbow Sword
+				Tooltip:
+					'''
+					Holds the light to light up everyone's worlds
+					Well timed swings can deflect certain dark projectiles
+					Right click to shoot a harmless beam of light
+					'''
+			}
+
+			RangerGun: {
+				DisplayName: Pow Shot Gun
+				Tooltip:
+					'''
+					Converts all bullets into star bubbles
+					Converts star bullets into giant star bubbles
+					'''
+			}
+
+			ShinobiScroll: {
+				DisplayName: Shinobi Scroll
+				Tooltip: Summons a bio spark to fight for you
+			}
+
+			SpaceRangerGun: {
+				DisplayName: Space Blaster
+				Tooltip:
+					'''
+					Converts all bullets into plasma shots that release sparks upon impact
+					Converts star bullets into concentrated orbs of plasma
+					25% chance to not consume ammo
+					'''
+			}
+
+			Staff: {
+				DisplayName: Jamba Staff
+				Tooltip:
+					'''
+					Mighty staff of the Jamba followers
+					Right click to swing it
+					'''
+			}
+
+			StarRod: {
+				DisplayName: Star Rod
+				Tooltip: ""
+			}
+
+			StormTornado: {
+				DisplayName: Storm Tornado Ring
+				Tooltip:
+					'''
+					Control a giant tornado by holding down the mouse
+					Leaves storm clouds and bursts of electricity 
+					Drains mana while being used
+					'''
+			}
+
+			SwayingBranch: {
+				DisplayName: Twitchy Twig
+				Tooltip:
+					'''
+					Summons a whispy woods sentry to spew apples at your enemies
+					Apples will momentarily spawn weak
+					'''
+			}
+
+			SwishyTree: {
+				DisplayName: Swishy Tree
+				Tooltip:
+					'''
+					Lashes three apples out from the leaves
+					'Swishy Swishy'
+					'''
+			}
+
+			Tornado: {
+				DisplayName: Tornado Ring
+				Tooltip:
+					'''
+					Control a tornado by holding down the mouse
+					Drains mana while being used
+					'''
+			}
+
+			ToyHammer: {
+				DisplayName: Toy Hammer
+				Tooltip:
+					'''
+					Hold right to slow and charge a powerful swing
+					Left click to release when at full power
+					'''
+			}
+
+			TripleStar: {
+				DisplayName: Triple Star Rod
+				Tooltip:
+					'''
+					Shoots out a maximum of three ricocheting stars that hit any enemies in their paths
+					Right click to shoot all three stars out at once at the cost of more mana
+					Stars not shot out will rotate around the player and deal damage to nearby enemies
+					'''
+			}
+
+			VolcanoFire: {
+				DisplayName: Volcano Pot
+				Tooltip:
+					'''
+					Sprays a shower of molten rocks
+					Explodes upon contact
+					'''
+			}
+
+			WeirdParosol: {
+				DisplayName: Tasty Fish
+				Tooltip:
+					'''
+					Summons a friendly face to help you uncover the mysteries of life
+					'Who...Me?'
+					'''
+			}
+
+			WildHammer: {
+				DisplayName: Wild Hammer
+				Tooltip:
+					'''
+					Hold right to slow and charge a firey and powerful swing
+					Left click to release when at full power
+					Charging gives you a 35% damage reduction bonus
+					'''
+			}
+
+			WindPipe: {
+				DisplayName: Wind Pipe
+				Tooltip: Shoots whisps that explode into smaller whisps
+			}
+
+			WhispySeed: {
+				DisplayName: Suspicious Looking Seed
+				Tooltip: Summons Whispy Woods
+			}
+
+			WhispyBag: {
+				DisplayName: Treasure Bag
+				Tooltip: "{$CommonItemTooltip.RightClickToOpen}"
+			}
+
+			WhispyBush: {
+				DisplayName: Whispy Shrub
+				Tooltip: When you're hit you spew apples from your body
+			}
+
+			WhispyMask: {
+				DisplayName: Whispy Woods Mask
+				Tooltip: ""
+			}
+
+			WhispyPetItem: {
+				DisplayName: Murmuring Sapling
+				Tooltip:
+					'''
+					Summons a murmuring woods
+					'Sometimes you can hear it go 'pspspspsps'...'
+					'''
+			}
+
+			WhispyTrophy: {
+				DisplayName: Whispy Woods Trophy
+				Tooltip: ""
+			}
+
+			BadgeOfGloom: {
+				DisplayName: Badge Of Gloom
+				Tooltip:
+					'''
+					While attacking, dark matter will shoot out from your body that follow your mouse
+					'No, this won't let you into the dark matter family'
+					'''
+			}
+
+			BloodyTendrils: {
+				DisplayName: Bloody Tendrils
+				Tooltip: "'Feels and looks bad'"
+			}
+
+			ZeroBag: {
+				DisplayName: Treasure Bag
+				Tooltip: "{$CommonItemTooltip.RightClickToOpen}"
+			}
+
+			ZeroEyePet: {
+				DisplayName: Zero's Eye
+				Tooltip: Summons Zero's eye to provide light
+			}
+
+			ZeroMask: {
+				DisplayName: Zero Mask
+				Tooltip: ""
+			}
+
+			ZeroPetItem: {
+				DisplayName: Hollow Shell
+				Tooltip:
+					'''
+					Summons a light wanderer
+					'Feels almost weightless'
+					'''
+			}
+
+			ZeroTrophy: {
+				DisplayName: Zero Trophy
+				Tooltip: ""
+			}
+
+			Changaroonie: {
+				Tooltip:
+					'''
+					Dev item
+					Cycles through stages of progression
+					'''
+				DisplayName: Changaroonie
+			}
+		}
+
+		Projectiles: {
+			BloodyTendrilsProj.DisplayName: Bloody Tendrils
+			AngledDarkBeam.DisplayName: Dark Beam
+			Apple.DisplayName: Apple
+			BadCutter.DisplayName: Cutter
+			BadFire.DisplayName: Fire
+			BadIce.DisplayName: Ice
+			BadIceChunk.DisplayName: Ice Cube
+			BadPlasmaBlast.DisplayName: Plasma Blast
+			BadPlasmaLaser.DisplayName: Plasma Laser
+			BadPlasmaZap.DisplayName: Plasma Zap
+			BadStar.DisplayName: Night Star
+			BallOfImpendingDoom.DisplayName: Ball Of Impending Doom
+			BeamBad.DisplayName: Beam
+			BeamBall.DisplayName: Beam
+			BeamBig.DisplayName: Beam
+			BigRangerStar.DisplayName: Big Ranger Star
+			BioDagger.DisplayName: Kunai
+			BioSlash.DisplayName: Bio Slash
+			BioSparkMinion.DisplayName: Bio Spark
+			BirdonFeatherBad.DisplayName: Birdon Feather
+			BladeSlash.DisplayName: Blade Slash
+			BladoProj.DisplayName: Blado
+			BlizzardFormation.DisplayName: Blizzard Formation
+			BlizzardIcicle.DisplayName: Blizzard Icicle
+			BombExplosive.DisplayName: Jolly Bomb
+			BombProj.DisplayName: Jolly Bomb
+			BonkersSmash.DisplayName: Smash
+			BouncyGordo.DisplayName: Gordo
+			BroomHatterDustCloud.DisplayName: Dust Cloud
+			BurningLeoMinion.DisplayName: Burning Leo
+			BuzzCutterProj.DisplayName: Buzz-Saw
+			ChainBombExplosion.DisplayName: Chain Bomb
+			ChainBombProj.DisplayName: Chain Bomb
+			ChakramCutterProj.DisplayName: Chakram Cutter
+			ChargedArrowProj.DisplayName: Magic-Star Arrow
+			ChillyMinion.DisplayName: Chilly
+			ChillyMinionFreeze.DisplayName: Chilly Minion Freeze
+			CleaningBroomDustCloud.DisplayName: Dust Cloud
+			Clutter.DisplayName: Clutter
+			ClutterNeedleBall.DisplayName: Clutter Needle Ball
+			CresentSlash.DisplayName: Cresent Slash
+			CrystalClutter.DisplayName: Crystal Clutter
+			CrystalNeedleBall.DisplayName: Crystal Needle Ball
+			CrystalShardProj.DisplayName: Crystal Shard
+			CrystalTrap.DisplayName: Crystal Trap
+			CutterBlade.DisplayName: Cutter Blade
+			CyborgArcherArrow.DisplayName: Laser Arrow
+			CyborgArcherLaser.DisplayName: Red Laser
+			CyborgArcherProbe.DisplayName: Cyborg Archer Probe
+			DarkBeam.DisplayName: Dark Beam
+			DarkLaser.DisplayName: Dark Laser
+			DarkMatterShot.DisplayName: Dark Matter
+			DarkMirrorProj.DisplayName: Dark Mirror
+			DarkOrb.DisplayName: Dark Orb
+			DededeSlam.DisplayName: Slam
+			DragonFireFire.DisplayName: Dragon Fire
+			DreamedFriend.DisplayName: Dreamed Friend
+			DuoBurningLeoMinion.DisplayName: Burning Leo
+			DuoChillyMinion.DisplayName: Chilly
+			ExplosiveCoconut.DisplayName: Explosive Coconut
+			FighterUppercut.DisplayName: Fighter Uppercut
+			FinalCutterBlade.DisplayName: Final Cutter Blade
+			FireFire.DisplayName: Fire Fire
+			FireSphere.DisplayName: Fire Sphere
+			FleurTornadoFeather.DisplayName: Fleur Tornado Feather
+			FleurTornadoNado.DisplayName: Fleur Tornado
+			FlyingPillarOfLight.DisplayName: Flying Pillar Of Light
+			FlyingPunch.DisplayName: Flying Punch
+			FrostyIceIce.DisplayName: Frosty Ice
+			FrostySculpture.DisplayName: Frosty Sculpture
+			GigantSwing.DisplayName: Gigant Swing
+			GoodBioDagger.DisplayName: Kunai
+			GoodBioSlash.DisplayName: Purple Slash
+			GoodDarkBeam.DisplayName: Dark Beam
+			GoodDarkLaser.DisplayName: Dark Laser
+			GoodDarkOrb.DisplayName: Dark Orb
+			GoodGordo.DisplayName: Gordo
+			GoodMatterOrb.DisplayName: Dark Petal
+			GoodNightStar.DisplayName: Night Star
+			GoodWhisp.DisplayName: Whisp
+			Gooey.DisplayName: Gooey
+			GooeyHitbox.DisplayName: Gooey
+			GooeyLaser.DisplayName: Gooey Laser
+			Gordo.DisplayName: Gordo
+			HammerThrow.DisplayName: Hammer Throw
+			HardenedFistProj.DisplayName: Hardened Fist
+			HardenedPebble.DisplayName: Hardened Pebble
+			HardenedSlam.DisplayName: Hardened Slam
+			HeroSlash.DisplayName: Hero Slash
+			HomingBombExplosion.DisplayName: Homing Bomb
+			HomingBombProj.DisplayName: Homing Bomb
+			HomingNightStar.DisplayName: Night Star
+			IceChunk.DisplayName: Ice Chunk
+			IceIce.DisplayName: Ice Ice
+			JoeBlast.DisplayName: Joe Blast
+			KirbyBallProj.DisplayName: Friend Ball
+			KrackoLightning.DisplayName: Lightning
+			LaserBeamLaser.DisplayName: Laser beam
+			LightBeamLaser.DisplayName: Light Beam
+			LoveDot.DisplayName: Love Dot
+			LoveLoves.DisplayName: Love Heart
+			MaskedFireTornado.DisplayName: Fire Spin
+			MaskedFireTornadoSmall.DisplayName: Fire Tornado
+			MaskedHammerThrow.DisplayName: Masked Hammer Throw
+			MasterDash.DisplayName: Master Dash
+			MasterSwing.DisplayName: Master Swing
+			MasterSwordProj.DisplayName: Master Sword Proj
+			MatterOrb.DisplayName: Dark Petal
+			MetaKnightSwing.DisplayName: Meta Knight Swing
+			MetalFighterSpike.DisplayName: Metal Fighter Spike
+			MetalFistProj.DisplayName: Metal Fist
+			MetalSlam.DisplayName: Metal Slam
+			MetalUppercut.DisplayName: Metal Uppercut
+			MetaSlash.DisplayName: Meta Slash
+			MinionBeam.DisplayName: Minion Beam
+			MinionFire.DisplayName: Minion Fire
+			MinionIce.DisplayName: Minion Ice
+			MiniWhispy.DisplayName: Mini Whispy
+			NebulaStar.DisplayName: Dark Nebula Star
+			NeedleBall.DisplayName: Needle Ball
+			NewHammerHoldUp.DisplayName: New Hammer Hold Up
+			NewHammerMissile.DisplayName: Hammer Missile
+			NewHammerShockwave.DisplayName: Shockwave
+			NightSlash.DisplayName: Night Slash
+			ParosolHitbox.DisplayName: Parosol Hitbox
+			ParosolMinion.DisplayName: Parasol Waddle Dee
+			PersonalCloud.DisplayName: Personal Cloud
+			PersonalCloudBeam.DisplayName: Personal Cloud Beam
+			DarkFollower.DisplayName: Dark Follower
+			DarkMatterPet.DisplayName: Dark Wanderer
+			KingDededePet.DisplayName: Dee
+			KrackoPet.DisplayName: Lil' Krackle
+			NightmarePet.DisplayName: Shade Mage
+			WhispyPet.DisplayName: Murmuring Woods
+			ZeroEyePetProj.DisplayName: Zero's Eye
+			ZeroPet.DisplayName: Light Wanderer
+			PinkRangerStar.DisplayName: Pink Ranger Star
+			PlasmaBlast.DisplayName: Plasma Blast
+			PlasmaLaser.DisplayName: Plasma Laser
+			PlasmaOrb.DisplayName: Plasma Shield
+			PlasmaShield.DisplayName: Plasma Shield
+			PlasmaZap.DisplayName: Plasma Zap
+			PlayerSlam.DisplayName: Slam
+			PoppyBomb.DisplayName: Poppy Bomb
+			PoppyBombExplode.DisplayName: Poppy Bomb Explosion
+			Puff.DisplayName: Puff
+			RainbowSlash.DisplayName: Rainbow Slash
+			RainbowSwordBeam.DisplayName: Casting light
+			RangerStar.DisplayName: Ranger Star
+			RangerStarExplode.DisplayName: Ranger Star Explosion
+			RisingRainbowBeam.DisplayName: Casting light
+			SmallApple.DisplayName: Small Apple
+			SmallDarkMatterShot.DisplayName: Dark Matter
+			SmolApple.DisplayName: Smol Apple
+			SmullApple.DisplayName: Smull Apple
+			SpaceRangerBlast.DisplayName: Space Blast
+			SpaceRangerBlastExplosion.DisplayName: Space Explosion
+			SpaceRangerOrb.DisplayName: Space Orb
+			SpaceRangerOrbField.DisplayName: Space Void
+			SplitDarkOrb.DisplayName: Split Dark Orb
+			Staffproj.DisplayName: Jamba Staff
+			Star.DisplayName: Star
+			StarArrowProj.DisplayName: Star Arrow
+			StarBulletProj.DisplayName: Star Bullet
+			StormTornadoCloud.DisplayName: Storm Tornado Cloud
+			StormTornadoNado.DisplayName: Storm Tornado
+			StormTornadoShock.DisplayName: Storm Tornado Shock
+			TornadoNado.DisplayName: Tornado
+			TripleStarStar.DisplayName: Star
+			UFOLaser.DisplayName: UFO Laser
+			VolcanoFireExplode.DisplayName: Volcano Fire
+			VolcanoFireFire.DisplayName: Volcano Fire
+			VulcanPunch.DisplayName: Vulcan Punch
+			WaddleDooMinion.DisplayName: Waddle Doo
+			Whisp.DisplayName: Whisp
+			WhispyBark.DisplayName: Whispy Bark
+			ZeroBloodPellet.DisplayName: Blood Pellet
+			ZeroBloodShot.DisplayName: Blood Shot
+			ZeroEyeBlood.DisplayName: Blood Trail
+			ZeroScreenBlood.DisplayName: Blood Shot
+			ZeroSpark.DisplayName: Spark
+			ZeroSparkExplosion.DisplayName: Spark
+			ZeroThornJuice.DisplayName: Thorn Juice
+			GigantSlash.DisplayName: Gigant Slash
+			BodyIce.DisplayName: Body Ice
+			BombExplosion.DisplayName: Jolly Bomb Explosion
+			NightCrownEffect.DisplayName: Night Crown Effect
+			CyclingStar.DisplayName: Cycling Star
+			BioSparkSlashHitbox.DisplayName: Slash
+			BioMinionSlashHitbox.DisplayName: Slash
+		}
+
+		NPCs: {
+			BioSpark.DisplayName: Bio Spark
+			Birdon.DisplayName: Birdon
+			BladeKnight.DisplayName: Blade Knight
+			BrontoBurt.DisplayName: Bronto Burt
+			BroomHatter.DisplayName: Broom Hatter
+			BurningLeo.DisplayName: Burning Leo
+			Cappy.DisplayName: Cappy
+			Chilly.DisplayName: Chilly
+
+			DarkMatter: {
+				DisplayName: Dark Matter
+
+				BossChecklistIntegration: {
+					SpawnInfo: Throw out a [i:5575] and right click towards it with a [i:5665].
+					DespawnMessage: The invader disappears to which it came...
+				}
+			}
+
+			Kabu.DisplayName: Kabu
+
+			KingDedede: {
+				DisplayName: King Dedede
+
+				BossChecklistIntegration: {
+					SpawnInfo: Use a [i:5576].
+					DespawnMessage: The gluttonous king gives up the chase...
+				}
+			}
+
+			KnuckleJoe.DisplayName: Knuckle Joe
+
+			Kracko: {
+				DisplayName: Kracko
+
+				BossChecklistIntegration: {
+					SpawnInfo: Kill a natural Kracko Jr. or use a [i:5613] to summon one.
+					DespawnMessage: Kracko floats back up into the heavens...
+				}
+			}
+
+			KrackoJr.DisplayName: Kracko Jr.
+			Bonkers.DisplayName: Bonkers
+			MrFrosty.DisplayName: Mr. Frosty
+			NightmareOrb.DisplayName: Power Orb
+
+			NightmareWizard: {
+				DisplayName: Nightmare
+
+				BossChecklistIntegration: {
+					SpawnInfo: Use a [i:5670] at a Fountain of Dreams during night.
+					DespawnMessage: It slips back into the shadows...
+				}
+			}
+
+			ParosolDee.DisplayName: Parasol Waddle Dee
+			PlasmaWisp.DisplayName: Plasma Wisp
+			PoppyBrosJr.DisplayName: Poppy Bros. Jr.
+			PureDarkMatter.DisplayName: Dark Matter
+			Scarfy.DisplayName: Scarfy
+			SirKibble.DisplayName: Sir Kibble
+			Twister.DisplayName: Twister
+			UFO.DisplayName: UFO
+			WaddleDee.DisplayName: Waddle Dee
+			WaddleDoo.DisplayName: Waddle Doo
+
+			Whispy: {
+				DisplayName: Whispy Woods
+
+				BossChecklistIntegration: {
+					SpawnInfo: Use a [i:5681].
+					DespawnMessage: Whispy Woods blends back in with it's bretheren...
+				}
+			}
+
+			WhispyRoot.DisplayName: Whispy Root
+
+			Zero: {
+				DisplayName: Zero
+
+				BossChecklistIntegration: {
+					SpawnInfo: Use a [i:5597] and prepare for what comes next.
+					DespawnMessage: The darkness clears...
+				}
+			}
+
+			ZeroEye.DisplayName: Eye of Zero
+			MidbossRift.DisplayName: Dimensional Rift
+		}
+
+		Tiles: {
+			BossTrophy.MapEntry: Trophy
+			EnemyBanner.MapEntry: Banner
+			FountainOfDreams.MapEntry: Fountain Of Dreams
+			RareStone.MapEntry: Rare Stone
+		}
+
+		Configs: {
+			KirbConfig: {
+				DisplayName: Kirb Config
+
+				HyperzoneClouds: {
+					Label: Enable Hyperzone Clouds
+					Tooltip: Enable or disable the clouds in the background of the Dark matter refight and Zero fight
+				}
+			}
+		}
+	}
+}

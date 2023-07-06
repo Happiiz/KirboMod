@@ -1,0 +1,364 @@
+using KirboMod.Items;
+using Microsoft.Xna.Framework;
+using System;
+using Terraria;
+using Terraria.Audio;
+using Terraria.ID;
+using Terraria.ModLoader;
+using Terraria.GameContent.Bestiary;
+using Terraria.GameContent.ItemDropRules;
+using SoundEngine = Terraria.Audio.SoundEngine;
+using KirboMod.Projectiles;
+using Terraria.ModLoader.Utilities;
+
+namespace KirboMod.NPCs.MidBosses
+{
+    [AutoloadBossHead]
+    public class Bonkers : ModNPC
+	{
+		private int attacktype = -1;
+		private int lastattack = 2;
+
+        public override void SetStaticDefaults()
+		{
+			// DisplayName.SetDefault("Bonkers");
+			Main.npcFrameCount[NPC.type] = 8;
+
+            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
+            {
+                //CustomTexturePath = "ExampleMod/Assets/Textures/Bestiary/MinionBoss_Preview",
+                PortraitScale = 1f, // Portrait refers to the full picture when clicking on the icon in the bestiary
+                PortraitPositionYOverride = 10f,
+                Position = new Vector2(40, 50),
+                PortraitPositionXOverride = 0,
+            };
+            NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
+        }
+
+		public override void SetDefaults()
+		{
+			NPC.width = 100;
+			NPC.height = 100;
+			DrawOffsetY = 70;
+			NPC.damage = Main.hardMode ? 100 : 50;
+			NPC.defense = 15;
+			NPC.lifeMax = Main.hardMode ? 2500 : 500;
+			NPC.HitSound = SoundID.NPCHit1;
+			NPC.DeathSound = SoundID.NPCDeath1;
+			NPC.value = Item.buyPrice(0, 0, 50, 0); // money it drops
+			NPC.knockBackResist = 0f; //how much knockback applies
+            Banner = NPC.type;
+            BannerItem = ModContent.ItemType<Items.Banners.BonkersBanner>();
+            NPC.aiStyle = -1; 
+			NPC.friendly = false;
+			NPC.noGravity = false;
+			NPC.rarity = 1; //1 is dungeon slime, 4 is mimic
+			NPC.lavaImmune = true;
+		}
+
+		public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */
+		{
+			/*(if (Main.hardMode)
+			{
+				NPC.lifeMax = (int)(NPC.lifeMax * 0.75f * balance);
+				NPC.damage = (int)(NPC.damage * 0.75f);
+			}*/
+		}
+
+		public override float SpawnChance(NPCSpawnInfo spawnInfo)
+		{
+            return 0f;
+        }
+
+        public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
+        {
+            // We can use AddRange instead of calling Add multiple times in order to add multiple items at once
+            bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
+            {
+				// Sets the spawning conditions of this NPC that is listed in the bestiary.
+				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Surface,
+
+				// Sets the description of this NPC that is listed in the bestiary.
+				new FlavorTextBestiaryInfoElement("A giant armored monkey that came from a strange star shaped rift, prepared to smash down on any threat that approaches with its hammer!")
+            });
+        }
+        public override void AI() //constantly cycles each time
+		{
+			NPC.spriteDirection = NPC.direction;
+			Player player = Main.player[NPC.target];
+
+			if (attacktype == -1)
+			{
+				Spawned();
+
+				if (NPC.velocity.Y == 0 && NPC.collideY) //touching tile and not falling
+				{
+					NPC.dontTakeDamage = false; //hittable
+					NPC.damage = NPC.defDamage; //regular damage
+					attacktype = 0; //start attack cycle
+				}
+			}
+			else
+			{
+				NPC.ai[0]++; //attack delay timer
+
+				if (NPC.ai[0] < 120) //not attacking
+				{
+					attacktype = 0; //walking
+				}
+				else
+				{
+					if (NPC.ai[0] == 120)
+					{
+						NPC.noTileCollide = false; //don't phase through tiles
+
+						if (lastattack == 2) //coconut was last
+						{
+							attacktype = 1; //hammer
+							lastattack = 1; //next is coconut
+						}
+						else
+						{
+							attacktype = 2; //coconut
+							lastattack = 2; //next is hammer
+						}
+					}
+
+					NPC.ai[1]++; //attack timer
+				}
+
+				if (player.dead) //player has died
+				{
+					attacktype = 0; //walk
+					NPC.ai[0] = 0;
+					NPC.ai[1] = 0;
+				}
+
+				//declaring attacktype values
+				if (attacktype == 0)
+				{
+					Walk();
+				}
+				if (attacktype == 1)
+				{
+					Hammer();
+				}
+				if (attacktype == 2)
+				{
+					ExplosiveCoconut();
+				}
+			}
+
+            //for stepping up tiles
+            Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
+        }
+
+		public override void FindFrame(int frameHeight) // animation
+		{
+            if (attacktype == -1) //just spawned
+            {
+                NPC.frame.Y = 0;
+            }
+            if (attacktype == 0) //walk
+			{
+				NPC.frameCounter += 1;
+				if (NPC.frameCounter < 10)
+				{
+					NPC.frame.Y = frameHeight; 
+				}
+				else if (NPC.frameCounter < 20)
+				{
+					NPC.frame.Y = frameHeight * 2; 
+				}
+				else
+				{
+                    NPC.frameCounter = 0;
+				}
+			}
+			else if (attacktype == 1) //hammer
+			{
+				if (NPC.ai[1] >= 60) //attacking
+				{
+					NPC.frame.Y = frameHeight * 4; //swing
+				}
+				else //stancing
+				{
+					NPC.frame.Y = frameHeight * 3; //ready hammer
+				}
+			}
+			else if (attacktype == 2) //cocunut
+			{
+				if (NPC.ai[1] >= 60) //attacking
+				{
+					NPC.frame.Y = frameHeight * 7; //toss
+				}
+                else if (NPC.ai[1] >= 30)
+                {
+                    NPC.frame.Y = frameHeight * 6; //hand behind back
+                }
+                else //stancing
+				{
+					NPC.frame.Y = frameHeight * 5; //hand behind back
+				}
+			}
+		}
+
+        private void Spawned() //do nothing
+        {
+            NPC.velocity.X *= 0.8f; //slow
+			NPC.dontTakeDamage = true; //immune
+			NPC.damage = 0; //dont deal damage
+        }
+
+        private void Walk() //walk towards player
+		{
+			Player player = Main.player[NPC.target];
+			if (player.dead == false)
+			{
+				NPC.TargetClosest(true);
+			}
+
+			CheckPlatform(player); //go down platforms when player is low
+
+            float speed = 4f; 
+			float inertia = 10f; //acceleration and decceleration speed
+
+            //we put this instead of player.Center so it will always be moving top speed instead of slowing down when player is near
+            Vector2 direction = NPC.Center + new Vector2(NPC.direction * 50, 0) - NPC.Center; //start - end 
+																							  
+			direction.Normalize();
+			direction *= speed;
+			NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
+
+            //tile in front of npc
+            if (NPC.collideX && NPC.velocity.Y == 0)
+            {
+                NPC.velocity.Y = -8; //jump over
+            }
+        }
+
+		private void Hammer() //slams hammer
+        {
+            Player player = Main.player[NPC.target];
+            Vector2 distance = player.Center - NPC.Center;
+
+            if (NPC.ai[1] < 60) //charge
+            {
+                NPC.TargetClosest(true); //face player
+                NPC.velocity.X *= 0.8f; //slow
+
+                if (NPC.ai[1] == 30 && distance.Y <= -100) //jump if player is high
+                {
+                    NPC.velocity.Y = -12; //jump
+                    NPC.noTileCollide = true;
+                }
+            }
+            else //slam
+            {
+				NPC.noTileCollide = false;
+
+                NPC.velocity.X *= 0.8f; //slow
+
+                if (NPC.ai[1] == 60) //unleash hammer
+                {
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 130, -10), NPC.velocity * 0.01f, 
+							ModContent.ProjectileType<BonkersSmash>(), NPC.damage / 4, 8f, Main.myPlayer, 0, 0);
+                    }
+
+                    SoundEngine.PlaySound(SoundID.Item1, NPC.Center); //we dont define the stuff after coordinates because legacy sound style
+                }
+                if (NPC.ai[1] >= 120) //restart
+                {
+                    NPC.ai[0] = 0;
+                    NPC.ai[1] = 0;
+                }
+            }
+        }
+
+		private void ExplosiveCoconut() //explosive coconut throw
+		{
+            Player player = Main.player[NPC.target];
+            Vector2 projshoot = player.Center - NPC.Center; //200 in the direction it's facing(doesn't have to be 200 because we normalize it)
+            projshoot.Normalize();
+            projshoot *= 10f;
+            NPC.velocity.X *= 0.8f; //slow
+
+            NPC.TargetClosest(true); //face player
+
+            if (NPC.ai[1] == 60) //climax
+            {
+                if (Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, projshoot.X, projshoot.Y - 5, ModContent.ProjectileType<ExplosiveCoconut>(), NPC.damage / 4, 0f, Main.myPlayer, 0, 0); //actual damage has to be divided by 2 (4 in this case because fuck you)
+                }
+                SoundEngine.PlaySound(SoundID.Item1, NPC.Center);
+            }
+            if (NPC.ai[1] >= 120) //restart
+            {
+                NPC.ai[1] = 0;
+                NPC.ai[0] = 0;
+            }
+        }
+
+        private void CheckPlatform(Player player) //trust me this is totally unique and original code and definitely not stolen from Spirit Mod's public source code(thx so much btw you don't know the hell I went through with this)
+        {
+            bool onplatform = true;
+            for (int i = (int)NPC.position.X; i < NPC.position.X + NPC.width; i += NPC.width / 4)
+            { //check tiles beneath the boss to see if they are all platforms
+                Tile tile = Framing.GetTileSafely(new Point((int)NPC.position.X / 16, (int)(NPC.position.Y + NPC.height + 8) / 16));
+                if (!TileID.Sets.Platforms[tile.TileType])
+                    onplatform = false;
+            }
+            if (onplatform && (NPC.Center.Y < player.position.Y - 75)) //if they are and the player is lower than the boss, temporarily let the boss ignore tiles to go through them
+            {
+                NPC.noTileCollide = true;
+            }
+            else
+            {
+                NPC.noTileCollide = false;
+            }
+        }
+
+        public override void ModifyNPCLoot(NPCLoot npcLoot)
+        {
+            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<Items.Weapons.Hammer>(), 1, 1)); // Guaranteed in all difficulties
+            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Starbit>(), 1, 24, 24));
+            npcLoot.Add(ItemDropRule.ByCondition(new Conditions.IsHardmode(), ModContent.ItemType<Items.RareStone>(), 1, 1, 1));
+        }
+
+        public override void HitEffect(NPC.HitInfo hit)
+		{
+			if (NPC.life <= 0)
+            {
+                for (int i = 0; i < 8; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+                {
+                    // go around in a octogonal pattern
+                    Vector2 speed = new Vector2((float)Math.Cos(MathHelper.ToRadians(i * 45)) * 20, (float)Math.Sin(MathHelper.ToRadians(i * 45)) * 20);
+
+                    Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.BoldStar>(), speed, Scale: 1.5f); //Makes dust in a messy circle
+                    d.noGravity = true;
+                }
+                for (int i = 0; i < 10; i++)
+				{
+					Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
+                    Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center, speed, Main.rand.Next(11, 13), Scale: 1.5f); //double jump smoke
+                }
+            }
+        }
+
+        public override void ModifyHoverBoundingBox(ref Rectangle boundingBox) //box where NPC name and health is shown
+        {
+            boundingBox = NPC.Hitbox;
+        }
+
+        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
+        {
+            position.Y = NPC.position.Y + NPC.height + 20;
+
+			return true;
+        }
+
+    }
+}
