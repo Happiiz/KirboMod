@@ -137,14 +137,14 @@ namespace KirboMod.NPCs
 				new FlavorTextBestiaryInfoElement("The more dangerous cousin of the Waddle Dee. Shoots out electric beams whenever it feels threatened.")
             });
         }
-
+		public bool SpawnedFromKracko { get => NPC.ai[1] == 1; }
         public override void AI() //constantly cycles each time
 		{
 			NPC.spriteDirection = NPC.direction;
 			Player player = Main.player[NPC.target];
 			Vector2 distance = player.Center - NPC.Center;
 
-			if (NPC.ai[1] == 1) //kracko doo
+			if (SpawnedFromKracko) //kracko doo
 			{
                 NPC.value = Item.buyPrice(0, 0, 0, 0); // money it dro- oh wait!
             }
@@ -273,7 +273,13 @@ namespace KirboMod.NPCs
 			NPC.velocity.X *= 0.9f;
 
 			Vector2 projshoot = new Vector2(NPC.direction * 8, (float)Math.Sin(45 - (NPC.ai[0] - 60) / 22.5f) * -5); //up and down starting from 30
+            if (SpawnedFromKracko)
+            {
+				float beamRangeVertical = Main.expertMode ? 15f : 8f;
+				float beamRangeHorizontal = Main.expertMode ? 20f : 12f;
+				projshoot = new Vector2(NPC.direction * beamRangeHorizontal, MathF.Sin(45 - (NPC.ai[0] - 60) / 10f) * -beamRangeVertical);
 
+			}
 			Vector2 startOffset = new Vector2(NPC.direction * 8, 0);
 
             if (NPC.ai[0] >= 60 & NPC.ai[0] <= 180) //attack window
@@ -304,7 +310,10 @@ namespace KirboMod.NPCs
 			{
                 NPC.TargetClosest(true);
 
-                float speed = 0.7f; //top speed
+                float speed = 0.8f;
+				speed *= SpawnedFromKracko ? 1.5f : 1f;
+				speed *= Main.expertMode ? 1.5f : 1f;
+				//top speed
                 float inertia = 20f; //acceleration and decceleration speed
 
                 //we put this instead of player.Center so it will always be moving top speed instead of slowing down when player is near
