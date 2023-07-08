@@ -56,5 +56,10 @@ namespace KirboMod.Projectiles
 		{
 			return Color.White * Projectile.Opacity; // Makes i uneffected by light
 		}
-	}
+
+        public override bool PreDraw(ref Color lightColor)
+        {
+            return base.PreDraw(ref lightColor);
+        }
+    }
 }
