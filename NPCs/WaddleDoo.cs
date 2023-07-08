@@ -138,7 +138,7 @@ namespace KirboMod.NPCs
             });
         }
 		public bool SpawnedFromKracko { get => NPC.ai[1] == 1; }
-        public override void AI() //constantly cycles each time
+		public override void AI() //constantly cycles each time
 		{
 			NPC.spriteDirection = NPC.direction;
 			Player player = Main.player[NPC.target];
@@ -146,31 +146,33 @@ namespace KirboMod.NPCs
 
 			if (SpawnedFromKracko) //kracko doo
 			{
-                NPC.value = Item.buyPrice(0, 0, 0, 0); // money it dro- oh wait!
-            }
-
-            bool lineOfSight = Collision.CanHitLine(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height);
-
-            if (distance.X < 120 & distance.X > -120 & distance.Y > -120 & distance.Y < 120 && lineOfSight && attacking == false) //checks if da doo is in range
-			{
-				NPC.ai[0] = 0; 
-                attacking = true;
+				NPC.value = Item.buyPrice(0, 0, 0, 0); // money it dro- oh wait!
 			}
-			
+
+			bool lineOfSight = Collision.CanHitLine(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height);
+
+			if (distance.X < 120 & distance.X > -120 & distance.Y > -120 & distance.Y < 120 && lineOfSight && attacking == false) //checks if da doo is in range
+			{
+				NPC.ai[0] = 0;
+				attacking = true;
+			}
+
 			//keep attacking if started
 			if (attacking == true)
-            {
+			{
 				Beam();
 			}
 			else
-            {
+			{
 				Walk();
 			}
 
 			//for stepping up tiles
-			Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
-		}
-
+			try {
+				Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
+			}
+            catch { }
+			}
 		public override void FindFrame(int frameHeight) // animation
 		{
 			if (attacking == false) //walking
@@ -271,15 +273,12 @@ namespace KirboMod.NPCs
             NPC.ai[0]++;
 
 			NPC.velocity.X *= 0.9f;
-
-			Vector2 projshoot = new Vector2(NPC.direction * 8, (float)Math.Sin(45 - (NPC.ai[0] - 60) / 22.5f) * -5); //up and down starting from 30
-            if (SpawnedFromKracko)
-            {
-				float beamRangeVertical = Main.expertMode ? 15f : 8f;
-				float beamRangeHorizontal = Main.expertMode ? 20f : 12f;
-				projshoot = new Vector2(NPC.direction * beamRangeHorizontal, MathF.Sin(45 - (NPC.ai[0] - 60) / 10f) * -beamRangeVertical);
-
-			}
+			float beamRange = 15;
+			if (Main.expertMode)
+				beamRange *= 1.5f;
+			if (SpawnedFromKracko)
+				beamRange *= 1.5f;
+			Vector2 projshoot = new Vector2(NPC.direction * beamRange, 0).RotatedBy(MathF.Sin((NPC.ai[0]  - 60) / 15f));
 			Vector2 startOffset = new Vector2(NPC.direction * 8, 0);
 
             if (NPC.ai[0] >= 60 & NPC.ai[0] <= 180) //attack window

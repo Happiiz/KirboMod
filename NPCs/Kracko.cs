@@ -16,7 +16,7 @@ namespace KirboMod.NPCs
 
         private int animation = 0;
 
-        private KrackoAttackType attacktype = KrackoAttackType.SpinningBeamOrbs; //decides the attack
+        private KrackoAttackType attacktype = KrackoAttackType.DecideNext; //decides the attack
         private int doodelay = 0;
         private float sweepheight = 0;
         private float sweepX = 0;
@@ -24,7 +24,7 @@ namespace KirboMod.NPCs
         float beamCurvingAngleMultiplier = 0.05f;
         int numberOfBeamsPerSpiral = 70;
         private sbyte attackDirection = 1;
-        private KrackoAttackType lastattacktype = KrackoAttackType.Sweep; //sets last attack type
+        private KrackoAttackType lastattacktype = KrackoAttackType.DecideNext; //sets last attack type
         private bool transitioning = false; //checks if going through expert mode exclusive phase
         private bool frenzy = false; //checks if going in frenzy mode in expert mode
 
@@ -68,14 +68,15 @@ namespace KirboMod.NPCs
                     return;
                 }
             }
-            else if (transitioning == true && (NPC.ai[2] > 180) == false) //TRANSITION TO PHASE 2
+            else if (transitioning == true && NPC.ai[2] <= 180) //TRANSITION TO PHASE 2
             {
                 NPC.ai[2]++;
                 NPC.velocity *= 0.0001f; //stop
 
                 if (NPC.ai[2] < 180)
                 {
-                    NPC.rotation += MathHelper.ToRadians(4f); //rotate (in degrees)
+                    float transitionProgress = Utils.GetLerpValue(0, 180, NPC.ai[2]);
+                    NPC.rotation = Easings.EaseInOutSine(transitionProgress) * 6 * MathF.Tau; //rotate (in degrees)
 
                     if (NPC.ai[2] % 5 == 0) //every multiple of 5
                     {
@@ -107,38 +108,9 @@ namespace KirboMod.NPCs
         private void AttackPattern()
         {
             Player player = Main.player[NPC.target];
-            Vector2 distance = player.Center - NPC.Center; //start - end
-            Vector2 distanceOverPlayer = player.Center + new Vector2(0, -200) - NPC.Center;
-            Vector2 distanceBelowPlayer = player.Center + new Vector2(0, 200) - NPC.Center;
-
-            Vector2 distanceDiagonalUpOfPlayer = player.Center + new Vector2(400 * attackDirection, -400) - NPC.Center;
-
-            Vector2 distanceLeftOfPlayer = player.Center + new Vector2(-400, 0) - NPC.Center;
-            Vector2 distanceRightOfPlayer = player.Center + new Vector2(400, 0) - NPC.Center;
-
             NPC.ai[0]++;
-
-            if (NPC.ai[0] == (!frenzy ? 15 : 60)) //changes depending or not in frenzy
-            {
-                if (doodelay == 1) //summon (multiplayer syncing stuff is because spawning npc)
-                {
-                    if (Main.netMode != NetmodeID.MultiplayerClient)
-                    {
-                        int index = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y, Mod.Find<ModNPC>("WaddleDoo").Type, 0, 0, 1, 0, 0, NPC.target);
-
-                        if (Main.netMode == NetmodeID.Server && index < Main.maxNPCs)
-                        {
-                            NetMessage.SendData(MessageID.SyncNPC, number: index);
-                        }
-                    }
-                    doodelay = 0; //reset
-                }
-                else
-                {
-                    doodelay += 1; //next turn will summon 
-                }
-            }
-            float attackEnd = 0;
+            //AttackSpawnDoo();
+            float attackEnd = float.MaxValue;
             switch (attacktype)
             {
                 case KrackoAttackType.DecideNext:
@@ -159,6 +131,30 @@ namespace KirboMod.NPCs
             }
             if (NPC.ai[0] >= attackEnd) //end          
                 ResetVarsForNextAttack();
+        }
+
+        private void AttackSpawnDoo()
+        {
+            if (NPC.ai[0] == (!frenzy ? 15 : 60)) //changes depending or not in frenzy
+            {
+                if (doodelay == 1) //summon (multiplayer syncing stuff is because spawning npc)
+                {
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        int index = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y, Mod.Find<ModNPC>("WaddleDoo").Type, 0, 0, 1, 0, 0, NPC.target);
+
+                        if (Main.netMode == NetmodeID.Server && index < Main.maxNPCs)
+                        {
+                            NetMessage.SendData(MessageID.SyncNPC, number: index);
+                        }
+                    }
+                    doodelay = 0; //reset
+                }
+                else
+                {
+                    doodelay += 1; //next turn will summon 
+                }
+            }
         }
 
         void AttackDecideNext()
@@ -186,10 +182,28 @@ namespace KirboMod.NPCs
             float moveStart = 40;
             float moveEnd = 180;
             float sweepStart = 180;
-            float sweepEnd = 280;
-            float sweepDepth = 14;
-            float sweepHorizontalSpeed = 14f;
-            float attackEnd = 290;
+            float sweepEnd = 270;
+            float sweepY = 1700;
+            float sweepX = 1700;
+            float sweepDuration = sweepEnd - sweepStart;
+
+            if (Main.expertMode)
+            {
+                sweepDuration *= 0.75f;
+                speed *= 1.5f;
+                inertia *= 1.5f;
+                if (frenzy)
+                {
+                    speed *= 1.5f;
+                    inertia *= 1.5f;
+                    sweepDuration *= 0.75f;
+                }
+                sweepEnd = sweepStart + sweepDuration;
+            }
+            sweepY /= sweepDuration;
+            sweepX /= sweepDuration;
+                                                                                                      //compensate for it losing overall distance travelled by accelerating and decelerating
+            Vector2 targetPos = player.Center + new Vector2(sweepX * sweepDuration * 0.5f * attackDirection - (attackDirection * sweepX * 5), -400);
             float sweepProgress = Utils.GetLerpValue(sweepStart, sweepEnd, NPC.ai[0]);
             if (NPC.ai[0] >= moveStart && NPC.ai[0] < moveEnd) //go to top left or right
             {
@@ -199,7 +213,6 @@ namespace KirboMod.NPCs
                 }
                 else //move
                 {
-                    Vector2 targetPos = player.Center + new Vector2(650 * attackDirection, -400);
                     Vector2 distanceDiagonalOfPlayer = targetPos - NPC.Center;
                     distanceDiagonalOfPlayer.Normalize();
                     distanceDiagonalOfPlayer *= speed;
@@ -214,14 +227,14 @@ namespace KirboMod.NPCs
             if (sweepProgress >= 0 && sweepProgress <= 1)
             {
                 Vector2 vel = new(-attackDirection, MathF.Cos(sweepProgress * MathF.PI));
-                vel.Y *= sweepDepth;
-                vel.X *= sweepHorizontalSpeed;
+                vel.Y *= sweepY;
+                vel.X *= sweepX;
                 float easingThing = Utils.GetLerpValue(sweepStart, sweepStart + 10, NPC.ai[0], true) * Utils.GetLerpValue(sweepEnd, sweepEnd - 10, NPC.ai[0], true);
                 vel *= easingThing;
                 NPC.Center += vel;
             }
 
-            return attackEnd;
+            return sweepEnd;
         }
 
         float AttackBeam()
@@ -282,7 +295,7 @@ namespace KirboMod.NPCs
             float moveStart = 0f;
             float moveEnd = 100;
             float dashStart = 100;
-            float dashEnd = 200f;
+            float dashEnd = 250;
             float dashDuration = dashEnd - dashStart;
             if (frenzy)
             {
@@ -339,21 +352,19 @@ namespace KirboMod.NPCs
         }
         float AttackLightning()
         {
-            float speed = 15f;
+            float speed = 25f;
             float inertia = 5f;
-            float thunderSlideSpeed = 10;
+            float thunderSlideSpeed = 13;
             float moveStart = 0;
-            float moveEnd = 100;
-            float attackStart = 100;
-            float attackEnd = 200;
+            float moveEnd = 80;
+            float attackStart = 80;
+            float attackEnd = 180;
             float attackDuration = attackEnd - attackStart;
             if (frenzy)
             {
-                attackStart -= 40;
-                moveEnd -= 40;
-                thunderSlideSpeed = 10;
+                thunderSlideSpeed *= 1.6f;
                 speed *= 2;
-                attackDuration = MathF.Round(attackDuration * 0.6f);
+                attackDuration = MathF.Round(attackDuration * 0.65f);
                 attackEnd = attackStart + attackDuration;
             }
             if (NPC.ai[0] >= moveStart && NPC.ai[0] < attackStart)
@@ -373,22 +384,28 @@ namespace KirboMod.NPCs
                 }
                 else //move
                 {
-                    Vector2 targetPos = Main.player[NPC.target].Center + new Vector2(400 * attackDirection, -400);
-                    NPC.velocity = (NPC.velocity * (inertia - 1) + GetDistanceDiagonalUpOfPlayerNormalizedMulipliedBySpeed(speed)) / inertia; //go above left of player
-                    if (NPC.DistanceSQ(targetPos) < 20)//cancel movement early if reached target pos
-                    {
-                        NPC.ai[0] = moveEnd;
-                    }
+                    Vector2 targetPos = Main.player[NPC.target].Center + new Vector2(650 * attackDirection, -400);
+                    Vector2 distanceDiagonalRightOfPlayer = targetPos - NPC.Center;
+                    distanceDiagonalRightOfPlayer.Normalize();
+                    distanceDiagonalRightOfPlayer *= speed;
+                    NPC.velocity = (NPC.velocity * (inertia - 1) + distanceDiagonalRightOfPlayer) / inertia; //go above left of player
+                    //if (NPC.DistanceSQ(targetPos) < 20)//cancel movement early if reached target pos
+                    //{
+                    //    NPC.ai[0] = moveEnd;
+                    //}
                 }
 
             }
             if (NPC.ai[0] >= attackStart) //for 120 ticks dash across screen(if on it)
             {
-                NPC.velocity.X = -attackDirection * thunderSlideSpeed * Utils.GetLerpValue(attackStart - 1, attackStart + 9, NPC.ai[0], true) * Utils.GetLerpValue(attackEnd + 1, attackEnd - 12, NPC.ai[0], true);
-                if (NPC.ai[0] % 4 == 0 && Main.netMode != NetmodeID.MultiplayerClient)
+                float easingMultiplier = Utils.GetLerpValue(attackStart - 1, attackStart + 9, NPC.ai[0], true) * Utils.GetLerpValue(attackEnd + 1, attackEnd - 12, NPC.ai[0], true);
+                int fireRate = frenzy ? 2 : 4;
+                NPC.velocity.Y = 0;
+                NPC.velocity.X = -attackDirection * thunderSlideSpeed * easingMultiplier;
+                if (NPC.ai[0] % fireRate == 0 && Main.netMode != NetmodeID.MultiplayerClient && easingMultiplier == 1)
                 {//												offset down a bit so it lookslike it's coming out below kracko
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y + 100, 0, 5.5f, ModContent.ProjectileType<KrackoLightning>(), 25 / 2, 2f, Main.myPlayer, 0, 0);
-                    SoundEngine.PlaySound(SoundID.Thunder, NPC.Center);
+                    SoundEngine.PlaySound(SoundID.Thunder with { MaxInstances = 0 }, NPC.Center);
                 }
             }
 

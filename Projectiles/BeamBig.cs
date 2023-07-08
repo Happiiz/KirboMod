@@ -89,7 +89,7 @@ namespace KirboMod.Projectiles
 			randScale *= 0.15f;
 		
 			Main.EntitySpriteDraw(VFX.Ring, Projectile.Center - Main.screenPosition, null, RndElectricCol with { A = 0} * 0.8f, randRot, VFX.Ring.Size() / 2, randScale, SpriteEffects.None);
-			Main.EntitySpriteDraw(VFX.Circle, Projectile.Center - Main.screenPosition, null, RndElectricCol with { A = 0 }* 0.35f, randRot, VFX.Circle.Size() / 2, randScale * 1.8f, SpriteEffects.None);
+			Main.EntitySpriteDraw(VFX.Circle, Projectile.Center - Main.screenPosition, null, RndElectricCol with { A = 0 } * 0.25f, randRot, VFX.Circle.Size() / 2, randScale * 1.8f, SpriteEffects.None);
 			VFX.DrawPrettyStarSparkle(Projectile.Opacity, Projectile.Center - Main.screenPosition + randomOffset, new Color(255, 255, 255, 0), possibleColors[Main.rand.Next(possibleColors.Length)], 1, 0, 1, 1, 2, Projectile.rotation, sparkleScale, fatness);
 			return false;
         }

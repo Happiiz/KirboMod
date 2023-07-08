@@ -146,15 +146,9 @@ namespace KirboMod.NPCs
 
 				return new Color(darkness, darkness, darkness); //darken for thunder
 			}
-			else if (attacktype == KrackoAttackType.Lightning && NPC.ai[0] >= 60 && frenzy) //frenzy
+			else if (attacktype == KrackoAttackType.Lightning && NPC.ai[0] >= 10 && frenzy) //frenzy
 			{
-				int darkness = 255 - (((int)NPC.ai[0] - 60) * 18); //subtract 18 from the value each time
-
-				if (darkness < 64) //minimum
-				{
-					darkness = 64;
-				}
-
+				int darkness = (int)Utils.Remap(NPC.ai[0], 30, 60, 255, 60);
 				return new Color(darkness, darkness, darkness); //darken for thunder
 			}
 			else
