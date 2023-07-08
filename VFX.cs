@@ -14,6 +14,13 @@ namespace KirboMod
 {
     public class VFX : ModSystem
     {
+        public static void LoadTextures()
+        {
+            Circle = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/CirclePremultiplied").Value;
+            Ring = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/RingPremultiplied").Value;
+            GlowBall = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowBallPremultiplied").Value;
+
+        }
         public static Texture2D Circle;
 
         public static Texture2D GlowBall;
@@ -22,11 +29,7 @@ namespace KirboMod
 
         public override void Load()
         {
-            Circle = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/CirclePremultiplied").Value;
-
-            GlowBall = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowBallPremultiplied").Value;
-
-            Ring = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/RingPremultiplied").Value;
+            LoadTextures();
         }
         /// <summary>
         /// 
@@ -49,7 +52,7 @@ namespace KirboMod
             Color bigShineColor = shineColor * opacity;
             bigShineColor.A = 0;
             Vector2 origin = texture.Size() / 2f;
-            Color smallShineColor = drawColor;
+            Color smallShineColor = drawColor * opacity;
             float brightness = Utils.GetLerpValue(fadeInStart, fadeInEnd, flareCounter, clamped: true) * Utils.GetLerpValue(fadeOutEnd, fadeOutStart, flareCounter, clamped: true);
             Vector2 scaleY = new Vector2(fatness.X * 0.5f, scale.X) * brightness;
             Vector2 scaleX = new Vector2(fatness.Y * 0.5f, scale.Y) * brightness;

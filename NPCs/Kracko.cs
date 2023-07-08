@@ -138,8 +138,33 @@ namespace KirboMod.NPCs
                     doodelay += 1; //next turn will summon 
                 }
             }
-                                                            //10 attack delay during frenzy, 70 during frenzy
-            if (attacktype == KrackoAttackType.DecideNext && NPC.ai[0] >= (!frenzy ? 70 : 10) && Main.netMode != NetmodeID.MultiplayerClient) //choose attack randomly(faster is frenzying)
+            float attackEnd = 0;
+            switch (attacktype)
+            {
+                case KrackoAttackType.DecideNext:
+                    AttackDecideNext();
+                    break;
+                case KrackoAttackType.SpinningBeamOrbs:
+                    attackEnd = AttackBeam();
+                    break;
+                case KrackoAttackType.Sweep:
+                    attackEnd = AttackSweep(player);
+                    break;
+                case KrackoAttackType.Dash:
+                    attackEnd = AttackDash();
+                    break;
+                case KrackoAttackType.Lightning:
+                    attackEnd = AttackLightning();
+                    break;
+            }
+            if (NPC.ai[0] >= attackEnd) //end          
+                ResetVarsForNextAttack();
+        }
+
+        void AttackDecideNext()
+        {
+            //10 attack delay during frenzy, 70 during frenzy
+            if (NPC.ai[0] >= (!frenzy ? 70 : 10)) //choose attack randomly(faster is frenzying)
             {
                 attackDirection = (sbyte)(Main.rand.NextBool() ? 1 : -1); //right or left
                 List<KrackoAttackType> possibleAttacks = new() { KrackoAttackType.SpinningBeamOrbs, KrackoAttackType.Sweep, KrackoAttackType.Dash };
@@ -149,393 +174,239 @@ namespace KirboMod.NPCs
                 possibleAttacks.TrimExcess();
                 attacktype = possibleAttacks[Main.rand.Next(possibleAttacks.Count)];
                 lastattacktype = attacktype;
-                attacktype = KrackoAttackType.SpinningBeamOrbs;//DEBUG LINE DELETE THIS LATER
+                NPC.ai[0] = 0;
                 NPC.netUpdate = true;
-            }
-            if (attacktype == KrackoAttackType.DecideNext)
-                return;//don't execute everything else
-            if (frenzy == false) //normal cycle
-            {
-                if (attacktype == KrackoAttackType.SpinningBeamOrbs) //beams
-                {
-                    GetSpinningOrbVars(out float speed, out float inertia, out float moveStart, out float moveStop, out float beamStart, out float beamEnd);
-                    if (NPC.ai[0] >= moveStart && NPC.ai[0] < moveStop)
-                    {
-                        if (NPC.ai[0] >= moveStop - 1) //stop
-                        {
-                            NPC.velocity *= 0.0001f;
-                        }
-                        else //move
-                        {
-                            distanceOverPlayer.Normalize();
-                            distanceOverPlayer *= speed;
-                            NPC.velocity = (NPC.velocity * (inertia - 1) + distanceOverPlayer) / inertia; //go above player
-                        }
-                    }
-                    if (NPC.ai[0] >= beamStart && NPC.ai[0] < beamEnd) //120 ticks 
-                    {
-                        SpawnBeam(numberOfBeamsPerSpiral, beamStart);
-                        if (NPC.ai[0] == beamStart || NPC.ai[0] == beamStart + 60)//sound length
-                        {
-                            SoundEngine.PlaySound(SoundID.Item93, NPC.Center);
-                        }
-                    }
-                    if (NPC.ai[0] >= beamEnd)
-                    {
-                        NPC.ai[0] = 0;
-                        NPC.netUpdate = true;
-                    }
-                }
-                if (attacktype == KrackoAttackType.Sweep) //sweep
-                {
-                    float speed = 20f;
-                    float inertia = 5f;
-                    float moveStart = 40;
-                    float moveEnd = 180;
-                    float sweepStart = 180;
-                    float sweepEnd = 280;
-                    float sweepDuration = sweepEnd - sweepStart;
-                    float sweepDepth = 14;
-                    float sweepHorizontalSpeed = 14f;
-                    float attackEnd = 290;
-                    Main.NewText(attackDirection);
-                    float sweepProgress = Utils.GetLerpValue(sweepStart, sweepEnd, NPC.ai[0]);
-                    if (NPC.ai[0] >= moveStart && NPC.ai[0] < moveEnd) //go to top left or right
-                    {
-                        if (NPC.ai[0] >= moveEnd - 1) //stop
-                        {
-                            NPC.velocity *= 0.0001f;
-                        }
-                        else //move
-                        {
-                            Vector2 targetPos = player.Center + new Vector2(650 * attackDirection, -400);
-                            Vector2 distanceDiagonalOfPlayer = targetPos - NPC.Center;
-                            distanceDiagonalOfPlayer.Normalize();
-                            distanceDiagonalOfPlayer *= speed;
-                            NPC.velocity = (NPC.velocity * (inertia - 1) + distanceDiagonalOfPlayer) / inertia;
-                            if (NPC.DistanceSQ(targetPos) < 20 && NPC.ai[0] < sweepStart - 20)
-                            {
-                                NPC.ai[0] = sweepStart - 20;//if has reached the target position, start the sweep up to 20 frames earlier than usual
-                                NPC.velocity *= 0.0001f;
-                            }
-                        }
-                    }
-                    if (sweepProgress >= 0 && sweepProgress <= 1)
-                    {
-                        Vector2 vel = new(-attackDirection, MathF.Cos(sweepProgress * MathF.PI));
-                        vel.Y *= sweepDepth;
-                        vel.X *= sweepHorizontalSpeed;
-                        float easingThing = Utils.GetLerpValue(sweepStart, sweepStart + 10, NPC.ai[0], true) * Utils.GetLerpValue(sweepEnd,  sweepEnd - 10, NPC.ai[0], true);
-                        vel *= easingThing;
-                        NPC.Center += vel;
-                    }
-                    if (NPC.ai[0] >= attackEnd)
-                    {
-                        NPC.velocity *= 0;
-                        NPC.ai[0] = 0;
-                        attacktype = KrackoAttackType.DecideNext;
-                    }
-                }
-                if (attacktype == KrackoAttackType.Dash) //dash
-                {
-                    if (NPC.ai[0] >= 120 && NPC.ai[0] < 180) //go to right
-                    {
-                        if (NPC.ai[0] >= 179) //stop
-                        {
-                            NPC.velocity *= 0.0001f;
-                        }
-                        else //move
-                        {
-                            float speed = 20f;
-                            float inertia = 5f;
-
-                            if (attackDirection == 2) //left
-                            {
-                                distanceLeftOfPlayer.Normalize();
-                                distanceLeftOfPlayer *= speed;
-                                NPC.velocity = (NPC.velocity * (inertia - 1) + distanceLeftOfPlayer) / inertia; //go of player
-                            }
-                            else if (attackDirection == 1) //right
-                            {
-                                distanceRightOfPlayer.Normalize();
-                                distanceRightOfPlayer *= speed;
-                                NPC.velocity = (NPC.velocity * (inertia - 1) + distanceRightOfPlayer) / inertia; //go right of player
-                            }
-                        }
-                    }
-                    if (NPC.ai[0] >= 200 && NPC.ai[0] < 230) //30 ticks
-                    {
-                        if (attackDirection == 2) //left of player
-                        {
-                            NPC.velocity.X -= 0.2f; //backup left
-                        }
-                        else if (attackDirection == 1) //right of player
-                        {
-                            NPC.velocity.X += 0.2f; //backup right
-                        }
-                    }
-                    if (NPC.ai[0] == 230)
-                    {
-                        //choose direction to dash
-                        if (attackDirection == 2) //left of player
-                        {
-                            NPC.velocity.X = 40; //dash right
-                        }
-                        else if (attackDirection == 1) //right of player
-                        {
-                            NPC.velocity.X = -40; //dash left
-                        }
-
-                        NPC.velocity.Y = 0;
-                    }
-
-                    if (NPC.ai[0] > 230) //dash for 75 ticks
-                    {
-                        NPC.velocity.X *= 0.95f;
-                    }
-
-                    if (NPC.ai[0] >= 305)
-                    {
-                        NPC.velocity *= 0.0001f;
-                        NPC.ai[0] = 0;
-                    }
-                }
-                if (attacktype == KrackoAttackType.Lightning) //thunder
-                {
-                    float thunderSlideSpeed = 10;
-                    float moveStart = 120;
-                    float moveEnd = 180;
-                    float attackStart = 240;
-                    float attackEnd = 360;
-                    if (NPC.ai[0] % 5 == 0 && NPC.ai[0] >= 120 && NPC.ai[0] < 240) //multiple of 5
-                    {
-                        for (int i = 0; i < 6; i++) //make bursts of electricity for warning
-                        {
-                            Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-                            Dust d = Dust.NewDustPerfect(NPC.position + new Vector2(Main.rand.Next(0, NPC.width), Main.rand.Next(0, NPC.height)), DustID.Electric, speed, Scale: 1f); //Makes dust in a messy circle
-                            d.noGravity = true;
-                        }
-                    }
-                    if (NPC.ai[0] >= 120 && NPC.ai[0] < 180)
-                    {
-                        if (NPC.ai[0] >= 179) //stop
-                        {
-                            NPC.velocity *= 0.0001f;
-                        }
-                        else //move
-                        {
-                            float speed = 15f;
-                            float inertia = 5f;
-                            NPC.velocity = (NPC.velocity * (inertia - 1) + GetDistanceDiagonalUpOfPlayerNormalizedMulipliedBySpeed(speed)) / inertia; //go above left of player
-                        }
-                    }
-                    if (NPC.ai[0] >= attackStart) //for 120 ticks dash across screen(if on it)
-                    {
-                        NPC.velocity.X = -attackDirection * thunderSlideSpeed * Utils.GetLerpValue(attackStart - 1, attackStart + 9, NPC.ai[0], true) * Utils.GetLerpValue(attackEnd + 1, attackEnd - 12, NPC.ai[0], true);
-                        if (NPC.ai[0] % 4 == 0 && Main.netMode != NetmodeID.MultiplayerClient)
-                        {//												offset down a bit so it lookslike it's coming out below them
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y + 100, 0, 5.5f, ModContent.ProjectileType<KrackoLightning>(), 25 / 2, 2f, Main.myPlayer, 0, 0);
-                            SoundEngine.PlaySound(SoundID.Thunder, NPC.Center);
-                        }
-                    }
-                    if (NPC.ai[0] >= attackEnd) //end
-                    {
-                        NPC.velocity *= 0;
-                        NPC.ai[0] = 0;
-                    }
-                }
-            }
-            else if (frenzy == true) //hardened cycle
-            {
-                if (attacktype == KrackoAttackType.Sweep) //sweep
-                {
-                    if (NPC.ai[0] >= 60 && NPC.ai[0] < 90) //go to top left or right
-                    {
-                        if (NPC.ai[0] >= 89) //stop
-                        {
-                            NPC.velocity *= 0.0001f;
-                        }
-                        else //move
-                        {
-                            NPC.velocity = GetDistanceDiagonalUpOfPlayerNormalizedMulipliedBySpeed(40);
-                        }
-                    }
-
-                    if (NPC.ai[0] >= 90 && NPC.ai[0] < 105) //15 ticks
-                    {
-                        NPC.velocity.Y -= 0.2f;
-
-                        if (NPC.ai[0] == 90)
-                        {
-                            sweepX = distanceBelowPlayer.X / 20;
-                            sweepY = distanceBelowPlayer.Y / 20;
-                        }
-                    }
-                    if (NPC.ai[0] == 105)
-                    {
-                        //target below to give player chance to jump over
-                        NPC.velocity.X = sweepX;
-
-                        NPC.velocity.Y = sweepY;
-
-                        //caps(most doubled)
-                        if (NPC.velocity.X > 60)
-                        {
-                            NPC.velocity.X = 60;
-                        }
-                        if (NPC.velocity.X < -60)
-                        {
-                            NPC.velocity.X = -60;
-                        }
-                        if (NPC.velocity.Y < 5)
-                        {
-                            NPC.velocity.Y = 5;
-                        }
-                        if (NPC.velocity.Y > 60)
-                        {
-                            NPC.velocity.Y = 60;
-                        }
-
-                        sweepheight = NPC.velocity.Y;
-                    }
-
-                    if (NPC.ai[0] > 105) //sweep for 50 ticks
-                    {
-                        NPC.velocity.Y -= sweepheight / 25;
-                    }
-
-                    if (NPC.ai[0] >= 155)
-                    {
-                        NPC.velocity *= 0;
-                        NPC.ai[0] = 0;
-                    }
-                }
-                if (attacktype == KrackoAttackType.Dash) //dash
-                {
-                    if (NPC.ai[0] >= 60 && NPC.ai[0] < 90) //30 ticks
-                    {
-                        if (NPC.ai[0] >= 89) //stop
-                        {
-                            NPC.velocity *= 0.0001f;
-                        }
-                        else //move
-                        {
-                            if (attackDirection == 2) //left
-                            {
-                                NPC.velocity = distanceLeftOfPlayer / 10;
-                            }
-                            else if (attackDirection == 1) //right
-                            {
-                                NPC.velocity = distanceRightOfPlayer / 10;
-                            }
-                        }
-                    }
-                    if (NPC.ai[0] >= 90 && NPC.ai[0] < 105) //15 ticks
-                    {
-                        if (attackDirection == 2) //left of player
-                        {
-                            NPC.velocity.X -= 0.2f; //backup left
-                        }
-                        else if (attackDirection == 1) //right of player
-                        {
-                            NPC.velocity.X += 0.2f; //backup right
-                        }
-                        NPC.velocity.X += attackDirection * 0.2f;
-                    }
-                    if (NPC.ai[0] == 105)
-                    {
-                        NPC.velocity = new Vector2(-60 * attackDirection, 0);
-                    }
-                    if (NPC.ai[0] > 105) //dash for 50 ticks
-                    {
-                        NPC.velocity.X *= 0.92f;
-                    }
-
-                    if (NPC.ai[0] >= 155)
-                    {
-                        NPC.velocity *= 0.0001f;
-                        NPC.ai[0] = 0;
-                    }
-                }
-                if (attacktype == KrackoAttackType.Lightning) //thunder
-                {
-                    if (NPC.ai[0] % 5 == 0 && NPC.ai[0] >= 60 && NPC.ai[0] < 120) //multiple of 5
-                    {
-                        for (int i = 0; i < 6; i++) //make bursts of electricity for warning
-                        {
-                            Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-                            Dust d = Dust.NewDustPerfect(NPC.position + new Vector2(Main.rand.Next(0, NPC.width), Main.rand.Next(0, NPC.height)), DustID.Electric, speed, Scale: 1f); //Makes dust in a messy circle
-                            d.noGravity = true;
-                        }
-                    }
-
-                    if (NPC.ai[0] >= 60 && NPC.ai[0] < 90)
-                    {
-                        if (NPC.ai[0] >= 89) //stop
-                        {
-                            NPC.velocity *= 0.0001f;
-                        }
-                        else //move
-                        {
-                            NPC.velocity = GetDistanceDiagonalUpOfPlayerNormalizedMulipliedBySpeed(40);
-                        }
-                    }
-                    if (NPC.ai[0] >= 120) //for 30 ticks dash across screen(if on it)
-                    {
-                        //choose direction to dash
-                        if (attackDirection == 2) //left of player
-                        {
-                            NPC.velocity.X = 20; //move right
-                        }
-                        else if (attackDirection == 1) //right of player
-                        {
-                            NPC.velocity.X = -20; //move left
-                        }
-
-                        if (NPC.ai[0] % 6 == 0 && Main.netMode != NetmodeID.MultiplayerClient)
-                        {
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, 0, 5.5f, Mod.Find<ModProjectile>("KrackoLightning").Type, 25 / 2, 2f, Main.myPlayer, 0, 0);
-                            SoundEngine.PlaySound(SoundID.Item122, NPC.Center);
-                        }
-                    }
-                    if (NPC.ai[0] >= 150) //end
-                    {
-                        NPC.velocity *= 0.0001f;
-                        NPC.ai[0] = 0;
-                    }
-                }
             }
         }
 
-        private void GetSpinningOrbVars(out float speed, out float inertia, out float moveStart, out float moveStop, out float beamStart, out float beamEnd)
+        private float AttackSweep(Player player)
         {
-            speed = 15f;
-            inertia = 5f;
-            moveStart = 120;
-            moveStop = 180;
-            beamStart = 240;
-            beamEnd = 360;
+            float speed = 20f;
+            float inertia = 5f;
+            float moveStart = 40;
+            float moveEnd = 180;
+            float sweepStart = 180;
+            float sweepEnd = 280;
+            float sweepDepth = 14;
+            float sweepHorizontalSpeed = 14f;
+            float attackEnd = 290;
+            float sweepProgress = Utils.GetLerpValue(sweepStart, sweepEnd, NPC.ai[0]);
+            if (NPC.ai[0] >= moveStart && NPC.ai[0] < moveEnd) //go to top left or right
+            {
+                if (NPC.ai[0] >= moveEnd - 1) //stop
+                {
+                    NPC.velocity *= 0.0001f;
+                }
+                else //move
+                {
+                    Vector2 targetPos = player.Center + new Vector2(650 * attackDirection, -400);
+                    Vector2 distanceDiagonalOfPlayer = targetPos - NPC.Center;
+                    distanceDiagonalOfPlayer.Normalize();
+                    distanceDiagonalOfPlayer *= speed;
+                    NPC.velocity = (NPC.velocity * (inertia - 1) + distanceDiagonalOfPlayer) / inertia;
+                    if (NPC.DistanceSQ(targetPos) < 20 && NPC.ai[0] < sweepStart - 20)
+                    {
+                        NPC.ai[0] = sweepStart - 20;//if has reached the target position, start the sweep up to 20 frames earlier than usual
+                        NPC.velocity *= 0.0001f;
+                    }
+                }
+            }
+            if (sweepProgress >= 0 && sweepProgress <= 1)
+            {
+                Vector2 vel = new(-attackDirection, MathF.Cos(sweepProgress * MathF.PI));
+                vel.Y *= sweepDepth;
+                vel.X *= sweepHorizontalSpeed;
+                float easingThing = Utils.GetLerpValue(sweepStart, sweepStart + 10, NPC.ai[0], true) * Utils.GetLerpValue(sweepEnd, sweepEnd - 10, NPC.ai[0], true);
+                vel *= easingThing;
+                NPC.Center += vel;
+            }
+
+            return attackEnd;
+        }
+
+        float AttackBeam()
+        {
+            Vector2 distanceOverPlayer = Main.player[NPC.target].Center + new Vector2(0, -200) - NPC.Center;
+            float speed = 15f;
+            float inertia = 5f;
+            float moveStart = 0;
+            float moveStop = 70;
+            float beamStart = 80;
+            float beamEnd = 380;
             if (frenzy)
             {
                 speed = 30;
                 inertia = 3;
-                moveStart = 60;
-                moveStop = 90;
-                beamStart = 120;
-                beamEnd = 180;
+                moveStart = 0;
+                moveStop = 50;
+                beamStart = 50;
+                beamEnd = 350;
             }
+            if (NPC.ai[0] >= moveStart && NPC.ai[0] < moveStop)
+            {
+                if (NPC.ai[0] >= moveStop - 1) //stop
+                {
+                    NPC.velocity *= 0.0001f;
+                }
+                else //move
+                {
+                    distanceOverPlayer.Normalize();
+                    distanceOverPlayer *= speed;
+                    NPC.velocity = (NPC.velocity * (inertia - 1) + distanceOverPlayer) / inertia; //go above player
+                }
+            }
+            if (NPC.ai[0] >= beamStart && NPC.ai[0] < beamEnd) //120 ticks 
+            {
+                SpawnBeam(numberOfBeamsPerSpiral, beamStart);
+                if (NPC.ai[0] == beamStart || (NPC.ai[0] - beamStart) % 34 == 0)// 34 is sound length
+                {
+                    SoundEngine.PlaySound(SoundID.Item93 with { MaxInstances = 0 }, NPC.Center);
+                }
+            }
+            return beamEnd;
         }
 
-        private void SpawnBeam(int numberOfBeams, float timeToCheck)
+        private void ResetVarsForNextAttack()
         {
+            attacktype = KrackoAttackType.DecideNext;
+            NPC.velocity = Vector2.Zero;
+            NPC.ai[0] = 0;
+            NPC.netUpdate = true;
+        }
+        float AttackDash()
+        {
+            Vector2 targetPos = Main.player[NPC.target].Center + new Vector2(0, -200);
+            Vector2 distanceOnTopOfPlayer = targetPos - NPC.Center;
+            float speed = frenzy ? 30 : 20f;
+            float inertia = 5f;
+            float moveStart = 0f;
+            float moveEnd = 100;
+            float dashStart = 100;
+            float dashEnd = 200f;
+            float dashDuration = dashEnd - dashStart;
+            if (frenzy)
+            {
+                dashDuration = MathF.Round(dashDuration * 0.75f);
+                dashEnd = dashStart + dashDuration;
+            }
+            float dashDistanceY = 900;
+            float dashDistanceX = 9000;
+            dashDistanceX /= dashDuration;
+            dashDistanceY /= dashDuration;
+            float dashProgress = Utils.GetLerpValue(dashStart, dashEnd, NPC.ai[0]);
+            if (NPC.ai[0] >= moveStart && NPC.ai[0] < moveEnd) //go to right
+            {
+                if (NPC.ai[0] >= moveEnd - 1) //stop
+                {
+                    NPC.velocity *= 0.0001f;
+                }
+                else //move
+                {
+                    distanceOnTopOfPlayer.Normalize();
+                    distanceOnTopOfPlayer *= speed;
+                    NPC.velocity = (NPC.velocity * (inertia - 1) + distanceOnTopOfPlayer) / inertia;
+                }
+                if (NPC.Center.DistanceSQ(targetPos) < 20)
+                {
+                    NPC.velocity *= 0.0001f;//cancel the movement early if reaches top of player
+                    NPC.ai[0] = moveEnd;
+                }
+            }
+            if (dashProgress < 0)
+                return dashEnd;
+            float easingMultiplier;
+            if (dashProgress < 0.33f)
+            {
+                easingMultiplier = Utils.GetLerpValue(0, 0.5f, dashProgress * 3, true) * Utils.GetLerpValue(1, 0.5f, dashProgress * 3, true);
+                NPC.velocity = new Vector2(dashDistanceX / 2 * attackDirection, dashDistanceY) * easingMultiplier;
+            }
+            else if (dashProgress < 0.66f)
+            {
+                easingMultiplier = Utils.GetLerpValue(0, 0.5f, (dashProgress - 0.33f) * 3, true) * Utils.GetLerpValue(1, 0.5f, (dashProgress - 0.33f) * 3, true);
+                NPC.velocity = new Vector2(dashDistanceX * -attackDirection, 0) * easingMultiplier;
+            }
+            else if (dashProgress < 1)
+            {
+                easingMultiplier = Utils.GetLerpValue(0, 0.5f, (dashProgress - 0.66f) * 3, true) * Utils.GetLerpValue(1, 0.5f, (dashProgress - 0.66f) * 3, true);
+                NPC.velocity = new Vector2(dashDistanceX / 2 * attackDirection, -dashDistanceY) * easingMultiplier;
+            }
+            else
+            {
+                NPC.velocity = Vector2.Zero;
+            }
+            NPC.rotation = NPC.velocity.X * 0.01f;
+            return dashEnd;
+        }
+        float AttackLightning()
+        {
+            float speed = 15f;
+            float inertia = 5f;
+            float thunderSlideSpeed = 10;
+            float moveStart = 0;
+            float moveEnd = 100;
+            float attackStart = 100;
+            float attackEnd = 200;
+            float attackDuration = attackEnd - attackStart;
+            if (frenzy)
+            {
+                attackStart -= 40;
+                moveEnd -= 40;
+                thunderSlideSpeed = 10;
+                speed *= 2;
+                attackDuration = MathF.Round(attackDuration * 0.6f);
+                attackEnd = attackStart + attackDuration;
+            }
+            if (NPC.ai[0] >= moveStart && NPC.ai[0] < attackStart)
+            {
+                for (int i = 0; i < 6; i++) //make bursts of electricity for warning
+                {
+                    Vector2 dustSpeed = Main.rand.NextVector2Circular(5f, 5f); //circle
+                    Dust d = Dust.NewDustPerfect(NPC.position + new Vector2(Main.rand.Next(0, NPC.width), Main.rand.Next(0, NPC.height)), DustID.Electric, dustSpeed); //Makes dust in a messy circle
+                    d.noGravity = true;
+                }
+            }
+            if (NPC.ai[0] >= moveStart && NPC.ai[0] < moveEnd)
+            {
+                if (NPC.ai[0] >= moveEnd - 1) //stop
+                {
+                    NPC.velocity = Vector2.Zero;
+                }
+                else //move
+                {
+                    Vector2 targetPos = Main.player[NPC.target].Center + new Vector2(400 * attackDirection, -400);
+                    NPC.velocity = (NPC.velocity * (inertia - 1) + GetDistanceDiagonalUpOfPlayerNormalizedMulipliedBySpeed(speed)) / inertia; //go above left of player
+                    if (NPC.DistanceSQ(targetPos) < 20)//cancel movement early if reached target pos
+                    {
+                        NPC.ai[0] = moveEnd;
+                    }
+                }
+
+            }
+            if (NPC.ai[0] >= attackStart) //for 120 ticks dash across screen(if on it)
+            {
+                NPC.velocity.X = -attackDirection * thunderSlideSpeed * Utils.GetLerpValue(attackStart - 1, attackStart + 9, NPC.ai[0], true) * Utils.GetLerpValue(attackEnd + 1, attackEnd - 12, NPC.ai[0], true);
+                if (NPC.ai[0] % 4 == 0 && Main.netMode != NetmodeID.MultiplayerClient)
+                {//												offset down a bit so it lookslike it's coming out below kracko
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y + 100, 0, 5.5f, ModContent.ProjectileType<KrackoLightning>(), 25 / 2, 2f, Main.myPlayer, 0, 0);
+                    SoundEngine.PlaySound(SoundID.Thunder, NPC.Center);
+                }
+            }
+
+            return attackEnd;
+        }
+
+        void SpawnBeam(int numberOfBeams, float timeToCheck)
+        {
+            float numberOfSpirals = frenzy ? 4 : 2;
+            numberOfSpirals += Main.getGoodWorld ? 2 : 0;//add 2 on for the worthy
             if (NPC.ai[0] == timeToCheck && Main.netMode != NetmodeID.MultiplayerClient) //inital
             {
                 for (float i = 0; i < numberOfBeams; i++) //i decides the offset
-                {
-                    for (float j = 0; j < 2; j++)
+                {                 
+                    for (float j = 0; j < numberOfSpirals; j++)
                     {
-                        Projectile spawnedProj = Projectile.NewProjectileDirect(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<BeamBig>(), 20 / 2, 8f, Main.myPlayer, NPC.whoAmI, j * MathF.PI - i * beamCurvingAngleMultiplier, i * 100 + 100);
-                        spawnedProj.direction = (int)Main.rand.NextFloatDirection();
+                        Projectile spawnedProj = Projectile.NewProjectileDirect(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<BeamBig>(), 20 / 2, 8f, Main.myPlayer, NPC.whoAmI, j * (MathF.Tau / numberOfSpirals) - i * beamCurvingAngleMultiplier, i * 70 + 100);
+                        spawnedProj.direction = Main.rand.NextBool() ? 1 : -1;
                     }
                 }
             }
@@ -568,5 +439,6 @@ namespace KirboMod.NPCs
             if (drawEyelid)
                 spriteBatch.Draw(eyelid, NPC.Center - Main.screenPosition + new Vector2(0, -4), null, Color.White, 0, eyelid.Size() / 2, 1, SpriteEffects.None, 0);
         }
+       
     }
 }
