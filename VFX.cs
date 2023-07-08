@@ -28,8 +28,22 @@ namespace KirboMod
 
             Ring = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/RingPremultiplied").Value;
         }
-
-        public static void DrawPrettyStarSparkle(float opacity, SpriteEffects dir, Vector2 drawpos, Color drawColor, Color shineColor, float flareCounter, float fadeInStart, float fadeInEnd, float fadeOutStart, float fadeOutEnd, float rotation, Vector2 scale, Vector2 fatness)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="opacity"></param>
+        /// <param name="drawpos">remember to subtract Main.screenPosition</param>
+        /// <param name="drawColor">color of the inner cross, most of the time you will want to leave this as white</param>
+        /// <param name="shineColor">color of the outer cross</param>
+        /// <param name="flareCounter">used as a timer for the fade things</param>
+        /// <param name="fadeInStart"></param>
+        /// <param name="fadeInEnd"></param>
+        /// <param name="fadeOutStart"></param>
+        /// <param name="fadeOutEnd"></param>
+        /// <param name="rotation"></param>
+        /// <param name="scale"></param>
+        /// <param name="fatness"></param>
+        public static void DrawPrettyStarSparkle(float opacity, Vector2 drawpos, Color drawColor, Color shineColor, float flareCounter, float fadeInStart, float fadeInEnd, float fadeOutStart, float fadeOutEnd, float rotation, Vector2 scale, Vector2 fatness)
         {
             Texture2D texture = TextureAssets.Extra[98].Value;
             Color bigShineColor = shineColor * opacity;
@@ -41,10 +55,19 @@ namespace KirboMod
             Vector2 scaleX = new Vector2(fatness.Y * 0.5f, scale.Y) * brightness;
             bigShineColor *= brightness;
             smallShineColor *= brightness;
-            Main.EntitySpriteDraw(texture, drawpos, null, bigShineColor, MathHelper.PiOver2 + rotation, origin, scaleY, dir, 0);
-            Main.EntitySpriteDraw(texture, drawpos, null, bigShineColor, rotation, origin, scaleX, dir, 0);
-            Main.EntitySpriteDraw(texture, drawpos, null, smallShineColor, MathHelper.PiOver2 + rotation, origin, scaleY * 0.6f, dir, 0);
-            Main.EntitySpriteDraw(texture, drawpos, null, smallShineColor, rotation, origin, scaleX * 0.6f, dir, 0);
+            Main.EntitySpriteDraw(texture, drawpos, null, bigShineColor, MathHelper.PiOver2 + rotation, origin, scaleY, SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(texture, drawpos, null, bigShineColor, rotation, origin, scaleX, SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(texture, drawpos, null, smallShineColor, MathHelper.PiOver2 + rotation, origin, scaleY * 0.6f, SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(texture, drawpos, null, smallShineColor, rotation, origin, scaleX * 0.6f, SpriteEffects.None, 0);
+        }
+
+
+        public override void Unload()
+        {
+            //annoying thing we need to do to static fields, free up the memory they are using.
+            Circle = null;
+            GlowBall = null;
+            Ring = null;
         }
     }
 

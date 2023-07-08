@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Diagnostics.Metrics;
 using Terraria;
@@ -59,6 +60,15 @@ namespace KirboMod.Projectiles
 
         public override bool PreDraw(ref Color lightColor)
         {
+			Color[] possibleColors = new Color[] { Color.Yellow, Color.Lime, Color.Cyan };
+			Vector2 randomOffset = Main.rand.NextVector2Circular(16, 16);
+			Vector2 fatness = Vector2.One;//feel free to mess around with
+			Vector2 sparkleScale = Vector2.One;//these values to see what thet change
+
+			fatness *= Projectile.scale;
+			sparkleScale *= Projectile.scale;
+			randomOffset *= Projectile.scale;
+			VFX.DrawPrettyStarSparkle(Projectile.Opacity, Projectile.Center - Main.screenPosition + randomOffset, Color.White, possibleColors[Main.rand.Next(possibleColors.Length)], 1, 0, 1, 1, 2, Main.rand.NextFloat() * MathF.Tau, sparkleScale, fatness);
             return base.PreDraw(ref lightColor);
         }
     }
