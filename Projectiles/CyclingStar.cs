@@ -40,7 +40,7 @@ namespace KirboMod.Projectiles
             Player player = Main.player[Projectile.owner];
             Lighting.AddLight(Projectile.Center, 0.255f, 0.255f, 0f);
 
-			Projectile.rotation = player.GetModPlayer<KirbPlayer>().tripleStarRotationCounter * 0.06f; // rotates projectile (final result if 0.3, same as triple star
+			Projectile.rotation = player.GetModPlayer<KirbPlayer>().tripleStarRotationCounter * 0.25f - Projectile.whoAmI; // rotates projectile (final result if 0.3, same as triple star
 
             if (player.GetModPlayer<KirbPlayer>().HasTripleStars[(int)Projectile.ai[1]] == true &&
                 player.HeldItem.type == ModContent.ItemType<TripleStar>()) //ai 1 now being i in Projectile summoning code in KirbPlayer
@@ -48,13 +48,12 @@ namespace KirboMod.Projectiles
                 Projectile.timeLeft = 2; //suspend death
             }
 
-            Projectile.ai[0] = player.GetModPlayer<KirbPlayer>().tripleStarRotationCounter; //grow
+            Projectile.ai[0] = player.GetModPlayer<KirbPlayer>().tripleStarRotationCounter * 0.1f; //grow
 
-            float rotationalOffset = Projectile.ai[0] + Projectile.ai[1] * 120; //offset so three stars are evenly spaced out
+            float rotationalOffset = Projectile.ai[0] + Projectile.ai[1] * MathF.Tau / 3; //offset so three stars are evenly spaced out
 
             //set a point(circleCenter) and then make the projectile spiral in a growing circle around that (starting at the center)
-            Projectile.position.X = player.Center.X - 25 + (float)Math.Cos(MathHelper.ToRadians(rotationalOffset)) * 50;
-            Projectile.position.Y = player.Center.Y - 25 + (float)Math.Sin(MathHelper.ToRadians(rotationalOffset)) * 50;
+            Projectile.Center = player.MountedCenter + (rotationalOffset).ToRotationVector2() * 40;
         }
 
         public override bool? CanCutTiles()

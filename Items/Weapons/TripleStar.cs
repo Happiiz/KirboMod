@@ -1,7 +1,9 @@
+using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -41,26 +43,34 @@ namespace KirboMod.Items.Weapons
 			Item.shoot = ModContent.ProjectileType<Projectiles.TripleStarStar>();
 			Item.shootSpeed = 32f;
 			Item.crit += 24; //same as star rod
-
 		}
 
         public override bool AltFunctionUse(Player player)
         {
             return true; //can right click
         }
-
+		
         public override bool CanUseItem(Player player)
         {
+			KirbPlayer kirbPlayer = player.GetModPlayer<KirbPlayer>();
+			List<TripleStarStar> stars = new();
 			if (player.altFunctionUse == 2) //right click
 			{
-                return player.ownedProjectileCounts[Item.shoot] < 1; //has to be none out
-            }
+				for (int i = 0; i < 3; i++)
+				{
+					TripleStarStar star = kirbPlayer.GetAvailableTripleStarStar();
+					if (star != null)
+					{
+						stars.Add(star);
+					}
+				}
+				return stars.Count > 0;
+			}
 			else
 			{
-				return player.ownedProjectileCounts[Item.shoot] < 3; //only three at a time
+				return kirbPlayer.GetAvailableTripleStarStar() != null;
 			}
-        }
-
+		}
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {
 			position.Y -= 10; //move up slightly
@@ -75,16 +85,27 @@ namespace KirboMod.Items.Weapons
 
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
+			if (Main.myPlayer != player.whoAmI)
+				return false;
+			TripleStarStar star;
+			KirbPlayer kirbPlayer = player.GetModPlayer<KirbPlayer>();
             if (player.altFunctionUse == 2) //right click
             {
-				Vector2 velocity2 = velocity.RotatedBy(MathHelper.ToRadians(5));
-                Vector2 velocity3 = velocity.RotatedBy(MathHelper.ToRadians(-5));
+                for (int i = 0; i < 3; i++)
+                {
+					 star = kirbPlayer.GetAvailableTripleStarStar();
+					if(star != null)
+                    {
+						star.Shoot();
 
-				Projectile.NewProjectile(source, position, velocity2, type, damage, knockback);
-                Projectile.NewProjectile(source, position, velocity3, type, damage, knockback);
-            }
-
-            return true;
+                    }
+				}
+				return false;
+            }       
+			 star = kirbPlayer.GetAvailableTripleStarStar();
+			if (star != null)
+				star.Shoot();     
+            return false;
         }
 
         public override Color? GetAlpha(Color lightColor)
@@ -94,12 +115,12 @@ namespace KirboMod.Items.Weapons
 
 		public override void AddRecipes()
 		{
-			Recipe recipe1 = CreateRecipe();//the result is gigantsword
+			Recipe recipe1 = CreateRecipe();//the result is triple star
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.StarRod>()); //Star Rod
 			recipe1.AddIngredient(ItemID.HallowedBar, 20); //20 hallowed bars
             recipe1.AddIngredient(ModContent.ItemType<HeartMatter>(), 5); //5 Heart Matter
             recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 100); //100 starbits
-			recipe1.AddIngredient(ModContent.ItemType<Items.DreamEssence>(), 50); //50 dream matter
+			recipe1.AddIngredient(ModContent.ItemType<DreamEssence>(), 50); //50 dream matter
 			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 5); //5 rare stones
 			recipe1.AddTile(TileID.MythrilAnvil); //crafted at hardmode anvil
 			recipe1.Register(); //adds this recipe to the game

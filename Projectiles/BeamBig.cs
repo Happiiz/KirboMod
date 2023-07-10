@@ -72,7 +72,7 @@ namespace KirboMod.Projectiles
 		{
 			return Color.White * Projectile.Opacity; // Makes i uneffected by light
 		}
-        public Color RndElectricCol { get =>  (Main.rand.NextBool(3) ? Color.Yellow : Main.rand.NextBool() ? Color.Cyan : Color.Cyan) * Projectile.Opacity ; }
+        Color RndElectricCol { get => (Main.rand.NextBool(2, 5) ? Color.Yellow : Color.Cyan) * Projectile.Opacity; }
         public override bool PreDraw(ref Color lightColor)
         {
 			Color[] possibleColors = new Color[] { Color.Yellow, Color.Cyan, Color.Cyan };

@@ -21,13 +21,14 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 215;
+			Item.damage = 2503;
 			Item.DamageType = DamageClass.Ranged;
 			Item.noMelee = true;
 			Item.width = 80;
 			Item.height = 62;
-			Item.useTime = 10;
-			Item.useAnimation = 10;
+			Item.useTime = 9;
+			Item.useAnimation = 36;
+			Item.reuseDelay = 27;
 			Item.useStyle = ItemUseStyleID.Shoot;
 			Item.knockBack = 2;
             Item.value = Item.buyPrice(0, 25, 0, 0);
@@ -35,7 +36,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item11; //gunshot
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.CrystalShardProj>();
-			Item.shootSpeed = 20f;
+			Item.shootSpeed = 30f;
 			Item.alpha = 50;
 			Item.useAmmo = ModContent.ItemType<CrystalShard>(); //use this ammo group
 		}

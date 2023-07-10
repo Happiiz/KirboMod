@@ -23,6 +23,8 @@ namespace KirboMod.Projectiles
 			Projectile.timeLeft = 20;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
+			Projectile.usesLocalNPCImmunity = true;
+			Projectile.localNPCHitCooldown = 10;
 		}
 
 		public override void AI()
