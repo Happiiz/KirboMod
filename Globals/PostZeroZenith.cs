@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using static Terraria.Graphics.FinalFractalHelper;
 using KirboMod.Items.Weapons;
 using System.Linq;
+using Terraria.Graphics.Shaders;
+using Terraria.Graphics;
 
 namespace KirboMod.Globals
 {
@@ -134,13 +136,34 @@ namespace KirboMod.Globals
             Terraria.Graphics.On_FinalFractalHelper.GetRandomProfileIndex += GetRandomProfileIndexPostZero;
             Terraria.Graphics.On_FinalFractalHelper.Draw += DrawRainbowTrailIfRainbowSword;
 		}
+		private static VertexStrip _vertexStrip = new();
+		Color ColorFunction(float progress)
+		{
+			return Main.hslToRgb((float)((progress + Main.timeForVisualEffects / 30) % 1), 1, 0.5f);
+		}
+		private void DrawRainbowTrailIfRainbowSword(On_FinalFractalHelper.orig_Draw orig, ref Terraria.Graphics.FinalFractalHelper self, Projectile proj)
+        {		
+			if((int)proj.ai[1] != ModContent.ItemType<RainbowSword>())
+            {
+				orig.Invoke(ref self, proj);
+				return;
+            }
+			FinalFractalProfile finalFractalProfile = GetFinalFractalProfile((int)proj.ai[1]);
+			MiscShaderData miscShaderData = GameShaders.Misc["FinalFractal"];
+			int num = 4;
+			int num2 = 0;
+			int num3 = 0;
+			int num4 = 4;
+			miscShaderData.UseShaderSpecificData(new Vector4(num, num2, num3, num4));
+			miscShaderData.UseImage0("Images/Extra_" + (short)201);
+			miscShaderData.UseImage1("Images/Extra_" + (short)193);
+			miscShaderData.Apply();
+			_vertexStrip.PrepareStrip(proj.oldPos, proj.oldRot, ColorFunction, finalFractalProfile.widthMethod, -Main.screenPosition + proj.Size / 2f, proj.oldPos.Length, includeBacksides: true);
+			_vertexStrip.DrawTrail();
+			Main.pixelShader.CurrentTechnique.Passes[0].Apply();	
+		}
 
-        private void DrawRainbowTrailIfRainbowSword(Terraria.Graphics.On_FinalFractalHelper.orig_Draw orig, ref Terraria.Graphics.FinalFractalHelper self, Projectile proj)
-        {
-            throw new NotImplementedException();
-        }
-
-        private int GetRandomProfileIndexPostZero(Terraria.Graphics.On_FinalFractalHelper.orig_GetRandomProfileIndex orig)
+        private int GetRandomProfileIndexPostZero(On_FinalFractalHelper.orig_GetRandomProfileIndex orig)
         {
 			List<int> list = _fractalProfiles.Keys.ToList();
 			int index = Main.rand.Next(list.Count);
@@ -152,7 +175,7 @@ namespace KirboMod.Globals
 			return list[index];
 		}
 
-        private FinalFractalProfile GetFinalFractalProfilePostZero(Terraria.Graphics.On_FinalFractalHelper.orig_GetFinalFractalProfile orig, int usedSwordId)
+        private FinalFractalProfile GetFinalFractalProfilePostZero(On_FinalFractalHelper.orig_GetFinalFractalProfile orig, int usedSwordId)
 		{
 			if (!_fractalProfiles.TryGetValue(usedSwordId, out var value))
 			{
@@ -163,8 +186,10 @@ namespace KirboMod.Globals
 
         public override void Unload()
         {
-			Terraria.Graphics.On_FinalFractalHelper.GetFinalFractalProfile -= GetFinalFractalProfilePostZero;
-			Terraria.Graphics.On_FinalFractalHelper.GetRandomProfileIndex -= GetRandomProfileIndexPostZero;
+			On_FinalFractalHelper.Draw -= DrawRainbowTrailIfRainbowSword;
+			On_FinalFractalHelper.GetFinalFractalProfile -= GetFinalFractalProfilePostZero;
+			On_FinalFractalHelper.GetRandomProfileIndex -= GetRandomProfileIndexPostZero;
+			_vertexStrip = null;
 		}
 	}
 	public class PostZeroZenithRecipe : ModSystem
