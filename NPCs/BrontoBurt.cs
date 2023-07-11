@@ -155,7 +155,7 @@ namespace KirboMod.NPCs
             else
 			{
                 NPC.velocity.Y = (float)Math.Sin(NPC.position.X / 20) * 2;
-
+				
                 //movement
                 float speed = 1f;
                 float inertia = 20f;
