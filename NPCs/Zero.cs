@@ -20,16 +20,28 @@ using System.IO;
 using KirboMod.Projectiles;
 using KirboMod.Dusts;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace KirboMod.NPCs
 {
 	[AutoloadBossHead]
 	public class Zero : ModNPC
 	{
-		private int animation = 1; //frame cycles
+        enum ZeroAttackType : byte
+        {
+            DecideNext,//0
+            BloodShots,//1
+            Dash,//2
+            DarkMatterShots,//3
+            Sparks,//4
+            ThornTail,//5
+            BackgroundShots,//6
+        }
 
-		private int lastattacktype = 2; //sets last attack type
-		private int attacktype = 1; //decides the attack
+        private int animation = 1; //frame cycles
+
+		private ZeroAttackType lastattacktype = ZeroAttackType.DecideNext; //sets last attack type
+		private ZeroAttackType attacktype = ZeroAttackType.DecideNext; //decides the attack
 
 		private float backupoffset = 0; //offset goto position when backing up
 
@@ -47,7 +59,8 @@ namespace KirboMod.NPCs
 
 		private int animationXframeOffset = 0; //changes the sprite column depending on what animation is playing
 
-		public override void SetStaticDefaults()
+
+        public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Zero");
 			Main.npcFrameCount[NPC.type] = 8; //kinda pointless as the drawing is done manually
@@ -128,8 +141,8 @@ namespace KirboMod.NPCs
         {
             writer.Write(animation);
 
-            writer.Write(lastattacktype);
-            writer.Write(attacktype);
+            writer.Write((byte)lastattacktype);
+            writer.Write((byte)attacktype);
 
             writer.Write(backupoffset);
 
@@ -151,8 +164,8 @@ namespace KirboMod.NPCs
         {
             animation = reader.ReadInt32();
 
-            lastattacktype = reader.ReadInt32();
-            attacktype = reader.ReadInt32();
+            lastattacktype = (ZeroAttackType)reader.ReadByte();
+			attacktype = (ZeroAttackType)reader.ReadByte();
 
             backupoffset = reader.ReadSingle();
 
@@ -246,18 +259,7 @@ namespace KirboMod.NPCs
 
 				NPC.dontTakeDamage = false;
 
-				if (Main.masterMode)
-				{
-					NPC.damage = 360;
-				}
-				else if (Main.expertMode)
-				{
-					NPC.damage = 240;
-				}
-				else
-				{
-					NPC.damage = 120;
-				}
+				NPC.damage = NPC.defDamage;
 			}
 
 			NPC.ai[0]++;
@@ -267,624 +269,47 @@ namespace KirboMod.NPCs
 
 			if (NPC.ai[0] <= 120)
 			{
-				NPC.TargetClosest(true);
+				NPC.TargetClosest(true); //face player before attacking
 
-				if (playerDistance.X <= 0)
-				{
-					playerRightDistance.Normalize();
-					playerRightDistance *= speed;
-					NPC.velocity = (NPC.velocity * (inertia - 1) + playerRightDistance) / inertia; //fly towards player
-				}
-				else
-				{
-					playerLeftDistance.Normalize();
-					playerLeftDistance *= speed;
-					NPC.velocity = (NPC.velocity * (inertia - 1) + playerLeftDistance) / inertia; //fly towards player
-				}
+                DefaultMovement(playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
 
-
-				//BEGINNING OF SUPER DUPER LONG LINE OF CODE RANDOMIZING ZERO'S ATTACKS
-
-
-
-
-				if (NPC.ai[0] == 120)  
+                if (NPC.ai[0] == 120)  
 				{
 					if (NPC.life <= NPC.lifeMax * 0.10) //10%
 					{
+						//background attack is done every 3 attacks when zero's health gets low enough
+						//(does it the next cycle upon initally dropping low enough)
+
 						if (backgroundAttackCountDown <= 0) //equal or less than zero
 						{
-							attacktype = 6; //background attack
-							lastattacktype = 6;
+							attacktype = ZeroAttackType.BackgroundShots; //background attack
+							lastattacktype = ZeroAttackType.BackgroundShots;
 							backgroundAttackCountDown = 2; //restart
 						}
 						else //do regular attack
 						{
 							backgroundAttackCountDown--; //go down by 1
-
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								int randattack = Main.rand.Next(1, 5 + 1);
-								if (randattack == 1)
-								{
-									if (lastattacktype == 1)
-									{
-										int subrandattack = Main.rand.Next(1, 4 + 1);
-										if (subrandattack == 1)
-										{
-											attacktype = 2;
-											lastattacktype = 2;
-										}
-										else if (subrandattack == 2)
-										{
-											attacktype = 3;
-											lastattacktype = 3;
-										}
-										else if (subrandattack == 3)
-										{
-											attacktype = 4;
-											lastattacktype = 4;
-										}
-										else
-										{
-											attacktype = 5;
-											lastattacktype = 5;
-										}
-									}
-									else
-									{
-										attacktype = 1;
-										lastattacktype = 1;
-									}
-								}
-								else if (randattack == 2)
-								{
-									if (lastattacktype == 2)
-									{
-										int subrandattack = Main.rand.Next(1, 4 + 1);
-										if (subrandattack == 1)
-										{
-											attacktype = 1;
-											lastattacktype = 1;
-										}
-										else if (subrandattack == 2)
-										{
-											attacktype = 4;
-											lastattacktype = 4;
-										}
-										else if (subrandattack == 3)
-										{
-											attacktype = 3;
-											lastattacktype = 3;
-										}
-										else
-										{
-											attacktype = 5;
-											lastattacktype = 5;
-										}
-									}
-									else
-									{
-										attacktype = 2;
-										lastattacktype = 2;
-									}
-								}
-								else if (randattack == 3)
-								{
-									if (lastattacktype == 3)
-									{
-										int subrandattack = Main.rand.Next(1, 4 + 1);
-										if (subrandattack == 1)
-										{
-											attacktype = 2;
-											lastattacktype = 2;
-										}
-										else if (subrandattack == 2)
-										{
-											attacktype = 1;
-											lastattacktype = 1;
-										}
-										else if (subrandattack == 3)
-										{
-											attacktype = 5;
-											lastattacktype = 5;
-										}
-										else
-										{
-											attacktype = 4;
-											lastattacktype = 4;
-										}
-									}
-									else
-									{
-										attacktype = 3;
-										lastattacktype = 3;
-									}
-								}
-								else if (randattack == 4)
-								{
-									if (lastattacktype == 4)
-									{
-										int subrandattack = Main.rand.Next(1, 4 + 1);
-										if (subrandattack == 1)
-										{
-											attacktype = 2;
-											lastattacktype = 2;
-										}
-										else if (subrandattack == 2)
-										{
-											attacktype = 1;
-											lastattacktype = 1;
-										}
-										else if (subrandattack == 3)
-										{
-											attacktype = 3;
-											lastattacktype = 3;
-										}
-										else
-										{
-											attacktype = 5;
-											lastattacktype = 5;
-										}
-									}
-									else
-									{
-										attacktype = 4;
-										lastattacktype = 4;
-									}
-								}
-								else //5
-								{
-									if (lastattacktype == 5)
-									{
-										int subrandattack = Main.rand.Next(1, 4 + 1);
-										if (subrandattack == 1)
-										{
-											attacktype = 2;
-											lastattacktype = 2;
-										}
-										else if (subrandattack == 2)
-										{
-											attacktype = 3;
-											lastattacktype = 3;
-										}
-										else if (subrandattack == 3)
-										{
-											attacktype = 4;
-											lastattacktype = 4;
-										}
-										else
-										{
-											attacktype = 1;
-											lastattacktype = 1;
-										}
-									}
-									else
-									{
-										attacktype = 5;
-										lastattacktype = 5;
-									}
-								}
-								NPC.netUpdate = true;
-							}
-						}
-                    }
-					else if (NPC.life <= NPC.lifeMax * 0.35) //35%
-                    {
-						if (Main.netMode != NetmodeID.MultiplayerClient)
-						{
-							int randattack = Main.rand.Next(1, 5 + 1);
-							if (randattack == 1)
-							{
-								if (lastattacktype == 1)
-								{
-									int subrandattack = Main.rand.Next(1, 4 + 1);
-									if (subrandattack == 1)
-									{
-										attacktype = 2;
-										lastattacktype = 2;
-									}
-									else if (subrandattack == 2)
-									{
-										attacktype = 3;
-										lastattacktype = 3;
-									}
-									else if (subrandattack == 3)
-									{
-										attacktype = 4;
-										lastattacktype = 4;
-									}
-									else
-									{
-										attacktype = 5;
-										lastattacktype = 5;
-									}
-								}
-								else
-								{
-									attacktype = 1;
-									lastattacktype = 1;
-								}
-							}
-							else if (randattack == 2)
-							{
-								if (lastattacktype == 2)
-								{
-									int subrandattack = Main.rand.Next(1, 4 + 1);
-									if (subrandattack == 1)
-									{
-										attacktype = 1;
-										lastattacktype = 1;
-									}
-									else if (subrandattack == 2)
-									{
-										attacktype = 4;
-										lastattacktype = 4;
-									}
-									else if (subrandattack == 3)
-									{
-										attacktype = 3;
-										lastattacktype = 3;
-									}
-									else
-									{
-										attacktype = 5;
-										lastattacktype = 5;
-									}
-								}
-								else
-								{
-									attacktype = 2;
-									lastattacktype = 2;
-								}
-							}
-							else if (randattack == 3)
-							{
-								if (lastattacktype == 3)
-								{
-									int subrandattack = Main.rand.Next(1, 4 + 1);
-									if (subrandattack == 1)
-									{
-										attacktype = 2;
-										lastattacktype = 2;
-									}
-									else if (subrandattack == 2)
-									{
-										attacktype = 1;
-										lastattacktype = 1;
-									}
-									else if (subrandattack == 3)
-									{
-										attacktype = 5;
-										lastattacktype = 5;
-									}
-									else
-									{
-										attacktype = 4;
-										lastattacktype = 4;
-									}
-								}
-								else
-								{
-									attacktype = 3;
-									lastattacktype = 3;
-								}
-							}
-							else if (randattack == 4)
-							{
-								if (lastattacktype == 4)
-								{
-									int subrandattack = Main.rand.Next(1, 4 + 1);
-									if (subrandattack == 1)
-									{
-										attacktype = 2;
-										lastattacktype = 2;
-									}
-									else if (subrandattack == 2)
-									{
-										attacktype = 1;
-										lastattacktype = 1;
-									}
-									else if (subrandattack == 3)
-									{
-										attacktype = 3;
-										lastattacktype = 3;
-									}
-									else
-									{
-										attacktype = 5;
-										lastattacktype = 5;
-									}
-								}
-								else
-								{
-									attacktype = 4;
-									lastattacktype = 4;
-								}
-							}
-							else //5
-							{
-								if (lastattacktype == 5)
-								{
-									int subrandattack = Main.rand.Next(1, 4 + 1);
-									if (subrandattack == 1)
-									{
-										attacktype = 2;
-										lastattacktype = 2;
-									}
-									else if (subrandattack == 2)
-									{
-										attacktype = 3;
-										lastattacktype = 3;
-									}
-									else if (subrandattack == 3)
-									{
-										attacktype = 4;
-										lastattacktype = 4;
-									}
-									else
-									{
-										attacktype = 1;
-										lastattacktype = 1;
-									}
-								}
-								else
-								{
-									attacktype = 5;
-									lastattacktype = 5;
-								}
-							}
-							NPC.netUpdate = true;
-						}
-					}
-					else if (NPC.life <= NPC.lifeMax * 0.50) //50%
-                    {
-						if (Main.netMode != NetmodeID.MultiplayerClient)
-						{
-							int randattack = Main.rand.Next(1, 4 + 1);
-							if (randattack == 1)
-							{
-								if (lastattacktype == 1)
-								{
-									int subrandattack = Main.rand.Next(1, 3 + 1);
-									if (subrandattack == 1)
-									{
-										attacktype = 2;
-										lastattacktype = 2;
-									}
-									else if (subrandattack == 2)
-									{
-										attacktype = 3;
-										lastattacktype = 3;
-									}
-									else
-									{
-										attacktype = 4;
-										lastattacktype = 4;
-									}
-								}
-								else
-								{
-									attacktype = 1;
-									lastattacktype = 1;
-								}
-							}
-							else if (randattack == 2)
-							{
-								if (lastattacktype == 2)
-								{
-									int subrandattack = Main.rand.Next(1, 3 + 1);
-									if (subrandattack == 1)
-									{
-										attacktype = 1;
-										lastattacktype = 1;
-									}
-									else if (subrandattack == 2)
-									{
-										attacktype = 4;
-										lastattacktype = 4;
-									}
-									else
-									{
-										attacktype = 3;
-										lastattacktype = 3;
-									}
-								}
-								else
-								{
-									attacktype = 2;
-									lastattacktype = 2;
-								}
-							}
-							else if (randattack == 3)
-							{
-								if (lastattacktype == 3)
-								{
-									int subrandattack = Main.rand.Next(1, 3 + 1);
-									if (subrandattack == 1)
-									{
-										attacktype = 2;
-										lastattacktype = 2;
-									}
-									else if (subrandattack == 2)
-									{
-										attacktype = 1;
-										lastattacktype = 1;
-									}
-									else
-									{
-										attacktype = 4;
-										lastattacktype = 4;
-									}
-								}
-								else
-								{
-									attacktype = 3;
-									lastattacktype = 3;
-								}
-							}
-							else //4
-							{
-								if (lastattacktype == 4)
-								{
-									int subrandattack = Main.rand.Next(1, 3 + 1);
-									if (subrandattack == 1)
-									{
-										attacktype = 2;
-										lastattacktype = 2;
-									}
-									else if (subrandattack == 2)
-									{
-										attacktype = 1;
-										lastattacktype = 1;
-									}
-									else
-									{
-										attacktype = 3;
-										lastattacktype = 3;
-									}
-								}
-								else
-								{
-									attacktype = 4;
-									lastattacktype = 4;
-								}
-							}
-							NPC.netUpdate = true;
-						}
-					}
-					else if (NPC.life <= NPC.lifeMax * 0.75) //75%
-                    {
-						if (Main.netMode != NetmodeID.MultiplayerClient)
-						{
-							int randattack = Main.rand.Next(1, 3 + 1);
-							if (randattack == 1)
-							{
-								if (lastattacktype == 1)
-								{
-									int subrandattack = Main.rand.Next(1, 2 + 1);
-									if (subrandattack == 1)
-									{
-										attacktype = 2;
-										lastattacktype = 2;
-									}
-									else
-									{
-										attacktype = 3;
-										lastattacktype = 3;
-									}
-								}
-								else
-								{
-									attacktype = 1;
-									lastattacktype = 1;
-								}
-							}
-							else if (randattack == 2)
-							{
-								if (lastattacktype == 2)
-								{
-									int subrandattack = Main.rand.Next(1, 2 + 1);
-									if (subrandattack == 1)
-									{
-										attacktype = 1;
-										lastattacktype = 1;
-									}
-									else
-									{
-										attacktype = 3;
-										lastattacktype = 3;
-									}
-								}
-								else
-								{
-									attacktype = 2;
-									lastattacktype = 2;
-								}
-							}
-							else //3
-							{
-								if (lastattacktype == 3)
-								{
-									int subrandattack = Main.rand.Next(1, 2 + 1);
-									if (subrandattack == 1)
-									{
-										attacktype = 2;
-										lastattacktype = 2;
-									}
-									else
-									{
-										attacktype = 1;
-										lastattacktype = 1;
-									}
-								}
-								else
-								{
-									attacktype = 3;
-									lastattacktype = 3;
-								}
-							}
-							NPC.netUpdate = true;
-						}
-					}
-					else if (NPC.life <= NPC.lifeMax * 0.90) //90%
-                    {
-						if (Main.netMode != NetmodeID.MultiplayerClient)
-						{
-							int randattack = Main.rand.Next(1, 2 + 1);
-							if (randattack == 1)
-							{
-								if (lastattacktype == 1)
-								{
-									attacktype = 2;
-									lastattacktype = 2;
-								}
-								else
-								{
-									attacktype = 1;
-									lastattacktype = 1;
-								}
-							}
-							else //2
-							{
-								if (lastattacktype == 2)
-								{
-									attacktype = 1;
-									lastattacktype = 1;
-								}
-								else
-								{
-									attacktype = 2;
-									lastattacktype = 2;
-								}
-							}
-							NPC.netUpdate = true;
-						}
+                            AttackDecideNext();
+                        }
 					}
 					else
-                    {
-						attacktype = 1;
-						lastattacktype = 1;
-					}
+					{
+                        AttackDecideNext();
+                    }
 				}
-
-
-
-
-
-				//END OF SUPER DUPER LONG LINE OF CODE RANDOMIZING ZERO'ATTACKS
 			}
 			else //attacking
             {
-				if (attacktype == 1) //blood shots
+				if (attacktype == ZeroAttackType.BloodShots) //blood shots
                 {
-					//effect for entire attack
-                    for (int i = 0; i < 1; i++)
-                    {
-                        Vector2 spread = Main.rand.NextVector2Circular(10f, 10f); //circle
-						Vector2 offset = new Vector2(NPC.direction * 125, 0);
-                        Dust.NewDustPerfect(NPC.Center + offset, ModContent.DustType<Dusts.Redsidue>(), spread, Scale: 1f); //Makes dust in a messy circle
-                    }
+                    NPC.TargetClosest(true); //face player during attack
+
+					//blood effect for attack
+					if (NPC.ai[0] % 5 == 0) //every 5
+					{
+						int d = Dust.NewDust(NPC.position + new Vector2(NPC.direction == 1 ? NPC.width - 200 : 0, NPC.height / 4), 200, 200, ModContent.DustType<Dusts.Redsidue>());
+						Main.dust[d].velocity *= 0;
+					}
 
                     //1st shot of round
 
@@ -979,29 +404,18 @@ namespace KirboMod.NPCs
                         SoundEngine.PlaySound(SkinTear, NPC.Center);
                     }
 
-                    if (playerDistance.X <= 0)
-					{
-						playerRightDistance.Normalize();
-						playerRightDistance *= speed;
-						NPC.velocity = (NPC.velocity * (inertia - 1) + playerRightDistance) / inertia; //fly towards player
-					}
-					else
-					{
-						playerLeftDistance.Normalize();
-						playerLeftDistance *= speed;
-						NPC.velocity = (NPC.velocity * (inertia - 1) + playerLeftDistance) / inertia; //fly towards player
-					}
+                    DefaultMovement(playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
 
-					if (NPC.ai[0] >= 440)
+                    if (NPC.ai[0] >= 440)
 					{
 						NPC.ai[0] = 0;
 					}
 				}
 
 
-				if (attacktype == 2) //dash
+				if (attacktype == ZeroAttackType.Dash) //dash
 				{
-                    NPC.TargetClosest(false);
+                    NPC.TargetClosest(false); //don't face player during attack
 
                     if (NPC.ai[0] <= 150) //backup
 					{
@@ -1045,10 +459,10 @@ namespace KirboMod.NPCs
 					}
 				}
 
-
-
-				if (attacktype == 3) //dark matter shot
+				if (attacktype == ZeroAttackType.DarkMatterShots) //dark matter shot
 				{
+                    NPC.TargetClosest(true); //face player during attack
+
                     if (NPC.ai[0] % 40 == 0)
 					{
                         Vector2 randomlocation = new Vector2(NPC.position.X + Main.rand.Next(0, NPC.width), NPC.position.Y + Main.rand.Next(20, NPC.height - 20));
@@ -1066,60 +480,43 @@ namespace KirboMod.NPCs
                         SoundEngine.PlaySound(SoundID.Item81, NPC.Center); //spawn slime mount
 					}
 
-					if (playerDistance.X <= 0)
-					{
-						playerRightDistance.Normalize();
-						playerRightDistance *= speed;
-						NPC.velocity = (NPC.velocity * (inertia - 1) + playerRightDistance) / inertia; //fly towards player
-					}
-					else
-					{
-						playerLeftDistance.Normalize();
-						playerLeftDistance *= speed;
-						NPC.velocity = (NPC.velocity * (inertia - 1) + playerLeftDistance) / inertia; //fly towards player
-					}
+                    DefaultMovement(playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
 
-					if (NPC.ai[0] >= 360)
+                    if (NPC.ai[0] >= 360)
 					{
 						NPC.ai[0] = 0;
 					}
 				}
 
-				if (attacktype == 4) //sparks
-				{
-					//shoot 30 in intervals
-					if (NPC.ai[0] > 120 && NPC.ai[0] <= 130 || NPC.ai[0] > 180 && NPC.ai[0] <= 190 || NPC.ai[0] > 240 && NPC.ai[0] <= 250 || NPC.ai[0] > 300 && NPC.ai[0] <= 310)
+				if (attacktype == ZeroAttackType.Sparks) //sparks
+                {
+                    NPC.TargetClosest(true); //face player during attack
+
+                    //shoot every 60 ticks
+                    if (NPC.ai[0] % 60 == 0)
 					{
-						//shoot all at once
-						if (Main.netMode != NetmodeID.MultiplayerClient)
+						for (int i = 0; i < 10; i++)
 						{
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 150, 0), new Vector2(NPC.direction * Main.rand.Next(1, 50), Main.rand.Next(-30, 30)), Mod.Find<ModProjectile>("ZeroSpark").Type, 0, 0, Main.myPlayer, 0, 0);
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 150, 0), new Vector2(NPC.direction * Main.rand.Next(1, 25), Main.rand.Next(-15, 15)), Mod.Find<ModProjectile>("ZeroSpark").Type, 0, 0, Main.myPlayer, 0, 0);
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 150, 0), new Vector2(NPC.direction * Main.rand.Next(1, 100), Main.rand.Next(-60, 60)), Mod.Find<ModProjectile>("ZeroSpark").Type, 0, 0, Main.myPlayer, 0, 0);
+							//shoot all at once
+							if (Main.netMode != NetmodeID.MultiplayerClient)
+							{
+								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 150, 0), new Vector2(NPC.direction * Main.rand.Next(1, 50), Main.rand.Next(-30, 30)), Mod.Find<ModProjectile>("ZeroSpark").Type, 0, 0, Main.myPlayer, 0, 0);
+								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 150, 0), new Vector2(NPC.direction * Main.rand.Next(1, 25), Main.rand.Next(-15, 15)), Mod.Find<ModProjectile>("ZeroSpark").Type, 0, 0, Main.myPlayer, 0, 0);
+								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 150, 0), new Vector2(NPC.direction * Main.rand.Next(1, 100), Main.rand.Next(-60, 60)), Mod.Find<ModProjectile>("ZeroSpark").Type, 0, 0, Main.myPlayer, 0, 0);
+							}
 						}
                         SoundEngine.PlaySound(SoundID.Item5.WithVolumeScale(1.6f).WithPitchOffset(0.1f), NPC.Center); //bow shot
 					}
 
-					if (playerDistance.X <= 0)
-					{
-						playerRightDistance.Normalize();
-						playerRightDistance *= speed;
-						NPC.velocity = (NPC.velocity * (inertia - 1) + playerRightDistance) / inertia; //fly towards player
-					}
-					else
-					{
-						playerLeftDistance.Normalize();
-						playerLeftDistance *= speed;
-						NPC.velocity = (NPC.velocity * (inertia - 1) + playerLeftDistance) / inertia; //fly towards player
-					}
+					DefaultMovement(playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
 
-					if (NPC.ai[0] >= 360)
+                    if (NPC.ai[0] >= 360)
 					{
 						NPC.ai[0] = 0;
 					}
 				}
 
-				if (attacktype == 5) //thorns
+				if (attacktype == ZeroAttackType.ThornTail) //thorns
                 {
 					if (NPC.ai[0] < 180)
 					{
@@ -1162,13 +559,13 @@ namespace KirboMod.NPCs
 						NPC.ai[0] = 0;
 					}
 				}
-				if (attacktype == 6) //background attack
+				if (attacktype == ZeroAttackType.BackgroundShots) //background attack
 				{
 					NPC.velocity.Y *= 0.98f;
 
 					if (NPC.ai[0] <= 180) //backup
 					{
-						NPC.TargetClosest(false);
+						NPC.TargetClosest(false); //don't face player during attack
 
 						NPC.scale -= 0.01f; //get smaller
 						NPC.behindTiles = true;
@@ -1230,176 +627,57 @@ namespace KirboMod.NPCs
 			}
 		}
 
-        /*public override void FindFrame(int frameHeight) // animation
+        void AttackDecideNext()
         {
-			int Yframe = 0; //Y determining which part of the animation
-
-			if (animation == 0) //regular
-			{
-                NPC.frameCounter ++;
-				if (NPC.frameCounter < 10)
-				{
-                    animationXframeOffset = 0; //attacks 
-                    Yframe = 0;
-                }
-				else if (NPC.frameCounter < 20)
-				{
-                    animationXframeOffset = 0; //attacks 
-                    Yframe = 800;
-                }
-				else if (NPC.frameCounter < 30)
-				{
-                    animationXframeOffset = 0; //attacks 
-                    Yframe = 1600;
-                }
-				else if (NPC.frameCounter < 40)
-				{
-                    animationXframeOffset = 0; //attacks 
-                    Yframe = 800;
-                }
-				else
-				{
-                    animationXframeOffset = 0; //attacks 
-                    Yframe = 0;
-                    NPC.frameCounter = 0; //reset
-				}
-			}
-			if (animation == 1) //intro
+            List<ZeroAttackType> possibleAttacks = new() { ZeroAttackType.BloodShots };
+            if (NPC.GetLifePercent() < 0.90f)
             {
-				NPC.frameCounter++;
-				if (NPC.frameCounter < 60) //change texture
-				{
-                    animationXframeOffset = 1; //intro 1
-                    Yframe = 0;
-                }
-				else if (NPC.frameCounter < 70)
-				{
-                    animationXframeOffset = 1; //intro 1
-                    Yframe = 800;
-                }
-				else if (NPC.frameCounter < 80)
-				{
-                    animationXframeOffset = 1; //intro 1
-                    Yframe = 1600;
-                }
-				else if (NPC.frameCounter < 90)
-				{
-                    animationXframeOffset = 1; //intro 1
-                    Yframe = 2400;
-                }
-				else if (NPC.frameCounter < 150)
-				{
-                    animationXframeOffset = 1; //intro 1
-                    Yframe = 3200; 
-                }
-				else if (NPC.frameCounter < 160)
-				{
-                    animationXframeOffset = 1; //intro 1
-                    Yframe = 4000;
-                }
-				else if (NPC.frameCounter < 170)
-				{
-                    animationXframeOffset = 1; //intro 1
-                    Yframe = 4800;
-				}
-				else if (NPC.frameCounter < 180) //change texture
-                {
-                    animationXframeOffset = 2; //intro 2
-                    Yframe = 0;
-                }
-				else if (NPC.frameCounter < 240) 
-                {
-                    animationXframeOffset = 2; //intro 2
-                    Yframe = 800; 
-                }
-				else if (NPC.frameCounter < 250)
-				{
-                    animationXframeOffset = 2; //intro 2
-                    Yframe = 1600;
-                }
-				else if (NPC.frameCounter < 310)
-				{
-                    animationXframeOffset = 2; //intro 2
-                    Yframe = 2400;
-                }
-				else if (NPC.frameCounter < 320)
-				{
-                    animationXframeOffset = 2; //intro 2
-                    Yframe = 3200;
-                }
-				else 
-				{
-                    animationXframeOffset = 2; //intro 2
-                    Yframe = 4000;
-                }
-			}
-			if (animation == 2) //thorns open
-			{
-                NPC.frameCounter++;
-				if (NPC.frameCounter < 10)
-				{
-                    animationXframeOffset = 0; //attacks 
-                    Yframe = 2400;
-                }
-				else 
-				{
-                    animationXframeOffset = 0; //attacks 
-                    Yframe = 3200;
-                }
-			}
-			if (animation == 3) //thorns loop
-			{
-                animationXframeOffset = 0; //attacks 
-
-                NPC.frameCounter++;
-				if (NPC.frameCounter < 10)
-				{
-                    animationXframeOffset = 0; //attacks 
-                    Yframe = 3200;
-                }
-				else if (NPC.frameCounter < 20)
-				{
-                    animationXframeOffset = 0; //attacks 
-                    Yframe = 4000;
-                }
-				else if (NPC.frameCounter < 30)
-				{
-                    animationXframeOffset = 0; //attacks 
-                    Yframe = 3200;
-                }
-				else if (NPC.frameCounter < 40)
-				{
-                    animationXframeOffset = 0; //attacks 
-                    Yframe = 4800;
-                }
-				else
-				{
-                    Yframe = 3200;
-                    NPC.frameCounter = 0; //reset
-				}
-			}
-			if (animation == 4) //thorns close
-			{
-                NPC.frameCounter++;
-				if (NPC.frameCounter < 10)
-				{
-                    animationXframeOffset = 0; //attacks 
-                    Yframe = 2400;
-                }
-				else 
-				{
-                    animationXframeOffset = 0; //attacks 
-                    Yframe = 5600;
-                }
-			}
-			if (animation == 5) //front face
-			{
-                animationXframeOffset = 0; //attacks 
-                Yframe = 5600;
+                possibleAttacks.Add(ZeroAttackType.Dash);
+            }
+            if (NPC.GetLifePercent() < 0.75f)
+            {
+                possibleAttacks.Add(ZeroAttackType.DarkMatterShots);
+            }
+            if (NPC.GetLifePercent() < 0.50f)
+            {
+                possibleAttacks.Add(ZeroAttackType.Sparks);
+            }
+            if (NPC.GetLifePercent() < 0.35f)
+            {
+                possibleAttacks.Add(ZeroAttackType.ThornTail);
             }
 
-            NPC.frame = new Rectangle(animationXframeOffset * 800, Yframe, 800, 800);
-        }*/
+            possibleAttacks.Remove(lastattacktype);
+            possibleAttacks.TrimExcess();
+
+            if (NPC.GetLifePercent() >= 0.90f)
+            {
+                attacktype = ZeroAttackType.BloodShots;
+            }
+            else
+            {
+                attacktype = possibleAttacks[Main.rand.Next(possibleAttacks.Count)];
+                NPC.netUpdate = true;
+            }
+
+            lastattacktype = attacktype;
+		}
+
+        void DefaultMovement(Vector2 playerDistance, Vector2 playerRightDistance, Vector2 playerLeftDistance, float speed, float inertia)
+        {
+            if (playerDistance.X <= 0)
+            {
+                playerRightDistance.Normalize();
+                playerRightDistance *= speed;
+                NPC.velocity = (NPC.velocity * (inertia - 1) + playerRightDistance) / inertia; //fly towards player
+            }
+            else
+            {
+                playerLeftDistance.Normalize();
+                playerLeftDistance *= speed;
+                NPC.velocity = (NPC.velocity * (inertia - 1) + playerLeftDistance) / inertia; //fly towards player
+            }
+        }
 
 		public override Color? GetAlpha(Color lightColor)
 		{
@@ -1420,9 +698,9 @@ namespace KirboMod.NPCs
 
 			if (NPC.life == 1 && deathcounter > 0)
             {
-				return false; //no healt bar
+				return false; //no health bar
             }
-			else //healt bar
+			else //health bar
 			return true;
 		}
 
@@ -1598,7 +876,7 @@ namespace KirboMod.NPCs
 
 		public override void DrawBehind(int index)
         {
-			if (attacktype == 6 & NPC.ai[0] > 120)
+			if (attacktype == ZeroAttackType.BackgroundShots & NPC.ai[0] > 120)
 			{
 				NPC.hide = true;
 				Main.instance.DrawCacheNPCsMoonMoon.Add(index);//be drawn behind things like moonlord(?)

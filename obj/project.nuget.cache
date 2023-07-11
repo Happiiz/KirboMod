@@ -1,10 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "0Mz64J91fgszmNtQDzjbk2wlc8FsUCySeRi8vjdiqcWyglMLhUFkWEcDyrsYnWhvdLyJ1RACaPD8m8nO8i1g9w==",
+  "dgSpecHash": "OCianpJENl9OxA2qjPgdALY6pBqnQI4tTXRO+1Y0/ly88Q51cFCoRm2n3BkhxpuE3KVZ+ndXQ5n8tNsXVfhDhA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\User\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\KirboMod\\KirboMod.csproj",
+  "projectFilePath": "C:\\Users\\abdou\\OneDrive\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\KirboMod\\KirboMod.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\User\\.nuget\\packages\\tmodloader.codeassist\\0.1.5\\tmodloader.codeassist.0.1.5.nupkg.sha512"
+    "C:\\Users\\abdou\\.nuget\\packages\\tmodloader.codeassist\\0.1.5\\tmodloader.codeassist.0.1.5.nupkg.sha512"
   ],
   "logs": []
 }

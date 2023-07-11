@@ -87,7 +87,7 @@ namespace KirboMod.NPCs
                 new HyperzoneBackgroundProvider(), //I totally didn't reference the vanilla code what no way
 
 				// Sets the description of this NPC that is listed in the bestiary.
-				new FlavorTextBestiaryInfoElement("No one knows where the source of this pure evil came from. A physical manifestation of one half of the battle between good and evil? But then what good counters evil of this magnitude?")
+				new FlavorTextBestiaryInfoElement("I see you (unused)")
             });
         }
 
@@ -237,12 +237,7 @@ namespace KirboMod.NPCs
 
 			NPC.rotation = desiredRotation;
 		}
-
-		public override void FindFrame(int frameHeight) // animation
-		{
-
-		}
-
+		
 		public override void HitEffect(NPC.HitInfo hit)
 		{
 			for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
