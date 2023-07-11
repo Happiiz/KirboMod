@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -44,17 +45,37 @@ namespace KirboMod.Projectiles
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = 10;
 		}
-        static int FindTarget()
+        int FindTargetCone(float maxRange = 500)
         {
             int target = -1;
-            float maxRange = 400;
-            Vector2 searchCenter = Main.MouseWorld;
+            Vector2 searchCenter = Main.player[Projectile.owner].Center;
+            List<int> targetsInCone = new();
+            float coneRot = (Main.MouseWorld - Main.player[Projectile.owner].Center).ToRotation();
+            float coneAngle = 0.5f;
             for (int i = 0; i < Main.maxNPCs; i++)
             {
-                if (!Main.npc[i].CanBeChasedBy() || Main.npc[i].DistanceSQ(searchCenter) > maxRange * maxRange || target == -1 || Main.npc[i].DistanceSQ(searchCenter) > Main.npc[target].DistanceSQ(searchCenter))
+                if (!Main.npc[i].CanBeChasedBy() || !Main.npc[i].Hitbox.IntersectsConeSlowMoreAccurate(Main.player[Projectile.owner].Center, maxRange, coneRot, coneAngle))
                     continue;
-                target = i;
+                targetsInCone.Add(i);
             }
+            for (int i = 0; i < targetsInCone.Count; i++)
+            {
+                if (Main.npc[i].boss)
+                {
+                    target = i;
+                    break;
+                }
+                if (target == -1 || Main.npc[targetsInCone[i]].DistanceSQ(searchCenter) < Main.npc[target].DistanceSQ(searchCenter))
+                    target = i;
+            }
+            //debug visualization of cone
+            //for (float i = 0; i < 1; i += 10f / maxRange)
+            //{
+            //    Vector2 point = searchCenter + coneRot.ToRotationVector2().RotatedBy(-coneAngle) * maxRange * i;
+            //    Dust.NewDustPerfect(point, DustID.MushroomSpray, Vector2.Zero).noGravity = true;
+            //    point = searchCenter + coneRot.ToRotationVector2().RotatedBy(coneAngle) * maxRange * i;
+            //    Dust.NewDustPerfect(point, DustID.MushroomSpray, Vector2.Zero).noGravity = true;
+            //}
             return target;
         }
         public void Shoot()
@@ -63,10 +84,10 @@ namespace KirboMod.Projectiles
             Projectile.ai[0] = 0;
             if(Main.myPlayer == Projectile.owner)
             {
-                int targetIndex = FindTarget();
+                int targetIndex = FindTargetCone(1000);
                 Vector2 targetPos = targetIndex == -1 ? Main.MouseWorld : Main.npc[targetIndex].Center;
                 float velLength = MathF.Max((targetPos - Projectile.Center).Length() / 20, 50f);
-                Projectile.velocity = Vector2.Normalize(targetPos - Projectile.Center) * velLength;
+                Projectile.velocity = targetIndex == -1 ? Vector2.Normalize(targetPos - Projectile.Center) * velLength : AIUtils.GetPredictiveAimVelocity(Projectile.Center, velLength, targetPos, Main.npc[targetIndex].velocity);
                 Projectile.netUpdate = true;
             }
             SoundEngine.PlaySound(SoundID.Item9, Projectile.position); //star sound       

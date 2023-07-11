@@ -12,7 +12,7 @@ namespace KirboMod
 {
     public class ParticleSystem : ModSystem
     {
-        public const int maxSparkles = 1300;
+        public const int maxSparkles = 1000;
         public static Sparkle[] sparkle = new Sparkle[maxSparkles + 1];
         public override void Load()
         {
@@ -21,6 +21,8 @@ namespace KirboMod
         }
         public override void Unload()
         {
+            for (int i = 0; i < sparkle.Length; i++)
+                sparkle[i] = null;
             sparkle = null;
         }
         public override void PostDrawTiles()
@@ -28,12 +30,12 @@ namespace KirboMod
             Main.spriteBatch.Begin(SpriteSortMode.Texture, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
             for (int i = 0; i < maxSparkles; i++)
             {
-                if (i < maxSparkles && sparkle[i].Active)
+                if (i < maxSparkles || sparkle[i].Active)
                     sparkle[i].DrawWhitePart();
             }
             for (int i = 0; i < maxSparkles; i++)
             {
-                if (i < maxSparkles && sparkle[i].Active)
+                if (i < maxSparkles || sparkle[i].Active)
                     sparkle[i].Draw();
             }
             Main.spriteBatch.End();

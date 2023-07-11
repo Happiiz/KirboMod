@@ -73,6 +73,9 @@ namespace KirboMod
             Main.EntitySpriteDraw(texture, drawpos, null, smallShineColor, MathHelper.PiOver2 + rotation, origin, scaleY * 0.6f, SpriteEffects.None, 0);
             Main.EntitySpriteDraw(texture, drawpos, null, smallShineColor, rotation, origin, scaleX * 0.6f, SpriteEffects.None, 0);
         }
+        /// <summary>
+        /// random electric color
+        /// </summary>
         public static Color RndElectricCol { get => Main.rand.NextBool(2, 5) ? Color.Yellow : Color.Cyan; }
         public static void DrawElectricOrb(Vector2 pos, Vector2 scale, float opacity, float rotation)
         {
@@ -102,18 +105,22 @@ namespace KirboMod
         public static void DrawProjWithStarryTrail(Projectile proj, Color drawColorMainTrail, Color drawColorSmallInnerTrail, Color drawColorStar, float drawColorMult = 0.2f, byte innerTrailAlpha = 0, byte trailAlpha = 0, byte starAlpha = 0)
         {
             Main.instance.LoadProjectile(proj.type);
+            drawColorMainTrail *= proj.Opacity;
+            drawColorSmallInnerTrail *= proj.Opacity;
+            drawColorStar *= proj.Opacity;
             Texture2D projSprite = TextureAssets.Projectile[proj.type].Value;
+            float scaleMultFromTex = Utils.Remap(projSprite.Size().Length(), 27, 90, 1, 2);
             float scaleIncrease = 0.3f;
-            Vector2 spinningpoint = new(0f, -projSprite.Size().Length() / 3);
+            Vector2 spinningpoint = new(0f, 15);
             Vector2 drawPos = proj.Center + Vector2.Normalize(proj.velocity) * projSprite.Size().Length() / 2 - Main.screenPosition;
             Texture2D starTrailTexture = TextureAssets.Extra[ExtrasID.FallingStar].Value;
             Vector2 starTrailOrigin = new(starTrailTexture.Width / 2f, 10f);
             float timerVar = (float)Main.timeForVisualEffects / 60f;
             float rotation = proj.velocity.ToRotation() + MathHelper.PiOver2;
             drawColorMainTrail *= drawColorMult;
-            Main.EntitySpriteDraw(starTrailTexture, drawPos + spinningpoint.RotatedBy(MathF.PI * 2f * timerVar), null, drawColorMainTrail, rotation, starTrailOrigin, 1.3f + scaleIncrease, SpriteEffects.None, 0);
-            Main.EntitySpriteDraw(starTrailTexture, drawPos + spinningpoint.RotatedBy(MathF.PI * 2f * timerVar + MathHelper.TwoPi / 3f), null, drawColorMainTrail, rotation, starTrailOrigin, 0.9f + scaleIncrease, SpriteEffects.None, 0);
-            Main.EntitySpriteDraw(starTrailTexture, drawPos + spinningpoint.RotatedBy(MathF.PI * 2f * timerVar + 4.1887903f), null, drawColorMainTrail, rotation, starTrailOrigin, 1.1f + scaleIncrease, SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(starTrailTexture, drawPos + spinningpoint.RotatedBy(MathF.Tau * timerVar), null, drawColorMainTrail, rotation, starTrailOrigin,scaleMultFromTex * ( 1.3f + scaleIncrease), SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(starTrailTexture, drawPos + spinningpoint.RotatedBy(MathF.Tau * timerVar + MathHelper.TwoPi / 3f), null, drawColorMainTrail, rotation, starTrailOrigin, scaleMultFromTex * (0.9f + scaleIncrease), SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(starTrailTexture, drawPos + spinningpoint.RotatedBy(MathF.Tau * timerVar + 4.1887903f), null, drawColorMainTrail, rotation, starTrailOrigin, scaleMultFromTex *( 1.1f + scaleIncrease), SpriteEffects.None, 0);
             drawPos = proj.Center + Vector2.Normalize(proj.velocity) * -projSprite.Size().Length() / 4 - Main.screenPosition;
             drawColorSmallInnerTrail.A = innerTrailAlpha;
             for (float i = 0f; i < 1f; i += 0.5f)
@@ -129,7 +136,7 @@ namespace KirboMod
                 Color drawColor = drawColorSmallInnerTrail * colorMult;
                 if (innerTrailAlpha != 0)
                     drawColor.A = (byte)Math.Clamp(innerTrailAlpha * colorMult, 0, 255);
-                Main.EntitySpriteDraw(starTrailTexture, drawPos, null, drawColor, rotation, starTrailOrigin, 0.2f + scale * 0.7f, SpriteEffects.None, 0);
+                Main.EntitySpriteDraw(starTrailTexture, drawPos, null, drawColor, rotation, starTrailOrigin, (0.2f + scale * 0.7f) *scaleMultFromTex, SpriteEffects.None, 0);
             }
             drawPos = proj.Center - Main.screenPosition;
             Main.instance.LoadProjectile(proj.type);

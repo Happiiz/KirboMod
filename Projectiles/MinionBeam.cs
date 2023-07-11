@@ -12,8 +12,11 @@ namespace KirboMod.Projectiles
 		{
 			Main.projFrames[Projectile.type] = 2;
 		}
-
-		public override void SetDefaults()
+        public override bool PreDraw(ref Color lightColor)
+        {
+            return base.PreDraw(ref lightColor);
+        }
+        public override void SetDefaults()
 		{
 			Projectile.width = 30;
 			Projectile.height = 30;

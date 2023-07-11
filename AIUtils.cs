@@ -8,6 +8,21 @@ namespace KirboMod
 {
     public static class AIUtils
     {
+        /// <summary>
+        /// THIS DOESN'T WORK WITH MINIONS BECAUSE OF WHIP TARGETING
+        /// </summary>
+        public static int FindHomingTarget(Projectile proj, float maxRange, bool includeNPCsImmuneToThis = true)
+        {
+            int target = -1;
+            float maxRangeSQ = maxRange * maxRange;
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                if (!ValidHomingTarget(Main.npc[i], proj, includeNPCsImmuneToThis) || Main.npc[i].DistanceSQ(proj.Center) > maxRangeSQ || i == -1 || (Main.npc[i].DistanceSQ(proj.Center) > Main.npc[target].DistanceSQ(proj.Center)))
+                    continue;
+                target = i;
+            }
+            return target;
+        }
         public static bool ValidHomingTarget(NPC npc, Projectile proj, bool includeImmuneNPCs = true)
         {
             bool npcImmuneToProj = false;
@@ -50,6 +65,18 @@ namespace KirboMod
                 amountToCurve = MathHelper.Clamp(amountToCurve + homingStrengthIncrease, float.MinValue, maxHomingStrength);
                 Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Vector2.Normalize(target.Center - Projectile.Center) * maxVel, amountToCurve);
             }
+        }
+        public static Vector2 GetPredictiveAimVelocity(Vector2 shotOrigin, float shotVelLength, Vector2 aimedTargetPos, Vector2 aimedTargetVel)
+        {
+            return GetPredictiveAimRotation(shotOrigin, shotVelLength, aimedTargetPos, aimedTargetVel).ToRotationVector2() * shotVelLength;
+        }
+        public static float GetPredictiveAimRotation(Vector2 shotOrigin, float shotVelLength, Vector2 aimedTargetPos, Vector2 aimedTargetVel)
+        {
+            float angleToTarget = (aimedTargetPos - shotOrigin).ToRotation();
+            float targetTraj = aimedTargetVel.ToRotation();
+            float aimedTargetVelLength = aimedTargetVel.Length();
+            float z = MathF.PI + targetTraj - angleToTarget;
+            return angleToTarget - MathF.Asin(aimedTargetVelLength * MathF.Sin(z) / shotVelLength);
         }
     }
 }

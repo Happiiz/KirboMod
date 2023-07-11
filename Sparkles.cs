@@ -37,14 +37,18 @@ namespace KirboMod
             fatness ??= Vector2.One;
             acceleration ??= Vector2.Zero;
             int finalIndex = ParticleSystem.maxSparkles;
+            Vector2 screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
+            Rectangle screenHitbox = Utils.CenteredRectangle(Main.screenPosition + screenSize / 2f, screenSize + new Vector2(400f));
+
             for (int i = 0; i < ParticleSystem.maxSparkles; i++)
             {
-                if (ParticleSystem.sparkle[i].Active)
+                Rectangle prticleHitbox = new Rectangle((int)(position.X - scale.Value.X * 20), (int)(position.Y - scale.Value.Y * 20), (int)(scale.Value.X * 20), (int)(scale.Value.Y * 20));
+                if (ParticleSystem.sparkle[i].Active || !prticleHitbox.Intersects(screenHitbox))    
                     continue;
                 finalIndex = i;
                 ParticleSystem.sparkle[i].Position = position;
-                ParticleSystem.sparkle[i].Color = color;
                 ParticleSystem.sparkle[i].Scale = scale.Value;
+                ParticleSystem.sparkle[i].Color = color;
                 ParticleSystem.sparkle[i].Velocity = velocity.Value;
                 ParticleSystem.sparkle[i].TimeLeft = duration;
                 ParticleSystem.sparkle[i].Fatness = fatness.Value;
@@ -69,7 +73,7 @@ namespace KirboMod
         public void Draw()
         {
             Vector2 drawpos = Position - Main.screenPosition;
-            Color bigShineColor = Color * 0.5f;
+            Color bigShineColor = Color;
             bigShineColor.A = (byte)(Main.dayTime ? (100 * Opacity) : 0);
             Vector2 origin = sparkleTexture.Size() / 2f;
             float brightness = MathF.Cos(TimeLeft * 0.4f) * 0.25f + 0.75f;
@@ -83,7 +87,7 @@ namespace KirboMod
         {
             Vector2 drawpos = Position - Main.screenPosition;
             Vector2 origin = sparkleTexture.Size() / 2f;
-            Color smallShineColor = Color.White * 0.5f;
+            Color smallShineColor = Color.White;
             smallShineColor.A = 0;
             float brightness = MathF.Cos(TimeLeft * 0.4f) * 0.25f + 0.75f;
             Vector2 scaleX = new Vector2(Fatness.X * 0.5f, Scale.X) * brightness;

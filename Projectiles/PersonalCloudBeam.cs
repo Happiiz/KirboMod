@@ -37,8 +37,11 @@ namespace KirboMod.Projectiles
 				}
 			}
 		}
-
-		public override Color? GetAlpha(Color lightColor)
+        public override bool PreDraw(ref Color lightColor)
+        {
+            return base.PreDraw(ref lightColor);
+        }
+        public override Color? GetAlpha(Color lightColor)
 		{
 			return Color.White; // Makes it uneffected by light
 		}

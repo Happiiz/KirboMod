@@ -121,24 +121,6 @@ namespace KirboMod
                 darkDashTime = 0;
             }
         }
-        public bool AllTripleStarStarsAvailableForUse()//TODO: DELETE THIS
-        {
-            //TripleStarStar availableStar = null;
-            //for (int i = 0; i < tripleStarIndexes.Length; i++)
-            //{
-            //    if (tripleStarIndexes[i] != -1)
-            //    {
-            //        availableStar = Main.projectile[tripleStarIndexes[i]].ModProjectile as TripleStarStar;
-            //        if (!availableStar.AvailableForUse)
-            //            return false;
-            //    }
-            //    else
-            //    {
-            //        return false;
-            //    }
-            //}
-            return true;
-        }
         public TripleStarStar GetAvailableTripleStarStar()
         {
             TripleStarStar availableStar;
