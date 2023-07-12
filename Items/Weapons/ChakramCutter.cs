@@ -1,5 +1,7 @@
+using Microsoft.Xna.Framework;
 using System;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -15,7 +17,6 @@ namespace KirboMod.Items.Weapons
 				"\nOnly four can be out at a time"); */
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research 
         }
-
 		public override void SetDefaults()
 		{
 			Item.damage = 35;
@@ -40,8 +41,18 @@ namespace KirboMod.Items.Weapons
 		{
 			return player.ownedProjectileCounts[Item.shoot] < 4; //only four at a time
 		}
-
-		public override void AddRecipes()
+        public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+        {
+			if (Main.myPlayer != player.whoAmI)
+				return false;
+            for (int i = 0; i < 2; i++)
+            {
+				int delayBeforeSecondChakramFires = 10;
+				Projectile.NewProjectileDirect(source, position + velocity.RotatedBy(MathF.PI / 2 + i * MathF.PI), velocity, type, damage, knockback, player.whoAmI, -delayBeforeSecondChakramFires * i, i == 0 ? 1 : -1);
+            }
+			return false;
+        }
+        public override void AddRecipes()
 		{
 			Recipe recipe1 = CreateRecipe();//the result is chakramcutter
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.Cutter>()); //Cutter

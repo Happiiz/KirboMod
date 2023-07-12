@@ -19,13 +19,13 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 180;
+			Item.damage = 400;
 			Item.DamageType = DamageClass.Magic;
 			Item.mana = 12;
 			Item.width = 20; //half of sprite size(only effects world dimensions)
 			Item.height = 20; //half of sprite size(only effects world dimensions)
-			Item.useTime = 20;
-			Item.useAnimation = 20;
+			Item.useTime = 16;
+			Item.useAnimation = 16;
 			Item.useStyle = ItemUseStyleID.Swing;
 			Item.knockBack = 8;
             Item.value = Item.buyPrice(0, 25, 0, 0);
@@ -33,7 +33,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item8; //magic cast
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.LoveLoves>();
-			Item.shootSpeed = 12f;
+			Item.shootSpeed = 24f;
 			Item.noMelee = true;
 		}
 

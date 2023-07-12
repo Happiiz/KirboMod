@@ -25,7 +25,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 32;
+			Item.damage = 40;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 34;
@@ -70,18 +70,18 @@ namespace KirboMod.Items.Weapons
                 type = ModContent.ProjectileType<Projectiles.PlasmaZap>();
                 velocity.X = projshoot.X;
                 velocity.Y = projshoot.Y;
-                damage = 32;
+                damage *= 1;
                 player.GetModPlayer<KirbPlayer>().plasmacharge = 0;
             }
             else if (player.GetModPlayer<KirbPlayer>().plasmacharge < 12)
             {
                 Vector2 projshoot = Main.MouseWorld - player.Center;
                 projshoot.Normalize();
-                projshoot *= 25;
+                projshoot *= 25;//GIVE 1 EXTRA UPDATE FOR BETTER COLLISION
                 type = ModContent.ProjectileType<Projectiles.PlasmaLaser>();
                 velocity.X = projshoot.X;
                 velocity.Y = projshoot.Y;
-                damage = 64;
+                damage *= 25;
                 player.statMana -= 9; //+ -3 is -12 mana
                 player.GetModPlayer<KirbPlayer>().plasmacharge = 0;
             }
@@ -89,7 +89,7 @@ namespace KirboMod.Items.Weapons
             {
                 //use default shoot speed(10)
                 type = ModContent.ProjectileType<Projectiles.PlasmaBlast>();
-                damage = 128;
+                damage *= 50;
                 player.statMana -= 37; //+ -3 is -40 mana
                 player.GetModPlayer<KirbPlayer>().plasmacharge = 0;
             }

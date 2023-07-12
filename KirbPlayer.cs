@@ -32,6 +32,7 @@ namespace KirboMod
 
         public bool[] HasTripleStars = {false, false, false}; //targeting
         public int tripleStarRotationCounter = 0;
+        public int[] tripleStarIndexes = new int[3];
 
         public bool nightcrown; //for nightmare crown accesory true or false
         public bool nightmareeffect; // nightmare crown effect
@@ -120,7 +121,22 @@ namespace KirboMod
                 darkDashTime = 0;
             }
         }
-
+        public TripleStarStar GetAvailableTripleStarStar()
+        {
+            TripleStarStar availableStar;
+            for (int i = 0; i < tripleStarIndexes.Length; i++)
+            {
+                if (tripleStarIndexes[i] != -1)
+                {
+                    availableStar = Main.projectile[tripleStarIndexes[i]].ModProjectile as TripleStarStar;
+                    if (availableStar.AvailableForUse)
+                    {
+                        return availableStar;
+                    }
+                }
+            }
+            return null;
+        }
         public override void PostUpdate()
         {
             Player player = Main.player[Main.myPlayer];
@@ -137,62 +153,67 @@ namespace KirboMod
             }
 
             //TRIPLE STAR STARS
-
-            tripleStarRotationCounter += 5;
-
-            int tripleStar = ModContent.ItemType<TripleStar>();
-
-            int tripleStarStar = ModContent.ProjectileType<TripleStarStar>();
-
-            if (player.HeldItem.type == tripleStar && !player.dead && player.active) //holding Triple Star Rod
+            tripleStarRotationCounter += 1;
+           
+            int tripleStarID = ModContent.ItemType<TripleStar>();
+            if (player.HeldItem.type == tripleStarID && !player.dead && player.active)
             {
-                if (player.ownedProjectileCounts[tripleStarStar] < 1) //no stars out
-                {
-                    //all stars circle
-                    HasTripleStars[0] = true;
-                    HasTripleStars[1] = true;
-                    HasTripleStars[2] = true;
-                }
-                else if (player.ownedProjectileCounts[tripleStarStar] < 2) //1 star out
-                {
-                    //2 stars circle
-                    HasTripleStars[0] = false;
-                    HasTripleStars[1] = true;
-                    HasTripleStars[2] = true;
-                }
-                else if (player.ownedProjectileCounts[tripleStarStar] < 3) //2 stars out
-                {
-                    //1 star circle
-                    HasTripleStars[0] = false;
-                    HasTripleStars[1] = false;
-                    HasTripleStars[2] = true;
-                }
-                else //all stars out
-                {
-                    //no stars circle
-                    HasTripleStars[0] = false;
-                    HasTripleStars[1] = false;
-                    HasTripleStars[2] = false;
-                }
-
-                for (int i = 0; i < 3; i++) //to 3
-                {
-                    float finalDamage = player.GetTotalDamage(Player.HeldItem.DamageType).ApplyTo(Player.HeldItem.damage); //final damage calculated
-
-                    if (HasTripleStars[i]) //checks each one to see if it has the triple stars
+                float finalDamage = player.GetTotalDamage(Player.HeldItem.DamageType).ApplyTo(Player.HeldItem.damage); //final damage calculated
+                for (int i = 0; i < tripleStarIndexes.Length; i++)
+                {   
+                    if (tripleStarIndexes[i] == -1 || !Main.projectile[tripleStarIndexes[i]].active)
                     {
-                        Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, Vector2.Zero,
-                            ModContent.ProjectileType<CyclingStar>(), (int)finalDamage, 0, player.whoAmI, 0, i);
+                        tripleStarIndexes[i] = Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, Vector2.Zero,
+                                ModContent.ProjectileType<TripleStarStar>(), (int)finalDamage, 0, player.whoAmI, 0, 0);
+                    }
+                    else
+                    {
+                        Projectile tripleStar = Main.projectile[tripleStarIndexes[i]];
+                        tripleStar.timeLeft = 2;
                     }
                 }
             }
-            else //not holding
+            else
             {
-                //no stars circle
-                HasTripleStars[0] = false;
-                HasTripleStars[0] = false;
-                HasTripleStars[0] = false;
+                for (int i = 0; i < tripleStarIndexes.Length; i++)
+                {
+                    if (tripleStarIndexes[i] != -1)
+                    {
+                        Main.projectile[tripleStarIndexes[i]].Kill();
+                        tripleStarIndexes[i] = -1;
+                    }
+                }
             }
+            //holding Triple Star Rod
+            //if (player.HeldItem.type == tripleStar && !player.dead && player.active) //holding Triple Star Rod
+            //{
+            //    for (int i = 0; i < HasTripleStars.Length; i++)
+            //    {
+            //        tripleStarIndexes[i] = -1;
+            //    }
+            //    //for (int i = 0; i < player.ownedProjectileCounts[tripleStarStar]; i++)
+            //    //{
+            //    //    HasTripleStars[i] = false;
+            //    //}
+            //    for (int i = 0; i < 3; i++) //to 3
+            //    {
+            //        float finalDamage = player.GetTotalDamage(Player.HeldItem.DamageType).ApplyTo(Player.HeldItem.damage); //final damage calculated
+
+            //        if (tripleStarIndexes[i] == -1) //checks each one to see if it has the triple stars
+            //        {
+
+            //            tripleStarIndexes[i] = Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, Vector2.Zero,
+            //                ModContent.ProjectileType<CyclingStar>(), (int)finalDamage, 0, player.whoAmI, 0, i);
+            //        }
+            //    }
+            //}
+            //else //not holding
+            //{
+            //    //no stars circle
+            //    HasTripleStars[0] = false;
+            //    HasTripleStars[0] = false;
+            //    HasTripleStars[0] = false;
+            //}
 
             //Plasma
 

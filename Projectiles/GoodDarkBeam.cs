@@ -24,8 +24,9 @@ namespace KirboMod.Projectiles
 			Projectile.timeLeft = 60;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
-			//projectile.usesLocalNPCImmunity = true; //uses own immunity frames
-			//projectile.localNPCHitCooldown = 30; //time before hit again
+
+			Projectile.usesLocalNPCImmunity = true;
+			Projectile.localNPCHitCooldown = 10;
 		}
 
 		public override void AI()

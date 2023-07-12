@@ -15,8 +15,8 @@ namespace KirboMod.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 30;
-			Projectile.height = 30;
+			Projectile.width = 50;
+			Projectile.height = 50;
 			Projectile.friendly = true;
 			Projectile.timeLeft = 300;
 			Projectile.tileCollide = false;
@@ -37,8 +37,12 @@ namespace KirboMod.Projectiles
 				}
 			}
 		}
-
-		public override Color? GetAlpha(Color lightColor)
+        public override bool PreDraw(ref Color lightColor)
+        {
+			VFX.DrawElectricOrb(Projectile.Center, Vector2.One * 1.3f, Projectile.Opacity, Projectile.rotation);
+			return false;
+        }
+        public override Color? GetAlpha(Color lightColor)
 		{
 			return Color.White; // Makes it uneffected by light
 		}

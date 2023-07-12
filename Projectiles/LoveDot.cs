@@ -13,35 +13,37 @@ namespace KirboMod.Projectiles
 	public class LoveDot : ModProjectile
 	{
 		Vector2 circleCenter = new Vector2(0, 0);
-		float counter = 1;
+		float counter = 20;
 		float gorate = 0.4f;
         public override void SetStaticDefaults()
 		{
 			Main.projFrames[Projectile.type] = 1;
 
             //for afterimages
-            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 10; // The length of old position to be recorded
+            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 30; // The length of old position to be recorded
             ProjectileID.Sets.TrailingMode[Projectile.type] = 0; // The recording mode
         }
 
 		public override void SetDefaults()
 		{
+			ProjectileID.Sets.TrailCacheLength[Projectile.type] = 30; // The length of old position to be recorded
+
 			Projectile.width = 14;
 			Projectile.height = 14;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Magic;
-			Projectile.timeLeft = 30; 
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 			Projectile.scale = 1;
-			Projectile.usesIDStaticNPCImmunity = true; //shares immunity frames with proj of same type
-			Projectile.idStaticNPCHitCooldown = 20; //time before hit again
+			Projectile.extraUpdates = 2;//more afterimages for a more cohesive trail
+			Projectile.usesLocalNPCImmunity = true; //shares immunity frames with proj of same type
+			Projectile.localNPCHitCooldown = 20; //time before hit again
 		}
-
+		int afterimgCancelDrawCount = 0;
 		public override void AI()
 		{
-			Projectile.scale *= 1.02f;
-            if (++Projectile.frameCounter >= 4) //changes frames every 3 ticks 
+			
+            if (++Projectile.frameCounter >= 8) //changes frames every 3 ticks 
 			{
 				Projectile.frameCounter = 0;
 				if (++Projectile.frame >= Main.projFrames[Projectile.type])
@@ -49,23 +51,24 @@ namespace KirboMod.Projectiles
 					Projectile.frame = 0;
 				}
 			}
-
-			//set it to position here as setting it in love love would make it the love love position
-            circleCenter = new Vector2(Projectile.ai[0] - (Projectile.width / 2), Projectile.ai[1] - (Projectile.height / 2));
-			counter += gorate; //go up
-
-			float rotationalOffset = MathHelper.ToRadians(Projectile.ai[2]); //convert degrees to radians
-
-            //set a point(circleCenter) and then make the projectile spiral in a growing circle around that (starting at the center)
-            Projectile.position.X = circleCenter.X + (float)Math.Cos(counter + rotationalOffset) * ((counter * 50) -  50);
-            Projectile.position.Y = circleCenter.Y + (float)Math.Sin(counter + rotationalOffset) * ((counter * 50) - 50);
-
-			gorate *= 0.90f;
-
-			if (gorate < 0.04f) //slow enough
-			{
-                Projectile.alpha += 40;
+			if(afterimgCancelDrawCount == 0)
+				Projectile.scale *= 1.005f;
+			if (afterimgCancelDrawCount > Projectile.oldPos.Length)
+            {
+				Projectile.Kill();
             }
+			if(Projectile.localAI[0] > 100)//how many updates you want it to last
+            {
+				afterimgCancelDrawCount++;
+            }
+			Projectile.localAI[0]++;
+			float progress = Projectile.localAI[0] / 70;
+			progress = progress > 1 ? MathF.Sin(progress * MathF.PI * 0.5f + MathF.PI) + 2: MathF.Sin(progress * MathF.PI * 0.5f);			
+			gorate = progress * 3f;
+			counter = (1 - progress) * 10  + 10;
+			float rotationalOffset = Projectile.ai[2];
+			Projectile.velocity = (gorate + rotationalOffset ).ToRotationVector2() * counter;
+		
         }
 
 		public override Color? GetAlpha(Color lightColor)
@@ -82,16 +85,17 @@ namespace KirboMod.Projectiles
             Texture2D texture = afterimagae.Value;
 
             // Redraw the projectile with the color not influenced by light
-            for (int k = 1; k < Projectile.oldPos.Length; k++) //start at 1 so not ontop of actual dot
+            for (int k = Projectile.oldPos.Length - 1; k >= afterimgCancelDrawCount; k--)
             {
-                Vector2 drawOrigin = new Vector2(texture.Width / 2, texture.Height / 2);
-                Vector2 drawPos = (Projectile.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
-
-                Color color = (Projectile.GetAlpha(lightColor) * Projectile.Opacity) * ((Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);
-                Main.EntitySpriteDraw(texture, drawPos, null, color, Projectile.rotation, drawOrigin, 1, SpriteEffects.None, 0);
-            }
-
-            return true; //draw og
+				Vector2 drawOrigin = new Vector2(texture.Width / 2, texture.Height / 2);
+				Vector2 drawPos = (Projectile.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
+				Vector2 lerpedPos = k == 0 ? Vector2.Lerp(Projectile.position, Projectile.oldPos[0], 0.5f) : Vector2.Lerp(Projectile.oldPos[k - 1], Projectile.oldPos[k], 0.5f);
+				lerpedPos -= -drawOrigin + new Vector2(0f, Projectile.gfxOffY) + Main.screenPosition;
+				Color color = (Projectile.GetAlpha(lightColor) * Projectile.Opacity) * (1 - (float)k / Projectile.oldPos.Length);
+				Main.EntitySpriteDraw(texture, drawPos, null, color * 0.75f, Projectile.rotation, drawOrigin, Projectile.scale, SpriteEffects.None, 0);
+				Main.EntitySpriteDraw(texture, lerpedPos, null, color * 0.75f, Projectile.rotation, drawOrigin, Projectile.scale, SpriteEffects.None, 0);
+			}
+			return afterimgCancelDrawCount == 0; //draw og
         }
     }
 }

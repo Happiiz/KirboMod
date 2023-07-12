@@ -24,7 +24,6 @@ namespace KirboMod.Projectiles
 			Projectile.penetrate = 99;
 			
 		}
-
 		public override void AI()
 		{
 			Projectile.rotation += 0.4f * (float)Projectile.direction; // rotates projectile
@@ -37,8 +36,12 @@ namespace KirboMod.Projectiles
 				}
 			}
 		}
-
-		public override Color? GetAlpha(Color lightColor)
+        public override bool PreDraw(ref Color lightColor)
+        {
+			VFX.DrawElectricOrb(Projectile.Center, new Vector2(1.6f), Projectile.Opacity, Projectile.rotation);
+			return false;
+        }
+        public override Color? GetAlpha(Color lightColor)
 		{
 			return Color.White; // Makes it uneffected by light
 		}

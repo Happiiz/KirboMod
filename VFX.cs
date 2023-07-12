@@ -14,38 +14,51 @@ namespace KirboMod
 {
     public class VFX : ModSystem
     {
+        public static void SpawnBlueStarParticle(Projectile proj, Vector2? velocity = null, float scale = 1, Vector2? posOffset = null)
+        {
+            //16 yellow star gore
+            //17 blue star gore
+            velocity ??= Vector2.Zero;
+            posOffset ??= Vector2.Zero;
+            Gore.NewGoreDirect(proj.GetSource_FromThis(), proj.Center + posOffset.Value, velocity.Value, 17, scale);
+        }
+        public static void SpawnYellowStarParticle(Projectile proj, Vector2? velocity = null, float scale = 1, Vector2? posOffset = null)
+        {
+            //16 yellow star gore
+            //17 blue star gore
+            velocity ??= Vector2.Zero;
+            posOffset ??= Vector2.Zero;
+            Gore.NewGoreDirect(proj.GetSource_FromThis(), proj.Center + posOffset.Value, velocity.Value, 16, scale);
+        }
         public static void LoadTextures()
         {
             Circle = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/CirclePremultiplied").Value;
             Ring = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/RingPremultiplied").Value;
             GlowBall = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowBallPremultiplied").Value;
-
+            glowLine = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowLinePremultiplied").Value;
+            glowLineCap = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowLineCapPremultiplied").Value;
         }
+        public static Texture2D glowLine;
+        public static Texture2D glowLineCap;
         public static Texture2D Circle;
 
         public static Texture2D GlowBall;
 
         public static Texture2D Ring;
 
+        public override void OnWorldLoad()
+        {
+            LoadTextures();//hopefully this fixes the textures not being loaded??
+        }
         public override void Load()
         {
             LoadTextures();
         }
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="opacity"></param>
         /// <param name="drawpos">remember to subtract Main.screenPosition</param>
         /// <param name="drawColor">color of the inner cross, most of the time you will want to leave this as white</param>
         /// <param name="shineColor">color of the outer cross</param>
         /// <param name="flareCounter">used as a timer for the fade things</param>
-        /// <param name="fadeInStart"></param>
-        /// <param name="fadeInEnd"></param>
-        /// <param name="fadeOutStart"></param>
-        /// <param name="fadeOutEnd"></param>
-        /// <param name="rotation"></param>
-        /// <param name="scale"></param>
-        /// <param name="fatness"></param>
         public static void DrawPrettyStarSparkle(float opacity, Vector2 drawpos, Color drawColor, Color shineColor, float flareCounter, float fadeInStart, float fadeInEnd, float fadeOutStart, float fadeOutEnd, float rotation, Vector2 scale, Vector2 fatness)
         {
             Texture2D texture = TextureAssets.Extra[98].Value;
@@ -63,7 +76,42 @@ namespace KirboMod
             Main.EntitySpriteDraw(texture, drawpos, null, smallShineColor, MathHelper.PiOver2 + rotation, origin, scaleY * 0.6f, SpriteEffects.None, 0);
             Main.EntitySpriteDraw(texture, drawpos, null, smallShineColor, rotation, origin, scaleX * 0.6f, SpriteEffects.None, 0);
         }
-
+        /// <summary>
+        /// random electric color
+        /// </summary>
+        public static Color RndElectricCol { get => Main.rand.NextBool(2, 5) ? Color.Yellow : Color.Cyan; }
+        public static void DrawElectricOrb(Projectile proj, Vector2 scale)
+        {
+            Vector2 randomOffset = Main.rand.NextVector2Circular(4, 4);
+            Vector2 fatness = Vector2.One;//feel free to mess around with
+            Vector2 sparkleScale = Vector2.One;//these values to see what thet change
+            fatness *= scale;
+            sparkleScale *= scale;
+            randomOffset *= scale;
+            float randRot = Main.rand.NextFloat() * MathF.Tau;
+            Vector2 randScale = new(Main.rand.NextFloat() + 1f, Main.rand.NextFloat() + 1f);
+            randScale *= scale;
+            randScale *= 0.15f;
+            Main.EntitySpriteDraw(Ring, proj.Center - Main.screenPosition, null, RndElectricCol with { A = 0 } * 0.8f * proj.Opacity, randRot, Ring.Size() / 2, randScale, SpriteEffects.None);
+            Main.EntitySpriteDraw(Circle, proj.Center - Main.screenPosition, null, RndElectricCol with { A = 0 } * 0.25f * proj.Opacity, randRot, Circle.Size() / 2, randScale * 1.8f, SpriteEffects.None);
+            DrawPrettyStarSparkle(proj.Opacity, proj.Center - Main.screenPosition + randomOffset, new Color(255, 255, 255, 0), RndElectricCol, 1, 0, 1, 1, 2, proj.rotation, sparkleScale, fatness);
+        }
+        public static void DrawElectricOrb(Vector2 pos, Vector2 scale, float opacity, float rotation)
+        {
+            Vector2 randomOffset = Main.rand.NextVector2Circular(4, 4);
+            Vector2 fatness = Vector2.One;//feel free to mess around with
+            Vector2 sparkleScale = Vector2.One;//these values to see what thet change
+            fatness *= scale;
+            sparkleScale *= scale;
+            randomOffset *= scale;
+            float randRot = Main.rand.NextFloat() * MathF.Tau;
+            Vector2 randScale = new(Main.rand.NextFloat() + 1f, Main.rand.NextFloat() + 1f);
+            randScale *= scale;
+            randScale *= 0.15f;
+            Main.EntitySpriteDraw(Ring, pos - Main.screenPosition, null, RndElectricCol with { A = 0 } * 0.8f * opacity, randRot, Ring.Size() / 2, randScale, SpriteEffects.None);
+            Main.EntitySpriteDraw(Circle, pos - Main.screenPosition, null, RndElectricCol with { A = 0 } * 0.25f * opacity, randRot, Circle.Size() / 2, randScale * 1.8f, SpriteEffects.None);
+            DrawPrettyStarSparkle( opacity, pos - Main.screenPosition + randomOffset, new Color(255, 255, 255, 0), RndElectricCol, 1, 0, 1, 1, 2, rotation, sparkleScale, fatness);
+        }
 
         public override void Unload()
         {
@@ -72,6 +120,50 @@ namespace KirboMod
             GlowBall = null;
             Ring = null;
         }
+
+        public static void DrawProjWithStarryTrail(Projectile proj, Color drawColorMainTrail, Color drawColorSmallInnerTrail, Color drawColorStar, float drawColorMult = 0.2f, byte innerTrailAlpha = 0, byte trailAlpha = 0, byte starAlpha = 0)
+        {
+            Main.instance.LoadProjectile(proj.type);
+            drawColorMainTrail *= proj.Opacity;
+            drawColorSmallInnerTrail *= proj.Opacity;
+            drawColorStar *= proj.Opacity;
+            Texture2D projSprite = TextureAssets.Projectile[proj.type].Value;
+            float scaleMultFromTex = Utils.Remap(projSprite.Size().Length(), 27, 90, 1, 2);
+            float scaleIncrease = 0.3f;
+            Vector2 spinningpoint = new(0f, 15);
+            Vector2 drawPos = proj.Center + Vector2.Normalize(proj.velocity) * projSprite.Size().Length() / 2 - Main.screenPosition;
+            Texture2D starTrailTexture = TextureAssets.Extra[ExtrasID.FallingStar].Value;
+            Vector2 starTrailOrigin = new(starTrailTexture.Width / 2f, 10f);
+            float timerVar = (float)Main.timeForVisualEffects / 60f;
+            float rotation = proj.velocity.ToRotation() + MathHelper.PiOver2;
+            drawColorMainTrail *= drawColorMult;
+            Main.EntitySpriteDraw(starTrailTexture, drawPos + spinningpoint.RotatedBy(MathF.Tau * timerVar), null, drawColorMainTrail, rotation, starTrailOrigin,scaleMultFromTex * ( 1.3f + scaleIncrease), SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(starTrailTexture, drawPos + spinningpoint.RotatedBy(MathF.Tau * timerVar + MathHelper.TwoPi / 3f), null, drawColorMainTrail, rotation, starTrailOrigin, scaleMultFromTex * (0.9f + scaleIncrease), SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(starTrailTexture, drawPos + spinningpoint.RotatedBy(MathF.Tau * timerVar + 4.1887903f), null, drawColorMainTrail, rotation, starTrailOrigin, scaleMultFromTex *( 1.1f + scaleIncrease), SpriteEffects.None, 0);
+            drawPos = proj.Center + Vector2.Normalize(proj.velocity) * -projSprite.Size().Length() / 4 - Main.screenPosition;
+            drawColorSmallInnerTrail.A = innerTrailAlpha;
+            for (float i = 0f; i < 1f; i += 0.5f)
+            {
+                float scale = timerVar % 0.5f / 0.5f;
+                scale = (scale + i) % 1f;
+                float colorMult = scale * 2f;
+                if (colorMult > 1f)
+                {
+                    colorMult = 2f - colorMult;
+                }
+                colorMult += +0.2f;
+                Color drawColor = drawColorSmallInnerTrail * colorMult;
+                if (innerTrailAlpha != 0)
+                    drawColor.A = (byte)Math.Clamp(innerTrailAlpha * colorMult, 0, 255);
+                Main.EntitySpriteDraw(starTrailTexture, drawPos, null, drawColor, rotation, starTrailOrigin, (0.2f + scale * 0.7f) *scaleMultFromTex, SpriteEffects.None, 0);
+            }
+            drawPos = proj.Center - Main.screenPosition;
+            Main.instance.LoadProjectile(proj.type);
+            starTrailTexture = TextureAssets.Projectile[proj.type].Value;
+            drawColorStar.A = starAlpha;
+            Main.EntitySpriteDraw(starTrailTexture, drawPos, null, drawColorStar, proj.rotation, starTrailTexture.Size() / 2, 1, SpriteEffects.None, 0);
+        }
+
     }
 
 }

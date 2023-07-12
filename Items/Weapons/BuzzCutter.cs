@@ -21,7 +21,8 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 80;
+			Item.ArmorPenetration = 1000;
+			Item.damage = 20;
 			Item.noMelee = true;
 			Item.DamageType = DamageClass.Ranged;
 			Item.width = 50;
@@ -32,10 +33,10 @@ namespace KirboMod.Items.Weapons
 			Item.knockBack = 3;
 			Item.value = Item.buyPrice(0, 5, 50, 0);
 			Item.rare = ItemRarityID.Yellow;
-			Item.UseSound = SoundID.Item61;
+			Item.UseSound = SoundID.Item84 with { MaxInstances = 10 };
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.BuzzCutterProj>();
-			Item.shootSpeed = 20f; //doesn't matter
+			Item.shootSpeed = 20; //doesn't matter
 		}
 
 		public override bool CanUseItem(Player player)

@@ -31,8 +31,17 @@ namespace KirboMod.Projectiles
 			Projectile.usesLocalNPCImmunity = true; //doesn't wait for other projectiles to hit again
 			Projectile.localNPCHitCooldown = 10; //time until able to hit npc even if npc has just been struck
 		}
-
-		public override void AI()
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+        {
+			return Projectile.ai[0] >= 0 && AIUtils.CheckCircleCollision(targetHitbox, Projectile.Center, 35);
+        }
+        public override bool PreAI()
+        {
+			if (Projectile.ai[0] < 0)
+				Projectile.Center = Main.player[Projectile.owner].Center - Projectile.velocity;
+			return Projectile.ai[0] >= 0;
+        }
+        public override void AI()
 		{
 			Player player = Main.player[Projectile.owner];
 			Projectile.rotation += Projectile.direction * 0.5f;
@@ -40,6 +49,10 @@ namespace KirboMod.Projectiles
 			Projectile.ai[0]++;
 			if (Projectile.ai[0] >= 25)//return
             {
+				if(Projectile.ai[0] == 25)
+                {
+					Projectile.velocity = Projectile.velocity.RotatedBy(Projectile.ai[1] * MathF.PI / 2);
+                }
 				float speed = 25f; //top speed(original shoot speed)
 				float inertia = 10f; //acceleration and decceleration speed
 
@@ -56,13 +69,15 @@ namespace KirboMod.Projectiles
             }
 		}
 
-        public static Asset<Texture2D> afterimagae;
+        public static Asset<Texture2D> afterimage;
 
         public override bool PreDraw(ref Color lightColor)
         {
+			if (Projectile.ai[0] < 0)
+				return false;
             Main.instance.LoadProjectile(Projectile.type);
-            afterimagae = ModContent.Request<Texture2D>(Texture);
-            Texture2D texture = afterimagae.Value;
+            afterimage = ModContent.Request<Texture2D>(Texture);
+            Texture2D texture = afterimage.Value;
 
             // Redraw the projectile with the color not influenced by light
             for (int k = 1; k < Projectile.oldPos.Length; k++) //start at 1 so not ontop of actual ring

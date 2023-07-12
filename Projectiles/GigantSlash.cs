@@ -25,6 +25,8 @@ namespace KirboMod.Projectiles
 			Projectile.tileCollide = false;
 			Projectile.ignoreWater = true;
 			Projectile.alpha = 50;
+			Projectile.usesLocalNPCImmunity = true;
+			Projectile.localNPCHitCooldown = 10;
 		}
 
 		public override void AI()

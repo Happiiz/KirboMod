@@ -19,7 +19,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 52;
+			Item.damage = 100;
 			Item.noMelee = true;
 			Item.DamageType = DamageClass.Magic;
 			Item.mana = 8;
@@ -32,10 +32,10 @@ namespace KirboMod.Items.Weapons
 			Item.value = Item.buyPrice(0, 0, 15, 50);
 			Item.rare = ItemRarityID.Pink;
 			Item.autoReuse = true;
-			Item.UseSound = SoundID.Item9; //astral magic noise
+			//Item.UseSound = SoundID.Item9; //astral magic noise//I put sound on the projectile
 			Item.scale = 1f;
 			Item.shoot = ModContent.ProjectileType<Projectiles.Star>();
-			Item.shootSpeed = 16f;
+			Item.shootSpeed = 32f;
 			Item.crit += 24;
 
 		}
@@ -43,11 +43,16 @@ namespace KirboMod.Items.Weapons
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {
             position.Y -= 10; //move up slightly
+			position += (velocity).SafeNormalize(Vector2.Zero) * 20;
         }
 
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
 		{
-			Projectile.NewProjectile(source, position.X, position.Y, velocity.X, velocity.Y, ModContent.ProjectileType<Projectiles.Star>(), Item.damage, 6f, player.whoAmI);
+			if (Main.myPlayer != player.whoAmI)
+				return false;
+			Projectile proj = Projectile.NewProjectileDirect(source, position, velocity, ModContent.ProjectileType<Projectiles.Star>(), damage, 6f, player.whoAmI);
+			proj.rotation += Main.rand.NextFloat() * MathF.Tau;
+			proj.netUpdate = true;
 			return false;
 		}
 
