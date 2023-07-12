@@ -32,7 +32,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item5; //bow shot
 			Item.autoReuse = true;
 			Item.shoot = ItemID.JestersArrow;
-			Item.shootSpeed = 10f;
+			Item.shootSpeed = 13;
 			Item.useAmmo = AmmoID.Arrow;
 		}
 
