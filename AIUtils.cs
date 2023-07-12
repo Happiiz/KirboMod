@@ -8,6 +8,17 @@ namespace KirboMod
 {
     public static class AIUtils
     {
+        public static void DustCircle(int dustAmount, float radius, Vector2 circleOrigin, int dustID = DustID.MagnetSphere)
+        {
+            for (float i = 0; i < 1; i+= 1f / dustAmount)
+            {
+                Dust.NewDustPerfect(circleOrigin + (i * MathF.Tau).ToRotationVector2() * radius, dustID, Vector2.Zero);
+            }
+        }
+        public static bool CheckCircleCollision(Rectangle targetHitbox, Vector2 circleOrigin, float radius)
+        {
+            return circleOrigin.DistanceSQ(targetHitbox.ClosestPointInRect(circleOrigin)) < radius * radius;
+        }
         /// <summary>
         /// THIS DOESN'T WORK WITH MINIONS BECAUSE OF WHIP TARGETING
         /// </summary>

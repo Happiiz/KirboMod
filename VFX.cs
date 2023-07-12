@@ -35,8 +35,11 @@ namespace KirboMod
             Circle = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/CirclePremultiplied").Value;
             Ring = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/RingPremultiplied").Value;
             GlowBall = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowBallPremultiplied").Value;
-
+            glowLine = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowLinePremultiplied").Value;
+            glowLineCap = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowLineCapPremultiplied").Value;
         }
+        public static Texture2D glowLine;
+        public static Texture2D glowLineCap;
         public static Texture2D Circle;
 
         public static Texture2D GlowBall;
@@ -77,6 +80,22 @@ namespace KirboMod
         /// random electric color
         /// </summary>
         public static Color RndElectricCol { get => Main.rand.NextBool(2, 5) ? Color.Yellow : Color.Cyan; }
+        public static void DrawElectricOrb(Projectile proj, Vector2 scale)
+        {
+            Vector2 randomOffset = Main.rand.NextVector2Circular(4, 4);
+            Vector2 fatness = Vector2.One;//feel free to mess around with
+            Vector2 sparkleScale = Vector2.One;//these values to see what thet change
+            fatness *= scale;
+            sparkleScale *= scale;
+            randomOffset *= scale;
+            float randRot = Main.rand.NextFloat() * MathF.Tau;
+            Vector2 randScale = new(Main.rand.NextFloat() + 1f, Main.rand.NextFloat() + 1f);
+            randScale *= scale;
+            randScale *= 0.15f;
+            Main.EntitySpriteDraw(Ring, proj.Center - Main.screenPosition, null, RndElectricCol with { A = 0 } * 0.8f * proj.Opacity, randRot, Ring.Size() / 2, randScale, SpriteEffects.None);
+            Main.EntitySpriteDraw(Circle, proj.Center - Main.screenPosition, null, RndElectricCol with { A = 0 } * 0.25f * proj.Opacity, randRot, Circle.Size() / 2, randScale * 1.8f, SpriteEffects.None);
+            DrawPrettyStarSparkle(proj.Opacity, proj.Center - Main.screenPosition + randomOffset, new Color(255, 255, 255, 0), RndElectricCol, 1, 0, 1, 1, 2, proj.rotation, sparkleScale, fatness);
+        }
         public static void DrawElectricOrb(Vector2 pos, Vector2 scale, float opacity, float rotation)
         {
             Vector2 randomOffset = Main.rand.NextVector2Circular(4, 4);
@@ -89,8 +108,8 @@ namespace KirboMod
             Vector2 randScale = new(Main.rand.NextFloat() + 1f, Main.rand.NextFloat() + 1f);
             randScale *= scale;
             randScale *= 0.15f;
-            Main.EntitySpriteDraw(Ring, pos - Main.screenPosition, null, RndElectricCol with { A = 0 } * 0.8f, randRot, Ring.Size() / 2, randScale, SpriteEffects.None);
-            Main.EntitySpriteDraw(Circle, pos - Main.screenPosition, null, RndElectricCol with { A = 0 } * 0.25f, randRot, Circle.Size() / 2, randScale * 1.8f, SpriteEffects.None);
+            Main.EntitySpriteDraw(Ring, pos - Main.screenPosition, null, RndElectricCol with { A = 0 } * 0.8f * opacity, randRot, Ring.Size() / 2, randScale, SpriteEffects.None);
+            Main.EntitySpriteDraw(Circle, pos - Main.screenPosition, null, RndElectricCol with { A = 0 } * 0.25f * opacity, randRot, Circle.Size() / 2, randScale * 1.8f, SpriteEffects.None);
             DrawPrettyStarSparkle( opacity, pos - Main.screenPosition + randomOffset, new Color(255, 255, 255, 0), RndElectricCol, 1, 0, 1, 1, 2, rotation, sparkleScale, fatness);
         }
 

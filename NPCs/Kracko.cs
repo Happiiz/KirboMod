@@ -109,7 +109,7 @@ namespace KirboMod.NPCs
         {
             Player player = Main.player[NPC.target];
             NPC.ai[0]++;
-            //AttackSpawnDoo();
+            AttackSpawnDoo();
             float attackEnd = float.MaxValue;
             switch (attacktype)
             {

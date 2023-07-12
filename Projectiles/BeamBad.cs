@@ -24,8 +24,12 @@ namespace KirboMod.Projectiles
 			Projectile.tileCollide = false;
 			Projectile.penetrate = 99;
 		}
-		
-		public override void AI()
+        public override bool PreDraw(ref Color lightColor)
+        {
+			VFX.DrawElectricOrb(Projectile.Center, new Vector2(1), Projectile.Opacity,Projectile.rotation);
+			return false;
+        }
+        public override void AI()
 		{
 			if (Projectile.damage > 24)
             {

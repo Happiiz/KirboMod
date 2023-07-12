@@ -10,6 +10,8 @@ using KirboMod.Items.Weapons;
 using System.Linq;
 using Terraria.Graphics.Shaders;
 using Terraria.Graphics;
+using Microsoft.Xna.Framework.Audio;
+using Terraria.Audio;
 
 namespace KirboMod.Globals
 {
@@ -135,11 +137,23 @@ namespace KirboMod.Globals
 			Terraria.Graphics.On_FinalFractalHelper.GetFinalFractalProfile += GetFinalFractalProfilePostZero;
             Terraria.Graphics.On_FinalFractalHelper.GetRandomProfileIndex += GetRandomProfileIndexPostZero;
             Terraria.Graphics.On_FinalFractalHelper.Draw += DrawRainbowTrailIfRainbowSword;
+            Terraria.Audio.On_SoundEngine.PlaySound_refSoundStyle_Nullable1_SoundUpdateCallback += SoundEngineFixAttempt;
 		}
-		private static VertexStrip _vertexStrip = new();
+		/// <summary>
+		/// experimental thing. Remove later
+		/// </summary>
+        private ReLogic.Utilities.SlotId SoundEngineFixAttempt(On_SoundEngine.orig_PlaySound_refSoundStyle_Nullable1_SoundUpdateCallback orig, ref SoundStyle style, Vector2? position, SoundUpdateCallback updateCallback)
+        {
+			style.MaxInstances = 60;
+			return orig.Invoke(ref style, position, updateCallback);
+        }
+
+       
+
+        private static VertexStrip _vertexStrip = new();
 		Color ColorFunction(float progress)
 		{
-			return Main.hslToRgb((float)((progress + Main.timeForVisualEffects / 30) % 1), 1, 0.5f);
+			return Main.hslToRgb((float)((progress * 3 + Main.timeForVisualEffects / 30) % 1), 1, 0.5f);
 		}
 		private void DrawRainbowTrailIfRainbowSword(On_FinalFractalHelper.orig_Draw orig, ref Terraria.Graphics.FinalFractalHelper self, Projectile proj)
         {		
@@ -189,7 +203,9 @@ namespace KirboMod.Globals
 			On_FinalFractalHelper.Draw -= DrawRainbowTrailIfRainbowSword;
 			On_FinalFractalHelper.GetFinalFractalProfile -= GetFinalFractalProfilePostZero;
 			On_FinalFractalHelper.GetRandomProfileIndex -= GetRandomProfileIndexPostZero;
+			Terraria.Audio.On_SoundEngine.PlaySound_refSoundStyle_Nullable1_SoundUpdateCallback -= SoundEngineFixAttempt;
 			_vertexStrip = null;
+			_fractalProfiles = null;
 		}
 	}
 	public class PostZeroZenithRecipe : ModSystem

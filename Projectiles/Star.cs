@@ -84,7 +84,10 @@ namespace KirboMod.Projectiles
 			SoundEngine.PlaySound(SoundID.Item10, Projectile.position); //impact
 			return true; //collision
 		}
-
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+        {
+			return AIUtils.CheckCircleCollision(targetHitbox, Projectile.Center, 50) || AIUtils.CheckCircleCollision(targetHitbox, Projectile.Center - Projectile.velocity * 4, 50); ;
+        }
         public override Color? GetAlpha(Color lightColor)
         {
 			return Color.White; // Makes it uneffected by light

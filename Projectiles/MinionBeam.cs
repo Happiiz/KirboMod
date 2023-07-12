@@ -14,7 +14,8 @@ namespace KirboMod.Projectiles
 		}
         public override bool PreDraw(ref Color lightColor)
         {
-            return base.PreDraw(ref lightColor);
+            VFX.DrawElectricOrb(Projectile.Center, Vector2.One * 1.5f, Projectile.Opacity, Projectile.rotation);
+			return false;
         }
         public override void SetDefaults()
 		{
@@ -31,7 +32,7 @@ namespace KirboMod.Projectiles
 
 		public override void AI()
 		{
-			Projectile.rotation += 0.4f * (float)Projectile.direction; // rotates projectile
+			Projectile.rotation += 0.4f * Projectile.direction; // rotates projectile
 			if (++Projectile.frameCounter >= 2) //changes frames every 2 ticks 
 			{
 				Projectile.frameCounter = 0;

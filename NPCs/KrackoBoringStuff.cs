@@ -135,18 +135,7 @@ namespace KirboMod.NPCs
 
 		public override Color? GetAlpha(Color lightColor)
 		{
-			if (attacktype == KrackoAttackType.Lightning && NPC.ai[0] >= 120 && !frenzy) //no frenzy
-			{
-				int darkness = 255 - (((int)NPC.ai[0] - 120) * 9); //subtract 9 from the value each time
-
-				if (darkness < 64) //minimum
-				{
-					darkness = 64;
-				}
-
-				return new Color(darkness, darkness, darkness); //darken for thunder
-			}
-			else if (attacktype == KrackoAttackType.Lightning && NPC.ai[0] >= 10 && frenzy) //frenzy
+			 if (attacktype == KrackoAttackType.Lightning) //frenzy
 			{
 				int darkness = (int)Utils.Remap(NPC.ai[0], 30, 60, 255, 60);
 				return new Color(darkness, darkness, darkness); //darken for thunder
