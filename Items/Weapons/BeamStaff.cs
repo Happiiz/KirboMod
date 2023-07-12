@@ -49,11 +49,7 @@ namespace KirboMod.Items.Weapons
 		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
 		{
             Vector2 shootdir = Main.MouseWorld - player.Center;
-            shootdir.Normalize();
-            shootdir *= 8f;
-            position = player.Center + shootdir * 5;
-            velocity.X = shootdir.X;
-            velocity.Y = shootdir.Y;
+            position = player.Center + (velocity * 8);
         }
     }
 }

@@ -89,7 +89,7 @@ namespace KirboMod.Projectiles
 			//move up or down
 			if (!player.dead) //check this so it doesn't flatline when player dies
 			{
-				float speed = 28f;
+				float speed = 16f;
 				float inertia = 8f;
 				Vector2 direction = player.Center - Projectile.Center; //start - end
 				direction.Normalize();
