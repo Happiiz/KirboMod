@@ -109,7 +109,7 @@ namespace KirboMod.NPCs
         {
             Player player = Main.player[NPC.target];
             NPC.ai[0]++;
-            AttackSpawnDoo();
+            //AttackSpawnDoo();
             float attackEnd = float.MaxValue;
             switch (attacktype)
             {
@@ -141,7 +141,7 @@ namespace KirboMod.NPCs
                 {
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        int index = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<WaddleDoo>(), 0, 0, 1, 0, 0, NPC.target);
+                        int index = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y, Mod.Find<ModNPC>("WaddleDoo").Type, 0, 0, 1, 0, 0, NPC.target);
 
                         if (Main.netMode == NetmodeID.Server && index < Main.maxNPCs)
                         {
@@ -454,7 +454,7 @@ namespace KirboMod.NPCs
             spriteBatch.Draw(eye, NPC.Center - Main.screenPosition, null, new Color(255, 255, 255), 0, new Vector2(29, 29), 1f, SpriteEffects.None, 0f);
             spriteBatch.Draw(pupil, NPC.Center - Main.screenPosition + pupilOffset, null, Color.White, 0, pupil.Size() / 2, 1, SpriteEffects.None, 0);
             if (drawEyelid)
-                spriteBatch.Draw(eyelid, NPC.Center - Main.screenPosition, null, Color.White, 0, eyelid.Size() / 2, 1, SpriteEffects.None, 0);
+                spriteBatch.Draw(eyelid, NPC.Center - Main.screenPosition + new Vector2(0, -4), null, Color.White, 0, eyelid.Size() / 2, 1, SpriteEffects.None, 0);
         }
        
     }
