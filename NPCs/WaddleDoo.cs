@@ -275,9 +275,9 @@ namespace KirboMod.NPCs
 			NPC.velocity.X *= 0.9f;
 			float beamRange = 15;
 			if (Main.expertMode)
-				beamRange *= 1.5f;
+				beamRange *= 1.2f;
 			if (SpawnedFromKracko)
-				beamRange *= 1.5f;
+				beamRange *= 1.2f;
 			Vector2 projshoot = new Vector2(NPC.direction * beamRange, 0).RotatedBy(MathF.Sin((NPC.ai[0]  - 60) / 15f));
 			Vector2 startOffset = new Vector2(NPC.direction * 8, 0);
 

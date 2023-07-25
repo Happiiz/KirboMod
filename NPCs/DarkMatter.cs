@@ -34,7 +34,7 @@ namespace KirboMod.NPCs
 		public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Dark Matter");
-			Main.npcFrameCount[NPC.type] = 6;
+			Main.npcFrameCount[NPC.type] = 18;
 
             // Add this in for bosses that have a summon item, requires corresponding code in the item
             NPCID.Sets.MPAllowedEnemies[Type] = true; 
@@ -73,6 +73,7 @@ namespace KirboMod.NPCs
 		{
 			NPC.width = 130;
 			NPC.height = 130;
+			DrawOffsetY = 30;
 			NPC.damage = 100;
 			NPC.noTileCollide = true;
 			NPC.defense = 35;
@@ -156,14 +157,21 @@ namespace KirboMod.NPCs
 			Vector2 move = player.Center - NPC.Center;
 
 			if (phase == 1) //DARK MATTER BLADE
-			{
+            {
+                //passive dust effect in hair
+                if (NPC.ai[0] % 5 == 0) //every 5 ticks
+				{
+					Dust.NewDust(NPC.position, NPC.width, 30, ModContent.DustType<Dusts.DarkResidue>(), 0, -5, Scale: 0.5f);
+				}
 		       
 				NPC.spriteDirection = NPC.direction;
 				NPC.rotation = 0.0f;
 
 				if (NPC.ai[0] <= 360) //Movement before special attack (Alot of this code was taken from ExampleMod's capitive element(2)) so I don't fully understand this yet, but it makes my video game reference go smooth so I don't mind it
-				{
-					float minX = moveTo.X - 50f;
+                {
+                    animation = 0; //default
+
+                    float minX = moveTo.X - 50f;
 					float maxX = moveTo.X + 50f;
 					float minY = moveTo.Y;
 					float maxY = moveTo.Y;
@@ -199,8 +207,6 @@ namespace KirboMod.NPCs
 					}
 					NPC.TargetClosest(true);
 				}
-
-				animation = 0; //blade form
 
 				if (NPC.ai[0] == 0) //checks if cycle has restarted
 				{
@@ -389,7 +395,10 @@ namespace KirboMod.NPCs
 					NPC.velocity.X += NPC.direction * -1.1f;
 
 					NPC.velocity.Y *= 0;
-				}
+
+
+                    animation = 2; //backup
+                }
 
 				if (NPC.ai[0] == 321) //declaring lunge values
 				{
@@ -408,7 +417,9 @@ namespace KirboMod.NPCs
 					NPC.TargetClosest(false);
 					NPC.velocity.X = lunge;
 					NPC.velocity.Y *= 0;
-				}
+
+                    animation = 1; //dash
+                }
 
 				if (frenzy == false) //not angy
 				{
@@ -437,7 +448,9 @@ namespace KirboMod.NPCs
 						NPC.TargetClosest(false);
 						NPC.velocity.X = lunge;
 						NPC.velocity.Y *= 0;
-					}
+
+                        animation = 2; //backup
+                    }
 
 					if (NPC.ai[0] > 414)
                     {
@@ -452,7 +465,9 @@ namespace KirboMod.NPCs
 				if (NPC.ai[0] >= 360 & NPC.ai[1] == 2) //Stop movement for orb attack
 				{
 					NPC.velocity *= 0;
-				}
+
+                    animation = 0; //default (stop)
+                }
 
 				if (NPC.ai[0] == 370 & NPC.ai[1] == 2) //charge orb and attack
 				{
@@ -498,7 +513,7 @@ namespace KirboMod.NPCs
 				NPC.rotation = 0.0f;
 				NPC.velocity *= 0.95f; //slow
 				NPC.ai[2]++; //go up by 1 each tick
-				animation = 1; //phase transition
+				animation = 3; //phase transition
 				NPC.defense = 2000;
 				NPC.damage = 0;
 
@@ -507,7 +522,7 @@ namespace KirboMod.NPCs
 					if (NPC.ai[2] % 10 == 0) //remainder
 					{
 						Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-						Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed * 3, 1); //Makes a crumb of dust
+						Dust d = Dust.NewDustPerfect(NPC.Center + new Vector2(0, 20), ModContent.DustType<Dusts.DarkResidue>(), speed * 3, 1); //Makes a crumb of dust
 						d.noGravity = true;
 					}
 				}
@@ -516,7 +531,7 @@ namespace KirboMod.NPCs
 					if (NPC.ai[2] % 5 == 0) //remainder
 					{
 						Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-						Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed * 3, 1); //Makes a crumb of dust
+						Dust d = Dust.NewDustPerfect(NPC.Center + new Vector2(0, 20), ModContent.DustType<Dusts.DarkResidue>(), speed * 3, 1); //Makes a crumb of dust
 						d.noGravity = true;
 					}
 					
@@ -524,7 +539,7 @@ namespace KirboMod.NPCs
 				else
 				{
 					Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-					Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed * 3, 1); //Makes a crumb of dust
+					Dust d = Dust.NewDustPerfect(NPC.Center + new Vector2(0, 20), ModContent.DustType<Dusts.DarkResidue>(), speed * 3, 1); //Makes a crumb of dust
 					d.noGravity = true;
 				}
 
@@ -1140,7 +1155,7 @@ namespace KirboMod.NPCs
 					}
 				}
 				NPC.spriteDirection = NPC.direction;
-				animation = 2; //true form
+				animation = 4; //true form
 			}
 		}	
 
@@ -1150,52 +1165,116 @@ namespace KirboMod.NPCs
 			{
 				if (NPC.ai[0] >= 300 & NPC.ai[1] == 2) //dark orb attack
 				{
-					NPC.frame.Y = 0; //robe swish
+					NPC.frame.Y = frameHeight * 3; 
 					NPC.frameCounter = 0;
 				}
 				else //robe swing
 				{
 					NPC.frameCounter += 1.0;
-					if (NPC.frameCounter < 15.0)
+					if (NPC.frameCounter < 12.0)
 					{
 						NPC.frame.Y = 0; //robe swish
 					}
-					else if (NPC.frameCounter < 30.0)
+					else if (NPC.frameCounter < 24.0)
 					{
 						NPC.frame.Y = frameHeight; //robe swoosh
 					}
-					else
+                    else if (NPC.frameCounter < 36.0)
+                    {
+                        NPC.frame.Y = frameHeight * 2; //robe swash
+                    }
+                    else if (NPC.frameCounter < 48.0)
+                    {
+                        NPC.frame.Y = frameHeight * 3; //robe swush
+                    }
+                    else
 					{
 						NPC.frameCounter = 0.0; //reset
 					}
 				}
 			}
-			if (animation == 1) //phase transition
+            if (animation == 1) //dash
             {
-				NPC.frameCounter += 1.0;
-				if (NPC.frameCounter < 15.0)
-				{
-					NPC.frame.Y = frameHeight * 2; //flap down
-				}
-				else if (NPC.frameCounter < 30.0)
-				{
-					NPC.frame.Y = frameHeight * 3; //flap up
-				}
-				else
-				{
-					NPC.frameCounter = 0.0; //reset
-				}
-			}
-			if (animation == 2) //phase 2
+                NPC.frameCounter += 1.0;
+                if (NPC.frameCounter < 6.0)
+                {
+                    NPC.frame.Y = frameHeight * 4;
+                }
+                else if (NPC.frameCounter < 12.0)
+                {
+                    NPC.frame.Y = frameHeight * 5;
+                }
+                else if (NPC.frameCounter < 18.0)
+                {
+                    NPC.frame.Y = frameHeight * 6;
+                }
+                else if (NPC.frameCounter < 24.0)
+                {
+                    NPC.frame.Y = frameHeight * 7;
+                }
+                else
+                {
+                    NPC.frameCounter = 0.0; //reset
+                }
+            }
+            if (animation == 2) //retreat
+            {
+                NPC.frameCounter += 1.0;
+                if (NPC.frameCounter < 6.0)
+                {
+                    NPC.frame.Y = frameHeight * 8;
+                }
+                else if (NPC.frameCounter < 12.0)
+                {
+                    NPC.frame.Y = frameHeight * 9;
+                }
+                else if (NPC.frameCounter < 18.0)
+                {
+                    NPC.frame.Y = frameHeight * 10;
+                }
+                else if (NPC.frameCounter < 24.0)
+                {
+                    NPC.frame.Y = frameHeight * 11;
+                }
+                else
+                {
+                    NPC.frameCounter = 0.0; //reset
+                }
+            }
+            if (animation == 3) //phase transition
+            {
+                NPC.frameCounter += 1.0;
+                if (NPC.frameCounter < 6.0)
+                {
+                    NPC.frame.Y = frameHeight * 12; 
+                }
+                else if (NPC.frameCounter < 12.0)
+                {
+                    NPC.frame.Y = frameHeight * 13; 
+                }
+                else if (NPC.frameCounter < 18.0)
+                {
+                    NPC.frame.Y = frameHeight * 14; 
+                }
+                else if (NPC.frameCounter < 24.0)
+                {
+                    NPC.frame.Y = frameHeight * 15; 
+                }
+                else
+                {
+                    NPC.frameCounter = 0.0; //reset
+                }
+            }
+			if (animation == 4) //phase 2
 			{
 				NPC.frameCounter += 1.0;
-				if (NPC.frameCounter < 8.0)
+				if (NPC.frameCounter < 6.0)
 				{
-					NPC.frame.Y = frameHeight * 4; //idle
+					NPC.frame.Y = frameHeight * 16; //idle
 				}
-				else if (NPC.frameCounter < 16.0)
+				else if (NPC.frameCounter < 12.0)
 				{
-					NPC.frame.Y = frameHeight * 5; //lil' stretch
+					NPC.frame.Y = frameHeight * 17; //lil' stretch
 				}
 				else
 				{
