@@ -29,6 +29,7 @@ namespace KirboMod.Projectiles
 			Projectile.timeLeft = 240;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
+            Projectile.extraUpdates = 1;
 			Projectile.scale = 1f;
 		}
 		public override void AI()

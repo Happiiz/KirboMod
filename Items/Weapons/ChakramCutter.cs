@@ -33,7 +33,8 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = false;
 			Item.shoot = ModContent.ProjectileType<Projectiles.ChakramCutterProj>();
-			Item.shootSpeed = 25f; 
+			Item.shootSpeed = 35f;
+			Item.autoReuse = true; 
 			Item.noUseGraphic = true;
 		}
 

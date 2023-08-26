@@ -137,19 +137,7 @@ namespace KirboMod.Globals
 			Terraria.Graphics.On_FinalFractalHelper.GetFinalFractalProfile += GetFinalFractalProfilePostZero;
             Terraria.Graphics.On_FinalFractalHelper.GetRandomProfileIndex += GetRandomProfileIndexPostZero;
             Terraria.Graphics.On_FinalFractalHelper.Draw += DrawRainbowTrailIfRainbowSword;
-            Terraria.Audio.On_SoundEngine.PlaySound_refSoundStyle_Nullable1_SoundUpdateCallback += SoundEngineFixAttempt;
 		}
-		/// <summary>
-		/// experimental thing. Remove later
-		/// </summary>
-        private ReLogic.Utilities.SlotId SoundEngineFixAttempt(On_SoundEngine.orig_PlaySound_refSoundStyle_Nullable1_SoundUpdateCallback orig, ref SoundStyle style, Vector2? position, SoundUpdateCallback updateCallback)
-        {
-			style.MaxInstances = 60;
-			return orig.Invoke(ref style, position, updateCallback);
-        }
-
-       
-
         private static VertexStrip _vertexStrip = new();
 		Color ColorFunction(float progress)
 		{
@@ -203,7 +191,6 @@ namespace KirboMod.Globals
 			On_FinalFractalHelper.Draw -= DrawRainbowTrailIfRainbowSword;
 			On_FinalFractalHelper.GetFinalFractalProfile -= GetFinalFractalProfilePostZero;
 			On_FinalFractalHelper.GetRandomProfileIndex -= GetRandomProfileIndexPostZero;
-			Terraria.Audio.On_SoundEngine.PlaySound_refSoundStyle_Nullable1_SoundUpdateCallback -= SoundEngineFixAttempt;
 			_vertexStrip = null;
 			_fractalProfiles = null;
 		}

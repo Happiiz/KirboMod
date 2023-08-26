@@ -28,6 +28,7 @@ namespace KirboMod.Projectiles
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 			Projectile.DamageType = DamageClass.Ranged;
+			Projectile.extraUpdates = 1;
 			Projectile.usesLocalNPCImmunity = true; //doesn't wait for other projectiles to hit again
 			Projectile.localNPCHitCooldown = 10; //time until able to hit npc even if npc has just been struck
 		}
@@ -37,16 +38,19 @@ namespace KirboMod.Projectiles
         }
         public override bool PreAI()
         {
+			Projectile.ai[0]++;
 			if (Projectile.ai[0] < 0)
 				Projectile.Center = Main.player[Projectile.owner].Center - Projectile.velocity;
 			return Projectile.ai[0] >= 0;
         }
         public override void AI()
 		{
+			Lighting.AddLight(Projectile.Center, Color.Gold.ToVector3());
 			Player player = Main.player[Projectile.owner];
 			Projectile.rotation += Projectile.direction * 0.5f;
-
-			Projectile.ai[0]++;
+			Dust dust = Main.dust[Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.SpelunkerGlowstickSparkle)];
+			dust.scale = 2;
+			dust.velocity += Projectile.velocity;
 			if (Projectile.ai[0] >= 25)//return
             {
 				if(Projectile.ai[0] == 25)
