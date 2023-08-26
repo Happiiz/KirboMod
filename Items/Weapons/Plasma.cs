@@ -12,7 +12,6 @@ namespace KirboMod.Items.Weapons
 {
 	public class Plasma : ModItem
 	{
-		private int timer = 0; //timer for charge decrease
 		private bool holdingbutton = false; //checks if you're holding WASD
 		public override void SetStaticDefaults()
 		{
@@ -25,7 +24,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 40;
+			Item.damage = 32;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 34;
@@ -39,7 +38,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item12; //laser beam
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.PlasmaZap>();
-			Item.shootSpeed = 10f;
+			Item.shootSpeed = 20f;
 			Item.mana = 3;
 		}
 
@@ -64,32 +63,25 @@ namespace KirboMod.Items.Weapons
 		{
             if (player.GetModPlayer<KirbPlayer>().plasmacharge < 3)
             {
-                Vector2 projshoot = Main.MouseWorld - player.Center;
-                projshoot.Normalize();
-                projshoot *= 20;
                 type = ModContent.ProjectileType<Projectiles.PlasmaZap>();
-                velocity.X = projshoot.X;
-                velocity.Y = projshoot.Y;
                 damage *= 1;
                 player.GetModPlayer<KirbPlayer>().plasmacharge = 0;
             }
             else if (player.GetModPlayer<KirbPlayer>().plasmacharge < 12)
             {
-                Vector2 projshoot = Main.MouseWorld - player.Center;
-                projshoot.Normalize();
-                projshoot *= 25;//GIVE 1 EXTRA UPDATE FOR BETTER COLLISION
                 type = ModContent.ProjectileType<Projectiles.PlasmaLaser>();
-                velocity.X = projshoot.X;
-                velocity.Y = projshoot.Y;
-                damage *= 25;
+                velocity *= 1.25f; //make velocity 25
+				position += velocity * 5; //start away from player
+                damage *= 4;
                 player.statMana -= 9; //+ -3 is -12 mana
                 player.GetModPlayer<KirbPlayer>().plasmacharge = 0;
             }
             else if (player.GetModPlayer<KirbPlayer>().plasmacharge >= 12)
             {
-                //use default shoot speed(10)
                 type = ModContent.ProjectileType<Projectiles.PlasmaBlast>();
-                damage *= 50;
+                velocity *= 0.5f; //make velocity 10
+                position += velocity * 5; //start away from player
+                damage *= 16;
                 player.statMana -= 37; //+ -3 is -40 mana
                 player.GetModPlayer<KirbPlayer>().plasmacharge = 0;
             }
@@ -98,7 +90,7 @@ namespace KirboMod.Items.Weapons
         public override void HoldItem(Player player)
         {
 			//if pressing right or left(not holding)
-			if ((player.controlRight || player.controlLeft) & holdingbutton == false)
+			if ((player.controlRight || player.controlLeft) && holdingbutton == false)
 			{
 				player.GetModPlayer<KirbPlayer>().plasmacharge++;
                 player.GetModPlayer<KirbPlayer>().plasmaTimer = 0; //reset timer

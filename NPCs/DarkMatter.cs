@@ -1,119 +1,33 @@
-using KirboMod.Items.DarkMatter;
-using KirboMod.Items.Zero;
+using KirboMod.Dusts;
+using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
-using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.GameContent.Bestiary;
-using Terraria.GameContent.ItemDropRules;
-using KirboMod.Bestiary;
-using KirboMod.Systems;
-using Terraria.DataStructures;
+using static Terraria.GameContent.Animations.On_Actions.NPCs;
+using static Terraria.ModLoader.PlayerDrawLayer;
 
 namespace KirboMod.NPCs
 {
-	[AutoloadBossHead]
-	public class DarkMatter : ModNPC
+    [AutoloadBossHead]
+	public partial class DarkMatter : ModNPC
 	{
 		private int animation = 0; //frame cycles
 
-		private float lunge = 20; // velocity of lunge when lunging
-
 		private int phase = 1; //phase 1 = blade, phase 2 = transition, phase 3 = true form
-		private int phase2special = 1; //for deciding which special is used in phase 2
 
-		private int frenzydashamount = 2; //not 3 because the inital dash
+		private bool frenzy = false; 
 
-		private bool frenzy = false;
+        private Vector2 enrageDashTargetArea = Vector2.Zero;
 
-		public override void SetStaticDefaults()
-		{
-			// DisplayName.SetDefault("Dark Matter");
-			Main.npcFrameCount[NPC.type] = 18;
+        private DarkMatterAttackType attacktype = DarkMatterAttackType.DarkBeams;
 
-            // Add this in for bosses that have a summon item, requires corresponding code in the item
-            NPCID.Sets.MPAllowedEnemies[Type] = true; 
-
-            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
-            {
-                //CustomTexturePath = ,
-                PortraitScale = 1, // Portrait refers to the full picture when clicking on the icon in the bestiary
-                PortraitPositionYOverride = 0,
-                PortraitPositionXOverride = 20,
-                Position = new Vector2(20, 0),
-            };
-            NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
-
-            NPCDebuffImmunityData debuffData = new NPCDebuffImmunityData
-            {
-                SpecificallyImmuneTo = new int[] 
-				{
-                    BuffID.Confused, // Most NPCs have this
-		            BuffID.Poisoned,
-                    BuffID.Venom,
-                    BuffID.OnFire,
-                    BuffID.CursedInferno,
-                    BuffID.ShadowFlame,
-                }
-            };
-            NPCID.Sets.DebuffImmunitySets[Type] = debuffData;
-        }
-
-		public override void Load() //I use this to allow me to use the boss head
-        {
-            Mod.AddBossHeadTexture("KirboMod/NPCs/DarkMatter_Head_Boss2");
-        }
-
-		public override void SetDefaults()
-		{
-			NPC.width = 130;
-			NPC.height = 130;
-			DrawOffsetY = 30;
-			NPC.damage = 100;
-			NPC.noTileCollide = true;
-			NPC.defense = 35;
-			NPC.lifeMax = 52000;
-			NPC.HitSound = SoundID.NPCHit1;
-			NPC.DeathSound = SoundID.NPCDeath1;
-			NPC.value = Item.buyPrice( 0, 19, 9, 5); // money it drops
-			NPC.knockBackResist = 0f;
-			NPC.aiStyle = -1;
-			NPC.npcSlots = 12;
-			NPC.boss = true;
-			NPC.noGravity = true;
-			NPC.lavaImmune = true;
-			NPC.buffImmune[BuffID.Poisoned] = true;
-			NPC.buffImmune[BuffID.Venom] = true;
-			NPC.buffImmune[BuffID.OnFire] = true;
-			NPC.buffImmune[BuffID.CursedInferno] = true;
-			NPC.buffImmune[BuffID.ShadowFlame] = true;
-			Music = MusicID.Boss4;
-            NPC.buffImmune[BuffID.Confused] = true;
-        }
-
-		public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */
-		{
-			NPC.lifeMax = (int)(NPC.lifeMax * 0.7 * balance);
-			NPC.damage = (int)(NPC.damage * 0.6);
-		}
-
-        public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
-        {
-            // We can use AddRange instead of calling Add multiple times in order to add multiple items at once
-            bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
-            {
-                new SurfaceBackgroundProvider(), //I totally didn't steal this code
-				// Sets the spawning conditions of this NPC that is listed in the bestiary.
-
-				// Sets the description of this NPC that is listed in the bestiary.
-				new FlavorTextBestiaryInfoElement("A being of pure evil bent on spreading darkness. What could be the origin of this innate vile in it's heart?")
-            });
-        }
+        private DarkMatterAttackType lastattacktype = DarkMatterAttackType.Orbs;
 
         public override void AI() //constantly cycles each time
 		{
@@ -138,6 +52,8 @@ namespace KirboMod.NPCs
 					NPC.velocity.Y = NPC.velocity.Y - 0.2f;
 				}
 
+                NPC.ai[0] = 0;
+
 				if (NPC.timeLeft > 60)
 				{
 					NPC.timeLeft = 60;
@@ -151,1048 +67,763 @@ namespace KirboMod.NPCs
 		}
 		private void AttackPattern()
 		{
-			Player player = Main.player[NPC.target];
-			Vector2 moveTo = player.Center; 
-			Vector2 playerDistance = player.Center - NPC.Center;
-			Vector2 move = player.Center - NPC.Center;
+            NPC.ai[0]++;
 
-			if (phase == 1) //DARK MATTER BLADE
+            NPC.spriteDirection = NPC.direction;
+
+            if (phase == 1)
             {
-                //passive dust effect in hair
-                if (NPC.ai[0] % 5 == 0) //every 5 ticks
-				{
-					Dust.NewDust(NPC.position, NPC.width, 30, ModContent.DustType<Dusts.DarkResidue>(), 0, -5, Scale: 0.5f);
-				}
-		       
-				NPC.spriteDirection = NPC.direction;
-				NPC.rotation = 0.0f;
-
-				if (NPC.ai[0] <= 360) //Movement before special attack (Alot of this code was taken from ExampleMod's capitive element(2)) so I don't fully understand this yet, but it makes my video game reference go smooth so I don't mind it
+                //passive effects
+                if (Main.rand.NextBool(4)) //1/4 chance
                 {
-                    animation = 0; //default
-
-                    float minX = moveTo.X - 50f;
-					float maxX = moveTo.X + 50f;
-					float minY = moveTo.Y;
-					float maxY = moveTo.Y;
-
-					if (playerDistance.X <= 0) //if player is behind enemy
-					{
-						move = move + new Vector2(400f, -20); // go in front of player and slightly above
-					}
-					else
-                    {
-						move = move + new Vector2(-400f, -20); // go behind player and slightly above
-					}
-
-					if (NPC.Center.X >= minX && NPC.Center.X <= maxX && NPC.Center.Y >= minY && NPC.Center.Y <= maxY) //certain range
-					{
-						NPC.velocity *= 0.98f; //slow
-					}
-					else
-					{
-						float magnitude = (float)Math.Sqrt(move.X * move.X + move.Y * move.Y);
-						float speed = 14f; //speed I think
-						if (magnitude > speed)
-						{
-							move *= speed / magnitude;
-						}
-						float inertia = 10f; //Ok so like I'm pretty sure this is supposed to be how wibbly wobbly you want the npc to be before it reaches its destination
-						NPC.velocity = (inertia * NPC.velocity + move) / (inertia + 1);
-						magnitude = (float)Math.Sqrt(NPC.velocity.X * NPC.velocity.X + NPC.velocity.Y + NPC.velocity.Y);
-						if (magnitude > speed)
-						{
-							NPC.velocity *= speed / magnitude;
-						}
-					}
-					NPC.TargetClosest(true);
-				}
-
-				if (NPC.ai[0] == 0) //checks if cycle has restarted
-				{
-					if (NPC.life <= NPC.lifeMax * 0.75 & Main.expertMode) //checks if npc has 3/4 of life and in expert mode
-					{
-						frenzy = true;
-					}
-					else
-					{
-						frenzy = false;
-					}
-				}
-
-				NPC.ai[0]++; //phase 1 cycle
-
-				//PROJECTILE
-				Vector2 beamshoot = player.Center - NPC.Center;
-
-				
-				if (NPC.ai[0] == 60)
-				{
-					beamshoot.Normalize(); //reduces it to a value of 1
-					beamshoot *= 20f; //inital projectile speed
-					beamshoot.Y = 0f;
-					if (Main.netMode != NetmodeID.MultiplayerClient)
-					{
-						Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y + 20f, beamshoot.X, beamshoot.Y, Mod.Find<ModProjectile>("DarkBeam").Type, (NPC.damage / 3) / 2, 8f, Main.myPlayer, 0, 0);
-					}
-					SoundEngine.PlaySound(SoundID.Item15); //phaseblade
-				}
-				if (NPC.ai[0] == 80)
-				{
-					beamshoot.Normalize(); //reduces it to a value of 1
-					beamshoot *= 20f; //inital projectile speed
-					beamshoot.Y = 0f;
-                    if (Main.netMode != NetmodeID.MultiplayerClient)
-                    {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y + 20f, beamshoot.X, beamshoot.Y, Mod.Find<ModProjectile>("DarkBeam").Type, (NPC.damage / 3) / 2, 8f, Main.myPlayer, 0, 0);
-                    }
-                    SoundEngine.PlaySound(SoundID.Item15);
-				}
-				if (NPC.ai[0] == 100)
-				{
-					beamshoot.Normalize(); //reduces it to a value of 1
-					beamshoot *= 20f; //inital projectile speed
-					beamshoot.Y = 0f;
-                    if (Main.netMode != NetmodeID.MultiplayerClient)
-                    {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y + 20f, beamshoot.X, beamshoot.Y, Mod.Find<ModProjectile>("DarkBeam").Type, (NPC.damage / 3) / 2, 8f, Main.myPlayer, 0, 0);
-                    }
-                    SoundEngine.PlaySound(SoundID.Item15);
-				}
-
-
-				if (frenzy == true) //angy
-				{
-					if (NPC.ai[0] == 120)
-					{
-						beamshoot.Normalize(); //reduces it to a value of 1
-						beamshoot *= 20f; //inital projectile speed
-						beamshoot.Y = 0f;
-                        if (Main.netMode != NetmodeID.MultiplayerClient)
-                        {
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y + 20f, beamshoot.X, beamshoot.Y, Mod.Find<ModProjectile>("DarkBeam").Type, (NPC.damage / 3) / 2, 8f, Main.myPlayer, 0, 0);
-                        }
-                        SoundEngine.PlaySound(SoundID.Item15); //phaseblade
-					}
-					if (NPC.ai[0] == 140)
-					{
-						beamshoot.Normalize(); //reduces it to a value of 1
-						beamshoot *= 20f; //inital projectile speed
-						beamshoot.Y = 0f;
-                        if (Main.netMode != NetmodeID.MultiplayerClient)
-                        {
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y + 20f, beamshoot.X, beamshoot.Y, Mod.Find<ModProjectile>("DarkBeam").Type, (NPC.damage / 3) / 2, 8f, Main.myPlayer, 0, 0);
-                        }
-                        SoundEngine.PlaySound(SoundID.Item15);
-					}
-				}
-
-
-				if (NPC.ai[0] == 160)
-				{
-					beamshoot.Normalize(); //reduces it to a value of 1
-					beamshoot *= 20f; //inital projectile speed
-					beamshoot.Y = 0f;
-                    if (Main.netMode != NetmodeID.MultiplayerClient)
-                    {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y + 20f, beamshoot.X, beamshoot.Y, Mod.Find<ModProjectile>("DarkBeam").Type, (NPC.damage / 3) / 2, 8f, Main.myPlayer, 0, 0);
-                    }
-                    SoundEngine.PlaySound(SoundID.Item15); //phaseblade
-				}
-				if (NPC.ai[0] == 180)
-				{
-					beamshoot.Normalize(); //reduces it to a value of 1
-					beamshoot *= 20f; //inital projectile speed
-					beamshoot.Y = 0f;
-                    if (Main.netMode != NetmodeID.MultiplayerClient)
-                    {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y + 20f, beamshoot.X, beamshoot.Y, Mod.Find<ModProjectile>("DarkBeam").Type, (NPC.damage / 3) / 2, 8f, Main.myPlayer, 0, 0);
-                    }
-                    SoundEngine.PlaySound(SoundID.Item15);
-				}
-				if (NPC.ai[0] == 200)
-				{
-					beamshoot.Normalize(); //reduces it to a value of 1
-					beamshoot *= 20f; //inital projectile speed
-					beamshoot.Y = 0f;
-                    if (Main.netMode != NetmodeID.MultiplayerClient)
-                    {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y + 20f, beamshoot.X, beamshoot.Y, Mod.Find<ModProjectile>("DarkBeam").Type, (NPC.damage / 3) / 2, 8f, Main.myPlayer, 0, 0);
-                    }
-                    SoundEngine.PlaySound(SoundID.Item15);
-				}
-
-
-				if (frenzy == true) //angy
-				{
-					if (NPC.ai[0] == 220)
-					{
-						beamshoot.Normalize(); //reduces it to a value of 1
-						beamshoot *= 20f; //inital projectile speed
-						beamshoot.Y = 0f;
-                        if (Main.netMode != NetmodeID.MultiplayerClient)
-                        {
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y + 20f, beamshoot.X, beamshoot.Y, Mod.Find<ModProjectile>("DarkBeam").Type, (NPC.damage / 3) / 2, 8f, Main.myPlayer, 0, 0);
-                        }
-                        SoundEngine.PlaySound(SoundID.Item15); //phaseblade
-					}
-					if (NPC.ai[0] == 240)
-					{
-						beamshoot.Normalize(); //reduces it to a value of 1
-						beamshoot *= 20f; //inital projectile speed
-						beamshoot.Y = 0f;
-                        if (Main.netMode != NetmodeID.MultiplayerClient)
-                        {
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y + 20f, beamshoot.X, beamshoot.Y, Mod.Find<ModProjectile>("DarkBeam").Type, (NPC.damage / 3) / 2, 8f, Main.myPlayer, 0, 0);
-                        }
-                        SoundEngine.PlaySound(SoundID.Item15);
-					}
-				}
-
-
-				if (NPC.ai[0] == 260)
-				{
-					beamshoot.Normalize(); //reduces it to a value of 1
-					beamshoot *= 20f; //inital projectile speed
-					beamshoot.Y = 0f;
-                    if (Main.netMode != NetmodeID.MultiplayerClient)
-                    {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y + 20f, beamshoot.X, beamshoot.Y, Mod.Find<ModProjectile>("DarkBeam").Type, (NPC.damage / 3) / 2, 8f, Main.myPlayer, 0, 0);
-                    }
-                    SoundEngine.PlaySound(SoundID.Item15);
-				}
-				if (NPC.ai[0] == 280)
-				{
-					beamshoot.Normalize(); //reduces it to a value of 1
-					beamshoot *= 20f; //inital projectile speed
-					beamshoot.Y = 0f;
-                    if (Main.netMode != NetmodeID.MultiplayerClient)
-                    {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y + 20f, beamshoot.X, beamshoot.Y, Mod.Find<ModProjectile>("DarkBeam").Type, (NPC.damage / 3) / 2, 8f, Main.myPlayer, 0, 0);
-                    }
-                    SoundEngine.PlaySound(SoundID.Item15);
-				}
-				if (NPC.ai[0] == 300)
-				{
-					beamshoot.Normalize(); //reduces it to a value of 1
-					beamshoot *= 20f; //inital projectile speed
-					beamshoot.Y = 0f;
-                    if (Main.netMode != NetmodeID.MultiplayerClient)
-                    {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y + 20f, beamshoot.X, beamshoot.Y, Mod.Find<ModProjectile>("DarkBeam").Type, (NPC.damage / 3) / 2, 8f, Main.myPlayer, 0, 0);
-                    }
-                    SoundEngine.PlaySound(SoundID.Item15);
-				}
-
-				if (NPC.ai[0] == 360) //Increase ai[1] to make dark orb attack happen next cycle
-				{
-					NPC.ai[1] += 1;
-				}
-
-				//LUNGE
-				if (NPC.ai[0] >= 360 & NPC.ai[0] <= 380 )//back up
-				{
-					NPC.velocity.X += NPC.direction * -1.1f;
-
-					NPC.velocity.Y *= 0;
-
-
-                    animation = 2; //backup
+                    Dust.NewDust(NPC.position, NPC.width, 40, ModContent.DustType<DarkResidue>(), 0f, -2f, 200, default, 0.75f); //dust
                 }
 
-				if (NPC.ai[0] == 321) //declaring lunge values
-				{
-					if (player.Center.X > NPC.Center.X) //if player in front of npc
-					{
-						lunge = 30; //left
-					}
-					else
-					{
-						lunge = -30; //right
-					}
-					NPC.velocity.Y *= 0;
-				}
-				if (NPC.ai[0] >= 382 & NPC.ai[0] <= 391)//lunge
-				{
-					NPC.TargetClosest(false);
-					NPC.velocity.X = lunge;
-					NPC.velocity.Y *= 0;
-
-                    animation = 1; //dash
-                }
-
-				if (frenzy == false) //not angy
-				{
-					if (NPC.ai[0] >= 392 & NPC.ai[0] <= 479)//slow
-					{
-						lunge *= 0.95f;
-						NPC.TargetClosest(false);
-						NPC.velocity.X = lunge;
-						NPC.velocity.Y *= 0;
-					}
-				}
-				else //angy
+                if (NPC.ai[0] < 30)
                 {
-					if (NPC.ai[0] >= 392 & NPC.ai[0] <= 412)//slow but shorter
-					{
-						lunge *= 0.95f;
-						NPC.TargetClosest(false);
-						NPC.velocity.X = lunge;
-						NPC.velocity.Y *= 0;
-					}
+                    NPC.velocity *= 0.9f; //slow during intermission
 
-					if (NPC.ai[0] == 413)
+                    animation = 0;
+
+                    NPC.TargetClosest();
+
+                    if (NPC.ai[0] == 1)
                     {
-						lunge = NPC.direction * -30; //backtrack
+                        AttackDecideNext();
 
-						NPC.TargetClosest(false);
-						NPC.velocity.X = lunge;
-						NPC.velocity.Y *= 0;
-
-                        animation = 2; //backup
+                        if (NPC.GetLifePercent() < 0.75f && Main.expertMode) //Enrage
+                        {
+                            frenzy = true;
+                        }
                     }
-
-					if (NPC.ai[0] > 414)
+                }
+                else
+                {
+                    if (attacktype == DarkMatterAttackType.DarkBeams)
                     {
-						lunge *= 0.95f;
-						NPC.TargetClosest(false);
-						NPC.velocity.X = lunge;
-						NPC.velocity.Y *= 0;
-					}
-				}
-
-				//DARK ORB
-				if (NPC.ai[0] >= 360 & NPC.ai[1] == 2) //Stop movement for orb attack
-				{
-					NPC.velocity *= 0;
-
-                    animation = 0; //default (stop)
+                        if (frenzy == true)
+                        {
+                            EnrageDarkBeams();
+                        }
+                        else
+                        {
+                            AttackDarkBeams();
+                        }
+                    }
+                    if (attacktype == DarkMatterAttackType.Dash)
+                    {
+                        if (frenzy == true)
+                        {
+                            EnrageDash();
+                        }
+                        else
+                        {
+                            AttackDash();
+                        }
+                    }
+                    if (attacktype == DarkMatterAttackType.Orbs)
+                    {
+                        if (frenzy == true)
+                        {
+                            EnrageOrbs();
+                        }
+                        else
+                        {
+                            AttackOrbs();
+                        }
+                    }
+                    /*switch (attacktype)
+                    {
+                        case DarkMatterAttackType.DarkBeams:
+                            AttackDarkBeams();
+                            break;
+                        case DarkMatterAttackType.Dash:
+                            AttackDash();
+                            break;
+                        case DarkMatterAttackType.Orbs:
+                            AttackOrbs();
+                            break;
+                    }
+                    AttackDash();*/
                 }
+            }
+        }
 
-				if (NPC.ai[0] == 370 & NPC.ai[1] == 2) //charge orb and attack
-				{
-					if (Main.netMode != NetmodeID.MultiplayerClient)
-					{
-						Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X - 15, NPC.Center.Y + -90, NPC.velocity.X * 0, NPC.velocity.Y * 0, ModContent.ProjectileType<Projectiles.DarkOrb>(), NPC.damage / 2, 10f, Main.myPlayer, 0, NPC.target);
-					}
-					SoundEngine.PlaySound(SoundID.Item13, NPC.Center); //magic spray
-					//(shoot sound is in dark orb)
-				}
+        void AttackDecideNext()
+        {
+            List<DarkMatterAttackType> possibleAttacks = new() { DarkMatterAttackType.DarkBeams, DarkMatterAttackType.Dash, DarkMatterAttackType.Orbs };
 
-				//END OF PHASE 1 CYCLE
+            /*if (NPC.GetLifePercent() < 0.75f && Main.expertMode) //Enrage
+                possibleAttacks = new() { DarkMatterAttackType.EnrageDarkBeams, DarkMatterAttackType.EnrageDash, DarkMatterAttackType.EnrageOrbs };*/
+            possibleAttacks.Remove(lastattacktype);
+            possibleAttacks.TrimExcess();
+            attacktype = possibleAttacks[Main.rand.Next(possibleAttacks.Count)];
+            lastattacktype = attacktype;
+            NPC.netUpdate = true;
+        }
 
-				if (NPC.ai[0] >= 425 && NPC.ai[1] == 2 && frenzy == true) //if enraged orb attack
-                {
-					NPC.ai[0] = 0; //recycle attack cycle timer
-					if (NPC.ai[1] >= 2) //recycle special attack
-					{
-						NPC.ai[1] = 0;
-					}
-				}
+        void AttackDarkBeams()
+        {
+            Player player = Main.player[NPC.target];
+            Vector2 playerDistance = player.Center - NPC.Center;
+            NPC.TargetClosest();
+            animation = 0;
 
-				if (NPC.ai[0] >= 480)
-				{
-					NPC.ai[0] = 0; //recycle attack cycle timer
-					if (NPC.ai[1] >= 2) //recycle special attack
-					{
-						NPC.ai[1] = 0;
-					}
-				}
+            float xOffset = 400;
 
-				//NEXT PHASE
-				if (NPC.life <= NPC.lifeMax / 2)
-                {
-					NPC.ai[0] = 0; //end of phase 1
-					phase = 2; //transition
-                }
-			}
-
-			if (phase == 2) //TRANSITION TO BALL
+            if (playerDistance.X <= 0) //if player is behind enemy
             {
-				NPC.TargetClosest(false);
-				NPC.rotation = 0.0f;
-				NPC.velocity *= 0.95f; //slow
-				NPC.ai[2]++; //go up by 1 each tick
-				animation = 3; //phase transition
-				NPC.defense = 2000;
-				NPC.damage = 0;
+                xOffset = 400; // go in front of player 
+            }
+            else
+            {
+                xOffset = -400; // go behind player
+            }
 
-			    if (NPC.ai[2] < 60) 
+            Vector2 playerXOffest = player.Center + new Vector2(xOffset, -20f); //go in front of player
+            Vector2 move = playerXOffest - NPC.Center;
+
+            Vector2 velocity = new Vector2(NPC.direction * 30, 0);
+
+            Vector2 position = NPC.Center + new Vector2(0, 30f);
+
+            if (NPC.ai[0] >= 30 && NPC.ai[0] < 50)
+            {
+                move /= 3;
+
+                NPC.velocity = move;
+            }
+            if (NPC.ai[0] == 50)
+            {
+                NPC.velocity *= 0.01f;
+
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+            }
+
+            if (NPC.ai[0] >= 60 && NPC.ai[0] < 80)
+            {
+                move /= 3;
+
+                NPC.velocity = move;
+            }
+            if (NPC.ai[0] == 80)
+            {
+                NPC.velocity *= 0.01f;
+
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+            }
+
+            if (NPC.ai[0] >= 90 && NPC.ai[0] < 110)
+            {
+                move /= 3;
+
+                NPC.velocity = move;
+            }
+            if (NPC.ai[0] == 110)
+            {
+                NPC.velocity *= 0.01f;
+
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+            }
+
+            if (NPC.ai[0] >= 120 && NPC.ai[0] < 140)
+            {
+                move /= 3;
+
+                NPC.velocity = move;
+            }
+            if (NPC.ai[0] == 140)
+            {
+                NPC.velocity *= 0.01f;
+
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+            }
+
+            if (NPC.ai[0] >= 150 && NPC.ai[0] < 170)
+            {
+                move /= 3;
+
+                NPC.velocity = move;
+            }
+            if (NPC.ai[0] == 170)
+            {
+                NPC.velocity *= 0.01f;
+
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+            }
+
+            if (NPC.ai[0] >= 180 && NPC.ai[0] < 200)
+            {
+                move /= 3;
+
+                NPC.velocity = move;
+            }
+            if (NPC.ai[0] == 200)
+            {
+                NPC.velocity *= 0.01f;
+
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+
+                if (NPC.GetLifePercent() > 0.75f && !Main.expertMode) //restart if high enough (and not expert mode)
                 {
-					if (NPC.ai[2] % 10 == 0) //remainder
-					{
-						Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-						Dust d = Dust.NewDustPerfect(NPC.Center + new Vector2(0, 20), ModContent.DustType<Dusts.DarkResidue>(), speed * 3, 1); //Makes a crumb of dust
-						d.noGravity = true;
-					}
-				}
-				else if (NPC.ai[2] < 120) 
-				{
-					if (NPC.ai[2] % 5 == 0) //remainder
-					{
-						Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-						Dust d = Dust.NewDustPerfect(NPC.Center + new Vector2(0, 20), ModContent.DustType<Dusts.DarkResidue>(), speed * 3, 1); //Makes a crumb of dust
-						d.noGravity = true;
-					}
-					
-				}
-				else
-				{
-					Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-					Dust d = Dust.NewDustPerfect(NPC.Center + new Vector2(0, 20), ModContent.DustType<Dusts.DarkResidue>(), speed * 3, 1); //Makes a crumb of dust
-					d.noGravity = true;
-				}
+                    NPC.ai[0] = 0; //restart
+                }
+            }
 
-				//NEXT PHASE
-				if (NPC.ai[2] >= 180) 
+            //keep going if low enough or expert mode
+
+            if (NPC.ai[0] >= 210 && NPC.ai[0] < 230)
+            {
+                move /= 3;
+
+                NPC.velocity = move;
+            }
+            if (NPC.ai[0] == 230)
+            {
+                NPC.velocity *= 0.01f;
+
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+            }
+
+            if (NPC.ai[0] >= 240 && NPC.ai[0] < 260)
+            {
+                move /= 3;
+
+                NPC.velocity = move;
+            }
+            if (NPC.ai[0] == 260)
+            {
+                NPC.velocity *= 0.01f;
+
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+            }
+
+            if (NPC.ai[0] >= 270 && NPC.ai[0] < 290)
+            {
+                move /= 3;
+
+                NPC.velocity = move;
+            }
+            if (NPC.ai[0] == 290)
+            {
+                NPC.velocity *= 0.01f;
+
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+            }
+
+            if (NPC.ai[0] >= 300 && NPC.ai[0] < 320)
+            {
+                move /= 3;
+
+                NPC.velocity = move;
+            }
+            if (NPC.ai[0] == 320)
+            {
+                NPC.velocity *= 0.01f;
+
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+
+                NPC.ai[0] = 0; //restart
+            }
+        }
+
+        void AttackDash()
+        {
+            Player player = Main.player[NPC.target];
+            Vector2 playerDistance = player.Center - NPC.Center;
+
+            float speed = 30f;
+            float inertia = 10f;
+
+            if (NPC.ai[0] < 120) //ready charge
+            {
+                animation = 1; //dash
+
+                float xOffset = 400;
+
+                if (playerDistance.X <= 0) //if player is behind enemy
                 {
-					//dust-splosion
-					for (int i = 0; i < 20; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-					{
-						Vector2 speed = Main.rand.NextVector2Unit(); //circle edge
-						Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed * 10, 10); //Makes dust in a messy circle
-						d.noGravity = true;
-						SoundEngine.PlaySound(SoundID.Item81, NPC.Center); //spawn slime mount
-					}
-					phase = 3; //phase 2(?)
-				}
-			}
+                    xOffset = 400; // go in front of player 
+                }
+                else
+                {
+                    xOffset = -400; // go behind player
+                }
 
-			if (phase == 3) //DARK MATTER'S TRUE FORM
-			{
-				
-				if (NPC.ai[3] < 30) //rise up gang
-				{
-					NPC.velocity.Y = -3;
-					NPC.ai[3]++;
+                Vector2 playerXOffest = player.Center + new Vector2(xOffset, 0f); //go in front of player
+                Vector2 move = playerXOffest - NPC.Center;
 
-					if (NPC.ai[3] == 29) //disable frenzy from last phase(not the last phase but phase 1)
-					{
-						frenzy = false;
-					}
-				}
-				else if (NPC.ai[3] >= 30)//start cycle
-				{
+                NPC.TargetClosest(); //face player only for charge
 
-					if (NPC.ai[3] < 360) //Movement before special attack (Alot of this code was taken from ExampleMod's capitive element(2)) so I don't fully understand this yet, but it makes my video game reference go smooth so I don't mind it
-                    {
-						float minX = moveTo.X - 50f;
-						float maxX = moveTo.X + 50f;
-						float minY = moveTo.Y;
-						float maxY = moveTo.Y;
+                move.Normalize();
+                move *= speed;
+                NPC.velocity = (NPC.velocity * (inertia - 1) + move) / inertia; 
+            }
+            else if (NPC.ai[0] == 120) //stop X velocity for a moment to make the backup stand out more
+            {
+                NPC.velocity.X = 0.01f; //backup
+            }
+            else if (NPC.ai[0] < 150) //backup
+            {
+                NPC.velocity.X += -NPC.direction * 0.5f; //backup
 
-						if (playerDistance.X <= 0) //if player is behind enemy
-						{
-							move = move + new Vector2(400f, 0); // go in front of player 
-						}
-						else
-						{
-							move = move + new Vector2(-400f, 0); // go behind player 
-						}
+                speed = 20f; //make smaller
 
-						if (NPC.Center.X >= minX && NPC.Center.X <= maxX && NPC.Center.Y >= minY && NPC.Center.Y <= maxY) //certain range
-						{
-							NPC.velocity *= 0.98f; //slow
-						}
-						else
-						{
-							float magnitude = (float)Math.Sqrt(move.X * move.X + move.Y * move.Y);
-							float speed = 28; //speed I think
-							if (magnitude > speed)
-							{
-								move *= speed / magnitude;
-							}
-							float inertia = 10f; //Ok so like I'm pretty sure this is supposed to be how wibbly wobbly you want the npc to be before it reaches its destination
-							NPC.velocity = (inertia * NPC.velocity + move) / (inertia + 1);
-							magnitude = (float)Math.Sqrt(NPC.velocity.X * NPC.velocity.X + NPC.velocity.Y + NPC.velocity.Y);
-							if (magnitude > speed)
-							{
-								NPC.velocity *= speed / magnitude;
-							}
-						}
-						NPC.TargetClosest(true);
-					}
+                playerDistance.Normalize();
+                playerDistance *= speed;
+                NPC.velocity.Y = (NPC.velocity.Y * (inertia - 1) + playerDistance.Y) / inertia; //only change Y
+            }
+            else if (NPC.ai[0] < 210) //dash
+            {
+                NPC.velocity.X += NPC.direction * 1.5f;
 
-					if (!Main.expertMode) //if not Expert Mode
-					{
-						NPC.damage = 120; 
-					}
-                    else if (!Main.masterMode) //if not Master Mode
-                    {
-                        NPC.damage = (int)(360 * 0.6f);
-                    }
-                    else
-                    {
-						NPC.damage = (int)(240 * 0.6f); //put it this way because expert scaling
-                    }
+                playerDistance.Normalize();
+                playerDistance *= speed;
+                NPC.velocity.Y = (NPC.velocity.Y * (inertia - 1) + playerDistance.Y) / inertia;
 
-					NPC.defense = 35; //back to regular defense
+                Dust.NewDust(NPC.position, NPC.width, NPC.height, ModContent.DustType<DarkResidue>());
+            }
 
-					if (NPC.ai[3] == 30) //checks if cycle has restarted
-					{
-						if (NPC.life <= NPC.lifeMax * 0.25 & Main.expertMode) //checks if npc has 2/10 of life and in expert mode
-						{
-							frenzy = true;
-						}
-						else
-						{
-							frenzy = false;
-						}
-					}
+            if (NPC.GetLifePercent() > 0.75f && !Main.expertMode) //restart if high enough (and not expert mode)
+            {
+                if (NPC.ai[0] == 210)
+                {
+                    animation = 2; //lean back
+                    NPC.velocity.X = -NPC.direction * 20; //jolt back
+                    NPC.velocity.Y = 0.01f;
+                }
+                else if (NPC.ai[0] > 210)
+                {
+                    NPC.velocity.X *= 0.95f; //slow
+                    NPC.velocity.Y = 0.01f;
+                }
 
-					NPC.ai[3]++; //phase 2 cycle
+                if (NPC.ai[0] >= 240)
+                {
+                    NPC.ai[0] = 0; //restart
+                }
+            }
 
-					if (NPC.ai[3] >= 90 && NPC.ai[3] <= 120) //Matter Orb
-                    {
-						if (NPC.ai[3] == 90)
-						{
-							//up
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + 0, NPC.Center.Y - 10, 0, -10, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+            else //below 75% or expert mode
+            {
+                if (NPC.ai[0] == 210) //stop a bit later
+                {
+                    animation = 2; //lean back
+                    NPC.velocity.X = 0.01f; //stop
+                }
+                else if (NPC.ai[0] > 210) //back up
+                {
+                    NPC.velocity.X += -NPC.direction * 1.5f;
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-						else if (NPC.ai[3] == 100)
-						{
-							//down
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + 0, NPC.Center.Y + 10, 0, 10, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+                    speed = 30f; //make smaller
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-						else if (NPC.ai[3] == 110)
-						{
-							//diagonal up
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.direction * -10, NPC.Center.Y + NPC.direction * -5, NPC.direction * -10, -10, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+                    playerDistance.Normalize();
+                    playerDistance *= speed;
+                    NPC.velocity.Y = (NPC.velocity.Y * (inertia - 1) + playerDistance.Y) / inertia;
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-						else if (NPC.ai[3] == 120)
-						{
-							//diagonal down
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.direction * 10, NPC.Center.Y + NPC.direction * 5, NPC.direction * -10, 10, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+                    Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Shadowflame);
+                }
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-					}
-					if (NPC.ai[3] >= 130 && NPC.ai[3] <= 170 && frenzy == true) //Matter Orb (enraged)
-					{
-						if (NPC.ai[3] == 130)
-						{
-							//up
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + 0, NPC.Center.Y - 10, 0, -10, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+                if (NPC.ai[0] >= 260)
+                {
+                    NPC.ai[0] = 0; //restart
+                }
+            }
+        }
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-						else if (NPC.ai[3] == 140)
-						{
-							//down
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + 0, NPC.Center.Y + 10, 0, 10, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+        void AttackOrbs()
+        {
+            Player player = Main.player[NPC.target];
+            NPC.TargetClosest();
+            animation = 0;
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-						else if (NPC.ai[3] == 150)
-						{
-							//diagonal up
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.direction * -10, NPC.Center.Y + NPC.direction * -5, NPC.direction * -10, -10, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+            NPC.velocity *= 0.9f; //slow
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-						else if (NPC.ai[3] == 160)
-						{
-							//diagonal down
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.direction * 10, NPC.Center.Y + NPC.direction * 5, NPC.direction * -10, 10, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+            if (NPC.ai[0] < 40)
+            {
+                NPC.alpha += 30; //lemme be clear
+            }
+            else if (NPC.ai[0] == 40)
+            {
+                enrageDashTargetArea = player.Center; //set dash target 
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-						else if (NPC.ai[3] == 170)
-						{
-							//center
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.direction * 10, NPC.Center.Y + NPC.direction * 5, NPC.direction * -10, 0, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+                float xlocation = -500;
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-					}
-					if (NPC.ai[3] >= 180 && NPC.ai[3] <= 210) //Matter Orb
-					{
-						if (NPC.ai[3] == 180)
-						{
-							//up
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + 0, NPC.Center.Y - 10, 0, -10, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+                if (Main.rand.NextBool(2))
+                {
+                    xlocation = 500; 
+                }
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-						else if (NPC.ai[3] == 190)
-						{
-							//down
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + 0, NPC.Center.Y + 10, 0, 10, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+                //teleport to either side of the player
+                NPC.Center = player.Center + new Vector2(xlocation, Main.rand.Next(-200, 200));
+            }
+            if (NPC.ai[0] == 70) //shoot
+            {
+                Vector2 Yoffset = new Vector2(0, -170);
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-						else if (NPC.ai[3] == 200)
-						{
-							//diagonal up
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.direction * -10, NPC.Center.Y + NPC.direction * -5, NPC.direction * -10, -10, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, default, 0, player.whoAmI);
+            }
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-						else if (NPC.ai[3] == 210)
-						{
-							//diagonal down
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.direction * 10, NPC.Center.Y + NPC.direction * 5, NPC.direction * -10, 10, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+            if (NPC.ai[0] > 40)
+            {
+                NPC.alpha -= 30;
+            }
+            
+            if (NPC.ai[0] > 130)
+            {
+                NPC.alpha = 0;
+                NPC.ai[0] = 0;
+            }
+        }
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-					}
-					if (NPC.ai[3] >= 220 && NPC.ai[3] <= 260 && frenzy == true) //Matter Orb (enraged)
-					{
-						if (NPC.ai[3] == 220)
-						{
-							//up
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + 0, NPC.Center.Y - 10, 0, -10, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+        //Enraged attacks
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-						else if (NPC.ai[3] == 230)
-						{
-							//down
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + 0, NPC.Center.Y + 10, 0, 10, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+        void EnrageDarkBeams()
+        {
+            Player player = Main.player[NPC.target];
+            Vector2 playerDistance = player.Center - NPC.Center;
+            NPC.TargetClosest();
+            animation = 0;
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-						else if (NPC.ai[3] == 240)
-						{
-							//diagonal up
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.direction * -10, NPC.Center.Y + NPC.direction * -5, NPC.direction * -10, -10, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+            float xOffset = 400;
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-						else if (NPC.ai[3] == 250)
-						{
-							//diagonal down
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.direction * 10, NPC.Center.Y + NPC.direction * 5, NPC.direction * -10, 10, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+            if (playerDistance.X <= 0) //if player is behind enemy
+            {
+                xOffset = 400; // go in front of player 
+            }
+            else
+            {
+                xOffset = -400; // go behind player
+            }
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-						else if (NPC.ai[3] == 260)
-						{
-							//center
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.direction * 10, NPC.Center.Y + NPC.direction * 5, NPC.direction * -10, 0, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+            Vector2 playerXOffest = player.Center + new Vector2(xOffset, -20f); //go in front of player
+            Vector2 move = playerXOffest - NPC.Center;
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-					}
-					if (NPC.ai[3] >= 270 && NPC.ai[3] <= 300) //Matter Orb
-					{
-						if (NPC.ai[3] == 270)
-						{
-							//up
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + 0, NPC.Center.Y - 10, 0, -10, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+            Vector2 velocity = new Vector2(NPC.direction * 30, 0);
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-						else if (NPC.ai[3] == 280)
-						{
-							//down
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + 0, NPC.Center.Y + 10, 0, 10, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+            Vector2 position = NPC.Center + new Vector2(0, 30f);
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-						else if (NPC.ai[3] == 290)
-						{
-							//diagonal up
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.direction * -10, NPC.Center.Y + NPC.direction * -5, NPC.direction * -10, -10, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+            if (NPC.ai[0] >= 30 && NPC.ai[0] < 40) //1
+            {
+                move /= 2;
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-						else if (NPC.ai[3] == 300)
-						{
-							//diagonal down
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.direction * 10, NPC.Center.Y + NPC.direction * 5, NPC.direction * -10, 10, ModContent.ProjectileType<Projectiles.MatterOrb>(), 60 / 2, 2f, Main.myPlayer, 0, NPC.target);
-							}
-							SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center);
+                NPC.velocity = move;
+            }
+            if (NPC.ai[0] == 40)
+            {
+                NPC.velocity *= 0.01f;
 
-							for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-							{
-								Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-								Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 0, default, 1f); //Makes dust in a messy circle
-								d.noGravity = true;
-							}
-						}
-					}
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
 
-					//SPECIAL ATTACKS
-					if (NPC.ai[3] == 360 & phase2special == 3) //reset because there is no special 3
-                    {
-						phase2special = 1;
-					}
-					
-					if (NPC.ai[3] > 360 & NPC.ai[3] < 420 & phase2special == 1) //DASH START //Backup
-					{
-						NPC.TargetClosest(true); //face player
+                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+            }
 
-						float speed = 28f;
-						float inertia = 10f;
+            if (NPC.ai[0] >= 50 && NPC.ai[0] < 60) //2
+            {
+                move /= 2;
 
-						Vector2 direction = player.Center - NPC.Center; //start - end
+                NPC.velocity = move;
+            }
+            if (NPC.ai[0] == 60)
+            {
+                NPC.velocity *= 0.01f;
 
-						if (playerDistance.X <= 0) //if player is behind enemy
-						{
-							direction.X += 400f + (NPC.ai[3] - 360) * 3; // go in front of player (and backup!)
-						}
-						else
-						{
-							direction.X -= 400f + (NPC.ai[3] - 360) * 3; // go behind player (and backup!)
-						}
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
 
-						direction.Y += player.velocity.Y * 30; //read player
+                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+            }
 
-						direction.Normalize();
-						direction *= speed;
-						NPC.velocity = (NPC.velocity * (inertia - 1) + direction) / inertia;  //fly to area of aim
-					}
-					
-					if (NPC.ai[3] >= 420 & phase2special == 1) //dash for 60 ticks
-					{
-						NPC.TargetClosest(false);
-						NPC.velocity.X += NPC.direction * 1.04f;
-						NPC.velocity.Y = 0;
+            if (NPC.ai[0] >= 70 && NPC.ai[0] < 80) //3
+            {
+                move /= 2;
 
-						if (NPC.ai[3] % 2 == 0) //every multiple of 2 place a dust
-						{
-							Dust d = Dust.NewDustPerfect(NPC.Center + new Vector2(Main.rand.Next(-70, 70), Main.rand.Next(-70, 70)), ModContent.DustType<Dusts.DarkResidue>(), NPC.velocity * 0, 2); //Makes dust i
-							d.noGravity = true;
-						}
+                NPC.velocity = move;
+            }
+            if (NPC.ai[0] == 80)
+            {
+                NPC.velocity *= 0.01f;
 
-						if (NPC.ai[3] == 420) //upon dash start
-                        {
-							SoundEngine.PlaySound(SoundID.Roar, player.position); //do da roar
-						}
-					}
-					
-					if (NPC.ai[3] > 360 & NPC.ai[3] <= 540 & phase2special == 2) //DARK LASERS
-                    {
-						NPC.velocity *= 0;
-					
-						if (NPC.ai[3] % 60 == 0 & phase2special == 2) //shoots only if ai 3 is a multiple of 60
-                        {
-							NPC.TargetClosest(true);
-							Vector2 lasershoot = player.Center - NPC.Center;
-							lasershoot.Normalize(); //reduces it to a value of 1
-							lasershoot *= 32f; //inital projectile speed
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
 
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 5, 0), lasershoot, Mod.Find<ModProjectile>("DarkLaser").Type, 120 / 2, 10f, Main.myPlayer);
-							}
-							SoundEngine.PlaySound(SoundID.Item12);
-						}
-                    }
+                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+            }
 
-					if (NPC.ai[3] == 660 && phase2special == 2 & frenzy == true) //for spin beam
-					{
-						NPC.rotation = MathHelper.ToRadians(-90f); //face up
-						NPC.direction = 1; //face correctly(idk which way but it's right*get it?*)
-					}
+            if (NPC.ai[0] >= 90 && NPC.ai[0] < 100) //4
+            {
+                move /= 2;
 
-					if (NPC.ai[3] > 660 & NPC.ai[3] <= 680 && phase2special == 2 & frenzy == true) // also for spin beam
-                    {
-						NPC.rotation += MathHelper.ToRadians(18);
-                    }
+                NPC.velocity = move;
+            }
+            if (NPC.ai[0] == 100)
+            {
+                NPC.velocity *= 0.01f;
 
-					if (NPC.ai[3] >= 740 & NPC.ai[3] <= 980 & phase2special == 2 && frenzy == true) //SPIN BEAM (expert frenzy)
-					{
-						NPC.velocity *= 0; //stop
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
 
-						if (NPC.ai[3] == 680) //face up
-                        {
-							NPC.rotation = MathHelper.ToRadians(-90f);
-							NPC.direction = 1; //face correctly(idk which way but it's right*get it?*)
-                        }
-						
-						if (NPC.ai[3] >= 740 & NPC.ai[3] < 980 & phase2special == 2) //4 seconds
-						{
-							NPC.rotation += MathHelper.ToRadians(3);
-							NPC.TargetClosest(false); //don't face player
+                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+            }
 
-							if (NPC.ai[3] % 3 == 0)//only shoots if ai 3 is a multiple of 3
-							{
-								float spinshoot = 18f;
+            if (NPC.ai[0] >= 110 && NPC.ai[0] < 120) //5
+            {
+                move /= 2;
 
-								if (Main.netMode != NetmodeID.MultiplayerClient)
-								{
-									Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + 10 * (float)Math.Cos(NPC.rotation), NPC.Center.Y + 10 * (float)Math.Cos(NPC.rotation), spinshoot * (float)Math.Cos(NPC.rotation), spinshoot * (float)Math.Sin(NPC.rotation), Mod.Find<ModProjectile>("AngledDarkBeam").Type, 60 / 2, 10f, Main.myPlayer);
-								}
-								SoundEngine.PlaySound(SoundID.Item12);
-							}
-						}
-					}
+                NPC.velocity = move;
+            }
+            if (NPC.ai[0] == 120)
+            {
+                NPC.velocity *= 0.01f;
+
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+            }
+
+            if (NPC.ai[0] >= 130 && NPC.ai[0] < 140) //6
+            {
+                move /= 2;
+
+                NPC.velocity = move;
+            }
+            if (NPC.ai[0] == 140)
+            {
+                NPC.velocity *= 0.01f;
+
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+            }
+
+            if (NPC.ai[0] >= 150 && NPC.ai[0] < 160) //7
+            {
+                move /= 2;
+
+                NPC.velocity = move;
+            }
+            if (NPC.ai[0] == 160)
+            {
+                NPC.velocity *= 0.01f;
+
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+            }
+
+            if (NPC.ai[0] >= 170 && NPC.ai[0] < 180) //8
+            {
+                move /= 3;
+
+                NPC.velocity = move;
+            }
+            if (NPC.ai[0] == 180)
+            {
+                NPC.velocity *= 0.01f;
+
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+            }
+
+            velocity = new Vector2(NPC.direction * 20, 0);
+
+            Vector2 move2 = playerXOffest + new Vector2(0, -500)  - NPC.Center;
+
+            if (NPC.ai[0] >= 190 && NPC.ai[0] < 200) //spread 1
+            {
+                move2 /= 3;
+
+                NPC.velocity = move2;
+            }
+            if (NPC.ai[0] >= 200 && NPC.ai[0] < 250) //move down
+            {
+                NPC.velocity.Y = 20;
+
+                NPC.velocity.X *= 0.01f;
+
+                if (NPC.ai[0] % 5 == 0)
+                {
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                    SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                }
+            }
+
+            Vector2 move3 = playerXOffest + new Vector2(0, 500) - NPC.Center;
+
+            if (NPC.ai[0] >= 250 && NPC.ai[0] < 260) //spread 2
+            {
+                move3 /= 3;
+
+                NPC.velocity = move3;
+            }
+            if (NPC.ai[0] >= 260 && NPC.ai[0] < 310) //move up
+            {
+                NPC.velocity.Y = -20;
+
+                NPC.velocity.X *= 0.01f;
+
+                if (NPC.ai[0] % 5 == 0)
+                {
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                    SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                }
+            }
+            
+            if (NPC.ai[0] > 310)
+            {
+                NPC.ai[0] = 0; //restart
+            }
+        }
+        void EnrageDash()
+        {
+            Player player = Main.player[NPC.target];
+            Vector2 playerDistance = player.Center - NPC.Center;
+
+            Vector2 targetDistance = enrageDashTargetArea - NPC.Center;
+
+            float speed = 30f;
+            float inertia = 10f;
 
 
-					if (NPC.ai[3] >= 480 & phase2special == 1) //dash end
-                    {
-						if (!frenzy) //not frenzying
-						{
-							NPC.ai[3] = 30; //don't make it zero or it will rise again
-							phase2special += 1; //next attack
-						}
-						else //frenzying
-                        {
-							if (frenzydashamount > 0)
-							{
-								frenzydashamount -= 1;
-								NPC.velocity *= 0; //cut velocity
-								NPC.ai[3] = 361; //restart dash
-							}
-							else //end dash for real
-                            {
-								NPC.ai[3] = 30; //don't make it zero or it will rise again
-								phase2special += 1; //next attack
-								frenzydashamount = 2; //reset frenzy dash amount for next dash 
-							}
-                        }
-					}
+            if (NPC.ai[0] < 40)
+            {
+                NPC.alpha += 30; //lemme be clear
+            }
+            else if (NPC.ai[0] == 40)
+            {
+                enrageDashTargetArea = player.Center; //set dash target 
 
-					if (NPC.ai[3] >= 660 & phase2special == 2 & frenzy == false) //laser end
-					{
-						NPC.ai[3] = 30; //don't make it zero or it will rise again
-						phase2special += 1; //next attack
-					}
-					else if (NPC.ai[3] >= 1100 & phase2special == 2 & frenzy == true) //spin beam end
-                    {
-						NPC.ai[3] = 30; //don't make it zero or it will rise again
-						phase2special += 1; //next attack
-						NPC.rotation = 0;
-					}
-				}
-				NPC.spriteDirection = NPC.direction;
-				animation = 4; //true form
-			}
-		}	
+                NPC.Center = player.Center + Main.rand.NextVector2CircularEdge(500, 500);
 
-		public override void FindFrame(int frameHeight) // animation
+                //NPC.rotation = targetDistance.ToRotation(); //rotate towards target
+
+                animation = 1;
+
+                NPC.TargetClosest(); //flip direction once
+            }
+            else if (NPC.ai[0] < 60) //small backup
+            {
+                NPC.alpha -= 30; 
+
+                targetDistance.Normalize();
+                targetDistance *= -speed;
+                NPC.velocity = (NPC.velocity * (inertia - 1) + targetDistance) / inertia;
+
+                Dust.NewDust(NPC.position, NPC.width, NPC.height, ModContent.DustType<DarkResidue>());
+            }
+            else if (NPC.ai[0] >= 60 && NPC.ai[0] < 80) //increase velocity
+            {
+                NPC.alpha -= 30;
+                speed = 60f;
+
+                targetDistance.Normalize();
+                targetDistance *= speed;
+                NPC.velocity = (NPC.velocity * (inertia - 1) + targetDistance) / inertia;
+
+                Dust.NewDust(NPC.position, NPC.width, NPC.height, ModContent.DustType<DarkResidue>());
+            }
+
+            if (NPC.ai[0] > 100)
+            {
+                NPC.rotation = 0; //reset
+                NPC.alpha = 0;
+                NPC.ai[0] = 0; //restart
+            }
+        }
+        void EnrageOrbs()
+        {
+            Player player = Main.player[NPC.target];
+            NPC.TargetClosest();
+            animation = 0;
+
+            NPC.velocity *= 0.9f; //slow
+
+            if (NPC.ai[0] < 40)
+            {
+                NPC.alpha += 30; //lemme be clear
+            }
+            else if (NPC.ai[0] == 40)
+            {
+                enrageDashTargetArea = player.Center; //set dash target 
+
+                float xlocation = -500;
+
+                if (Main.rand.NextBool(2))
+                {
+                    xlocation = 500;
+                }
+
+                //teleport to either side of the player
+                NPC.Center = player.Center + new Vector2(xlocation, Main.rand.Next(-200, 200));
+            }
+            if (NPC.ai[0] >= 70 && NPC.ai[0] <= 160) //shoot
+            {
+                if (NPC.ai[0] % 30 == 0) //shoot
+                {
+                    Vector2 Yoffset = new Vector2(0, -170);
+
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, default, 0, player.whoAmI, NPC.whoAmI);
+                }
+            }
+
+            if (NPC.ai[0] > 40)
+            {
+                NPC.alpha -= 30;
+            }
+            
+            if (NPC.ai[0] > 190)
+            {
+                NPC.alpha = 0;
+                NPC.ai[0] = 0;
+            }
+        }
+
+        public override void FindFrame(int frameHeight) // animation
         {
 			if (animation == 0) //phase 1
 			{
-				if (NPC.ai[0] >= 300 & NPC.ai[1] == 2) //dark orb attack
-				{
-					NPC.frame.Y = frameHeight * 3; 
-					NPC.frameCounter = 0;
-				}
-				else //robe swing
-				{
-					NPC.frameCounter += 1.0;
-					if (NPC.frameCounter < 12.0)
-					{
-						NPC.frame.Y = 0; //robe swish
-					}
-					else if (NPC.frameCounter < 24.0)
-					{
-						NPC.frame.Y = frameHeight; //robe swoosh
-					}
-                    else if (NPC.frameCounter < 36.0)
-                    {
-                        NPC.frame.Y = frameHeight * 2; //robe swash
-                    }
-                    else if (NPC.frameCounter < 48.0)
-                    {
-                        NPC.frame.Y = frameHeight * 3; //robe swush
-                    }
-                    else
-					{
-						NPC.frameCounter = 0.0; //reset
-					}
-				}
-			}
+                NPC.frameCounter += 1.0;
+                if (NPC.frameCounter < 12.0)
+                {
+                    NPC.frame.Y = 0; //robe swish
+                }
+                else if (NPC.frameCounter < 24.0)
+                {
+                    NPC.frame.Y = frameHeight; //robe swoosh
+                }
+                else if (NPC.frameCounter < 36.0)
+                {
+                    NPC.frame.Y = frameHeight * 2; //robe swash
+                }
+                else if (NPC.frameCounter < 48.0)
+                {
+                    NPC.frame.Y = frameHeight * 3; //robe swush
+                }
+                else
+                {
+                    NPC.frameCounter = 0.0; //reset
+                }
+            }
             if (animation == 1) //dash
             {
                 NPC.frameCounter += 1.0;
@@ -1282,126 +913,77 @@ namespace KirboMod.NPCs
 				}
 			}
 		}
-		public override Color? GetAlpha(Color lightColor)
-		{
-			if (NPC.ai[3] > 360 & NPC.ai[3] < 540 & phase2special == 2 && phase == 3) //laser attack
-			{
-				if ((NPC.ai[3] % 60 <= 5) == false) //doesn't glow purple on the shot(or momentaraily after)
-				{
-					return Color.Purple; //make it ourple
-				}
-				else
-				{
-					return Color.White; //make it unaffected by light
-				}
-			}
-			else
-            {
-				return Color.White; //make it unaffected by light
-			}
-		}
-
-		public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
-		{
-			scale = 1.5f;
-			return true;
-		}
-
-		public override void BossLoot(ref string name, ref int potionType)
-		{
-			name = "Dark Matter"; //_ has been defeated!
-			potionType = ItemID.GreaterHealingPotion; //potion it drops
-		}
-
-		public override void HitEffect(NPC.HitInfo hit)
-		{
-			if (phase == 1)
-			{
-				for (int i = 0; i < 1; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-				{
-					Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-					Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed * 3, 1); //Makes dust in a messy circle
-					d.noGravity = true;
-				}
-			}
-			if (phase == 3)
-			{
-				for (int i = 0; i < 5; i++)
-				{
-					Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-					Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed * 2, 2); //Makes dust in a messy circle
-					d.noGravity = false;
-				}
-			}
-			if (NPC.life <= 0)
-			{
-				for (int i = 0; i < 40; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-				{
-					Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-					Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed * 4, 10); //Makes dust in a messy circle
-					d.noGravity = true;
-				}
-			}
-		}
-
-        public override void OnKill()
-        {
-            NPC.SetEventFlagCleared(ref DownedBossSystem.downedDarkMatterBoss, -1);
-        }
-
-        public override void ModifyNPCLoot(NPCLoot npcLoot)
-		{
-            npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<DarkMatterBag>())); //only drops in expert
-
-            LeadingConditionRule notExpertRule = new LeadingConditionRule(new Conditions.NotExpert()); //checks if not expert
-            LeadingConditionRule masterMode = new LeadingConditionRule(new Conditions.IsMasterMode()); //checks if master mode
-
-            notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<Items.DarkMaterial>(), 1, 30, 30));
-            notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<DarkMatterMask>(), 7));
-
-            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<DarkMatterTrophy>(), 10)); //drop trophy
-
-            npcLoot.Add(ItemDropRule.MasterModeCommonDrop(ModContent.ItemType<Items.Placeables.BossRelics.DarkMatterRelic>()));
-
-            masterMode.OnSuccess(ItemDropRule.Common(ModContent.ItemType<Items.DarkMatter.DarkMatterPetItem>(), 4));
-
-            // add the rules
-            npcLoot.Add(notExpertRule);
-            npcLoot.Add(masterMode);
-        }
 
 		// This npc uses additional textures for drawing
-		public static Asset<Texture2D> DarkBladeLeft;
-        public static Asset<Texture2D> DarkBladeRight;
-        public static Asset<Texture2D> DarkBladeUp;
+		public static Asset<Texture2D> DarkBlade;
         public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-			DarkBladeLeft = ModContent.Request<Texture2D>("KirboMod/NPCs/DarkBlade");
-            DarkBladeRight = ModContent.Request<Texture2D>("KirboMod/NPCs/DarkBlade2");
-            DarkBladeUp = ModContent.Request<Texture2D>("KirboMod/NPCs/DarkBlade3");
+			DarkBlade = ModContent.Request<Texture2D>("KirboMod/NPCs/DarkBlade");
+
+            float rotation = MathHelper.ToRadians(90);
+            SpriteEffects direction = SpriteEffects.None;
+
+            Vector2 offset = new Vector2(50, 30);  
+
+            if (NPC.direction == -1) 
+            {
+                direction = SpriteEffects.FlipVertically;
+                offset = new Vector2(-50, 30);
+            }
+
+            if ((attacktype == DarkMatterAttackType.Orbs && frenzy) && NPC.ai[0] >= 70 && NPC.ai[0] <= 160) //enraged
+            {
+                rotation = MathHelper.ToRadians(0);
+                direction = SpriteEffects.None;
+                offset = new Vector2(0, -20);
+            }
+            else if ((attacktype == DarkMatterAttackType.Orbs) && NPC.ai[0] >= 70 && NPC.ai[0] <= 90)  //regular
+            {
+                rotation = MathHelper.ToRadians(0);
+                direction = SpriteEffects.None;
+                offset = new Vector2(0, -20);
+            }
+
+            if ((attacktype == DarkMatterAttackType.Dash && frenzy) && NPC.ai[0] > 40) //change rotation for enrage dash
+            {
+                rotation += NPC.rotation;
+            }
 
             if (phase == 1) //sword
-			{                                                                               
-				if (NPC.ai[0] >= 300 & NPC.ai[1] == 2) //sword up bum bum bum  //
-				{                                                             //
-					Texture2D blade = DarkBladeUp.Value; //sword this way    o
-					spriteBatch.Draw(blade, NPC.Center - Main.screenPosition + new Vector2(0, -30), null, new Color(255, 255, 255), 0, new Vector2(16, 16), 1f, SpriteEffects.None, 0f);
-				}
-				else //sword neutral
-				{
-					if (NPC.direction == 1)
-					{
-						Texture2D blade = DarkBladeRight.Value; //sword this way o->===>
-						spriteBatch.Draw(blade, NPC.Center - Main.screenPosition + new Vector2(0, 30), null, new Color(255, 255, 255), 0, new Vector2(16, 16), 1f, SpriteEffects.None, 0f);
-					}
-					else
-					{
-						Texture2D blade = DarkBladeLeft.Value; //sword this way <===<-o 
-						spriteBatch.Draw(blade, NPC.Center - Main.screenPosition + new Vector2(-60, 30), null, new Color(255, 255, 255), 0, new Vector2(16, 16), 1f, SpriteEffects.None, 0f);
-					}
-				}
-			}
-		}
+			{
+                Texture2D blade = DarkBlade.Value; 
+                spriteBatch.Draw(blade, NPC.Center - Main.screenPosition + offset, null, new Color(255, 255, 255) * NPC.Opacity, rotation, new Vector2(19, 64), 1f, direction, 0f);
+            }
+        }
+        // This npc uses additional textures for drawing
+        public static Asset<Texture2D> afterimage;
+
+        /*public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+        {
+            Main.instance.LoadNPC(NPC.type);
+            afterimage = ModContent.Request<Texture2D>(Texture);
+            Texture2D texture = afterimage.Value;
+
+            // Redraw the projectile with the color not influenced by light
+            for (int k = 1; k < NPC.oldPos.Length; k++) //start at 1 so not ontop of actual npc
+            {
+                Vector2 drawOrigin = new Vector2(texture.Width / 2, texture.Height / 2);
+                Vector2 drawPos = (NPC.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(0f, NPC.gfxOffY);
+
+                SpriteEffects direction = SpriteEffects.None;
+
+                if (NPC.direction == -1) //reverse
+                {
+                    direction = SpriteEffects.FlipHorizontally;
+                }
+
+                Color color = NPC.GetAlpha(drawColor) * ((NPC.oldPos.Length - k) / (float)NPC.oldPos.Length);
+
+                Main.EntitySpriteDraw(texture, drawPos, null, color, NPC.rotation, drawOrigin, 1, direction);
+            }
+
+            return true;
+        }*/
 
         public override void BossHeadSlot(ref int index)
         {

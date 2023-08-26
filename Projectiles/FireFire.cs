@@ -21,18 +21,17 @@ namespace KirboMod.Projectiles
 			Projectile.timeLeft = 20;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
-
-			Projectile.usesLocalNPCImmunity = true;
-			Projectile.localNPCHitCooldown = 10;
 			Projectile.scale = 1f;
 			Projectile.alpha = 50;
+			Projectile.usesIDStaticNPCImmunity = true;
+			Projectile.idStaticNPCHitCooldown = 10;
 		}
 		public override void AI()
 		{
 			Projectile.rotation = Projectile.velocity.ToRotation();
 			Projectile.scale = Projectile.scale + 0.025f;
 
-			if (Main.rand.Next(5) == 1) // happens 1/5 times
+			if (Main.rand.NextBool(5)) // happens 1/5 times
 			{
 				int dustnumber = Dust.NewDust(Projectile.position, 24, 24, DustID.Torch, 0f, 0f, 200, default, 1.5f); //dust
 				Main.dust[dustnumber].velocity *= 0.3f;
