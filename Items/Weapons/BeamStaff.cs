@@ -30,7 +30,7 @@ namespace KirboMod.Items.Weapons
 			Item.useStyle = ItemUseStyleID.Shoot;
 			Item.knockBack = -3;
 			Item.value = Item.buyPrice(0, 0, 0, 20);
-			Item.rare = ItemRarityID.White;
+			Item.rare = ItemRarityID.Blue;
 			Item.UseSound = SoundID.Item93; //electro zap
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.BeamBall>();
@@ -45,8 +45,11 @@ namespace KirboMod.Items.Weapons
 			recipe.AddTile(TileID.Anvils); //crafted at anvil
 			recipe.Register(); //adds this recipe to the game
 		}
-
-		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
+        public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+        {
+            return base.Shoot(player, source, position, velocity, type, damage, knockback);
+        }
+        public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
 		{
             Vector2 shootdir = Main.MouseWorld - player.Center;
             position = player.Center + (velocity * 8);

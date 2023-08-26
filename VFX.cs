@@ -14,6 +14,20 @@ namespace KirboMod
 {
     public class VFX : ModSystem
     {
+        public static void DrawGlowBallDiffuse(Vector2 pos, float scaleMultiplier, Color outerColor, Color innerColor)
+        {
+            Vector2 origin = GlowBall.Size() / 2;
+            Main.EntitySpriteDraw(GlowBall, pos - Main.screenPosition, null, outerColor, Main.rand.NextFloat() * MathF.Tau, origin, scaleMultiplier, SpriteEffects.None);
+            Main.EntitySpriteDraw(GlowBall, pos - Main.screenPosition, null, innerColor, Main.rand.NextFloat() * MathF.Tau, origin, scaleMultiplier * 0.5f, SpriteEffects.None);
+        }
+        public static void DrawGlowBallAdditive(Vector2 pos, float scaleMultiplier, Color outerColor, Color innerColor, bool shiny = true)
+        {
+            Vector2 origin = GlowBall.Size() / 2;
+            Main.EntitySpriteDraw(GlowBall, pos - Main.screenPosition, null, outerColor with { A = 0 }, Main.rand.NextFloat() * MathF.Tau, origin, scaleMultiplier, SpriteEffects.None);
+            Main.EntitySpriteDraw(GlowBall, pos - Main.screenPosition, null, innerColor with { A = 0 }, Main.rand.NextFloat() * MathF.Tau, origin, scaleMultiplier * 0.5f, SpriteEffects.None);
+            if(shiny)
+            Main.EntitySpriteDraw(GlowBall, pos - Main.screenPosition, null, Color.White with { A = 0 }, Main.rand.NextFloat() * MathF.Tau, origin, scaleMultiplier * 0.25f, SpriteEffects.None);
+        }
         public static void SpawnBlueStarParticle(Projectile proj, Vector2? velocity = null, float scale = 1, Vector2? posOffset = null)
         {
             //16 yellow star gore

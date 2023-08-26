@@ -1437,6 +1437,7 @@ Mods: {
 
 			ZeroEye.DisplayName: Eye of Zero
 			MidbossRift.DisplayName: Dimensional Rift
+			SuperDummy.DisplayName: Super Dummy
 		}
 
 		Tiles: {

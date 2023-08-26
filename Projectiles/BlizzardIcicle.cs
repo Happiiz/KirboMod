@@ -1,7 +1,9 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
 using Terraria.Audio;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -11,7 +13,8 @@ namespace KirboMod.Projectiles
 	{
 		public override void SetStaticDefaults()
 		{
-			
+			ProjectileID.Sets.TrailCacheLength[Type] = 20;
+			ProjectileID.Sets.TrailingMode[Type] = 2;
 		}
 		public override void SetDefaults()
 		{
@@ -26,13 +29,26 @@ namespace KirboMod.Projectiles
 			Projectile.scale = 1f;
 			Projectile.alpha = 50;
 			Projectile.aiStyle = -1;
+			Projectile.extraUpdates = 2;
 			Projectile.ignoreWater = true;
 		}
-		public override void AI()
+        public override bool PreDraw(ref Color lightColor)
+        {
+			Texture2D texture = TextureAssets.Projectile[Type].Value;
+			VFX.DrawGlowBallDiffuse(Projectile.Center, 2, new Color(68, 124, 227), new Color(173, 247, 255));
+            for (int i = Projectile.oldPos.Length - 1; i >= 0; i--)
+            {
+				Vector2 drawPos = Projectile.oldPos[i] + Projectile.Size / 2 - Main.screenPosition;
+				Main.EntitySpriteDraw(texture, drawPos, null, lightColor * (1 - (float)i / Projectile.oldPos.Length), Projectile.rotation, texture.Size() / 2, Projectile.scale, SpriteEffects.None);
+            }
+			Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, null, lightColor, Projectile.rotation, texture.Size() / 2, Projectile.scale, SpriteEffects.None);
+			return false;
+        }
+        public override void AI()
 		{
 			Projectile.rotation = Projectile.velocity.ToRotation();
 
-			Projectile.velocity.Y += 0.4f;
+			Projectile.velocity.Y += 0.1f;
 			if (Projectile.velocity.Y > 16f)
             {
 				Projectile.velocity.Y = 16f;
@@ -65,7 +81,8 @@ namespace KirboMod.Projectiles
 				//spawns body ice on npc 
 				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + Projectile.velocity, Projectile.velocity, ModContent.ProjectileType<BodyIce>(), Projectile.damage / 4, 0, Projectile.owner, target.whoAmI); 
 			}
-
+			target.AddBuff(BuffID.Frostburn, 400);
+			target.AddBuff(BuffID.Frostburn2, 400);//frostbite, inflicted by frozen armor
             if (target.life <= 0 & target.boss == false) //checks if the npc is dead
             {
                 SoundEngine.PlaySound(SoundID.Item46, Projectile.position); //ice hydra

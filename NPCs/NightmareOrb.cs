@@ -1,6 +1,7 @@
 using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Terraria;
@@ -14,131 +15,42 @@ using Terraria.ModLoader;
 
 namespace KirboMod.NPCs
 {
-	[AutoloadBossHead]
-	public class NightmareOrb : ModNPC
+	public partial class NightmareOrb : ModNPC
 	{
-		private int attacktype = 0;
-
-		public bool frenzy { get => NPC.ai[3] == 1f; set => NPC.ai[3] = value ? 1f : 0f; }
-
-        public override void SetStaticDefaults() {
-			// DisplayName.SetDefault("Power Orb");
-			Main.npcFrameCount[NPC.type] = 2;
-
-			//Needed for multiplayer spawning to work
-			NPCID.Sets.MPAllowedEnemies[Type] = true;
-
-            NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
-            {
-                Hide = true // Hides this NPC from the Bestiary, useful for multi-part NPCs whom you only want one entry.
-            };
-            NPCID.Sets.NPCBestiaryDrawOffset.Add(NPC.type, value);
-        }
-
-		public override void SetDefaults() {
-			NPC.width = 100;
-			NPC.height = 100;
-			NPC.damage = 0; //initally
-			NPC.noTileCollide = true;
-			NPC.defense = 20; 
-			NPC.lifeMax = 15000;
-			NPC.HitSound = SoundID.NPCHit4;
-			NPC.DeathSound = SoundID.NPCDeath14; //explosive metal
-			NPC.value = 0f; // money it drops
-			NPC.knockBackResist = 0f;
-			Banner = 0;
-			BannerItem = Item.BannerToItem(Banner);
-			NPC.aiStyle = -1;
-			NPC.boss = true;
-			NPC.noGravity = true;
-			NPC.lavaImmune = true;
-			Music = MusicID.Boss3;
-			NPC.npcSlots = 6;
-			NPC.alpha = 255; //only initally of course
-		}
-
-		public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */ 
-		{
-			NPC.lifeMax = (int)(NPC.lifeMax * 0.75 * balance);
-			NPC.damage = (int)(NPC.damage);
-		}
-
-        public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
+        static readonly int[] yOffsetsForSlashBeam = new int[6] { -2, 1, -1, 2, 0, 0 };//another 0 as a failsafe in case of index out of bounds
+        Vector2 GetTargetPosOffset(float changeRate = 0.05f)
         {
-            // We can use AddRange instead of calling Add multiple times in order to add multiple items at once
-            bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
+            int moveType = AttacksPerformedSinceSpawn / 2 % 3;
+            Vector2 offset = new Vector2(MathF.Sin(NPC.ai[0] * changeRate * 2 + MathF.PI) * 250, MathF.Sin(NPC.ai[0] * changeRate) * 250);
+            if (moveType == 1)
+                offset.X = 0;
+            else if (moveType == 2)
             {
-				// Sets the spawning conditions of this NPC that is listed in the bestiary.
-				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Times.NightTime,
-
-				// Sets the description of this NPC that is listed in the bestiary.
-				new FlavorTextBestiaryInfoElement("An ominous orb that appeared from the fountain after being attracted to it's magic. Acts as the shield for a mysterious yet diabolical sorcerer.")
-            });
+                offset.Y = 0;
+            }
+            offset.X += MathF.CopySign(300,NPC.Center.X - Main.player[NPC.target].Center.X);//300 is horizontal offset to player
+            return offset;
         }
-
-		public override void SendExtraAI(BinaryWriter writer)
+        /// <summary>
+        /// these values are already divided by 2
+        /// </summary>
+        static Dictionary<NightmareOrbAtkType, int> dmgPerAtkType = new()
 		{
-			writer.Write(attacktype);
-        }
-
-		public override void ReceiveExtraAI(BinaryReader reader)
-		{
-			attacktype = reader.ReadInt32();
-        }
-
+			{ NightmareOrbAtkType.SlashBeam, 60},
+			{ NightmareOrbAtkType.SingleStar, 40},
+			{ NightmareOrbAtkType.TripleStar, 40},
+			{ NightmareOrbAtkType.HomingStar, 50}
+		};
+		private NightmareOrbAtkType AttackType { get => (NightmareOrbAtkType)NPC.ai[2]; set => NPC.ai[2] = (int)value; }
+        int AttacksPerformedSinceSpawn { get => (int)NPC.ai[1]; set => NPC.ai[1] = value; }
+		public bool frenzy { get => NPC.ai[3] == 1f; set => NPC.ai[3] = value ? 1f : 0f; }
         public override void AI() //constantly cycles each time
         {
 			Player player = Main.player[NPC.target];
 
 			NPC.TargetClosest(true);
-			
-			NPC.ai[2] = 60; //SKIP THIS PHASE FOR NOW AS IT's NOT NEEDED IN MULTIPLAYER
-
-			if (NPC.ai[2] < 60) //rise
 			{
-				/*NPC.velocity.Y = -2; //rise
-
-				if (NPC.alpha > 0)
-				{
-					NPC.alpha -= 5; //become visible
-				}
-				else
-                {
-					NPC.alpha = 0; //visible
-				}
-
-				if (NPC.ai[2] % 10 == 0) //sound
-                {
-					SoundEngine.PlaySound(SoundID.Run.WithVolumeScale(2f).WithPitchOffset(0.5f), NPC.Center);
-				}
-
-				if (NPC.ai[2] == 59)
-                {
-                    for (int i = 0; i < 60; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-					{
-						Vector2 speed = Main.rand.NextVector2Unit(); //circle edge
-						Dust.NewDustPerfect(NPC.Center, DustID.Shadowflame, speed * 10, 1); //Makes dust in a ring
-					}
-
-                    NPC.dontTakeDamage = false;
-                }*/
-			}
-			else //AFTER ENTRANCE
-			{
-				//set damage
-                if (Main.masterMode)
-                {
-                    NPC.damage = 210;
-                }
-				else if (Main.expertMode)
-				{
-					NPC.damage = 140;
-				}
-				else
-				{
-					NPC.damage = 70;
-				}
-
+				NPC.damage = 70;
                 //DESPAWNING
                 if (NPC.target < 0 || NPC.target == 255 || player.dead || !player.active || Main.dayTime == true)
 				{
@@ -153,497 +65,228 @@ namespace KirboMod.NPCs
 				}
 				else //regular attack stuff
 				{
-					AttackPattern();
-
+                    DecideNextAttack();
+                    AttackPattern();
 					//checks if rapid attacking in expert mode("phase 3" if you want) at the start of the cycle
-					if (NPC.ai[1] == 0 && Main.expertMode && NPC.life <= NPC.lifeMax * 0.25)
-                    {
-						frenzy = true; //turn from false to true
-                    }
-
-					NPC.ai[1]++; //marks when to switch attacks
-
-					if (Main.expertMode == false)
-					{
-						if (NPC.ai[1] == 300) //Tri stars
-						{
-							if (NPC.life >= NPC.lifeMax * 0.75) //dash if criteria met
-							{
-								NPC.ai[1] = 880; //point of dash
-								NPC.ai[0] = 0;
-							}
-							else
-							{
-								attacktype = 2;
-								NPC.ai[0] = 0; //set to 1 because it's one ahead
-							}
-						}
-
-						if (NPC.ai[1] == 480) //Homing stars
-						{
-							if (NPC.life >= NPC.lifeMax * 0.5 & NPC.ai[0] == 0) //dash if criteria met
-							{
-								NPC.ai[1] = 880; //point of dash
-								NPC.ai[0] = 0;
-							}
-							else
-							{
-								attacktype = 3;
-								NPC.ai[0] = 0;
-							}
-						}
-
-						if (NPC.ai[1] == 720) //Slash beams
-						{
-							if (NPC.life >= NPC.lifeMax * 0.25 & NPC.ai[0] == 0) //dash if criteria met
-							{
-								NPC.ai[1] = 880; //point of dash
-								NPC.ai[0] = 0;
-							}
-							else
-							{
-								attacktype = 1;
-								NPC.ai[0] = 0;
-							}
-						}
-
-						if (NPC.ai[1] == 880) //start dashing
-						{
-							NPC.ai[0] = 0;
-							attacktype = 4;
-						}
-					}
-					else //expert Mode cycle
-					{
-						if (NPC.ai[1] == 300) //Tri stars
-						{
-							if (NPC.life >= NPC.lifeMax * 0.85) //dash if criteria met
-							{
-								NPC.ai[1] = 880; //point of dash
-								NPC.ai[0] = 0;
-							}
-							else
-							{
-								attacktype = 2;
-								NPC.ai[0] = 0;
-							}
-						}
-
-						if (NPC.ai[1] == (frenzy ? 390 : 480)) //Homing stars(does it sooner if below 25%)
-						{
-							if (NPC.life >= NPC.lifeMax * 0.70 & NPC.ai[0] == 0) //dash if criteria met
-							{
-								NPC.ai[1] = 880; //point of dash
-								NPC.ai[0] = 0;
-							}
-							else
-							{
-								attacktype = 3;
-								NPC.ai[0] = 0;
-							}
-						}
-
-						if (NPC.ai[1] == (frenzy ? 510 : 720)) //Slash beams(does it sooner if below 25%)
-						{
-							if (NPC.life >= NPC.lifeMax * 0.55 & NPC.ai[0] == 0) //dash if criteria met
-							{
-								NPC.ai[1] = 880; //point of dash
-								NPC.ai[0] = 0;
-							}
-							else
-							{
-								attacktype = 1;
-								NPC.ai[0] = 0;
-							}
-						}
-
-						if (NPC.ai[1] == (frenzy ? 590 : 880)) //start dashing(does it sooner if below 25%)
-						{
-							NPC.ai[0] = 0;
-							attacktype = 4;
-						}
-					}
+                    frenzy = Main.expertMode && NPC.life <= NPC.lifeMax * 0.6; //turn from false to true
 				}
 			}
 		}
+        void DecideNextAttack()
+        {
+                                
+            if (AttackType == NightmareOrbAtkType.DecideNext && NPC.ai[0] >= 30)//time between attacks
+            {
+                NightmareOrbAtkType[] atkOrder = new NightmareOrbAtkType[]
+                {
+                NightmareOrbAtkType.SingleStar,
+                NightmareOrbAtkType.HomingStar,
+                NightmareOrbAtkType.SlashBeam,
+                NightmareOrbAtkType.Dash,
+                NightmareOrbAtkType.TripleStar,
+                NightmareOrbAtkType.Dash
+                };
+                AttackType = atkOrder[AttacksPerformedSinceSpawn % atkOrder.Length];
+
+                AttackType = NightmareOrbAtkType.SlashBeam;
+            }
+        }
 		private void AttackPattern()
 		{
             Player player = Main.player[NPC.target];
 
             NPC.ai[0]++;
 
-            if (attacktype != 4)
+            if (AttackType != NightmareOrbAtkType.Dash)
 			{
-                Vector2 moveTo = player.Center; //I don't know if I even need this
+                Vector2 move = player.Center - NPC.Center + GetTargetPosOffset(0.05f);           
+                float magnitude = move.Length();
+				float inertia = 20f; //Ok so like I'm pretty sure this is supposed to be how wibbly wobbly you want the npc to be before it reaches its destination
+				float speed = 30; //speed I think
+                if (magnitude > speed)
+                {
+                    move *= speed / magnitude;//sets the move vector's magnitude to be speed
+                }
+                NPC.velocity = (inertia * NPC.velocity + move) / (inertia + 1);
+                magnitude = NPC.velocity.Length();
+                if (magnitude > speed)
+                {
+                    NPC.velocity *= speed / magnitude;//sets npc's velocity vector's magnitude to be speed
+                }
+                
+            }
+			if (AttackType == NightmareOrbAtkType.SingleStar)//stars
+            {
+                AttackSingleStar(player);
+            }
+            else if (AttackType == NightmareOrbAtkType.SlashBeam)
+			{
+                //>attempts to make code better
+                //>actually make it worse
+                //>wires.png
+                const int startTime = 30;
+				float fireRate = GetValueMultipliedDependingOnPhaseAndDifficulty(30, 0.75f, 0.75f);
+                fireRate = (int)fireRate;
+				int currentSlashBeamIndex = (int)(NPC.ai[0] - startTime) / (int)fireRate;
                 Vector2 playerDistance = player.Center - NPC.Center;
-                Vector2 move = player.Center - NPC.Center;
-
-                float minX = moveTo.X - 50f;
-                float maxX = moveTo.X + 50f;
-                float minY = moveTo.Y;
-                float maxY = moveTo.Y;
-
-                if (playerDistance.X <= 0) //if player is behind enemy
+                Vector2 playerXOffset = player.Center + new Vector2(playerDistance.X <= 0 ? 400 : -400, 0); //go in front of player
+                int[] yOffsetsForSlashBeam = new int[6] { -2, 1, -1, 2, 0, 0 };
+				Vector2 targetPos = playerXOffset + new Vector2(0, yOffsetsForSlashBeam[currentSlashBeamIndex]) * 120;
+				NPC.velocity = NPC.DirectionTo(targetPos) * Utils.Remap(NPC.Distance(targetPos), 10, 50, 0, 45);
+				if (((int)NPC.ai[0] - startTime) % fireRate == 0) //shoot
+				{
+					if (Main.netMode != NetmodeID.MultiplayerClient)
+					{
+						Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, new Vector2(NPC.direction * 20, 0), ModContent.ProjectileType<NightSlash>(), dmgPerAtkType[AttackType], 0f, Main.myPlayer, 0, 0);
+					}
+					SoundEngine.PlaySound(SoundID.Item15, NPC.Center); //phasesaber
+				}
+				if(NPC.ai[0] >= startTime + fireRate * 5)//5 is number of waves
                 {
-                    move += new Vector2(400f, 0); // go in front of player 
+					EndAttack();
                 }
-                else
-                {
-                    move += new Vector2(-400f, 0); // go behind player
-                }
-
-                if (NPC.Center.X >= minX && NPC.Center.X <= maxX && NPC.Center.Y >= minY && NPC.Center.Y <= maxY) //certain range
-                {
-                    NPC.velocity *= 0.98f; //slow
-                }
-                else
-                {
-                    float magnitude = (float)Math.Sqrt(move.X * move.X + move.Y * move.Y);
-                    float speed = 15f; //speed I think
-                    if (magnitude > speed)
-                    {
-                        move *= speed / magnitude;
-                    }
-                    float inertia = 20f; //Ok so like I'm pretty sure this is supposed to be how wibbly wobbly you want the npc to be before it reaches its destination
-                    NPC.velocity = (inertia * NPC.velocity + move) / (inertia + 1);
-                    magnitude = (float)Math.Sqrt(NPC.velocity.X * NPC.velocity.X + NPC.velocity.Y + NPC.velocity.Y);
-                    if (magnitude > speed)
-                    {
-                        NPC.velocity *= speed / magnitude;
-                    }
-                }
-            }
-
-			if (attacktype == 0)//stars
-			{
-				//PROJECTILE
-				Vector2 projshoot = player.Center - NPC.Center;
-				projshoot.Normalize(); //reduces it to a value of 1
-				projshoot *= 15f; //projectile speed
-
-				if (NPC.ai[0] == 49 && frenzy) //expert mode below 25%
-				{
-					if (Main.netMode != NetmodeID.MultiplayerClient)
-					{
-						Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projshoot, ModContent.ProjectileType<BadStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-					}
-					SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
-				}
-				if (NPC.ai[0] == 59)
-				{
-					if (Main.netMode != NetmodeID.MultiplayerClient)
-					{
-						Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projshoot, ModContent.ProjectileType<BadStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-					}
-					SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
-				}
-				if (NPC.ai[0] == 69 && frenzy) //expert mode below 25%
-				{
-					if (Main.netMode != NetmodeID.MultiplayerClient)
-					{
-						Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projshoot, ModContent.ProjectileType<BadStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-					}
-					SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
-				}
-				if (NPC.ai[0] == 79)
-				{
-					if (Main.netMode != NetmodeID.MultiplayerClient)
-					{
-						Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projshoot, ModContent.ProjectileType<BadStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-					}
-					SoundEngine.PlaySound(SoundID.MaxMana , NPC.Center);
-				}
-				if (NPC.ai[0] == 89 && frenzy) //expert mode below 25%
-				{
-					if (Main.netMode != NetmodeID.MultiplayerClient)
-					{
-						Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projshoot, ModContent.ProjectileType<BadStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-					}
-					SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
-				}
-				if (NPC.ai[0] == 99)
-				{
-					if (Main.netMode != NetmodeID.MultiplayerClient)
-					{
-						Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projshoot, ModContent.ProjectileType<BadStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-					}
-					SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
-				}
-				if (NPC.ai[0] == 100)
-                {
-					NPC.ai[0] = 0; //end cycle
-				}
 			}
-
-			else if (attacktype == 1) //slashbeams
-			{
-                Vector2 playerDistance = player.Center - NPC.Center;
-				float xOffset = 400;
-
-                if (playerDistance.X <= 0) //if player is behind enemy
-                {
-                    xOffset = 400; // go in front of player 
-                }
-                else
-                {
-                    xOffset = -400; // go behind player
-                }
-
-                Vector2 playerXOffest = player.Center + new Vector2(xOffset, 0f); //go in front of player
-				Vector2 move = playerXOffest - NPC.Center;
-
-				if (!frenzy) //not expert mode or above 25%(has to be both to be expert attack)
-				{
-					if (NPC.ai[0] >= 40) //shoot
-					{
-						move *= 0f;
-						if (Main.netMode != NetmodeID.MultiplayerClient)
-						{
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * 18, 0, ModContent.ProjectileType<NightSlash>(), 40 / 2, 0f, Main.myPlayer, 0, 0);
-						}
-						SoundEngine.PlaySound(SoundID.Item15, NPC.Center); //phasesaber
-						NPC.ai[0] = 0;
-					}
-					else if (NPC.ai[0] >= 20) //jump to location
-					{
-						move /= 5f;
-					}
-					else if (NPC.ai[0] <= 20) //freeze up
-					{
-						move *= 0f;
-					}
-				}
-				else //expert cycle
-				{
-					if (NPC.ai[0] >= 20) //shoot
-					{
-						move *= 0f;
-						if (Main.netMode != NetmodeID.MultiplayerClient)
-						{
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * 18, 0, ModContent.ProjectileType<NightSlash>(), 40 / 2, 0f, Main.myPlayer, 0, 0);
-						}
-						SoundEngine.PlaySound(SoundID.Item15, NPC.Center); //phasesaber
-						NPC.ai[0] = 0;
-					}
-					else if (NPC.ai[0] >= 10) //jump to location
-					{
-						move /= 5f;
-					}
-					else if (NPC.ai[0] <= 10) //freeze up
-					{
-						move *= 0f;
-					}
-				}
-
-				NPC.velocity = move;
-			}
-
-			else if (attacktype == 2)//star barrage
-			{
-				//PROJECTILE
-				if (frenzy == false) //not expert mode or above 25%(has to be both to be expert attack)
-				{
-					if (NPC.ai[0] == 60 || NPC.ai[0] == 120 || NPC.ai[0] == 180)
-					{
-						if (Main.netMode != NetmodeID.MultiplayerClient)
-						{
-                            //Straight
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * 15, 0, ModContent.ProjectileType<BadStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-						
-						    //Down
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * 10, 5, ModContent.ProjectileType<BadStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-						
-						    //Up
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * 10, -5, ModContent.ProjectileType<BadStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-						}
-						SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
-					}
-
-					if (NPC.ai[0] >= 180)
-					{
-						NPC.ai[0] = 0; //end cycle
-					}
-				}
-				else //expert cycle
-				{
-					if (NPC.ai[0] == 30 || NPC.ai[0] == 60 || NPC.ai[0] == 90)
-					{
-						if (Main.netMode != NetmodeID.MultiplayerClient)
-						{
-                            //Straight
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * 15, 0, ModContent.ProjectileType<BadStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-						
-						    //Down
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * 10, 5, ModContent.ProjectileType<BadStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-						
-						    //Up
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * 10, -5, ModContent.ProjectileType<BadStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-						}
-						SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
-					}
-
-					if (NPC.ai[0] >= 90)
-					{
-						NPC.ai[0] = 0; //end cycle
-					}
-				}
-			}
-
-			else if (attacktype == 3)//homing stars
-			{
-				//PROJECTILE
-				if (frenzy == false) //not expert mode or above 25%(has to be both to be expert attack)
-				{
-					if (NPC.ai[0] == 60 || NPC.ai[0] == 120 || NPC.ai[0] == 180) //homing stars go behind it
-					{
-						if (Main.netMode != NetmodeID.MultiplayerClient)
-						{
-                            //low star
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * -20, 10, ModContent.ProjectileType<HomingNightStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-
-							//high star
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * -20, -10, ModContent.ProjectileType<HomingNightStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-
-							//lower star
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * -20, 20, ModContent.ProjectileType<HomingNightStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-
-							//higher star
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * -20, -20, ModContent.ProjectileType<HomingNightStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-
-							//center star
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * -20, -20, ModContent.ProjectileType<HomingNightStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-						}
-						SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
-					}
-
-					if (NPC.ai[0] >= 240)
-					{
-						NPC.ai[0] = 0; //end cycle
-					}
-				}
-				else //expert cycle
-				{
-					if (NPC.ai[0] == 30 || NPC.ai[0] == 60 || NPC.ai[0] == 90)
-					{
-						//low star
-						if (Main.netMode != NetmodeID.MultiplayerClient)
-						{
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * -20, 10, ModContent.ProjectileType<HomingNightStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-							//high star
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * -20, -10, ModContent.ProjectileType<HomingNightStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-							//lower star
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * -20, 20, ModContent.ProjectileType<HomingNightStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-							//higher star
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * -20, -20, ModContent.ProjectileType<HomingNightStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-							//center star
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * -20, -20, ModContent.ProjectileType<HomingNightStar>(), 20 / 2, 0f, Main.myPlayer, 0, 0);
-						}
-						SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
-					}
-
-					if (NPC.ai[0] >= 120)
-					{
-						NPC.ai[0] = 0; //end cycle
-					}
-				}
-			}
-
-			else if (attacktype == 4)//dash
-			{
-				//MOVEMENT
-				if (NPC.ai[0] == 1)
-                {
-					NPC.velocity.Y = 0;
-					NPC.velocity.X = 0;
-				}
-				if (NPC.ai[0] > 1 & NPC.ai[0] < 30) //back up
-                {
-					NPC.velocity.Y = 0;
-					NPC.velocity.X += NPC.direction * -0.5f;
-                }
-				if (NPC.ai[0] == 30) //charge
-                {
-					NPC.velocity.X = NPC.direction * 80;
-                }
-				if (NPC.ai[0] > 30) //slow move
-                {
-					NPC.velocity.X *= 0.92f;
-                }
-
-				if (NPC.ai[0] >= 210)
-				{
-					attacktype = 0; //recycle to single stars
-					NPC.ai[1] = 0; //reset entire attack cycle
-					NPC.ai[0] = 0; //end cycle
-				}
-			}
-		}
-		public override void FindFrame(int frameHeight) // animation
-        {
-            NPC.frameCounter += 1.0;
-            if (NPC.frameCounter < 7.0)
+			else if (AttackType == NightmareOrbAtkType.TripleStar)//star barrage
             {
-                NPC.frame.Y = 0;
+                AttackTripleStar();
             }
-            else if (NPC.frameCounter < 14.0)
+            else if (AttackType == NightmareOrbAtkType.HomingStar)//homing stars
             {
-                NPC.frame.Y = frameHeight;
+                AttackHomingStar();
             }
-            else
+            else if (AttackType == NightmareOrbAtkType.Dash)
             {
-                NPC.frameCounter = 0.0;
+                AttackDash();
             }
         }
 
-		public override Color? GetAlpha(Color lightColor)
-		{
-			if (NPC.ai[2] >= 60) //if done phaseing in
-			{
-				return Color.White; // Makes it uneffected by light
-			}
-			else
-            {
-				return null;
-            }
-		}
-
-		public override bool PreKill()
-		{
-			return false;
-		}
-
-		public override void HitEffect(NPC.HitInfo hit)
-		{
-			if (NPC.life <= 0)
-			{
-				for (int i = 0; i < 10; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-				{
-					Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
-					Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.NightStar>(), speed, Scale: 1.5f); //Makes dust in a messy circle
-					d.noGravity = true;
-				}
-				for (int i = 0; i < 10; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-				{
-					Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-                    Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center, speed, Main.rand.Next(11, 13), Scale: 1.5f); //double jump smoke
-                }
-			}
-		}
-
-		public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
-		{
-			scale = 1.5f;
-			return true;
-		}
-
-        public override bool CheckDead()
+        private void AttackTripleStar()
         {
-            if (Main.netMode != NetmodeID.MultiplayerClient)
+            int startTime = frenzy ? 30 : 60;
+            int fireRate = frenzy ? 30 : 60;
+            int numberOfShots = 3;
+            if ((NPC.ai[0] - startTime) % fireRate == 0)
             {
-                NPC.SpawnBoss((int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<NightmareWizard>(), Main.player[NPC.target].whoAmI); //different from SpawnOnPlayer()
+                if (Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    //Straight
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * 15, 0, ModContent.ProjectileType<BadStar>(), dmgPerAtkType[AttackType], 0f, Main.myPlayer, 0, 0);
+
+                    //Down
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * 10, 5, ModContent.ProjectileType<BadStar>(), dmgPerAtkType[AttackType], 0f, Main.myPlayer, 0, 0);
+
+                    //Up
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * 10, -5, ModContent.ProjectileType<BadStar>(), dmgPerAtkType[AttackType], 0f, Main.myPlayer, 0, 0);
+                }
+                SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
+            }
+            if (NPC.ai[0] > startTime + fireRate * numberOfShots)
+            {
+                EndAttack();
+            }
+        }
+
+      
+
+        private void AttackHomingStar()
+        {
+            int startTime = frenzy ? 30 : 60;
+            int fireRate = frenzy ? 30 : 60;
+            int numberOfShots = 3;
+            if ((NPC.ai[0] - startTime) % fireRate == 0) //homing stars go behind it
+            {
+                if (Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    Vector2[] shotDirections = new Vector2[] { new Vector2(-20, 80), new Vector2(-80, -120), new Vector2(-80, 120), new Vector2(-20, -80) };
+                    for (int i = 0; i < Main.maxPlayers; i++)
+                    {
+                        Player possibleTarget = Main.player[i];
+                        if (possibleTarget.dead || !possibleTarget.active)
+                            continue;
+                        for (int j = 0; j < shotDirections.Length; j++)
+                        {
+                            //todo: change homing night star ai to target the player with index ai1 and follow nightmare orb npc of index 0 before being fired. For proj use velocity as total offset, remember to subtract vel from pos in AI. use localAI0 as progress timer maybe?
+                            Vector2 projVel = shotDirections[j] with { X = NPC.direction * shotDirections[j].X };
+                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projVel * 2, ModContent.ProjectileType<HomingNightStar>(), dmgPerAtkType[AttackType], 0f, Main.myPlayer, NPC.whoAmI, i);
+                        }
+                    }
+                }
+                //SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
+            }
+            if (NPC.ai[0] > startTime + numberOfShots * fireRate)
+            {
+				EndAttack();
+			}
+        }
+
+        private void AttackSingleStar(Player player)
+        {
+            Vector2 shootVel = player.Center - NPC.Center;
+            shootVel.Normalize(); //reduces it to a value of 1
+            shootVel *= 15f; //projectile speed
+            shootVel *= Main.expertMode ? 1.25f : 1;
+            shootVel *= frenzy ? 1.25f : 1;
+            int fireRate = frenzy ? 10 : 20;
+            int startTime = 49;
+            int numberOfShots = frenzy ? 6 : 3;
+			if ((NPC.ai[0] - startTime) % fireRate == 0)
+            {
+                if (Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, shootVel, ModContent.ProjectileType<BadStar>(), dmgPerAtkType[AttackType], 0f, Main.myPlayer, 0, 0);
+                }
+                SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
+            }
+			if (NPC.ai[0] > startTime + numberOfShots * fireRate)
+			{
+				EndAttack();
+			}
+		}
+
+        private void AttackDash()
+        {
+            if (NPC.ai[0] == 1)
+            {
+                NPC.velocity.Y = 0;
+                NPC.velocity.X = 0;
+            }
+            if (NPC.ai[0] > 1 & NPC.ai[0] < 30) //back up
+            {
+                NPC.velocity.Y = 0;
+                NPC.velocity.X += NPC.direction * -0.5f;
+            }
+            if (NPC.ai[0] == 30) //charge
+            {
+                NPC.velocity.X = NPC.direction * 80;
+            }
+            if (NPC.ai[0] > 30) //slow move
+            {
+                NPC.velocity.X *= 0.92f;
             }
 
-            return true;
+            if (NPC.ai[0] >= 210)
+            {
+				EndAttack();
+			}
         }
+        int GetValueMultipliedDependingOnPhaseAndDifficulty(float value, float expertMultiplier = 1.25f, float frenzyMultiplier = 1.25f)
+        {
+            value *= Main.expertMode ? expertMultiplier : 1;
+            value *= frenzy ? frenzyMultiplier : 1;
+            return (int)value;
+        }
+        int GetValueDividedDependingOnPhaseAndDifficulty(float value, float expertDivisor = 1.25f, float frenzyDivisor = 1.25f)
+        {
+            value *= Main.expertMode ? expertDivisor : 1;
+            value *= frenzy ? frenzyDivisor : 1;
+            return (int)value;
+        }
+        private void EndAttack(int delayBeforeNextAttack = 0)
+		{
+			NPC.ai[0] = -delayBeforeNextAttack;
+			AttackType = NightmareOrbAtkType.DecideNext;
+			NPC.netUpdate = true;
+            AttacksPerformedSinceSpawn++;
+		}
 	}
 }

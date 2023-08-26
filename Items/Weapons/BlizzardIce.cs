@@ -35,7 +35,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item24; //spectre boots
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.BlizzardIcicle>(); 
-			Item.shootSpeed = 16f;
+			Item.shootSpeed = 20;//give proj extraupdate and afterimage for 60 velocity
 			Item.mana = 12;
 		}
 

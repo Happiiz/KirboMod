@@ -15,7 +15,6 @@ namespace KirboMod.Projectiles
 			// DisplayName.SetDefault("Night Star");
 			Main.projFrames[Projectile.type] = 1;
 		}
-
 		public override void SetDefaults()
 		{
 			Projectile.width = 40;
@@ -30,8 +29,12 @@ namespace KirboMod.Projectiles
 		}
 		public override void AI()
 		{
+
+			int timeBeforeLaunching = 30;
 			Lighting.AddLight(Projectile.Center, 0.255f, 0f, 0.255f);
-			
+			Projectile.localAI[0]++;
+			float progress = Projectile.localAI[0] / timeBeforeLaunching;
+			float progressWithEasing = 1 - MathF.Pow(1 - progress, 3);
 			if (Projectile.velocity.X >= 0)
             {
 				Projectile.rotation += 0.3f;
@@ -48,21 +51,17 @@ namespace KirboMod.Projectiles
 			}
 
 			//HOMING
-			Player player = Main.player[Main.myPlayer]; //chooses a random player
+			Player player = Main.player[(int)Projectile.ai[1]]; //TODO: TEST THIS LATER
 			Vector2 move = player.Center - Projectile.Center;
-
-			Projectile.ai[0]++;
-
-			if (Projectile.ai[0] < 30)
+			if (progress < 1)
 			{
-				Projectile.velocity *= 0.92f;
+				Projectile.Center = Main.npc[(int)Projectile.ai[0]].Center + progressWithEasing * Projectile.velocity - Projectile.velocity;
 			}
-
-			if (Projectile.ai[0] == 30)
+			else if (Projectile.localAI[0] == timeBeforeLaunching)
 			{
 				Projectile.hostile = true;
 				move.Normalize();
-				move *= 15;
+				move *= 25;
 				Projectile.velocity = move; //movemove = player.Center - projectile.Center; //update player position
 			}
 		}
@@ -89,7 +88,7 @@ namespace KirboMod.Projectiles
 
             Texture2D star = StarTexture.Value;
 
-            if (Projectile.ai[0] >= 30) //do it after homed
+            if (Projectile.localAI[0] >= 30) //do it after homed
 			{
 				for (int i = 0; i <= 2; i++)
 				{
