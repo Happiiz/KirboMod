@@ -66,23 +66,9 @@ namespace KirboMod.Projectiles
             Collision.StepUp(ref Projectile.position, ref Projectile.velocity, Projectile.width, Projectile.height, ref Projectile.stepSpeed, ref Projectile.gfxOffY);
         }
 
-        /*public override bool OnTileCollide(Vector2 oldVelocity) //bounce
-		{
-			if (Projectile.velocity.X != oldVelocity.X)
-			{
-				Projectile.velocity.X = -oldVelocity.X;
-			}
-			if (Projectile.velocity.Y != oldVelocity.Y)
-			{
-				Projectile.velocity.Y = -oldVelocity.Y;
-			}
-			return false;
-		}*/
-
-		//bad ice chunk code
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            if (oldVelocity.X != Projectile.velocity.X)
+            if (oldVelocity.X != Projectile.velocity.X) //stopped sliding horizontally
             {
                 return true; //kill
             }

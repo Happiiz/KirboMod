@@ -19,7 +19,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 100;
+			Item.damage = 52; 
 			Item.noMelee = true;
 			Item.DamageType = DamageClass.Magic;
 			Item.mana = 8;
@@ -37,20 +37,19 @@ namespace KirboMod.Items.Weapons
 			Item.shoot = ModContent.ProjectileType<Projectiles.Star>();
 			Item.shootSpeed = 32f;
 			Item.crit += 24;
-
 		}
 
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {
             position.Y -= 10; //move up slightly
-			position += (velocity).SafeNormalize(Vector2.Zero) * 20;
+			position += velocity.SafeNormalize(Vector2.Zero) * 10;
         }
 
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
 		{
 			if (Main.myPlayer != player.whoAmI)
 				return false;
-			Projectile proj = Projectile.NewProjectileDirect(source, position, velocity, ModContent.ProjectileType<Projectiles.Star>(), damage, 6f, player.whoAmI);
+			Projectile proj = Projectile.NewProjectileDirect(source, position, velocity, ModContent.ProjectileType<Projectiles.Star>(), damage, knockback, player.whoAmI);
 			proj.rotation += Main.rand.NextFloat() * MathF.Tau;
 			proj.netUpdate = true;
 			return false;
