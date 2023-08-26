@@ -33,12 +33,12 @@ namespace KirboMod.Projectiles
 		{
 			Lighting.AddLight(Projectile.Center, 0.8f, 0.8f, 0f); //yellow light half of a torch
 			Projectile.Opacity += 0.1f;
-
-			if (Main.rand.NextBool(3)) // happens 1/3 times
+			if (Main.rand.NextBool(2)) // happens 1/2 times
 			{
+				//int dustnumber = Dust.NewDust(Projectile.position - Projectile.velocity * 2, 50, 50, ModContent.DustType<Dusts.LilStar>(), 0f, 0f, 200, default, 0.5f); //dust
+				//Main.dust[dustnumber].velocity *= 0.3f;
 				Sparkle.NewSparkle(Projectile.Center + Main.rand.NextVector2Circular(20,20) - Projectile.velocity, Main.rand.NextBool(3, 5) ? Color.Yellow : Color.Blue, new Vector2(1, 1.5f), Projectile.velocity * 0.1f + Main.rand.NextVector2Circular(30, 30) / 10, 40, new Vector2(2, 2), null, 1, 0, 0.98f);
 			}
-
 			if (Projectile.soundDelay == 0)
 			{
 				Projectile.soundDelay = 20 + Main.rand.Next(40);
@@ -68,12 +68,11 @@ namespace KirboMod.Projectiles
         }
         public override void Kill(int timeLeft) //when the projectile dies
         {
-			for (int i = 0; i < 10; i++)
-            {
-                Vector2 velocity = Main.rand.NextVector2Circular(10, 10); //burst of sparkles
-                Sparkle.NewSparkle(Projectile.Center + Projectile.velocity, Main.rand.NextBool(3, 5) ? Color.Yellow : Color.Blue, 
-					new Vector2(1, 1f), velocity, 40, new Vector2(2, 2), null, 1, 0, 0.98f);
-            }
+			for (int i = 0; i < 5; i++)
+			{
+				Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
+				Dust.NewDustPerfect(Projectile.Center + Projectile.velocity * 2, ModContent.DustType<Dusts.LilStar>(), speed, Scale: 1f); //Makes dust in a messy circle
+			}
 		}
         public override bool PreDraw(ref Color lightColor)
         {

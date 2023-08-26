@@ -17,8 +17,8 @@ namespace KirboMod.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 148;
-			Projectile.height = 148;
+			Projectile.width = 100;
+			Projectile.height = 100;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.timeLeft = 5;
@@ -35,19 +35,12 @@ namespace KirboMod.Projectiles
 			{
 				SoundEngine.PlaySound(SoundID.Item14, Projectile.position); //bomb sound
 
-				for (int i = 0; i < 30; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+				for (int i = 0; i < 20; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 				{
-					Vector2 speed = Main.rand.NextVector2Circular(20f, 20f); //circle
-					Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.Enchanted_Gold, speed, Scale: 2f); //Makes dust in a messy circle
+					Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
+					Dust d = Dust.NewDustPerfect(Projectile.Center, ModContent.DustType<Dusts.LilStar>(), speed); //Makes dust in a messy circle
 					d.noGravity = true;
-
 				}
-
-				for (int i = 0; i < 20; i++)
-				{
-                    Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
-					Gore.NewGorePerfect(Projectile.GetSource_FromAI(), Projectile.Center, speed, Main.rand.Next(16, 18), 3);
-                }
 			}
 		}
     }

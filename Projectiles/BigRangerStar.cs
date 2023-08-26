@@ -16,8 +16,8 @@ namespace KirboMod.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 74;
-			Projectile.height = 74;
+			Projectile.width = 72;
+			Projectile.height = 72;
 			Projectile.friendly = false;
             Projectile.hostile = false;
             Projectile.DamageType = DamageClass.Ranged;
@@ -30,10 +30,10 @@ namespace KirboMod.Projectiles
 		public override void AI()
 		{
 			Lighting.AddLight(Projectile.Center, 0.255f, 0.255f, 0f);
-			Projectile.rotation += 0.25f * (float)Projectile.direction; // rotates projectile
-            if (Main.rand.NextBool(3)) // happens 1/3 times
-            {
-				int dustnumber = Dust.NewDust(Projectile.position + Projectile.velocity, 74, 74, DustID.Enchanted_Gold, 0f, 0f, 200, default, 1f); //dust
+			Projectile.rotation += 0.3f * (float)Projectile.direction; // rotates projectile
+			if (Main.rand.NextBool(5)) // happens 1/5 times
+			{
+				int dustnumber = Dust.NewDust(Projectile.position, 72, 72, ModContent.DustType<Dusts.LilStar>(), 0f, 0f, 200, default, 0.5f); //dust
 				Main.dust[dustnumber].velocity *= 0.3f;
 			}
 

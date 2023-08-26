@@ -17,8 +17,8 @@ namespace KirboMod.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 90;
-			Projectile.height = 90;
+			Projectile.width = 62;
+			Projectile.height = 62;
 			Projectile.friendly = true;
 			Projectile.hostile = false;
 			Projectile.timeLeft = 120;
@@ -29,7 +29,10 @@ namespace KirboMod.Projectiles
 
 		public override void AI()
 		{
-            Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, ModContent.DustType<Dusts.DarkResidue>(), Projectile.velocity.X * 0.25f, Projectile.velocity.Y * -0.5f, 200, default, 0.8f); //dust
+            if (Main.rand.NextBool(3)) // happens 1/3 times
+            {
+                Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, ModContent.DustType<Dusts.DarkResidue>(), Projectile.velocity.X * 0.25f, Projectile.velocity.Y * -0.5f, 200, default, 0.8f); //dust
+            }
         }
 
 		public override Color? GetAlpha(Color lightColor)

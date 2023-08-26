@@ -1,6 +1,4 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -19,46 +17,47 @@ namespace KirboMod.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 90;
-			Projectile.height = 90;
+			Projectile.width = 62;
+			Projectile.height = 62;
 			Projectile.friendly = false;
 			Projectile.hostile = false;
 			Projectile.timeLeft = 120;
-			Projectile.tileCollide = false;
+			Projectile.tileCollide = true;
 			Projectile.penetrate = 1;
+			Projectile.scale = 0.5f;
 		}
 
 		public override void AI()
 		{
 			Player player = Main.player[(int)Projectile.ai[1]]; //chooses npc target player
 
-			NPC darky = Main.npc[(int)Projectile.ai[2]];
-
 			if (Main.netMode == NetmodeID.SinglePlayer)
             {
 				player = Main.player[Main.myPlayer];
 			}
 
-            Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, ModContent.DustType<Dusts.DarkResidue>(), Projectile.velocity.X * 0.25f, Projectile.velocity.Y * 0.25f, 200, default, 0.8f); //dust
+            if (Main.rand.NextBool(3)) // happens 1/3 times
+            {
+                Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, ModContent.DustType<Dusts.DarkResidue>(), Projectile.velocity.X * 0.25f, Projectile.velocity.Y * -0.5f, 200, default, 0.8f); //dust
+            }
 
             Projectile.ai[0]++;
 
-			if (Projectile.ai[0] == 30) //Start hurtin'
+			if (Projectile.ai[0] <20) //Grow up darnet!
             {
+				Projectile.scale += 0.025f;
+			}
+
+			if (Projectile.ai[0] == 20) //Start hurt'in
+            {
+				Projectile.width = 66;
+				Projectile.height = 66;
 				SoundEngine.PlaySound(SoundID.Item117, Projectile.Center); //conjure arcanum
 
 				Vector2 move = (player.Center + player.velocity * 5) - Projectile.Center; //aims ahead of player
 				Projectile.hostile = true; //hurt
 				move.Normalize();
-
-				if (darky.GetLifePercent() > 75 && !Main.expertMode)
-				{
-					move *= 15;
-				}
-				else //move faster if low or if expert mode
-				{
-                    move *= 30;
-                }
+				move *= 20;
 				Projectile.velocity = move; //move
 			}
 		}
@@ -85,20 +84,5 @@ namespace KirboMod.Projectiles
 				d.noGravity = true;
 			}
 		}
-
-        public static Asset<Texture2D> image;
-
-        public override bool PreDraw(ref Color lightColor)
-        {
-            Main.instance.LoadProjectile(Projectile.type);
-            image = ModContent.Request<Texture2D>(Texture);
-            Texture2D texture = image.Value;
-
-			float size = 1 / Projectile.ai[0] < 20 ? 1 / Projectile.ai[0] : 1;
-
-            Main.EntitySpriteDraw(texture, Projectile.Center, null, Color.White, 0, new Vector2(45, 45), size, SpriteEffects.None);
-
-			return true;
-        }
     }
 }

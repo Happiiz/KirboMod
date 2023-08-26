@@ -34,8 +34,7 @@ namespace KirboMod.Projectiles
 			Projectile.penetrate = -1;
 			Projectile.usesLocalNPCImmunity = true; //uses own immunity frames
 			Projectile.extraUpdates = 3;//detect collision more often to more accurately get a collision point
-			Projectile.localNPCHitCooldown = 10; //time before hit again, very short to really get the feeling that this grinds enemies
-			Projectile.ArmorPenetration = 10; 
+			Projectile.localNPCHitCooldown = 6; //time before hit again, very short to really get the feeling that this grinds enemies
 		}
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
@@ -45,7 +44,7 @@ namespace KirboMod.Projectiles
         public override void AI()
 		{
 			Player player = Main.player[Projectile.owner];
-			Projectile.rotation -= 0.07f; // rotates projectile
+			Projectile.rotation -= 0.07f; // rotates projectile(in the teeth direction now)
 			if (Projectile.ai[0] == 0)
 				NPCToStickTo = -1;
 			Projectile.ai[0]++;
@@ -84,14 +83,13 @@ namespace KirboMod.Projectiles
 			if (Projectile.ai[1] < 0) //go up until 0
 			{
                 Projectile.ai[1]++;
-				Projectile.damage = Projectile.originalDamage; //reset damage
             }
 
 			if (lives <= 0) //enough bouncing
             {
 				Projectile.Kill(); //KILL
 
-                for (int i = 0; i < 20; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
                     Gore.NewGorePerfect(Projectile.GetSource_FromThis(), Projectile.Center, speed, Main.rand.Next(61, 63), Scale: 1f); //smoke
@@ -114,8 +112,7 @@ namespace KirboMod.Projectiles
 			{
 				Projectile.ai[1]++;
 				Projectile.ai[0] = 39;
-                Projectile.damage = Projectile.originalDamage / 9; //reduce damage while grinding
-                if (NPCToStickTo == -1)
+				if (NPCToStickTo == -1)
 				{
 					Projectile.velocity *= 0;
 					NPCToStickTo = target.whoAmI;

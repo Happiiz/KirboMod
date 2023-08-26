@@ -81,7 +81,7 @@ namespace KirboMod.NPCs
 			NPC.TargetClosest(true);
 
 			//passive effects
-			if (Main.rand.NextBool(4)) //1/4 chance
+			if (Main.rand.NextBool(4)) //1/3 chance
 			{
 				int dustnumber = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.TerraBlade, 0f, -20f, 200, default, 1.5f); //dust
 				Main.dust[dustnumber].velocity *= 0.3f;
@@ -166,24 +166,7 @@ namespace KirboMod.NPCs
 					}
 					if (Main.netMode != NetmodeID.MultiplayerClient)
 					{
-						if (proj == ModContent.ProjectileType<Projectiles.BadPlasmaLaser>()) //start farther away from wisp
-						{
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + direction2 * 2, direction2, proj, projdamage / 2, 10, Main.myPlayer);
-                        }
-						else
-						{
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, direction2, proj, projdamage / 2, 10, Main.myPlayer);
-
-							if (proj == ModContent.ProjectileType<Projectiles.BadPlasmaBlast>())
-							{
-                                for (int i = 0; i < 40; i++) 
-                                {
-                                    Vector2 speed2 = Main.rand.NextVector2CircularEdge(20, 20); //circle
-                                    Dust d = Dust.NewDustPerfect(NPC.Center + direction2 * 2, DustID.TerraBlade, speed2, Scale: 1f); //Makes dust in a messy circle
-                                    d.noGravity = true;
-                                }
-                            }
-						}
+						Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, direction2, proj, projdamage / 2, 10, Main.myPlayer);
 					}
 
 					if (proj == ModContent.ProjectileType<Projectiles.BadPlasmaZap>())
