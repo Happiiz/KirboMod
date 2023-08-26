@@ -65,7 +65,7 @@ namespace KirboMod.Items.Weapons
 				Item.shootSpeed = 16f;
 				Item.mana = 20;
 				Item.UseSound = SoundID.Item117; //conjure arcanum
-			}
+            }
 			else //left click
             {
 				Item.useTime = 8;
@@ -75,7 +75,7 @@ namespace KirboMod.Items.Weapons
 				Item.shootSpeed = 32f;
 				Item.mana = 4;
 				Item.UseSound = SoundID.Item12; //space gun
-			}
+            }
 			return true;
 		}
 

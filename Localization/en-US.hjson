@@ -582,7 +582,7 @@ Mods: {
 				Tooltip:
 					'''
 					Shoots a flying sawblade that bounces off nearby walls and grinds on enemies
-					Returns to the player if it can't hit any walls fast enough
+					Returns to the player if it can't reach any walls to bounce off of
 					Five can be out at a time
 					'''
 			}
@@ -846,7 +846,7 @@ Mods: {
 
 			LoveLoveStick: {
 				DisplayName: Love-Love Stick
-				Tooltip: A weapon crafted from nothing but love and the determination to defeat evil
+				Tooltip: A weapon crafted from nothing but love and hope
 			}
 
 			MaskedHammer: {
