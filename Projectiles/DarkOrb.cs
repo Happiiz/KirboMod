@@ -91,14 +91,14 @@ namespace KirboMod.Projectiles
         public override bool PreDraw(ref Color lightColor)
         {
             Main.instance.LoadProjectile(Projectile.type);
-            image = ModContent.Request<Texture2D>(Texture);
+            image = ModContent.Request<Texture2D>("KirboMod/Projectiles/DarkOrb");
             Texture2D texture = image.Value;
 
-			float size = 1 / Projectile.ai[0] < 20 ? 1 / Projectile.ai[0] : 1;
+			float size = Projectile.ai[0] / 20 < 1 ? Projectile.ai[0] / 20 : 1; //keep growing until proj ai0 = 20
 
-            Main.EntitySpriteDraw(texture, Projectile.Center, null, Color.White, 0, new Vector2(45, 45), size, SpriteEffects.None);
+            Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, null, Color.White, 0, new Vector2(45, 45), size, SpriteEffects.None);
 
-			return true;
+			return false;
         }
     }
 }

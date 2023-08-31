@@ -39,10 +39,10 @@ namespace KirboMod.NPCs
         /// </summary>
         static Dictionary<NightmareOrbAtkType, int> dmgPerAtkType = new()
 		{
-			{ NightmareOrbAtkType.SlashBeam, 60},
-			{ NightmareOrbAtkType.SingleStar, 40},
-			{ NightmareOrbAtkType.TripleStar, 40},
-			{ NightmareOrbAtkType.HomingStar, 50}
+			{ NightmareOrbAtkType.SlashBeam, 60 / 2},
+			{ NightmareOrbAtkType.SingleStar, 40 / 2},
+			{ NightmareOrbAtkType.TripleStar, 40 / 2},
+			{ NightmareOrbAtkType.HomingStar, 50 / 2}
 		};
 		private NightmareOrbAtkType AttackType { get => (NightmareOrbAtkType)NPC.ai[2]; set => NPC.ai[2] = (int)value; }
         int AttacksPerformedSinceSpawn { get => (int)NPC.ai[1]; set => NPC.ai[1] = value; }

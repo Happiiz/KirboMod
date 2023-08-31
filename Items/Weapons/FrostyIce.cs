@@ -35,7 +35,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item24; //spectre boots
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.FrostyIceIce>(); 
-			Item.shootSpeed = 12f;
+			Item.shootSpeed = 16f;
 			Item.mana = 6;
 		}
 

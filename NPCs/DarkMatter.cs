@@ -23,7 +23,7 @@ namespace KirboMod.NPCs
 
 		private bool frenzy = false; 
 
-        private Vector2 enrageDashTargetArea = Vector2.Zero;
+        private Vector2 playerTargetArea = Vector2.Zero;
 
         private DarkMatterAttackType attacktype = DarkMatterAttackType.DarkBeams;
 
@@ -180,6 +180,11 @@ namespace KirboMod.NPCs
                 xOffset = -400; // go behind player
             }
 
+            if (NPC.ai[0] % 30 == 0) //every 30 ticks
+            {
+                playerTargetArea = player.Center + player.velocity * 30;
+            }
+
             Vector2 playerXOffest = player.Center + new Vector2(xOffset, -20f); //go in front of player
             Vector2 move = playerXOffest - NPC.Center;
 
@@ -187,7 +192,7 @@ namespace KirboMod.NPCs
 
             Vector2 position = NPC.Center + new Vector2(0, 30f);
 
-            if (NPC.ai[0] >= 30 && NPC.ai[0] < 50)
+            if (NPC.ai[0] > 30 && NPC.ai[0] < 50)
             {
                 move /= 3;
 
@@ -202,7 +207,7 @@ namespace KirboMod.NPCs
                 SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
             }
 
-            if (NPC.ai[0] >= 60 && NPC.ai[0] < 80)
+            if (NPC.ai[0] > 60 && NPC.ai[0] < 80)
             {
                 move /= 3;
 
@@ -217,7 +222,7 @@ namespace KirboMod.NPCs
                 SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
             }
 
-            if (NPC.ai[0] >= 90 && NPC.ai[0] < 110)
+            if (NPC.ai[0] > 90 && NPC.ai[0] < 110)
             {
                 move /= 3;
 
@@ -232,7 +237,7 @@ namespace KirboMod.NPCs
                 SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
             }
 
-            if (NPC.ai[0] >= 120 && NPC.ai[0] < 140)
+            if (NPC.ai[0] > 120 && NPC.ai[0] < 140)
             {
                 move /= 3;
 
@@ -247,7 +252,7 @@ namespace KirboMod.NPCs
                 SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
             }
 
-            if (NPC.ai[0] >= 150 && NPC.ai[0] < 170)
+            if (NPC.ai[0] > 150 && NPC.ai[0] < 170)
             {
                 move /= 3;
 
@@ -262,7 +267,7 @@ namespace KirboMod.NPCs
                 SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
             }
 
-            if (NPC.ai[0] >= 180 && NPC.ai[0] < 200)
+            if (NPC.ai[0] > 180 && NPC.ai[0] < 200)
             {
                 move /= 3;
 
@@ -284,7 +289,7 @@ namespace KirboMod.NPCs
 
             //keep going if low enough or expert mode
 
-            if (NPC.ai[0] >= 210 && NPC.ai[0] < 230)
+            if (NPC.ai[0] > 210 && NPC.ai[0] < 230)
             {
                 move /= 3;
 
@@ -299,7 +304,7 @@ namespace KirboMod.NPCs
                 SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
             }
 
-            if (NPC.ai[0] >= 240 && NPC.ai[0] < 260)
+            if (NPC.ai[0] > 240 && NPC.ai[0] < 260)
             {
                 move /= 3;
 
@@ -314,7 +319,7 @@ namespace KirboMod.NPCs
                 SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
             }
 
-            if (NPC.ai[0] >= 270 && NPC.ai[0] < 290)
+            if (NPC.ai[0] > 270 && NPC.ai[0] < 290)
             {
                 move /= 3;
 
@@ -329,7 +334,7 @@ namespace KirboMod.NPCs
                 SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
             }
 
-            if (NPC.ai[0] >= 300 && NPC.ai[0] < 320)
+            if (NPC.ai[0] > 300 && NPC.ai[0] < 320)
             {
                 move /= 3;
 
@@ -465,7 +470,7 @@ namespace KirboMod.NPCs
             }
             else if (NPC.ai[0] == 40)
             {
-                enrageDashTargetArea = player.Center; //set dash target 
+                playerTargetArea = player.Center; //set dash target 
 
                 float xlocation = -500;
 
@@ -516,6 +521,11 @@ namespace KirboMod.NPCs
                 xOffset = -400; // go behind player
             }
 
+            if (NPC.ai[0] % 30 == 0) //every 30 ticks
+            {
+                playerTargetArea = player.Center + player.velocity * 30;
+            }
+
             Vector2 playerXOffest = player.Center + new Vector2(xOffset, -20f); //go in front of player
             Vector2 move = playerXOffest - NPC.Center;
 
@@ -523,13 +533,13 @@ namespace KirboMod.NPCs
 
             Vector2 position = NPC.Center + new Vector2(0, 30f);
 
-            if (NPC.ai[0] >= 30 && NPC.ai[0] < 40) //1
+            if (NPC.ai[0] > 20 && NPC.ai[0] < 30) //1
             {
                 move /= 2;
 
                 NPC.velocity = move;
             }
-            if (NPC.ai[0] == 40)
+            if (NPC.ai[0] == 30)
             {
                 NPC.velocity *= 0.01f;
 
@@ -538,13 +548,13 @@ namespace KirboMod.NPCs
                 SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
             }
 
-            if (NPC.ai[0] >= 50 && NPC.ai[0] < 60) //2
+            if (NPC.ai[0] > 40 && NPC.ai[0] < 50) //2
             {
                 move /= 2;
 
                 NPC.velocity = move;
             }
-            if (NPC.ai[0] == 60)
+            if (NPC.ai[0] == 50)
             {
                 NPC.velocity *= 0.01f;
 
@@ -553,13 +563,13 @@ namespace KirboMod.NPCs
                 SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
             }
 
-            if (NPC.ai[0] >= 70 && NPC.ai[0] < 80) //3
+            if (NPC.ai[0] > 60 && NPC.ai[0] < 70) //3
             {
                 move /= 2;
 
                 NPC.velocity = move;
             }
-            if (NPC.ai[0] == 80)
+            if (NPC.ai[0] == 70)
             {
                 NPC.velocity *= 0.01f;
 
@@ -568,13 +578,13 @@ namespace KirboMod.NPCs
                 SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
             }
 
-            if (NPC.ai[0] >= 90 && NPC.ai[0] < 100) //4
+            if (NPC.ai[0] > 80 && NPC.ai[0] < 90) //4
             {
                 move /= 2;
 
                 NPC.velocity = move;
             }
-            if (NPC.ai[0] == 100)
+            if (NPC.ai[0] == 90)
             {
                 NPC.velocity *= 0.01f;
 
@@ -583,13 +593,13 @@ namespace KirboMod.NPCs
                 SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
             }
 
-            if (NPC.ai[0] >= 110 && NPC.ai[0] < 120) //5
+            if (NPC.ai[0] > 100 && NPC.ai[0] < 110) //5
             {
                 move /= 2;
 
                 NPC.velocity = move;
             }
-            if (NPC.ai[0] == 120)
+            if (NPC.ai[0] == 110)
             {
                 NPC.velocity *= 0.01f;
 
@@ -598,13 +608,13 @@ namespace KirboMod.NPCs
                 SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
             }
 
-            if (NPC.ai[0] >= 130 && NPC.ai[0] < 140) //6
+            if (NPC.ai[0] > 120 && NPC.ai[0] < 130) //6
             {
                 move /= 2;
 
                 NPC.velocity = move;
             }
-            if (NPC.ai[0] == 140)
+            if (NPC.ai[0] == 130)
             {
                 NPC.velocity *= 0.01f;
 
@@ -613,13 +623,13 @@ namespace KirboMod.NPCs
                 SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
             }
 
-            if (NPC.ai[0] >= 150 && NPC.ai[0] < 160) //7
+            if (NPC.ai[0] > 140 && NPC.ai[0] < 150) //7
             {
                 move /= 2;
 
                 NPC.velocity = move;
             }
-            if (NPC.ai[0] == 160)
+            if (NPC.ai[0] == 150)
             {
                 NPC.velocity *= 0.01f;
 
@@ -628,13 +638,13 @@ namespace KirboMod.NPCs
                 SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
             }
 
-            if (NPC.ai[0] >= 170 && NPC.ai[0] < 180) //8
+            if (NPC.ai[0] > 160 && NPC.ai[0] < 170) //8
             {
                 move /= 3;
 
                 NPC.velocity = move;
             }
-            if (NPC.ai[0] == 180)
+            if (NPC.ai[0] == 170)
             {
                 NPC.velocity *= 0.01f;
 
@@ -647,13 +657,13 @@ namespace KirboMod.NPCs
 
             Vector2 move2 = playerXOffest + new Vector2(0, -500)  - NPC.Center;
 
-            if (NPC.ai[0] >= 190 && NPC.ai[0] < 200) //spread 1
+            if (NPC.ai[0] >= 180 && NPC.ai[0] < 190) //spread 1
             {
                 move2 /= 3;
 
                 NPC.velocity = move2;
             }
-            if (NPC.ai[0] >= 200 && NPC.ai[0] < 250) //move down
+            if (NPC.ai[0] >= 190 && NPC.ai[0] < 240) //move down
             {
                 NPC.velocity.Y = 20;
 
@@ -669,13 +679,13 @@ namespace KirboMod.NPCs
 
             Vector2 move3 = playerXOffest + new Vector2(0, 500) - NPC.Center;
 
-            if (NPC.ai[0] >= 250 && NPC.ai[0] < 260) //spread 2
+            if (NPC.ai[0] >= 240 && NPC.ai[0] < 250) //spread 2
             {
                 move3 /= 3;
 
                 NPC.velocity = move3;
             }
-            if (NPC.ai[0] >= 260 && NPC.ai[0] < 310) //move up
+            if (NPC.ai[0] >= 250 && NPC.ai[0] < 300) //move up
             {
                 NPC.velocity.Y = -20;
 
@@ -689,7 +699,7 @@ namespace KirboMod.NPCs
                 }
             }
             
-            if (NPC.ai[0] > 310)
+            if (NPC.ai[0] > 300)
             {
                 NPC.ai[0] = 0; //restart
             }
@@ -699,7 +709,7 @@ namespace KirboMod.NPCs
             Player player = Main.player[NPC.target];
             Vector2 playerDistance = player.Center - NPC.Center;
 
-            Vector2 targetDistance = enrageDashTargetArea - NPC.Center;
+            Vector2 targetDistance = playerTargetArea - NPC.Center;
 
             float speed = 30f;
             float inertia = 10f;
@@ -711,7 +721,7 @@ namespace KirboMod.NPCs
             }
             else if (NPC.ai[0] == 40)
             {
-                enrageDashTargetArea = player.Center; //set dash target 
+                playerTargetArea = player.Center; //set dash target 
 
                 NPC.Center = player.Center + Main.rand.NextVector2CircularEdge(500, 500);
 
@@ -764,7 +774,7 @@ namespace KirboMod.NPCs
             }
             else if (NPC.ai[0] == 40)
             {
-                enrageDashTargetArea = player.Center; //set dash target 
+                playerTargetArea = player.Center; //set dash target 
 
                 float xlocation = -500;
 

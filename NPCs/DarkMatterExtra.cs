@@ -125,7 +125,7 @@ namespace KirboMod.NPCs
             writer.Write(phase);
             writer.Write(frenzy);
 
-            writer.WriteVector2(enrageDashTargetArea);
+            writer.WriteVector2(playerTargetArea);
         }
 
         public override void ReceiveExtraAI(BinaryReader reader)
@@ -138,7 +138,7 @@ namespace KirboMod.NPCs
             phase = reader.ReadInt32();
             frenzy = reader.ReadBoolean();
 
-            enrageDashTargetArea = reader.ReadVector2();
+            playerTargetArea = reader.ReadVector2();
         }
 
         public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)

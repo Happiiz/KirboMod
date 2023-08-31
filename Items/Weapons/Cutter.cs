@@ -19,7 +19,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 9;
+			Item.damage = 14;
 			Item.noMelee = true;
 			Item.DamageType = DamageClass.Ranged;
 			Item.width = 30;
@@ -31,7 +31,7 @@ namespace KirboMod.Items.Weapons
 			Item.value = Item.buyPrice(0, 0, 0, 20);
 			Item.rare = ItemRarityID.White;
 			Item.UseSound = SoundID.Item1;
-			Item.autoReuse = false;
+			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.CutterBlade>();
 			Item.shootSpeed = 15f; //doesn't matter
 			Item.noUseGraphic = true;
@@ -39,7 +39,7 @@ namespace KirboMod.Items.Weapons
 
 		public override bool CanUseItem(Player player)
 		{
-			return player.ownedProjectileCounts[Item.shoot] < 2; //only two at a time
+			return player.ownedProjectileCounts[Item.shoot] < 3; //only two at a time
 		}
 
 		public override void AddRecipes()
