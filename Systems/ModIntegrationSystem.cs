@@ -145,7 +145,7 @@ namespace KirboMod.Systems
 
             // The item used to summon the boss with (if available)
             int summonItem2 = ModContent.ItemType<Items.DarkMirror>();
-            int summonItem2two = ModContent.ItemType<Items.Weapons.RainbowSword>();
+            int summonItem2two = ModContent.ItemType<Items.RainbowSword.RainbowSword>();
 
             List<int> spawnItems = new List<int>()
             {

@@ -124,7 +124,7 @@ namespace KirboMod.Globals
 		new FinalFractalProfile(84, Color.Gold)
 	},
 	{
-		ModContent.ItemType<RainbowSword>(),
+		ModContent.ItemType<Items.RainbowSword.RainbowSword>(),
 		new FinalFractalProfile(50, Main.DiscoColor)
 	},
 	{
@@ -145,7 +145,7 @@ namespace KirboMod.Globals
 		}
 		private void DrawRainbowTrailIfRainbowSword(On_FinalFractalHelper.orig_Draw orig, ref Terraria.Graphics.FinalFractalHelper self, Projectile proj)
         {		
-			if((int)proj.ai[1] != ModContent.ItemType<RainbowSword>())
+			if((int)proj.ai[1] != ModContent.ItemType<Items.RainbowSword.RainbowSword>())
             {
 				orig.Invoke(ref self, proj);
 				return;

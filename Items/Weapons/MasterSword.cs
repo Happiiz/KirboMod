@@ -231,7 +231,7 @@ namespace KirboMod.Items.Weapons
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.HeroSword>()); //Hero Sword
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.GigantSword>()); //Big Hero Sword
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.MetaKnightSword>()); //Knight Hero Sword
-			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.RainbowSword>()); //Epilespy Hero Sword
+			recipe1.AddIngredient(ModContent.ItemType<Items.RainbowSword.RainbowSword>()); //Epilespy Hero Sword
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.DarkSword>()); //Edgy Hero Sword
 			recipe1.AddIngredient(ModContent.ItemType<MiracleMatter>()); //Zero material drop
 			recipe1.AddTile(TileID.LunarCraftingStation); //crafted at ancient manipulator

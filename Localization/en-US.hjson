@@ -937,8 +937,7 @@ Mods: {
 				Tooltip:
 					'''
 					Holds the light to light up everyone's worlds
-					Well timed swings can deflect certain dark projectiles
-					Right click to shoot a harmless beam of light
+					Reflects small enemy projectiles
 					'''
 			}
 

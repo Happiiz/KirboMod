@@ -15,7 +15,7 @@ namespace KirboMod.Items.RainbowSword
     {
         public override void SetStaticDefaults()
         {
-            ProjectileID.Sets.TrailCacheLength[Type] = 50;
+            ProjectileID.Sets.TrailCacheLength[Type] = 40;
             ProjectileID.Sets.TrailingMode[Type] = 2;
         }
         public override void SetDefaults()
@@ -60,29 +60,11 @@ namespace KirboMod.Items.RainbowSword
             float derivative = 3 * c3 * MathF.Pow(progress - 1, 2) + 2 * c1 * (progress - 1);
             return derivative;
         }
-        Vector2 GetParticleVelocity()
-        {
-            float progress = Progress;
-            if (SwingDir == -1)
-                progress = 1 - progress;
-            if (SwingAngle >= MathF.PI)
-            {
-                return AngleLerpLongWay(Projectile.rotation - SwingAngle / 2f, Projectile.rotation + SwingAngle / 2f, progress).ToRotationVector2();
-                //Projectile.rotation += MathF.PI;
-            }
-            return Utils.AngleLerp(Projectile.rotation - SwingAngle / 2f, Projectile.rotation + SwingAngle / 2f, progress).ToRotationVector2();
-        }
         float GetSparkleVel(Vector2 hitPoint)
         {
             Player player = Main.player[Projectile.owner];
             Vector2 origin = player.RotatedRelativePoint(player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation));
             return Derivative(Progress) * Utils.Remap(hitPoint.Distance(origin) * 0.02f, 0, 20, 2, 20, false);
-        }
-        float GetSparkleVelocity()
-        {
-            //if (SwingDir == -1)
-            //    progress = 1 - progress;
-            return Derivative(Progress);
         }
         static float AngleLerpLongWay(float curAngle, float targetAngle, float amount)
         {
@@ -137,18 +119,12 @@ namespace KirboMod.Items.RainbowSword
             for (int i = 0; i < Main.maxProjectiles; i++)
             {
                 projToCheck = Main.projectile[i];
-                if (!projToCheck.active)
-                    continue;
-                if (!projToCheck.hostile)
-                    continue;
-                if (projToCheck.DistanceSQ(me.Center) > distance)
-                    continue;
-                if (projToCheck.width >= 30 || projToCheck.height >= 30)
+                if (!projToCheck.active || !projToCheck.active || projToCheck.DistanceSQ(me.Center) > distance || projToCheck.width >= 30 || projToCheck.height >= 30)
                     continue;
                 if (!Projectile.Colliding(me.Hitbox, projToCheck.Hitbox))
                     continue;
                 Vector2 origin = GetOrigin();
-                projToCheck.velocity += Vector2.Normalize(Projectile.Center-  origin).RotatedBy(MathF.PI / 2 * SwingDir) * GetSparkleVel(projToCheck.Hitbox.Center());
+                projToCheck.velocity += Vector2.Normalize(Projectile.Center - origin).RotatedBy(MathF.PI / 2 * SwingDir) * GetSparkleVel(projToCheck.Hitbox.Center());
                 projToCheck.hostile = false;
                 projToCheck.friendly = true;
                 projToCheck.localNPCHitCooldown = 10;
@@ -164,12 +140,12 @@ namespace KirboMod.Items.RainbowSword
                 Lighting.AddLight(Vector2.Lerp(lightStart, lightEnd, i), Main.DiscoColor.ToVector3() * 3f);
             }
             Lighting.AddLight(player.Center, Main.DiscoColor.ToVector3() * 4);
+            lightEnd = (lightEnd - lightStart) * 0.9f + lightStart;
             if(progress < 1)
             for (int i = 0; i < 2; i++)
             {
-                Sparkle sparkle = Sparkle.NewSparkle(lightEnd + Main.rand.NextVector2Circular(1500, 1500) / 50, Main.DiscoColor, new Vector2(1,1.5f), Vector2.Normalize(lightEnd - lightStart).RotatedBy(SwingDir * MathF.PI / 2).RotatedByRandom(0.3f) * GetSparkleVel(lightEnd), 30, Vector2.One, null, 1, 0, 0.98f);
-                    sparkle.Rotation = sparkle.Velocity.ToRotation() + MathF.PI / 2f;
-
+                Sparkle sparkle = Sparkle.NewSparkle(lightEnd + Main.rand.NextVector2Circular(1500, 1500) / 50, Main.DiscoColor, new Vector2(1,1.5f) * 1.5f, Vector2.Normalize(lightEnd - lightStart).RotatedBy(SwingDir * MathF.PI / 2).RotatedByRandom(0.3f) * GetSparkleVel(lightEnd), 30, Vector2.One * 1.5f, null, 1, 0, 0.98f);
+                sparkle.Rotation = sparkle.Velocity.ToRotation() + MathF.PI / 2f;
             }
         }
 
@@ -182,9 +158,7 @@ namespace KirboMod.Items.RainbowSword
         private void MakePlayerHoldMe()
         {
             Player player = Main.player[Projectile.owner];
-
             Projectile.timeLeft = 2;
-            //player.ChangeDir((int)MathF.Sign(MathF.Cos(VisualRotation)));
             player.ChangeDir(Projectile.direction);
             player.heldProj = Projectile.whoAmI;
             if(UseTime - Timer > 1)
@@ -200,7 +174,7 @@ namespace KirboMod.Items.RainbowSword
             centers = new();
             for (int i = (int)TrailCancelCount; i < Projectile.oldPos.Length; i++)
             {
-                for (float j = 0; j < 1; j+= 0.5f)
+                for (float j = 0; j < 1; j+= 0.25f)
                 {
                     if (Projectile.oldPos[i] == Vector2.Zero && Projectile.oldRot[i] == 0)
                         continue;
@@ -215,6 +189,7 @@ namespace KirboMod.Items.RainbowSword
             Texture2D texMain = TextureAssets.Projectile[Type].Value;
             Vector3 hslvec = Main.rgbToHsl(Main.DiscoColor);
             GetInterpolatedPoints(out List<float> rotations, out var centers);
+            float timeLeft = UseTime - Timer;
             for (int i = rotations.Count - 1; i >= 1; i--)
             {
                 //todo: getlerpvalue afterimage fadeout(no fade in)
@@ -223,14 +198,16 @@ namespace KirboMod.Items.RainbowSword
                 Color col = Main.hslToRgb(hslvec);
                 col.A = 0;
                 float brightness = centers[i].Distance(centers[i - 1]);
-                brightness *= 0.05f;
+                brightness *= 0.02f;
+                brightness *= Utils.GetLerpValue(-Projectile.oldPos.Length, 0, timeLeft, true);
                 Main.EntitySpriteDraw(texBack, centers[i], null, col * brightness * Utils.GetLerpValue(rotations.Count, rotations.Count / 2f, i, true), rotations[i], texBack.Size() / 2, Projectile.scale, SpriteEffects.None);
             }
 
             if (Dead)
                 return false;
-            Main.EntitySpriteDraw(texMain, Projectile.Center - Main.screenPosition, null, Color.White, Projectile.rotation, texMain.Size() / 2, Projectile.scale, SpriteEffects.None);
-            Main.EntitySpriteDraw(texBack, Projectile.Center - Main.screenPosition, null, Main.DiscoColor with {A = 0} * 0.5f, Projectile.rotation, texBack.Size() / 2, Projectile.scale, SpriteEffects.None);
+            float fade = Utils.GetLerpValue(0, 5, timeLeft, true);
+            Main.EntitySpriteDraw(texMain, Projectile.Center - Main.screenPosition, null, Color.White * fade, Projectile.rotation, texMain.Size() / 2, Projectile.scale, SpriteEffects.None);
+            Main.EntitySpriteDraw(texBack, Projectile.Center - Main.screenPosition, null, Main.DiscoColor with {A = 0} * 0.5f * fade, Projectile.rotation, texBack.Size() / 2, Projectile.scale, SpriteEffects.None);
 
             return false;
         }
