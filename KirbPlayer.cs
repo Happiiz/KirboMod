@@ -688,5 +688,8 @@ namespace KirboMod
                 SoundEngine.PlaySound(SoundID.Item4, Player.Center); //life crystal
             }
         }
+        public int rainbowSwordSwingCounter;
+        public int NextRainbowSwordSwingDirection { get => rainbowSwordSwingCounter++ % 2 * 2 - 1; }
     }
+
 }

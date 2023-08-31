@@ -1347,6 +1347,7 @@ Mods: {
 			CyclingStar.DisplayName: Cycling Star
 			BioSparkSlashHitbox.DisplayName: Slash
 			BioMinionSlashHitbox.DisplayName: Slash
+			RainbowSwordHeld.DisplayName: Rainbow Sword Held
 		}
 
 		NPCs: {

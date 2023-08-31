@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -20,26 +21,30 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 195; //1995
-			Item.DamageType = DamageClass.MeleeNoSpeed; //attack speed doesn't scale
+		//todo: make able to receive legendary
+			Item.damage = 300;//it has a relatively slow base use time so this compensates(+ also shorter range relatively)
+			Item.DamageType = DamageClass.Melee; 
 			Item.width = 40;
 			Item.height = 40;
-			Item.useTime = 10; 
-			Item.useAnimation = 10;
-			Item.useStyle = ItemUseStyleID.Swing; 
+			Item.useTime = Item.useAnimation = 28; 
+			Item.useStyle = ItemUseStyleID.Shoot; 
             Item.knockBack = 8;
 			Item.value = Item.buyPrice(0, 15, 50, 0);
 			Item.rare = ItemRarityID.Yellow;
-			Item.UseSound = SoundID.Item1;
-			Item.autoReuse = true;
-			Item.shoot = ModContent.ProjectileType<Projectiles.RainbowSlash>();
+			Item.autoReuse = false;
+			Item.shoot = ModContent.ProjectileType<Items.RainbowSword.RainbowSwordHeld>();
 			Item.noMelee = true; //hitbox reserved for swing and beam
-            //item.shootSpeed = 6f;
             Item.shootsEveryUse = true;
+			Item.channel = true;
+			Item.useTurn = true;
+			Item.shootSpeed = 1;
+			Item.noUseGraphic = true;
+			Item.autoReuse = true;
+			Item.UseSound = SoundID.Item74 with { MaxInstances = 0, Volume = 0.6f };
+		
+		}
 
-        }
-
-        public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
+		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {
             if (type == ModContent.ProjectileType<Projectiles.RainbowSwordBeam>())
 			{
@@ -47,8 +52,8 @@ namespace KirboMod.Items.Weapons
 			}
 			else //slash
 			{
-				velocity = new Vector2(player.direction, 0f); //for facing the right direction
-				position = player.MountedCenter + new Vector2(player.direction * 10, 0);
+				//velocity = new Vector2(player.direction, 0f); //for facing the right direction
+				//position = player.MountedCenter + new Vector2(player.direction * 10, 0);
             }
         }
 
@@ -57,6 +62,15 @@ namespace KirboMod.Items.Weapons
 			return Color.White; // Makes it uneffected by light
 		}
 
+
+		public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+        {
+			if(Main.myPlayer != player.whoAmI)
+			return false;
+			KirbPlayer mPlayer = player.GetModPlayer<KirbPlayer>();									//todo account for melee speed
+			Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI, player.itemAnimationMax, MathHelper.Lerp(6, 4, Main.rand.NextFloat()), mPlayer.NextRainbowSwordSwingDirection);
+			return false;
+        }
         public override void UseStyle(Player player, Rectangle heldItemFrame)
         {
             /*if (player.altFunctionUse != 2)
@@ -68,32 +82,11 @@ namespace KirboMod.Items.Weapons
 
         public override bool AltFunctionUse(Player player)
 		{
-			return true; //you can right click with this item
+			return false; //you can right click with this item
 		}
 		public override bool CanUseItem(Player player)
 		{
-			if (player.altFunctionUse == 2) //right click
-			{
-				Item.staff[Item.type] = true; //staff not gun
-				Item.useStyle = ItemUseStyleID.Shoot; //gun
-				Item.useTime = 60;
-				Item.useAnimation = 60;
-				Item.UseSound = SoundID.Item25; //fairy bell
-				Item.shoot = ModContent.ProjectileType<Projectiles.RainbowSwordBeam>();
-				Item.shootSpeed = 10f;
-				return !NPC.AnyNPCs(ModContent.NPCType<NPCs.DarkMatter>()); //checks if dark matter isn't alive
-			}
-			else
-			{
-				Item.staff[Item.type] = false;
-				Item.useStyle = ItemUseStyleID.Swing; //sword
-				Item.useTime = 10;
-				Item.useAnimation = 10;
-				Item.UseSound = SoundID.Item1; //swing
-				Item.shoot = ModContent.ProjectileType<Projectiles.RainbowSlash>();
-				Item.shootSpeed = 0;
-				return player.ownedProjectileCounts[Item.shoot] < 1;
-			}
+			return true;
 		}
 
 		public override void AddRecipes()
