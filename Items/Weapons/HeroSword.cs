@@ -31,15 +31,23 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.HeroSlash>();
-			Item.shootSpeed = 10f;
+			//Item.shootSpeed = 40f;
 		}
 
-		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
-		{
-            damage = Item.damage / 2;
+        public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
+        {
+            if (player.direction == 1)
+			{
+				velocity.X = 20;
+			}
+            else 
+            {
+                velocity.X = -20;
+            }
+            velocity.Y = 0;
         }
 
-		public override void AddRecipes()
+        public override void AddRecipes()
 		{
 			Recipe recipe1 = CreateRecipe();//the result is herosword
 			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 20); //20 starbits

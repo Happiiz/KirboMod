@@ -65,6 +65,7 @@ namespace KirboMod.Systems
                 ModContent.NPCType<NPCs.Whispy>(),
                 new Dictionary<string, object>()
                 {
+                    ["spawnInfo"] = Language.GetText($"Use a [i:{ModContent.ItemType<Items.WhispySeed>()}]."),
                     ["spawnItems"] = ModContent.ItemType<Items.WhispySeed>(),
                 }
             );
@@ -118,6 +119,7 @@ namespace KirboMod.Systems
                 ModContent.NPCType<NPCs.KingDedede>(),
                 new Dictionary<string, object>()
                 {
+                    ["spawnInfo"] = Language.GetText($"Use a [i:{ModContent.ItemType<Items.DededeBrooch>()}]."),
                     ["spawnItems"] = ModContent.ItemType<Items.DededeBrooch>(),
                     ["customPortrait"] = customBossPortrait2,
                 }

@@ -21,7 +21,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 55;
+			Item.damage = 45;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 56;
@@ -35,7 +35,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item34;
 			Item.autoReuse = true;
 			//item.shoot = ModContent.ProjectileType<Projectiles.FireFire>();
-			Item.shootSpeed = 16f; //doesn't matter
+			Item.shootSpeed = 16f; 
 			Item.mana = 12;
 		}
 
