@@ -10,51 +10,8 @@ using Terraria.UI.Chat;
 
 namespace KirboMod.Items.RainbowSword
 {
-	public class RainbowSword : ModItem
+	public partial class RainbowSword : ModItem
 	{
-		//todo: detour draw mouseover text and make sure the mouseover and pickup text properly draws
-		bool ShaderTooltip(DrawableTooltipLine line)
-		{
-			LoadShaderIfNeeded();
-			SetTooltipShaderParams();
-			Main.spriteBatch.End();
-			Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
-			if (line.Index == 0)
-			{
-				Vector2 textPos = new Vector2(line.X, line.Y);
-				for (float i = 0; i < 1; i += 0.25f)
-				{
-					Vector2 borderOffset = (i * MathF.Tau).ToRotationVector2() * 2;
-					ChatManager.DrawColorCodedString(Main.spriteBatch, line.Font, line.Text, textPos + borderOffset, Color.Black, line.Rotation, line.Origin, line.BaseScale);
-				}
-				Main.spriteBatch.End();
-				Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, tooltipShader, Main.UIScaleMatrix);
-				ChatManager.DrawColorCodedString(Main.spriteBatch, line.Font, line.Text, textPos, Color.Red, line.Rotation, line.Origin, line.BaseScale);
-				Main.spriteBatch.End();
-				Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
-				return false;
-			}
-			return true;
-		}
-		public override void SetStaticDefaults()
-		{
-            CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research
-        }
-		Effect rainbowSwordShader;
-		static Effect tooltipShader;
-        public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
-        {
-		
-			return ShaderTooltip(line);
-        }
-        static void SetTooltipShaderParams()
-        {
-			tooltipShader.Parameters["s"].SetValue(1);
-			tooltipShader.Parameters["l"].SetValue(0.5f);
-			tooltipShader.Parameters["uOpacity"].SetValue(1);
-			tooltipShader.Parameters["gradientScale"].SetValue(1);
-			tooltipShader.Parameters["time"].SetValue(Main.GlobalTimeWrappedHourly * 3f);
-		}
 		void SetShaderParams()
 		{
 			rainbowSwordShader.Parameters["s"].SetValue(1);
@@ -62,8 +19,8 @@ namespace KirboMod.Items.RainbowSword
 			rainbowSwordShader.Parameters["uOpacity"].SetValue(1);
 			rainbowSwordShader.Parameters["gradientScale"].SetValue(2f);
 			rainbowSwordShader.Parameters["time"].SetValue(Main.GlobalTimeWrappedHourly * 3f);
-
 		}
+		Effect rainbowSwordShader;
 
 		public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
 		{
@@ -114,7 +71,7 @@ namespace KirboMod.Items.RainbowSword
 			Item.useStyle = ItemUseStyleID.Shoot; 
             Item.knockBack = 8;
 			Item.value = Item.buyPrice(0, 15, 50, 0);
-			Item.rare = ItemRarityID.Expert;
+			Item.rare = ModContent.RarityType<RainbowSwordRarity>();
 			Item.autoReuse = false;
 			Item.shoot = ModContent.ProjectileType<Items.RainbowSword.RainbowSwordHeld>();
 			Item.noMelee = true; //hitbox reserved for swing and beam

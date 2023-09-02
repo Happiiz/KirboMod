@@ -75,6 +75,8 @@ float calcHueOffset(float2 coords)
 float4 swordGradient(float4 sampleColor : COLOR0, float2 coords : TEXCOORD0) : COLOR0
 {
     float4 curCol = tex2D(uImage0, coords);
+    if(curCol.r  < 0.2 && curCol.g < 0.2 && curCol.b < 0.2)
+        return curCol;
     float opacity = curCol.a * uOpacity;
     float hueOffset = calcHueOffset(coords);
     float4 rgba = hsl2RGBAAttempt2(s, 0.5f, 1, hueOffset);

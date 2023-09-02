@@ -128,7 +128,6 @@ namespace KirboMod.Items.RainbowSword
             }
             oldRotCenters[0] = GetArmRotationCenterAdjustForUpdates();
         }
-
         private void ProjectileDeflection()
         {
             Projectile projToCheck;
@@ -137,7 +136,7 @@ namespace KirboMod.Items.RainbowSword
             for (int i = 0; i < Main.maxProjectiles; i++)
             {
                 projToCheck = Main.projectile[i];
-                if (!projToCheck.active || !projToCheck.active || projToCheck.DistanceSQ(me.Center) > distance || projToCheck.width >= 30 || projToCheck.height >= 30)
+                if (!projToCheck.hostile || !projToCheck.active || projToCheck.damage < 1 || projToCheck.DistanceSQ(me.Center) > distance || projToCheck.width >= 30 || projToCheck.height >= 30)
                     continue;
                 if (!Projectile.Colliding(me.Hitbox, projToCheck.Hitbox))
                     continue;
@@ -149,7 +148,6 @@ namespace KirboMod.Items.RainbowSword
                 projToCheck.usesLocalNPCImmunity = true;
             }
         }
-
         private void SparklesFromSwing(float progress, Vector2 lightStart, Vector2 lightEnd)
         {
             for (int i = 0; i < 1 &&  progress < 1; i++)
@@ -159,7 +157,6 @@ namespace KirboMod.Items.RainbowSword
                 sparkle.Rotation = sparkle.Velocity.ToRotation() + MathF.PI / 2f;
             }
         }
-
         private void AddLight(Player player, out Vector2 lightStart, out Vector2 lightEnd)
         {
             lightStart = Projectile.Center - (Projectile.rotation - MathF.PI / 4).ToRotationVector2() * 170;
@@ -186,7 +183,7 @@ namespace KirboMod.Items.RainbowSword
             Player player = Main.player[Projectile.owner];
             return player.RotatedRelativePoint(player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation));
         }
-        void SetShaderParams()
+        static void SetShaderParams()
         {
             rainbowEffect.Parameters["s"].SetValue(1);
             rainbowEffect.Parameters["l"].SetValue(0.5f);
@@ -207,14 +204,10 @@ namespace KirboMod.Items.RainbowSword
             Projectile.position = player.RotatedRelativePoint(player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation)) - Projectile.Size / 2f + GetExtraUpdateAdjustmentOffset(player);
             Projectile.position += dirToPlayer * 170 * Projectile.scale;
         }
-
         private Vector2 GetExtraUpdateAdjustmentOffset(Player player)
         {
             return  Utils.GetLerpValue(0, Projectile.MaxUpdates, Projectile.numUpdates + 1) * (player.oldPosition - player.position);
         }
-
-        //todo: delete origins list
-        List<Vector2> origins = new();
         Vector2[] oldRotCenters = new Vector2[40];
         void GetInterpolatedPoints(out List<float> rotations, out List<Vector2> centers)
         {
@@ -256,9 +249,12 @@ namespace KirboMod.Items.RainbowSword
                 float lightness = Utils.Remap(i, rotations.Count, 0.1f, 0.5f, 0.85f);
                 hslvec.Z = lightness;
                 Color col = Main.hslToRgb(hslvec);
+                if(!Main.dayTime)
                 col.A = 0;
                 float brightness = centers[i].Distance(centers[i - 1]);
                 brightness *= 0.02f;
+                if (Main.dayTime)
+                    brightness *= 3;
                 brightness *= Utils.GetLerpValue(-Projectile.oldPos.Length, 0, timeLeft, true);
                 Main.EntitySpriteDraw(texBack, centers[i], null, col * brightness * Utils.GetLerpValue(rotations.Count, rotations.Count / 2f, i, true), rotations[i], texBack.Size() / 2, Projectile.scale, SpriteEffects.None);
             }

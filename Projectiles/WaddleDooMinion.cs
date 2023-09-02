@@ -334,7 +334,7 @@ namespace KirboMod.Projectiles
 						Projectile.frame = 9;
 				}
 
-                float speed = 7f; //walk speed
+                float speed = 10; //walk speed
                 float inertia = 6f; //turn speed
 
                 if (Math.Abs(vectorToIdlePosition.X) < 10f) //near idle position
@@ -376,11 +376,11 @@ namespace KirboMod.Projectiles
                 Projectile.alpha = 255; //hide projectile
 
                 float speed = direction2.Length() / 30;
-                if (speed < 40) //don't go below 40
+                if (speed < 100) //don't go below 40
                 {
-                    speed = 40;
+                    speed = 100;
                 }
-                float inertia = 6f;
+                float inertia = 8;
 
                 Vector2 direction = player.Center - Projectile.Center; //start - end
                 direction.Normalize();
