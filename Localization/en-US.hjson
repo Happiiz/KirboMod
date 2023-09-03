@@ -1347,6 +1347,7 @@ Mods: {
 			BioSparkSlashHitbox.DisplayName: Slash
 			BioMinionSlashHitbox.DisplayName: Slash
 			RainbowSwordHeld.DisplayName: Rainbow Sword Held
+			RainbowSwordCraftingAnimation.DisplayName: Rainbow Sword Crafting Animation
 		}
 
 		NPCs: {

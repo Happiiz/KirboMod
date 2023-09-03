@@ -16,26 +16,6 @@ namespace KirboMod.Items.RainbowSword
 {
 	public partial class RainbowSword : ModItem
 	{
-		//private static readonly MethodInfo DynamicSpriteFontExtensionMethods_DrawString = typeof(DynamicSpriteFontExtensionMethods).GetMethod(nameof(DynamicSpriteFontExtensionMethods.DrawString), BindingFlags.Public | BindingFlags.Static, new Type[] { typeof(SpriteBatch), typeof(DynamicSpriteFont), typeof(string), typeof(Vector2), typeof(Color), typeof(float), typeof(Vector2), typeof(float), typeof(SpriteEffects), typeof(float) });
-
-  //      private delegate void orig_DynamicSpriteFontExtensionMethods_DrawString(SpriteBatch spriteBatch, DynamicSpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2 origin, float scale, SpriteEffects effects, float layerDepth);
-  //      private delegate void hook_DynamicSpriteFontExtensionMethods_DrawString(orig_DynamicSpriteFontExtensionMethods_DrawString orig, SpriteBatch spriteBatch, DynamicSpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2 origin, float scale, SpriteEffects effects, float layerDepth);
-  //      private static Hook On_DynamicSpriteFontExtensionMethods_DrawString;
-        public override void Unload()
-        {
-           // On_DynamicSpriteFontExtensionMethods_DrawString = null;
-        }
-       //private void Hook_DynamicSpriteFontExtensionMethods_DrawString(orig_DynamicSpriteFontExtensionMethods_DrawString orig, SpriteBatch spriteBatch, DynamicSpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2 origin, float scale, SpriteEffects effects, float layerDepth)
-       // {
-       //     if (color != ModContent.GetInstance<RainbowSwordRarity>().RarityColor)
-       //     {
-       //         //orig(spriteBatch, spriteFont, text, position, color, rotation, origin, scale, effects, layerDepth);
-       //         //return;//test comments
-       //     }
-       //     SpritebatchSetupForShaderTooltip(ref spriteBatch);
-       //     orig(spriteBatch, spriteFont, text, position, color, rotation, origin, scale, effects, layerDepth);
-       //     SetupVanillaSpritebatch(ref spriteBatch);
-       // }
 	    static void SetupVanillaSpritebatchPopupText()
         {
 			Main.spriteBatch.End();
@@ -63,11 +43,13 @@ namespace KirboMod.Items.RainbowSword
 		}
 		public override void Load()
 		{
+            On_Main.CraftItem += SpawnRainbowSwordCraftAnimation;
             On_Main.DrawItemTextPopups += On_Main_DrawItemTextPopups;
             On_ChatManager.DrawColorCodedString_SpriteBatch_DynamicSpriteFont_TextSnippetArray_Vector2_Color_float_Vector2_Vector2_refInt32_float_bool += RainbowSwordEffectOnWorldHover;
 		}
 
-		private void On_Main_DrawItemTextPopups(On_Main.orig_DrawItemTextPopups orig, float scaleTarget)
+
+        private void On_Main_DrawItemTextPopups(On_Main.orig_DrawItemTextPopups orig, float scaleTarget)
 		{
 			orig.Invoke(scaleTarget);
 			for (int i = 0; i < 20; i++)

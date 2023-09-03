@@ -103,7 +103,7 @@ namespace KirboMod.Items.RainbowSword
             Vector2 origin = player.RotatedRelativePoint(player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation));
             return Derivative(Progress) * Utils.Remap(hitPoint.Distance(origin) * 0.02f, 0, 20, 2, 20, false);
         }
-        float GetSparkleVelAdv(Vector2 hitPoint, float extraProgress)
+        float GetSparkleVel(Vector2 hitPoint, float extraProgress)
         {
             Player player = Main.player[Projectile.owner];
             Vector2 origin = player.RotatedRelativePoint(player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation));
@@ -204,7 +204,7 @@ namespace KirboMod.Items.RainbowSword
                 float backFactor = Main.rand.NextFloat();
                 backFactor = 1 - (1 - backFactor) * (1 - backFactor);
                 Vector2 spawnPosOffset = Vector2.Lerp(origin, spawnPos, MathHelper.Lerp(0.5f, 1f, backFactor));
-                Sparkle sparkle = Sparkle.NewSparkle(spawnPos + (spawnPosOffset - spawnPos), Main.DiscoColor, new Vector2(1, 1.5f) * 1.5f, Vector2.Normalize(SparklePoints[i + 1] - SparklePoints[i]).RotatedBy(SwingDir * MathF.PI).RotatedByRandom(0.3f) * GetSparkleVelAdv(spawnPos, -extraProgress) * backFactor, 30, Vector2.One * 1.5f, null, 1, 0, 0.95f);
+                Sparkle sparkle = Sparkle.NewSparkle(spawnPos + (spawnPosOffset - spawnPos), Main.DiscoColor, new Vector2(1, 1.5f) * 1.5f, Vector2.Normalize(SparklePoints[i + 1] - SparklePoints[i]).RotatedBy(SwingDir * MathF.PI).RotatedByRandom(0.3f) * GetSparkleVel(spawnPos, -extraProgress) * backFactor, 30, Vector2.One * 1.5f, null, 1, 0, 0.95f);
                 sparkle.Rotation = sparkle.Velocity.ToRotation() + MathF.PI / 2f;
             }
         }
@@ -329,26 +329,6 @@ namespace KirboMod.Items.RainbowSword
             //HitboxPreview();
             return false;
         }
-
-        private void HitboxPreview()
-        {
-            hitboxes = GetInterpolatedHitboxes();
-            for (int i = 0; i < hitboxes.Count; i++)
-            {
-                RectView(hitboxes[i]);
-            }
-        }
-
-        public static void RectView(Rectangle rect)
-        {
-            AABBLineVisualizer(new Vector2(rect.X + rect.Width / 2, rect.Y), new Vector2(rect.X + rect.Width / 2, rect.Y + rect.Height), rect.Width);
-        }
-        public static void AABBLineVisualizer(Vector2 lineStart, Vector2 lineEnd, float lineWidth)
-        {
-            Texture2D blankTexture = Terraria.GameContent.TextureAssets.Extra[195].Value;
-            Vector2 texScale = new Vector2((lineStart - lineEnd).Length(), lineWidth) * 0.00390625f;//1/256, texture is 256x256
-            Main.EntitySpriteDraw(blankTexture, (lineStart) - Main.screenPosition, null, Color.Red * 0.25f, (lineEnd - lineStart).ToRotation(), new Vector2(0, 128), texScale, SpriteEffects.None);
-        }
         private static void LoadShaderIfNeeded()
         {
             if (rainbowEffect == null)
@@ -357,8 +337,7 @@ namespace KirboMod.Items.RainbowSword
             }
         }
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
-        {            
-         
+        {                 
             for (int i = 0; i < hitboxes.Count; i++)
             {
                 if (targetHitbox.Intersects(hitboxes[i]))
@@ -366,12 +345,9 @@ namespace KirboMod.Items.RainbowSword
                     HitEffect(targetHitbox);
                     return true;
                 }
-            }
-
-            
+            }      
             return false;
         }
-
         private void HitEffect(Rectangle targetHitbox)
         {
             SoundEngine.PlaySound((Main.rand.NextBool() ? SoundID.Item67 : SoundID.Item68) with { MaxInstances = 0, Volume = 0.4f }, Projectile.Center);
@@ -380,7 +356,6 @@ namespace KirboMod.Items.RainbowSword
                 SparkleFromHit(targetHitbox);
             }
         }
-
         private void SparkleFromHit(Rectangle targetHitbox)
         {
             Vector2 extraVel = Main.rand.NextVector2Circular(1000, 1000) / 200;
@@ -388,12 +363,10 @@ namespace KirboMod.Items.RainbowSword
             Vector2 centerVel = extraVel;
             extraVel = extraVel.RotatedByRandom(0.3f);
             extraVel *= MathHelper.Lerp(0.9f, 1.5f, Main.rand.NextFloat());
-
             float hue = Utils.Remap((centerVel - extraVel).ToRotation(), -MathF.PI, MathF.PI, 0, 1);
             Sparkle spalrkle = Sparkle.NewSparkle(targetHitbox.Center.ToVector2() - centerVel * 5 + Main.rand.NextVector2Circular(1000, 1000) / 80, Main.hslToRgb(hue, 1, 0.5f), new Vector2(1, 1.5f) * 1.6f, extraVel, 30, Vector2.One * 1.6f, null, 1, 0, 0.93f);
             spalrkle.Rotation = spalrkle.Velocity.ToRotation() + MathF.PI / 2f;
         }
-
         public override void Unload()
         {
             rainbowEffect = null;
