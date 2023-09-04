@@ -36,12 +36,6 @@ namespace KirboMod.Items.Weapons
 			Item.shootSpeed = 15f; //doesn't matter
 			Item.noUseGraphic = true;
 		}
-
-		public override bool CanUseItem(Player player)
-		{
-			return player.ownedProjectileCounts[Item.shoot] < 3; //only two at a time
-		}
-
 		public override void AddRecipes()
 		{
 			Recipe recipe1 = CreateRecipe();//the result is cutter

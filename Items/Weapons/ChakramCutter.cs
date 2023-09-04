@@ -19,7 +19,7 @@ namespace KirboMod.Items.Weapons
         }
 		public override void SetDefaults()
 		{
-			Item.damage = 35;
+			Item.damage = 55;
 			Item.noMelee = true;
 			Item.DamageType = DamageClass.Ranged;
 			Item.width = 60;
@@ -37,18 +37,13 @@ namespace KirboMod.Items.Weapons
 			Item.autoReuse = true; 
 			Item.noUseGraphic = true;
 		}
-
-		public override bool CanUseItem(Player player)
-		{
-			return player.ownedProjectileCounts[Item.shoot] < 4; //only four at a time
-		}
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
 			if (Main.myPlayer != player.whoAmI)
 				return false;
             for (int i = 0; i < 2; i++)
             {
-				int delayBeforeSecondChakramFires = 10;
+				int delayBeforeSecondChakramFires = 16;
 				Projectile.NewProjectileDirect(source, position + velocity.RotatedBy(MathF.PI / 2 + i * MathF.PI), velocity, type, damage, knockback, player.whoAmI, -delayBeforeSecondChakramFires * i, i == 0 ? 1 : -1);
             }
 			return false;

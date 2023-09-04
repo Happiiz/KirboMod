@@ -50,7 +50,8 @@ namespace KirboMod.Projectiles
 			Projectile.rotation += Projectile.direction * 0.5f;
 			Dust dust = Main.dust[Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.SpelunkerGlowstickSparkle)];
 			dust.scale = 2;
-			dust.velocity += Projectile.velocity;
+			if(Main.rand.NextBool())
+				dust.velocity += Projectile.velocity;
 			if (Projectile.ai[0] >= 25)//return
             {
 				if(Projectile.ai[0] == 25)

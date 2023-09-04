@@ -30,7 +30,7 @@ namespace KirboMod.Projectiles
 		public override void AI()
 		{
 			Projectile.ai[0]++;
-			Projectile.velocity.Y = 0f;
+			Projectile.velocity.Y *= 0.99f;
 			Player player = Main.player[Projectile.owner];
 
 			if (Projectile.ai[0] == 1) //move before turn

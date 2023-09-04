@@ -35,10 +35,5 @@ namespace KirboMod.Items.Weapons
 			Item.shootSpeed = 15f;
 			Item.noUseGraphic = true;
 		}
-
-        public override bool CanUseItem(Player player)
-        {
-			return player.ownedProjectileCounts[Item.shoot] < 20;
-		}
     }
 }

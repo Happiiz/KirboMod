@@ -38,7 +38,7 @@ namespace KirboMod.Projectiles
 			}
 
 			Projectile.ai[0]++;
-			Projectile.velocity.Y = 0f;
+			Projectile.velocity.Y *= 0.99f;
 
 			if (++Projectile.frameCounter >= 2) //changes frames every 3 ticks 
 			{

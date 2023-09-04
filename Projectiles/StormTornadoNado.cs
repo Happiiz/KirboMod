@@ -56,6 +56,10 @@ namespace KirboMod.Projectiles
 
 					direction.Normalize();
 					direction *= speed;
+					if(Projectile.ai[0]% 3 == 0)
+                    {
+						Projectile.netUpdate = true;
+                    }
 					Projectile.velocity = (Projectile.velocity * (inertia - 1) + direction) / inertia; //movement
 				}
                 UpdateDamageForManaSickness(player); //Tooken from old Example Mod (Bad idea)
@@ -75,7 +79,7 @@ namespace KirboMod.Projectiles
 			}
 
 			//Storm Cloud
-			if (Projectile.ai[0] % 5 == 0)
+			if (Projectile.ai[0] % 5 == 0 && Main.myPlayer == Projectile.owner)
 			{
 				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * 0, ModContent.ProjectileType<Projectiles.StormTornadoCloud>(), Projectile.damage / 3, 0f, Projectile.owner);
 			}

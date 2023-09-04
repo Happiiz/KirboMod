@@ -38,12 +38,6 @@ namespace KirboMod.Items.Weapons
 			Item.shoot = ModContent.ProjectileType<Projectiles.BuzzCutterProj>();
 			Item.shootSpeed = 20; //doesn't matter
 		}
-
-		public override bool CanUseItem(Player player)
-		{
-			return player.ownedProjectileCounts[Item.shoot] < 6; //only five at a time
-		}
-
 		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
 		{
 			position.Y -= 30; //go up a smidge

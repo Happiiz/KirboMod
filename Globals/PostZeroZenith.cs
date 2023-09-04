@@ -132,6 +132,7 @@ namespace KirboMod.Globals
 		new FinalFractalProfile(107, Color.Purple)
 	}
 };
+		//todo: fix rainbow sword item not displaying correctly
 		public override void Load()
 		{
 			Terraria.Graphics.On_FinalFractalHelper.GetFinalFractalProfile += GetFinalFractalProfilePostZero;

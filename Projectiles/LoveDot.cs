@@ -12,9 +12,8 @@ namespace KirboMod.Projectiles
 {
 	public class LoveDot : ModProjectile
 	{
-		Vector2 circleCenter = new Vector2(0, 0);
 		float counter = 20;
-		float gorate = 0.4f;
+		float girate = 0.4f;
         public override void SetStaticDefaults()
 		{
 			Main.projFrames[Projectile.type] = 1;
@@ -39,6 +38,8 @@ namespace KirboMod.Projectiles
 			Projectile.usesLocalNPCImmunity = true; //shares immunity frames with proj of same type
 			Projectile.localNPCHitCooldown = 20; //time before hit again
 		}
+		Vector2 SpawnPos { get => new Vector2(Projectile.ai[0], Projectile.ai[1]); }
+		ref float RotationalOffset { get => ref Projectile.ai[2]; }
 		int afterimgCancelDrawCount = 0;
 		public override void AI()
 		{
@@ -53,21 +54,22 @@ namespace KirboMod.Projectiles
 			}
 			if(afterimgCancelDrawCount == 0)
 				Projectile.scale *= 1.005f;
-			if (afterimgCancelDrawCount > Projectile.oldPos.Length)
+			if (afterimgCancelDrawCount > Projectile.oldPos.Length || Projectile.Opacity == 0)
             {
 				Projectile.Kill();
             }
 			if(Projectile.localAI[0] > 100)//how many updates you want it to last
             {
-				afterimgCancelDrawCount++;
+				//afterimgCancelDrawCount++;
+				Projectile.Opacity -= 1f / Projectile.oldPos.Length;
             }
 			Projectile.localAI[0]++;
 			float progress = Projectile.localAI[0] / 70;
-			progress = progress > 1 ? MathF.Sin(progress * MathF.PI * 0.5f + MathF.PI) + 2: MathF.Sin(progress * MathF.PI * 0.5f);			
-			gorate = progress * 3f;
 			counter = (1 - progress) * 10  + 10;
 			float rotationalOffset = Projectile.ai[2];
-			Projectile.velocity = (gorate + rotationalOffset ).ToRotationVector2() * counter;
+			progress = - progress * 0.5f * progress + 2 * progress;
+			//basically I want a distance function + a constant changing angle
+			Projectile.Center = (rotationalOffset + Projectile.localAI[0] * 0.04f).ToRotationVector2() * progress * 400 + SpawnPos;
 		
         }
 
@@ -95,7 +97,7 @@ namespace KirboMod.Projectiles
 				Main.EntitySpriteDraw(texture, drawPos, null, color * 0.75f, Projectile.rotation, drawOrigin, Projectile.scale, SpriteEffects.None, 0);
 				Main.EntitySpriteDraw(texture, lerpedPos, null, color * 0.75f, Projectile.rotation, drawOrigin, Projectile.scale, SpriteEffects.None, 0);
 			}
-			return afterimgCancelDrawCount == 0; //draw og
+			return afterimgCancelDrawCount == 0 && Projectile.Opacity == 1; //draw og
         }
     }
 }

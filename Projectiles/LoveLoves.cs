@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -41,13 +42,41 @@ namespace KirboMod.Projectiles
 				}
 			}
 		}
-		
-        public override void Kill(int timeLeft)
+		static List<Vector2> Heart()
+		{
+			List<Vector2> heartOffsets = new();
+			for (float i = 0; i < 1; i += 2f / 30f)
+			{
+				Vector2 offset = Vector2.Lerp(new Vector2(0, 100), new Vector2(100, 0), i);
+				heartOffsets.Add(offset);
+				offset.X *= -1f;
+				heartOffsets.Add(offset);
+			}
+			for (float i = MathF.PI * 0.75f; i < MathF.Tau * 0.89f; i += 1f / MathF.Tau)
+			{
+				Vector2 offset = (i).ToRotationVector2() * 70 + new Vector2(-50, -50);
+				heartOffsets.Add(offset);
+				offset.X *= -1;
+				heartOffsets.Add(offset);
+			}
+			return heartOffsets;
+		}
+		public override void Kill(int timeLeft)
         {
+			List<Vector2> offsets = Heart();
+            for (int i = 0; i < offsets.Count; i++)
+            {
+				Vector2 offset = offsets[i];
+				Dust dust = Dust.NewDustPerfect(Projectile.Center + offset * 0.1f, DustID.TheDestroyer, offset * 0.05f, 0, default, 2);
+				dust.noGravity = true;
+            }
+
 			SoundEngine.PlaySound(SoundID.Item67 with { MaxInstances = 0}, Projectile.Center); //rainbow gun
             for (float i = 0; i < 1; i += 1f / 20f)
-            {
-				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LoveDot>(), Projectile.damage, 0, Projectile.owner, 0, 0, i * MathF.Tau);		
+            { Vector2 offset = Main.rand.NextVector2Circular(1000, 1000) / 100;
+				Dust dust = Dust.NewDustPerfect(Projectile.Center + offset, DustID.RainbowMk2, offset * 0.3f, 0, Color.Lerp(Color.Red, Color.HotPink, Main.rand.NextFloat()), 1 + Main.rand.NextFloat());
+				dust.noGravity = true;
+				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LoveDot>(), Projectile.damage, 0, Projectile.owner, Projectile.Center.X, Projectile.Center.Y, i * MathF.Tau);		
 			}
 		}
 

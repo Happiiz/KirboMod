@@ -18,12 +18,13 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults() 
 		{
-			Item.damage = 14;
+			Item.damage = 24;
 			Item.DamageType = DamageClass.Melee/* tModPorter Suggestion: Consider MeleeNoSpeed for no attack speed scaling */;
 			Item.width = 40;
 			Item.height = 40;
 			Item.useTime = 15;
 			Item.useAnimation = 15;
+			Item.shootsEveryUse = true;
 			Item.useStyle = ItemUseStyleID.Swing;
 			Item.knockBack = 6;
 			Item.value = Item.buyPrice(0, 0, 0, 20);
@@ -31,20 +32,11 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.HeroSlash>();
-			//Item.shootSpeed = 40f;
+			Item.shootSpeed = 10f;
 		}
 
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {
-            if (player.direction == 1)
-			{
-				velocity.X = 20;
-			}
-            else 
-            {
-                velocity.X = -20;
-            }
-            velocity.Y = 0;
         }
 
         public override void AddRecipes()
