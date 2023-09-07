@@ -28,11 +28,18 @@ namespace KirboMod.Projectiles
 			Projectile.penetrate = -1;
             Projectile.extraUpdates = 3;
 			Projectile.usesLocalNPCImmunity = true;
-			Projectile.localNPCHitCooldown = 10; 
+			Projectile.localNPCHitCooldown = -1; 
 		}
 		public override void AI()
 		{
-			Projectile.spriteDirection = Projectile.direction;
+            Projectile.rotation = Projectile.velocity.ToRotation();
+            if (Main.rand.NextBool(Projectile.MaxUpdates))
+            {
+                Dust dust = Dust.NewDustPerfect(Projectile.Center + Main.rand.NextVector2Circular(10, 10) / 3, DustID.MagicMirror);
+                dust.scale *= 2;
+                dust.velocity *= 0.5f;
+                dust.velocity += Projectile.velocity;
+            }
 		}
 
         public override Color? GetAlpha(Color lightColor)

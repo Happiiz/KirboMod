@@ -21,8 +21,11 @@ namespace KirboMod.Items.RainbowSword
 			rainbowSwordShader.Parameters["time"].SetValue(Main.GlobalTimeWrappedHourly * 3f);
 		}
 		Effect rainbowSwordShader;
-
-		public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+        public override void OnSpawn(IEntitySource source)
+        {
+			Item.velocity.X = 0;
+        }
+        public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
 		{
 			LoadShaderIfNeeded();
 			spriteBatch.End();
