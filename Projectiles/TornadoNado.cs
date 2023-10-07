@@ -79,7 +79,7 @@ namespace KirboMod.Projectiles
             Projectile.damage = (int)(player.HeldItem.damage * ownerCurrentMagicDamage);
         }
 
-        public override void Kill(int timeLeft)
+        public override void OnKill(int timeLeft)
         {
 			for (int i = 0; i < 20; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 			{

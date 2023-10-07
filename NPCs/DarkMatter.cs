@@ -9,8 +9,6 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using static Terraria.GameContent.Animations.On_Actions.NPCs;
-using static Terraria.ModLoader.PlayerDrawLayer;
 
 namespace KirboMod.NPCs
 {
@@ -19,9 +17,7 @@ namespace KirboMod.NPCs
 	{
 		private int animation = 0; //frame cycles
 
-		private int phase = 1; //phase 1 = blade, phase 2 = transition, phase 3 = true form
-
-		private bool frenzy = false; 
+		private int phase = 1; //phase 1 = regular, phase 2 = harder, phase 3 = enraged, phase 4 = transition
 
         private Vector2 playerTargetArea = Vector2.Zero;
 
@@ -38,19 +34,18 @@ namespace KirboMod.NPCs
 			{
 				NPC.life = NPC.lifeMax;
 			}
+
+            if (phase == 4)
+            {
+                Transition();
+            }
+
 			//DESPAWNING
-			if (NPC.target < 0 || NPC.target == 255 || playerstate.dead || !playerstate.active)
+			else if (NPC.target < 0 || NPC.target == 255 || playerstate.dead || !playerstate.active)
 			{
 				NPC.TargetClosest(false);
 
-				if (phase == 1 || phase == 2) //rise into the sky to never be seen again!
-				{
-					NPC.velocity.Y = NPC.velocity.Y - 0.4f;
-				}
-				else //rise phaster
-                {
-					NPC.velocity.Y = NPC.velocity.Y - 0.2f;
-				}
+                NPC.velocity.Y = NPC.velocity.Y - 0.2f; //rise
 
                 NPC.ai[0] = 0;
 
@@ -71,81 +66,85 @@ namespace KirboMod.NPCs
 
             NPC.spriteDirection = NPC.direction;
 
-            if (phase == 1)
+            //passive effects
+            if (Main.rand.NextBool(4)) //1/4 chance
             {
-                //passive effects
-                if (Main.rand.NextBool(4)) //1/4 chance
+                Dust.NewDust(NPC.position, NPC.width, 40, ModContent.DustType<DarkResidue>(), 0f, -2f, 200, default, 0.75f); //dust
+            }
+
+            if (NPC.ai[0] < 30)
+            {
+                NPC.velocity *= 0.9f; //slow during intermission
+
+                animation = 0;
+
+                NPC.TargetClosest();
+
+                if (NPC.ai[0] == 1)
                 {
-                    Dust.NewDust(NPC.position, NPC.width, 40, ModContent.DustType<DarkResidue>(), 0f, -2f, 200, default, 0.75f); //dust
-                }
+                    AttackDecideNext();
 
-                if (NPC.ai[0] < 30)
+                    //Make attacks slightly harder
+                    if (NPC.GetLifePercent() <= 0.5f || Main.expertMode)
+                    {
+                        phase = 2;
+                    }
+
+                    //Enrage
+                    if (NPC.GetLifePercent() < 0.5f && Main.expertMode)
+                    {
+                        phase = 3;
+                    }
+                }
+            }
+            else
+            {
+                if (attacktype == DarkMatterAttackType.DarkBeams)
                 {
-                    NPC.velocity *= 0.9f; //slow during intermission
-
-                    animation = 0;
-
-                    NPC.TargetClosest();
-
-                    if (NPC.ai[0] == 1)
+                    if (phase == 3)
                     {
-                        AttackDecideNext();
-
-                        if (NPC.GetLifePercent() < 0.75f && Main.expertMode) //Enrage
-                        {
-                            frenzy = true;
-                        }
+                        EnrageDarkBeams();
+                    }
+                    else
+                    {
+                        AttackDarkBeams();
                     }
                 }
-                else
+                if (attacktype == DarkMatterAttackType.Dash)
                 {
-                    if (attacktype == DarkMatterAttackType.DarkBeams)
+                    if (phase == 3)
                     {
-                        if (frenzy == true)
-                        {
-                            EnrageDarkBeams();
-                        }
-                        else
-                        {
-                            AttackDarkBeams();
-                        }
+                        EnrageDash();
                     }
-                    if (attacktype == DarkMatterAttackType.Dash)
+                    else
                     {
-                        if (frenzy == true)
-                        {
-                            EnrageDash();
-                        }
-                        else
-                        {
-                            AttackDash();
-                        }
+                        AttackDash();
                     }
-                    if (attacktype == DarkMatterAttackType.Orbs)
-                    {
-                        if (frenzy == true)
-                        {
-                            EnrageOrbs();
-                        }
-                        else
-                        {
-                            AttackOrbs();
-                        }
-                    }
-                    /*switch (attacktype)
-                    {
-                        case DarkMatterAttackType.DarkBeams:
-                            AttackDarkBeams();
-                            break;
-                        case DarkMatterAttackType.Dash:
-                            AttackDash();
-                            break;
-                        case DarkMatterAttackType.Orbs:
-                            AttackOrbs();
-                            break;
-                    }
-                    AttackDash();*/
                 }
+                if (attacktype == DarkMatterAttackType.Orbs)
+                {
+                    if (phase == 3)
+                    {
+                        EnrageOrbs();
+                    }
+                    else
+                    {
+                        AttackOrbs();
+                    }
+                }
+                /*switch (attacktype)
+                {
+                    case DarkMatterAttackType.DarkBeams:
+                        AttackDarkBeams();
+                        break;
+                    case DarkMatterAttackType.Dash:
+                        AttackDash();
+                        break;
+                    case DarkMatterAttackType.Orbs:
+                        AttackOrbs();
+                        break;
+                }
+                AttackDash();*/
             }
         }
 
@@ -153,8 +152,6 @@ namespace KirboMod.NPCs
         {
             List<DarkMatterAttackType> possibleAttacks = new() { DarkMatterAttackType.DarkBeams, DarkMatterAttackType.Dash, DarkMatterAttackType.Orbs };
 
-            /*if (NPC.GetLifePercent() < 0.75f && Main.expertMode) //Enrage
-                possibleAttacks = new() { DarkMatterAttackType.EnrageDarkBeams, DarkMatterAttackType.EnrageDash, DarkMatterAttackType.EnrageOrbs };*/
             possibleAttacks.Remove(lastattacktype);
             possibleAttacks.TrimExcess();
             attacktype = possibleAttacks[Main.rand.Next(possibleAttacks.Count)];
@@ -180,175 +177,176 @@ namespace KirboMod.NPCs
                 xOffset = -400; // go behind player
             }
 
-            if (NPC.ai[0] % 30 == 0) //every 30 ticks
+            //movement code
+            if (NPC.ai[0] == 30)
             {
-                playerTargetArea = player.Center + player.velocity * 30;
+                playerTargetArea = player.Center + new Vector2(0, 0);
             }
 
-            Vector2 playerXOffest = player.Center + new Vector2(xOffset, -20f); //go in front of player
+            if (NPC.ai[0] == 60)
+            {
+                playerTargetArea = player.Center + new Vector2(0, -200);
+            }
+
+            if (NPC.ai[0] == 90)
+            {
+                playerTargetArea = player.Center + new Vector2(0, 0);
+            }
+
+            if (NPC.ai[0] == 120)
+            {
+                playerTargetArea = player.Center + new Vector2(0, 200);
+            }
+
+            if (NPC.ai[0] == 150 && phase == 1) //put extra checks here because this is also the first stopping point
+            {
+                playerTargetArea = player.Center + new Vector2(0, 0);
+            }
+
+            if (NPC.ai[0] == 180)
+            {
+                playerTargetArea = player.Center + new Vector2(0, -200);
+            }
+
+            if (NPC.ai[0] == 210)
+            {
+                playerTargetArea = player.Center + new Vector2(0, 0);
+            }
+
+            if (NPC.ai[0] == 240)
+            {
+                playerTargetArea = player.Center + new Vector2(0, 200);
+            }
+
+            Vector2 playerXOffest = playerTargetArea + new Vector2(xOffset, -20f); //go in front of player
             Vector2 move = playerXOffest - NPC.Center;
 
-            Vector2 velocity = new Vector2(NPC.direction * 30, 0);
+            Vector2 velocity = new Vector2(NPC.direction * 40, 0);
 
             Vector2 position = NPC.Center + new Vector2(0, 30f);
 
-            if (NPC.ai[0] > 30 && NPC.ai[0] < 50)
-            {
-                move /= 3;
+            move /= 3;
 
-                NPC.velocity = move;
+            NPC.velocity = move;
+
+            //shooting code
+
+            //shoot 1
+            if (NPC.ai[0] > 40 && NPC.ai[0] < 60) 
+            {
+                if (NPC.ai[0] % 5 == 0) //every 5 ticks
+                {
+                    NPC.velocity *= 0.01f;
+
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                    SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                }
             }
-            if (NPC.ai[0] == 50)
+            //shoot 2
+            if (NPC.ai[0] > 70 && NPC.ai[0] < 90)
             {
-                NPC.velocity *= 0.01f;
+                if (NPC.ai[0] % 5 == 0) //every 5 ticks
+                {
+                    NPC.velocity *= 0.01f;
 
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
 
-                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
-            }
-
-            if (NPC.ai[0] > 60 && NPC.ai[0] < 80)
-            {
-                move /= 3;
-
-                NPC.velocity = move;
-            }
-            if (NPC.ai[0] == 80)
-            {
-                NPC.velocity *= 0.01f;
-
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
-
-                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
-            }
-
-            if (NPC.ai[0] > 90 && NPC.ai[0] < 110)
-            {
-                move /= 3;
-
-                NPC.velocity = move;
-            }
-            if (NPC.ai[0] == 110)
-            {
-                NPC.velocity *= 0.01f;
-
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
-
-                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                    SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                }
             }
 
-            if (NPC.ai[0] > 120 && NPC.ai[0] < 140)
+            //shoot 3
+            if (NPC.ai[0] > 100 && NPC.ai[0] < 120)
             {
-                move /= 3;
+                if (NPC.ai[0] % 5 == 0) //every 5 ticks
+                {
+                    NPC.velocity *= 0.01f;
 
-                NPC.velocity = move;
-            }
-            if (NPC.ai[0] == 140)
-            {
-                NPC.velocity *= 0.01f;
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
 
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
-
-                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                    SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                }
             }
 
-            if (NPC.ai[0] > 150 && NPC.ai[0] < 170)
+            //shoot 4
+            if (NPC.ai[0] > 130 && NPC.ai[0] < 150)
             {
-                move /= 3;
+                if (NPC.ai[0] % 5 == 0) //every 5 ticks
+                {
+                    NPC.velocity *= 0.01f;
 
-                NPC.velocity = move;
-            }
-            if (NPC.ai[0] == 170)
-            {
-                NPC.velocity *= 0.01f;
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
 
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
-
-                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                    SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                }
             }
 
-            if (NPC.ai[0] > 180 && NPC.ai[0] < 200)
+            if (NPC.ai[0] >= 150)
             {
-                move /= 3;
-
-                NPC.velocity = move;
-            }
-            if (NPC.ai[0] == 200)
-            {
-                NPC.velocity *= 0.01f;
-
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
-
-                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
-
-                if (NPC.GetLifePercent() > 0.75f && !Main.expertMode) //restart if high enough (and not expert mode)
+                if (phase != 1) //restart if high enough (and not expert mode)
                 {
                     NPC.ai[0] = 0; //restart
                 }
             }
+            //continue if conditions are met
 
-            //keep going if low enough or expert mode
 
-            if (NPC.ai[0] > 210 && NPC.ai[0] < 230)
+            //shoot 5
+            if (NPC.ai[0] > 160 && NPC.ai[0] < 180)
             {
-                move /= 3;
+                if (NPC.ai[0] % 5 == 0) //every 5 ticks
+                {
+                    NPC.velocity *= 0.01f;
 
-                NPC.velocity = move;
-            }
-            if (NPC.ai[0] == 230)
-            {
-                NPC.velocity *= 0.01f;
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
 
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
-
-                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                    SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                }
             }
 
-            if (NPC.ai[0] > 240 && NPC.ai[0] < 260)
+            //shoot 6
+            if (NPC.ai[0] > 190 && NPC.ai[0] < 210)
             {
-                move /= 3;
+                if (NPC.ai[0] % 5 == 0) //every 5 ticks
+                {
+                    NPC.velocity *= 0.01f;
 
-                NPC.velocity = move;
-            }
-            if (NPC.ai[0] == 260)
-            {
-                NPC.velocity *= 0.01f;
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
 
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
-
-                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                    SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                }
             }
 
-            if (NPC.ai[0] > 270 && NPC.ai[0] < 290)
+            //shoot 7
+            if (NPC.ai[0] > 220 && NPC.ai[0] < 240)
             {
-                move /= 3;
+                if (NPC.ai[0] % 5 == 0) //every 5 ticks
+                {
+                    NPC.velocity *= 0.01f;
 
-                NPC.velocity = move;
-            }
-            if (NPC.ai[0] == 290)
-            {
-                NPC.velocity *= 0.01f;
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
 
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
-
-                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                    SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                }
             }
 
-            if (NPC.ai[0] > 300 && NPC.ai[0] < 320)
+            //shoot 8
+            if (NPC.ai[0] > 250 && NPC.ai[0] < 270)
             {
-                move /= 3;
+                if (NPC.ai[0] % 5 == 0) //every 5 ticks
+                {
+                    NPC.velocity *= 0.01f;
 
-                NPC.velocity = move;
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                    SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                }
             }
-            if (NPC.ai[0] == 320)
+
+            if (NPC.ai[0] == 270)
             {
-                NPC.velocity *= 0.01f;
-
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
-
-                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
-
-                NPC.ai[0] = 0; //restart
+                NPC.ai[0] = 0; //restart (2)
             }
         }
 
@@ -409,18 +407,18 @@ namespace KirboMod.NPCs
                 Dust.NewDust(NPC.position, NPC.width, NPC.height, ModContent.DustType<DarkResidue>());
             }
 
-            if (NPC.GetLifePercent() > 0.75f && !Main.expertMode) //restart if high enough (and not expert mode)
+            if (phase != 1) //restart if high enough (and not expert mode)
             {
                 if (NPC.ai[0] == 210)
                 {
                     animation = 2; //lean back
                     NPC.velocity.X = -NPC.direction * 20; //jolt back
-                    NPC.velocity.Y = 0.01f;
+                    NPC.velocity.Y *= 0.01f;
                 }
                 else if (NPC.ai[0] > 210)
                 {
                     NPC.velocity.X *= 0.95f; //slow
-                    NPC.velocity.Y = 0.01f;
+                    NPC.velocity.Y *= 0.01f;
                 }
 
                 if (NPC.ai[0] >= 240)
@@ -521,149 +519,108 @@ namespace KirboMod.NPCs
                 xOffset = -400; // go behind player
             }
 
-            if (NPC.ai[0] % 30 == 0) //every 30 ticks
+            //movement code
+            if (NPC.ai[0] == 30)
             {
-                playerTargetArea = player.Center + player.velocity * 30;
+                playerTargetArea = player.Center + new Vector2(0, 0);
             }
 
-            Vector2 playerXOffest = player.Center + new Vector2(xOffset, -20f); //go in front of player
+            if (NPC.ai[0] == 60)
+            {
+                playerTargetArea = player.Center + new Vector2(0, -200);
+            }
+
+            if (NPC.ai[0] == 90)
+            {
+                playerTargetArea = player.Center + new Vector2(0, 0);
+            }
+
+            if (NPC.ai[0] == 120)
+            {
+                playerTargetArea = player.Center + new Vector2(0, 200);
+            }
+
+            Vector2 playerXOffest = playerTargetArea + new Vector2(xOffset, -20f); //go in front of player
             Vector2 move = playerXOffest - NPC.Center;
 
-            Vector2 velocity = new Vector2(NPC.direction * 30, 0);
+            Vector2 velocity = new Vector2(NPC.direction * 40, 0);
 
             Vector2 position = NPC.Center + new Vector2(0, 30f);
 
-            if (NPC.ai[0] > 20 && NPC.ai[0] < 30) //1
-            {
-                move /= 2;
-
-                NPC.velocity = move;
-            }
-            if (NPC.ai[0] == 30)
-            {
-                NPC.velocity *= 0.01f;
-
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
-
-                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
-            }
-
-            if (NPC.ai[0] > 40 && NPC.ai[0] < 50) //2
-            {
-                move /= 2;
-
-                NPC.velocity = move;
-            }
-            if (NPC.ai[0] == 50)
-            {
-                NPC.velocity *= 0.01f;
-
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
-
-                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
-            }
-
-            if (NPC.ai[0] > 60 && NPC.ai[0] < 70) //3
-            {
-                move /= 2;
-
-                NPC.velocity = move;
-            }
-            if (NPC.ai[0] == 70)
-            {
-                NPC.velocity *= 0.01f;
-
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
-
-                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
-            }
-
-            if (NPC.ai[0] > 80 && NPC.ai[0] < 90) //4
-            {
-                move /= 2;
-
-                NPC.velocity = move;
-            }
-            if (NPC.ai[0] == 90)
-            {
-                NPC.velocity *= 0.01f;
-
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
-
-                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
-            }
-
-            if (NPC.ai[0] > 100 && NPC.ai[0] < 110) //5
-            {
-                move /= 2;
-
-                NPC.velocity = move;
-            }
-            if (NPC.ai[0] == 110)
-            {
-                NPC.velocity *= 0.01f;
-
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
-
-                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
-            }
-
-            if (NPC.ai[0] > 120 && NPC.ai[0] < 130) //6
-            {
-                move /= 2;
-
-                NPC.velocity = move;
-            }
-            if (NPC.ai[0] == 130)
-            {
-                NPC.velocity *= 0.01f;
-
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
-
-                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
-            }
-
-            if (NPC.ai[0] > 140 && NPC.ai[0] < 150) //7
-            {
-                move /= 2;
-
-                NPC.velocity = move;
-            }
-            if (NPC.ai[0] == 150)
-            {
-                NPC.velocity *= 0.01f;
-
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
-
-                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
-            }
-
-            if (NPC.ai[0] > 160 && NPC.ai[0] < 170) //8
+            if (NPC.ai[0] < 160) //not doing spread attack
             {
                 move /= 3;
 
                 NPC.velocity = move;
             }
-            if (NPC.ai[0] == 170)
+
+            //shoot 1
+            if (NPC.ai[0] > 40 && NPC.ai[0] < 60)
             {
-                NPC.velocity *= 0.01f;
+                if (NPC.ai[0] % 5 == 0) //every 5 ticks
+                {
+                    NPC.velocity *= 0.01f;
 
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
 
-                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                    SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                }
+            }
+            //shoot 2
+            if (NPC.ai[0] > 70 && NPC.ai[0] < 90)
+            {
+                if (NPC.ai[0] % 5 == 0) //every 5 ticks
+                {
+                    NPC.velocity *= 0.01f;
+
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                    SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                }
+            }
+
+            //shoot 3
+            if (NPC.ai[0] > 100 && NPC.ai[0] < 120)
+            {
+                if (NPC.ai[0] % 5 == 0) //every 5 ticks
+                {
+                    NPC.velocity *= 0.01f;
+
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                    SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                }
+            }
+
+            //shoot 4
+            if (NPC.ai[0] > 130 && NPC.ai[0] < 150)
+            {
+                if (NPC.ai[0] % 5 == 0) //every 5 ticks
+                {
+                    NPC.velocity *= 0.01f;
+
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+
+                    SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                }
             }
 
             velocity = new Vector2(NPC.direction * 20, 0);
 
-            Vector2 move2 = playerXOffest + new Vector2(0, -500)  - NPC.Center;
+            if (NPC.ai[0] == 160)
+            {
+                playerTargetArea = player.Center + new Vector2(xOffset, -525);
+            }
 
-            if (NPC.ai[0] >= 180 && NPC.ai[0] < 190) //spread 1
+            Vector2 move2 = playerTargetArea - NPC.Center;
+
+            if (NPC.ai[0] >= 160 && NPC.ai[0] < 170) //spread 1
             {
                 move2 /= 3;
 
                 NPC.velocity = move2;
             }
-            if (NPC.ai[0] >= 190 && NPC.ai[0] < 240) //move down
+            if (NPC.ai[0] >= 170 && NPC.ai[0] < 220) //move down
             {
                 NPC.velocity.Y = 20;
 
@@ -677,15 +634,20 @@ namespace KirboMod.NPCs
                 }
             }
 
-            Vector2 move3 = playerXOffest + new Vector2(0, 500) - NPC.Center;
+            if (NPC.ai[0] == 220)
+            {
+                playerTargetArea = player.Center + new Vector2(xOffset, 475);
+            }
 
-            if (NPC.ai[0] >= 240 && NPC.ai[0] < 250) //spread 2
+            Vector2 move3 = playerTargetArea - NPC.Center;
+
+            if (NPC.ai[0] >= 220 && NPC.ai[0] < 230) //spread 2
             {
                 move3 /= 3;
 
                 NPC.velocity = move3;
             }
-            if (NPC.ai[0] >= 250 && NPC.ai[0] < 300) //move up
+            if (NPC.ai[0] >= 230 && NPC.ai[0] < 280) //move up
             {
                 NPC.velocity.Y = -20;
 
@@ -699,7 +661,7 @@ namespace KirboMod.NPCs
                 }
             }
             
-            if (NPC.ai[0] > 300)
+            if (NPC.ai[0] > 280)
             {
                 NPC.ai[0] = 0; //restart
             }
@@ -725,7 +687,7 @@ namespace KirboMod.NPCs
 
                 NPC.Center = player.Center + Main.rand.NextVector2CircularEdge(500, 500);
 
-                //NPC.rotation = targetDistance.ToRotation(); //rotate towards target
+                NPC.rotation = targetDistance.ToRotation(); //rotate towards target
 
                 animation = 1;
 
@@ -805,6 +767,28 @@ namespace KirboMod.NPCs
             {
                 NPC.alpha = 0;
                 NPC.ai[0] = 0;
+            }
+        }
+
+        private void Transition() //transition to phase 2
+        {
+            NPC.ai[0]++;
+
+            animation = 3;
+            NPC.velocity *= 0.95f;
+            NPC.dontTakeDamage = true;
+            NPC.damage = 0;
+
+            Vector2 speed = Main.rand.NextVector2Circular(15f, 15f); //circle
+            Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 1); //Makes dust in a messy circle
+
+            if (NPC.ai[0] == 240) //summon phase two
+            {
+                if (Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    NPC.NewNPC(NPC.GetSource_FromThis(), (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<PureDarkMatter>());
+                }
+                NPC.active = false;
             }
         }
 
@@ -906,26 +890,48 @@ namespace KirboMod.NPCs
                     NPC.frameCounter = 0.0; //reset
                 }
             }
-			if (animation == 4) //phase 2
-			{
-				NPC.frameCounter += 1.0;
-				if (NPC.frameCounter < 6.0)
-				{
-					NPC.frame.Y = frameHeight * 16; //idle
-				}
-				else if (NPC.frameCounter < 12.0)
-				{
-					NPC.frame.Y = frameHeight * 17; //lil' stretch
-				}
-				else
-				{
-					NPC.frameCounter = 0.0; //reset
-				}
-			}
-		}
+        }
+        public override bool CheckDead()
+        {
+            NPC.active = true;
+            NPC.life = 1;
+            NPC.ai[0] = 0; //reset
+            phase = 4; //transition into second phase (pure dark matter)
+            return false;
+        }
 
-		// This npc uses additional textures for drawing
-		public static Asset<Texture2D> DarkBlade;
+        // This npc uses additional textures for drawing
+        public static Asset<Texture2D> afterimage;
+
+        public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+        {
+            /*Main.instance.LoadNPC(NPC.type);
+            afterimage = ModContent.Request<Texture2D>(Texture);
+            Texture2D texture = afterimage.Value;
+
+            //afterimage
+            for (int k = 1; k < NPC.oldPos.Length; k++) //start at 1 so not ontop of actual npc
+            {
+                Vector2 drawOrigin = new Vector2(texture.Width / 2, texture.Height / 2);
+                Vector2 drawPos = NPC.oldPos[k] - Main.screenPosition + new Vector2(0f, 1758 + NPC.gfxOffY);
+
+                SpriteEffects direction = SpriteEffects.None;
+
+                if (NPC.direction == 1) //reverse
+                {
+                    direction = SpriteEffects.FlipHorizontally;
+                }
+
+                Color color = NPC.GetAlpha(Color.White * NPC.Opacity) * ((NPC.oldPos.Length - k) / (float)NPC.oldPos.Length);
+
+                Main.EntitySpriteDraw(texture, drawPos, NPC.frame, color, NPC.rotation, drawOrigin, 1, direction);
+            }*/
+
+            return true;
+        }
+
+        // This npc uses additional textures for drawing
+        public static Asset<Texture2D> DarkBlade;
         public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
 			DarkBlade = ModContent.Request<Texture2D>("KirboMod/NPCs/DarkBlade");
@@ -941,7 +947,7 @@ namespace KirboMod.NPCs
                 offset = new Vector2(-50, 30);
             }
 
-            if ((attacktype == DarkMatterAttackType.Orbs && frenzy) && NPC.ai[0] >= 70 && NPC.ai[0] <= 160) //enraged
+            if ((attacktype == DarkMatterAttackType.Orbs && phase == 3) && NPC.ai[0] >= 70 && NPC.ai[0] <= 160) //enraged
             {
                 rotation = MathHelper.ToRadians(0);
                 direction = SpriteEffects.None;
@@ -954,46 +960,14 @@ namespace KirboMod.NPCs
                 offset = new Vector2(0, -20);
             }
 
-            if ((attacktype == DarkMatterAttackType.Dash && frenzy) && NPC.ai[0] > 40) //change rotation for enrage dash
+            if ((attacktype == DarkMatterAttackType.Dash && phase == 2) && NPC.ai[0] > 40) //change rotation for enrage dash
             {
                 rotation += NPC.rotation;
             }
 
-            if (phase == 1) //sword
-			{
-                Texture2D blade = DarkBlade.Value; 
-                spriteBatch.Draw(blade, NPC.Center - Main.screenPosition + offset, null, new Color(255, 255, 255) * NPC.Opacity, rotation, new Vector2(19, 64), 1f, direction, 0f);
-            }
+            Texture2D blade = DarkBlade.Value;
+            spriteBatch.Draw(blade, NPC.Center - Main.screenPosition + offset, null, new Color(255, 255, 255) * NPC.Opacity, rotation, new Vector2(19, 64), 1f, direction, 0f);
         }
-        // This npc uses additional textures for drawing
-        public static Asset<Texture2D> afterimage;
-
-        /*public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
-        {
-            Main.instance.LoadNPC(NPC.type);
-            afterimage = ModContent.Request<Texture2D>(Texture);
-            Texture2D texture = afterimage.Value;
-
-            // Redraw the projectile with the color not influenced by light
-            for (int k = 1; k < NPC.oldPos.Length; k++) //start at 1 so not ontop of actual npc
-            {
-                Vector2 drawOrigin = new Vector2(texture.Width / 2, texture.Height / 2);
-                Vector2 drawPos = (NPC.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(0f, NPC.gfxOffY);
-
-                SpriteEffects direction = SpriteEffects.None;
-
-                if (NPC.direction == -1) //reverse
-                {
-                    direction = SpriteEffects.FlipHorizontally;
-                }
-
-                Color color = NPC.GetAlpha(drawColor) * ((NPC.oldPos.Length - k) / (float)NPC.oldPos.Length);
-
-                Main.EntitySpriteDraw(texture, drawPos, null, color, NPC.rotation, drawOrigin, 1, direction);
-            }
-
-            return true;
-        }*/
 
         public override void BossHeadSlot(ref int index)
         {

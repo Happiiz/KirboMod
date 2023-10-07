@@ -59,7 +59,7 @@ namespace KirboMod.Projectiles
 			Collision.StepUp(ref Projectile.position, ref Projectile.velocity, Projectile.width, Projectile.height, ref Projectile.stepSpeed, ref Projectile.gfxOffY);
 		}
 
-        public override void Kill(int timeLeft) //when the projectile dies
+        public override void OnKill(int timeLeft) //when the projectile dies
          {
 			//crystal
 			for (int i = 0; i < 30; i++)

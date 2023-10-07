@@ -406,17 +406,17 @@ namespace KirboMod.NPCs
 		{
 			if (NPC.life <= 0)
 			{
-				for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-				{
-					Vector2 speed = Main.rand.NextVector2Unit(); //circle edge
-					Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.LilStar>(), speed * 5, Scale: 1f); //Makes dust in a messy circle
-				}
-				for (int i = 0; i < 5; i++)
-				{
-					Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-					Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center, speed, Main.rand.Next(11, 13), Scale: 1f); //double jump smoke
-				}
-			}
+                for (int i = 0; i < 10; i++)
+                {
+                    Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle edge
+                    Gore.NewGorePerfect(NPC.GetSource_FromAI(), NPC.Center, speed, Main.rand.Next(16, 18));
+                }
+                for (int i = 0; i < 5; i++)
+                {
+                    Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
+                    Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center, speed, Main.rand.Next(11, 13), Scale: 1f); //double jump smoke
+                }
+            }
 		}
 
         public override void ModifyHoverBoundingBox(ref Rectangle boundingBox) //box where NPC name and health is shown

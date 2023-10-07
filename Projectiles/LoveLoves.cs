@@ -42,7 +42,7 @@ namespace KirboMod.Projectiles
 			}
 		}
 		
-        public override void Kill(int timeLeft)
+        public override void OnKill(int timeLeft)
         {
 			SoundEngine.PlaySound(SoundID.Item67 with { MaxInstances = 0}, Projectile.Center); //rainbow gun
             for (float i = 0; i < 1; i += 1f / 20f)

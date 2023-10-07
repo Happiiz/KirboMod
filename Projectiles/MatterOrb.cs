@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using System;
 using Terraria;
 using Terraria.ID;
@@ -12,12 +13,16 @@ namespace KirboMod.Projectiles
 		public override void SetStaticDefaults()
 		{
 			Main.projFrames[Projectile.type] = 4;
-		}
+
+            //for afterimages
+            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 6; // The length of old position to be recorded
+            ProjectileID.Sets.TrailingMode[Projectile.type] = 0; // The recording mode
+        }
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 28;
-			Projectile.height = 26;
+			Projectile.width = 32;
+			Projectile.height = 32;
 			Projectile.friendly = false;
 			Projectile.hostile = false;
 			Projectile.DamageType = DamageClass.Ranged;
@@ -41,16 +46,39 @@ namespace KirboMod.Projectiles
 
 			if (Projectile.ai[0] < 20)
 			{
-				Projectile.velocity *= 0.92f;
+				Projectile.velocity *= 0.95f;
 			}
-
-			if (Projectile.ai[0] == 20)
+			else if (Projectile.ai[0] == 20)
             {
 				Projectile.hostile = true;
-				move.Normalize();
-				move *= 18;
-				Projectile.velocity = move; //movemove = player.Center - projectile.Center; //update player position
-			}
+
+				Projectile.velocity.X = move.X / 20;
+
+                if (Projectile.velocity.Y < 0)
+				{
+					Projectile.ai[2] = 1;
+					Projectile.velocity.Y = -50; //start up
+				}
+				else
+				{
+                    Projectile.velocity.Y = 50; //start down
+                }
+            }
+			else if (Projectile.ai[0] > 20) 
+            {
+				if (Projectile.ai[2] == 1) //go down
+				{
+					Projectile.velocity.Y += 4f;
+
+					Projectile.velocity.X *= 0.98f;
+				}
+                else //go up
+                {
+                    Projectile.velocity.Y -= 4f;
+
+                    Projectile.velocity.X *= 0.98f;
+                }
+            }
 
 			if (++Projectile.frameCounter >= 5) //changes frames every 5 ticks 
 			{
@@ -61,7 +89,7 @@ namespace KirboMod.Projectiles
 				}
 			}
 		}
-        public override void Kill(int timeLeft) //when the projectile dies
+        public override void OnKill(int timeLeft) //when the projectile dies
         {
             for (int i = 0; i < 10; i++)
             {
@@ -72,7 +100,32 @@ namespace KirboMod.Projectiles
 
         public override Color? GetAlpha(Color lightColor)
         {
-			return new Color(255, 255, 255); //white
+			return Color.White; //white
+        }
+
+
+        public static Asset<Texture2D> afterimage;
+
+        public override bool PreDraw(ref Color lightColor)
+        {
+            if (Projectile.ai[0] < 0)
+                return false;
+            Main.instance.LoadProjectile(Projectile.type);
+            afterimage = ModContent.Request<Texture2D>(Texture);
+            Texture2D texture = afterimage.Value;
+
+            // Redraw the projectile with the color not influenced by light
+            for (int k = 1; k < Projectile.oldPos.Length; k++) //start at 1 so not ontop of actual projectile
+            {
+                Vector2 drawOrigin = new Vector2(texture.Width / 2, texture.Height / 2);
+                Vector2 drawPos = (Projectile.oldPos[k] - Main.screenPosition) + new Vector2(16, 64 + Projectile.gfxOffY);
+
+                Color color = Projectile.GetAlpha(lightColor) * ((Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);
+                Main.EntitySpriteDraw(texture, drawPos, new Rectangle(0, Projectile.frame * Projectile.height, Projectile.width, Projectile.height), 
+					color, Projectile.rotation, drawOrigin, 1, SpriteEffects.None, 0);
+            }
+
+            return true; //draw og
         }
     }
 }

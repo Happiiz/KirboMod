@@ -37,27 +37,11 @@ namespace KirboMod.NPCs
 
             NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
             {
-                //CustomTexturePath = ,
-                PortraitScale = 1, // Portrait refers to the full picture when clicking on the icon in the bestiary
-                PortraitPositionYOverride = 0,
-                PortraitPositionXOverride = 20,
-                Position = new Vector2(20, 0),
+                Hide = true, //hide from bestiary
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
 
-            NPCDebuffImmunityData debuffData = new NPCDebuffImmunityData
-            {
-                SpecificallyImmuneTo = new int[]
-                {
-                    BuffID.Confused, // Most NPCs have this
-		            BuffID.Poisoned,
-                    BuffID.Venom,
-                    BuffID.OnFire,
-                    BuffID.CursedInferno,
-                    BuffID.ShadowFlame,
-                }
-            };
-            NPCID.Sets.DebuffImmunitySets[Type] = debuffData;
+            NPCID.Sets.ImmuneToRegularBuffs[Type] = true; //immune to all buffs that aren't whips
 
             //for drawing afterimages and stuff alike
             ProjectileID.Sets.TrailCacheLength[NPC.type] = 5; // The length of old position to be recorded
@@ -111,7 +95,7 @@ namespace KirboMod.NPCs
 				// Sets the spawning conditions of this NPC that is listed in the bestiary.
 
 				// Sets the description of this NPC that is listed in the bestiary.
-				new FlavorTextBestiaryInfoElement("A being of pure evil bent on spreading darkness. What could be the origin of this innate vile in it's heart?")
+				new FlavorTextBestiaryInfoElement("A mysterious monocular invader with a body as black as darkness itself. What hidden motives does it have descending upon this world?")
             });
         }
 
@@ -123,7 +107,6 @@ namespace KirboMod.NPCs
 
             writer.Write(animation);
             writer.Write(phase);
-            writer.Write(frenzy);
 
             writer.WriteVector2(playerTargetArea);
         }
@@ -136,7 +119,6 @@ namespace KirboMod.NPCs
 
             animation = reader.ReadInt32();
             phase = reader.ReadInt32();
-            frenzy = reader.ReadBoolean();
 
             playerTargetArea = reader.ReadVector2();
         }
@@ -144,6 +126,14 @@ namespace KirboMod.NPCs
         public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
         {
             scale = 1.5f;
+
+            position.Y = NPC.position.Y + NPC.height + 40;
+
+            if (NPC.life == 1)
+            {
+                return false; //no health bar
+            }
+            else //health bar
             return true;
         }
 

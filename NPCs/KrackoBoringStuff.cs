@@ -159,15 +159,8 @@ namespace KirboMod.NPCs
 			};
 			NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
 
-			NPCDebuffImmunityData debuffData = new NPCDebuffImmunityData
-			{
-				SpecificallyImmuneTo = new int[]
-				{
-					BuffID.Confused, // Most NPCs have this
-                }
-			};
-			NPCID.Sets.DebuffImmunitySets[Type] = debuffData;
-		}
+            NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true; //immune to not mess up movement
+        }
 
 		public override void SetDefaults()
 		{

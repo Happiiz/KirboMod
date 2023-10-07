@@ -256,23 +256,6 @@ namespace KirboMod.NPCs
             }
         }
 
-        /*public override void OnKill()
-		{
-			if (Main.expertMode)
-			{
-				weaponchance = Main.rand.Next(1, 10);
-			}
-			else
-			{
-				weaponchance = Main.rand.Next(1, 20);
-			}
-			if (weaponchance == 1)
-			{
-				Item.NewItem(NPC.getRect(), ModContent.ItemType<Items.Weapons.Cutter>());
-			}
-			Item.NewItem(NPC.getRect(), ModContent.ItemType<Items.Starbit>(), Main.rand.Next(2, 3));
-		}*/
-
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<Items.Weapons.Cutter>(), 40, 20)); // 1 in 40 (2.5%) chance in Normal. 1 in 20 (5%) chance in Expert
@@ -285,10 +268,10 @@ namespace KirboMod.NPCs
             {
                 if (NPC.life <= 0)
                 {
-                    for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+                    for (int i = 0; i < 10; i++)
                     {
-                        Vector2 speed = Main.rand.NextVector2Unit(); //circle edge
-                        Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.LilStar>(), speed * 5, Scale: 1f); //Makes dust in a messy circle
+                        Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle edge
+                        Gore.NewGorePerfect(NPC.GetSource_FromAI(), NPC.Center, speed, Main.rand.Next(16, 18));
                     }
                     for (int i = 0; i < 5; i++)
                     {

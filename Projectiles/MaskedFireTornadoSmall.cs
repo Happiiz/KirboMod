@@ -66,7 +66,7 @@ namespace KirboMod.Projectiles
 			Lighting.AddLight(Projectile.Center, 0.8f, 0.4f, 0f); //orange light
 		}
 
-        public override void Kill(int timeLeft) //when the projectile dies
+        public override void OnKill(int timeLeft) //when the projectile dies
          {
              for (int i = 0; i < 15; i++)
              {
