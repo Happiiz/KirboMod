@@ -70,6 +70,12 @@ namespace KirboMod
 
         public int plasmaTimer = 0; //if 60 then takes plasma charge down a bit
         public int plasmacharge = 0;  //charge amount for plasma weapon
+        public int darkSwordSwingCounter;
+        public void GetDarkSwordSwingStats(out int direction, out Items.DarkSword.DarkSword.ProjectileShootType projToShoot)
+        {
+            projToShoot = (Items.DarkSword.DarkSword.ProjectileShootType)(darkSwordSwingCounter % 3);
+            direction = darkSwordSwingCounter++ % 2 * 2 - 1;
+        }
 
         public int rainbowSwordSwingCounter;
         public int NextRainbowSwordSwingDirection { get => rainbowSwordSwingCounter++ % 2 * 2 - 1; }

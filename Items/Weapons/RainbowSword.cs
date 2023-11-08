@@ -59,10 +59,7 @@ namespace KirboMod.Items.RainbowSword
 			spriteBatch.End();//this is probably what is used
 			spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
 		}
-        public override bool MeleePrefix()
-        {
-			return true;
-        }
+		public override bool MeleePrefix() => true;
         public override void SetDefaults()
 		{
 			ItemID.Sets.ItemNoGravity[Type] = false;
@@ -87,10 +84,7 @@ namespace KirboMod.Items.RainbowSword
 			Item.UseSound = SoundID.Item74 with { MaxInstances = 0, Volume = 0.6f };
 		
 		}
-        public override Color? GetAlpha(Color lightColor)
-		{
-			return Color.White; // Makes it uneffected by light
-		}
+		public override Color? GetAlpha(Color lightColor) => Color.White;
 		public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
 			if(Main.myPlayer != player.whoAmI)

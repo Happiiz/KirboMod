@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -15,7 +16,7 @@ namespace KirboMod.Projectiles
 			Main.projFrames[Projectile.type] = 1; //one frame
 
             //for afterimages
-            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 6; // The length of old position to be recorded
+            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 10; // The length of old position to be recorded
             ProjectileID.Sets.TrailingMode[Projectile.type] = 0; // The recording mode
         }
 		public override void SetDefaults()
@@ -28,21 +29,30 @@ namespace KirboMod.Projectiles
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 			Projectile.DamageType = DamageClass.Ranged;
-			Projectile.extraUpdates = 1;
+			Projectile.extraUpdates = 2;
 			Projectile.usesLocalNPCImmunity = true; //doesn't wait for other projectiles to hit again
-			Projectile.localNPCHitCooldown = 10; //time until able to hit npc even if npc has just been struck
+			Projectile.localNPCHitCooldown = 20; //time until able to hit npc even if npc has just been struck
 		}
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
-			return Projectile.ai[0] >= 0 && AIUtils.CheckCircleCollision(targetHitbox, Projectile.Center, 35);
+			return Projectile.ai[0] >= 0 && (AIUtils.CheckCircleCollision(targetHitbox, Projectile.Center, 35) || AIUtils.CheckCircleCollision(targetHitbox, Projectile.oldPos[0] + Projectile.Size / 2, 35));
         }
         public override bool PreAI()
         {
+			if (Projectile.ai[0] <= 0)
+				VelLength = Projectile.velocity.Length();
+			if (Projectile.ai[0] <= 0)
+			{
+				Projectile.Center = Main.player[Projectile.owner].Center + Vector2.Normalize(Projectile.velocity).RotatedBy(MathF.PI / 2) * Projectile.ai[1] * 32 - Projectile.velocity;
+			}
 			Projectile.ai[0]++;
-			if (Projectile.ai[0] < 0)
-				Projectile.Center = Main.player[Projectile.owner].Center - Projectile.velocity;
+			if(Projectile.ai[0] == 0)
+            {
+				SoundEngine.PlaySound(SoundID.Item1 with { MaxInstances = 0 }, Projectile.Center);
+            }
 			return Projectile.ai[0] >= 0;
         }
+		ref float VelLength { get => ref Projectile.ai[2]; }
         public override void AI()
 		{
 			Lighting.AddLight(Projectile.Center, Color.Gold.ToVector3());
@@ -50,18 +60,18 @@ namespace KirboMod.Projectiles
 			Projectile.rotation += Projectile.direction * 0.5f;
 			Dust dust = Main.dust[Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.SpelunkerGlowstickSparkle)];
 			dust.scale = 2;
-			if(Main.rand.NextBool())
-				dust.velocity += Projectile.velocity;
-			if (Projectile.ai[0] >= 25)//return
+			//if(Main.rand.NextBool())
+				dust.velocity += Projectile.velocity * 0.4f;
+			if (Projectile.ai[0] >= 60)//return
             {
-				if(Projectile.ai[0] == 25)
+				if(Projectile.ai[0] == 60)
                 {
-					Projectile.velocity = Projectile.velocity.RotatedBy(Projectile.ai[1] * MathF.PI / 2);
+					Projectile.velocity = Vector2.Normalize( Projectile.velocity).RotatedBy(Projectile.ai[1] * MathF.PI / 2) * VelLength;
                 }
-				float speed = 25f; //top speed(original shoot speed)
+				float speed = AIUtils.RemapEasing(Projectile.ai[0], 25, 1000, 25f, 100, Easings.EaseInOutSine); //top speed(original shoot speed)
 				float inertia = 10f; //acceleration and decceleration speed
 
-				Vector2 direction = player.Center - Projectile.Center; //start - end 																	
+				Vector2 direction = player.Center - Projectile.Center; 																	
 				direction.Normalize();
 				direction *= speed;
 				Projectile.velocity = (Projectile.velocity * (inertia - 1) + direction) / inertia; 
@@ -71,7 +81,10 @@ namespace KirboMod.Projectiles
                 {
 					Projectile.Kill(); //KILL
                 }
+				return;
             }
+			Projectile.velocity.Normalize();
+			Projectile.velocity *= AIUtils.RemapEasing(Projectile.ai[0], 0, 40, VelLength, 0.1f, Easings.EaseInOutSine);
 		}
 
         public static Asset<Texture2D> afterimage;
@@ -83,18 +96,21 @@ namespace KirboMod.Projectiles
             Main.instance.LoadProjectile(Projectile.type);
             afterimage = ModContent.Request<Texture2D>(Texture);
             Texture2D texture = afterimage.Value;
+			Vector2 origin = texture.Size() / 2;
+			Vector2 drawPos;
 
-            // Redraw the projectile with the color not influenced by light
-            for (int k = 1; k < Projectile.oldPos.Length; k++) //start at 1 so not ontop of actual ring
+			// Redraw the projectile with the color not influenced by light
+			for (int i = Projectile.oldPos.Length - 1; i >= 0; i--)
             {
-                Vector2 drawOrigin = new Vector2(texture.Width / 2, texture.Height / 2);
-                Vector2 drawPos = (Projectile.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
+				 drawPos = (Projectile.oldPos[i] - Main.screenPosition) + new Vector2(0f, Projectile.gfxOffY) + Projectile.Size / 2;
+				Color color = Color.White * Utils.GetLerpValue(Projectile.oldPos.Length, 0, i);
+				Main.EntitySpriteDraw(texture, drawPos, null, color, Projectile.rotation, origin, 1, SpriteEffects.None, 0);
 
-                Color color = Projectile.GetAlpha(lightColor) * ((Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);
-                Main.EntitySpriteDraw(texture, drawPos, null, color, Projectile.rotation, drawOrigin, 1, SpriteEffects.None, 0);
-            }
+			}
+			drawPos = (Projectile.Center - Main.screenPosition) + new Vector2(0f, Projectile.gfxOffY);
+			Main.EntitySpriteDraw(texture, drawPos, null, Color.White, Projectile.rotation, origin, Projectile.scale, SpriteEffects.None);
 
-            return true; //draw og
+			return false; //draw og
         }
     }
 }

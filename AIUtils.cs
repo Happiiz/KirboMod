@@ -8,6 +8,11 @@ namespace KirboMod
 {
     public static class AIUtils
     {
+        //todo: add clamp param
+        public static float RemapEasing(float fromValue, float fromMin, float fromMax, float toMin, float toMax, Func<float, float> easingFunction)
+        {
+            return MathHelper.Lerp(toMin, toMax, easingFunction.Invoke(Utils.GetLerpValue(fromMin, fromMax, fromValue, true)));
+        }
         public static void DustCircle(int dustAmount, float radius, Vector2 circleOrigin, int dustID = DustID.MagnetSphere)
         {
             for (float i = 0; i < 1; i+= 1f / dustAmount)
