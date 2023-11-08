@@ -18,6 +18,8 @@ namespace KirboMod.NPCs
 	{
 		private int attacktype = 0;
 
+		private bool jumped = false;
+
 		public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Blade Knight");
@@ -279,11 +281,22 @@ namespace KirboMod.NPCs
 
 			direction.Normalize();
 			direction *= speed;
-			if (NPC.velocity.Y == 0) //on ground (so it doesn't interfere with knockback)
+			if (NPC.velocity.Y == 0 || jumped == true) //walking/jumping (so it doesn't interfere with knockback)
 			{
 				NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
 			}
-		}
+
+            if (NPC.collideX && NPC.velocity.Y == 0) //hop if touching wall
+            {
+                NPC.velocity.Y = -5;
+				jumped = true; 
+            }
+
+			if (NPC.velocity.Y == 0) //on ground
+			{
+				jumped = false;
+			}
+        }
 
 		private void Stance() //readies attack
         {

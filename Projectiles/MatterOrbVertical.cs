@@ -8,7 +8,7 @@ using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles
 {
-	public class MatterOrb : ModProjectile
+	public class MatterOrbVertical : ModProjectile
 	{
 		public override void SetStaticDefaults()
 		{
@@ -44,46 +44,21 @@ namespace KirboMod.Projectiles
 
 			Projectile.ai[0]++;
 
-			if (Projectile.ai[0] < 20)
+			if (Projectile.ai[0] < 15)
 			{
-				Projectile.velocity *= 0.95f;
+				Projectile.velocity *= 0.9f;
 			}
-			else if (Projectile.ai[0] == 20)
+			else 
             {
 				Projectile.hostile = true;
 
-				if (move.X > 0) //going right
+				if (Projectile.ai[1] == 1) //go up
 				{
-					Projectile.velocity.X = 30 + MathF.Cos(Main.GlobalTimeWrappedHourly * 2) * 25;
+					Projectile.velocity.Y = -20; 
 				}
-                else //going left
+                else //go down
                 {
-                    Projectile.velocity.X = -30 + MathF.Cos(Main.GlobalTimeWrappedHourly * 2) * 25;
-                }
-
-                if (Projectile.velocity.Y < 0)
-				{
-					Projectile.ai[2] = 1;
-					Projectile.velocity.Y = -50; //start up
-				}
-				else
-				{
-                    Projectile.velocity.Y = 50; //start down
-                }
-            }
-			else if (Projectile.ai[0] > 20) 
-            {
-				if (Projectile.ai[2] == 1) //go down
-				{
-					Projectile.velocity.Y += 4f;
-
-					Projectile.velocity.X *= 0.98f;
-				}
-                else //go up
-                {
-                    Projectile.velocity.Y -= 4f;
-
-                    Projectile.velocity.X *= 0.98f;
+                    Projectile.velocity.Y = 20;
                 }
             }
 

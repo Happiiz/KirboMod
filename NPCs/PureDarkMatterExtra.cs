@@ -78,13 +78,25 @@ namespace KirboMod.NPCs
         public override void SendExtraAI(BinaryWriter writer)
         {
             //send non NPC.ai array info to servers
+            writer.Write((byte)attacktype);
+            writer.Write((byte)lastattacktype);
+
+            writer.Write(attackTurn);
             writer.Write(phase);
+
+            writer.WriteVector2(spot);
         }
 
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             //sync in multiplayer
+            attacktype = (DarkMatterAttackType)reader.ReadByte();
+            lastattacktype = (DarkMatterAttackType)reader.ReadByte();
+
+            attackTurn = reader.ReadInt32();
             phase = reader.ReadInt32();
+
+            spot = reader.ReadVector2();
         }
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
@@ -115,10 +127,10 @@ namespace KirboMod.NPCs
         {
             if (NPC.life <= 0)
             {
-                for (int i = 0; i < 40; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+                for (int i = 0; i < 80; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
                 {
-                    Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-                    Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed * 4, 10); //Makes dust in a messy circle
+                    Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
+                    Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed * 4, 10, Scale: 2); //Makes dust in a messy circle
                     d.noGravity = true;
                 }
             }

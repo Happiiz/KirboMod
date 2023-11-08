@@ -1348,6 +1348,9 @@ Mods: {
 			BioMinionSlashHitbox.DisplayName: Slash
 			RainbowSwordHeld.DisplayName: Rainbow Sword Held
 			RainbowSwordCraftingAnimation.DisplayName: Rainbow Sword Crafting Animation
+			DarkMatterLaser.DisplayName: Dark Matter Laser
+			DarkMatterLaserTelegraph.DisplayName: Dark Matter Laser Telegraph
+			MatterOrbVertical.DisplayName: Matter Orb
 		}
 
 		NPCs: {

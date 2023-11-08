@@ -16,7 +16,9 @@ namespace KirboMod.NPCs
         public ref float attack => ref NPC.localAI[0]; //the attack timer
         private bool attacking = false; //controls if in attacking state
 
-		public override void SetStaticDefaults()
+        private bool jumped = false;
+
+        public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Sir Kibble");
 			Main.npcFrameCount[NPC.type] = 7;
@@ -219,11 +221,22 @@ namespace KirboMod.NPCs
 			direction.Normalize(); //reduce to 1
 			direction *= speed; //equal speed
 
-			if (NPC.velocity.Y == 0) //on ground (so it doesn't interfere with knockback)
-			{
+			if (NPC.velocity.Y == 0 || jumped == true) //walking/jumping (so it doesn't interfere with knockback)
+            {
 				NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
 			}
-		}
+
+            if (NPC.collideX && NPC.velocity.Y == 0) //hop if touching wall
+            {
+                NPC.velocity.Y = -5;
+                jumped = true;
+            }
+
+            if (NPC.velocity.Y == 0) //on ground
+            {
+                jumped = false;
+            }
+        }
 		private void Throw()
         {
 			Player player = Main.player[NPC.target];

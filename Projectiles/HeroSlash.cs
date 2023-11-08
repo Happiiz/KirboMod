@@ -23,7 +23,7 @@ namespace KirboMod.Projectiles
 			Projectile.height = 26;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Melee;
-			Projectile.timeLeft = 12;
+			Projectile.timeLeft = 8;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 			Projectile.usesLocalNPCImmunity = true;

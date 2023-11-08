@@ -129,7 +129,7 @@ namespace KirboMod.NPCs
 				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Surface,
 
 				// Sets the description of this NPC that is listed in the bestiary.
-				new FlavorTextBestiaryInfoElement("Flutters through the air in a zig-zag. Will push others out of the way to keep on it's path.")
+				new FlavorTextBestiaryInfoElement("Flutters through the air in a wave pattern. Will push others out of the way to keep on it's path.")
             });
         }
 

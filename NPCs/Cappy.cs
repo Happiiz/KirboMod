@@ -111,7 +111,7 @@ namespace KirboMod.NPCs
 				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Surface,
 
 				// Sets the description of this NPC that is listed in the bestiary.
-				new FlavorTextBestiaryInfoElement("This shy creature keeps itself concealed with a mushroom like hat. Uncovering it reveals a blank expression that heavily condradicts the enthusiastic hopping.")
+				new FlavorTextBestiaryInfoElement("This shy creature keeps itself concealed with a mushroom like hat. Uncovering it reveals a face that doesn't look as cheery as they move.")
             });
         }
 

@@ -16,9 +16,9 @@ namespace KirboMod.NPCs
 	{
 		private bool attacking = false; //controls if in attacking state
 
-		public ref float ranan => ref NPC.ai[2];
+        private bool jumped = false;
 
-		public override void SetStaticDefaults() 
+        public override void SetStaticDefaults() 
 		{
 			// DisplayName.SetDefault("Waddle Doo");
 			Main.npcFrameCount[NPC.type] = 11; //frames something has
@@ -40,7 +40,8 @@ namespace KirboMod.NPCs
 			NPC.aiStyle = -1;
 			NPC.friendly = false;
 			NPC.noGravity = false;
-		}
+            NPC.direction = Main.rand.NextBool(2) == true ? 1 : -1;
+        }
 
 		public override float SpawnChance(NPCSpawnInfo spawnInfo)
 		{
@@ -321,37 +322,63 @@ namespace KirboMod.NPCs
 
                 direction.Normalize();
                 direction *= speed;
-				if (NPC.velocity.Y == 0) //on ground (so it doesn't interfere with knockback)
-				{
+				if (NPC.velocity.Y == 0 || jumped == true) //walking/jumping (so it doesn't interfere with knockback)
+                {
 					NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
 				}
 				NPC.ai[0] = 0;
+
+
+                if (NPC.collideX && NPC.velocity.Y == 0) //hop if touching wall
+                {
+                    NPC.velocity.Y = -5;
+                    jumped = true;
+                }
+
+                if (NPC.velocity.Y == 0) //on ground
+                {
+                    jumped = false;
+                }
             }
 			else
 			{
                 NPC.TargetClosest(false);
-
-                if (NPC.ai[0] == 0)
-                {
-                    ranan = Main.rand.Next(0, 10);
-					NPC.netUpdate = true;
-                }
-
-                if (ranan > 5)
-                {
-                    NPC.direction = 1;
-                }
-                else
-                {
-                    NPC.direction = -1;
-                }
 
                 //reroll direction
                 ++NPC.ai[0];
 
                 if (NPC.ai[0] >= 300)
                 {
+                    int ranan = Main.rand.Next(0, 10);
+
+                    if (ranan > 5)
+                    {
+                        NPC.direction = 1;
+                    }
+                    else
+                    {
+                        NPC.direction = -1;
+                    }
+                    NPC.netUpdate = true;
+
                     NPC.ai[0] = 0f;
+                }
+
+                //turn around if touching wall for a while
+                if (NPC.collideX && NPC.velocity.Y == 0)
+                {
+                    NPC.ai[2]++;
+
+                    if (NPC.ai[2] >= 180) //turn around
+                    {
+                        NPC.direction *= -1;
+                        NPC.ai[2] = 0;
+                        NPC.ai[0] = 1f;
+                    }
+                }
+                else //reset
+                {
+                    NPC.ai[2] = 0;
                 }
 
                 //movement

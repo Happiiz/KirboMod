@@ -21,6 +21,8 @@ namespace KirboMod.NPCs
         int walkTimer = 0;
         int walkDirection = 1; //determines whether the enemy will walk forward or backward
 
+        private bool jumped = false;
+
         public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Knuckle Joe");
@@ -305,6 +307,8 @@ namespace KirboMod.NPCs
             {
                 walkDirection = -1; //walk forward
             }
+
+            Jump();
         }
 
 		private void Sidestep() //back up or move forward randomly
@@ -340,7 +344,23 @@ namespace KirboMod.NPCs
                 }
             }
 
+            Jump();
+
             NPC.velocity.X = walkDirection * 1.6f;
+        }
+
+        private void Jump()
+        {
+            if (NPC.collideX && NPC.velocity.Y == 0) //hop if touching wall
+            {
+                NPC.velocity.Y = -5;
+                jumped = true;
+            }
+
+            if (NPC.velocity.Y == 0) //on ground
+            {
+                jumped = false;
+            }
         }
 
 		private void RapidPunch() //fires punches

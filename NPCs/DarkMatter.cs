@@ -85,7 +85,7 @@ namespace KirboMod.NPCs
                     AttackDecideNext();
 
                     //Make attacks slightly harder
-                    if (NPC.GetLifePercent() <= 0.5f || Main.expertMode)
+                    if (NPC.GetLifePercent() < 0.5f || Main.expertMode)
                     {
                         phase = 2;
                     }
@@ -198,7 +198,7 @@ namespace KirboMod.NPCs
                 playerTargetArea = player.Center + new Vector2(0, 200);
             }
 
-            if (NPC.ai[0] == 150 && phase == 1) //put extra checks here because this is also the first stopping point
+            if (NPC.ai[0] == 150 && phase == 2) //put extra checks here because this is also the first stopping point
             {
                 playerTargetArea = player.Center + new Vector2(0, 0);
             }
@@ -284,7 +284,7 @@ namespace KirboMod.NPCs
 
             if (NPC.ai[0] >= 150)
             {
-                if (phase != 1) //restart if high enough (and not expert mode)
+                if (phase == 1) //restart if high enough (and not expert mode)
                 {
                     NPC.ai[0] = 0; //restart
                 }
@@ -407,7 +407,7 @@ namespace KirboMod.NPCs
                 Dust.NewDust(NPC.position, NPC.width, NPC.height, ModContent.DustType<DarkResidue>());
             }
 
-            if (phase != 1) //restart if high enough (and not expert mode)
+            if (phase == 1) //restart if high enough (and not expert mode)
             {
                 if (NPC.ai[0] == 210)
                 {
@@ -427,7 +427,7 @@ namespace KirboMod.NPCs
                 }
             }
 
-            else //below 75% or expert mode
+            else //below half or expert mode
             {
                 if (NPC.ai[0] == 210) //stop a bit later
                 {
@@ -479,23 +479,49 @@ namespace KirboMod.NPCs
 
                 //teleport to either side of the player
                 NPC.Center = player.Center + new Vector2(xlocation, Main.rand.Next(-200, 200));
+                NPC.netUpdate = true; //sync random movement
             }
-            if (NPC.ai[0] == 70) //shoot
-            {
-                Vector2 Yoffset = new Vector2(0, -170);
 
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, default, 0, player.whoAmI);
-            }
 
             if (NPC.ai[0] > 40)
             {
                 NPC.alpha -= 30;
             }
-            
-            if (NPC.ai[0] > 130)
+
+            //normal mode above half
+            if (phase == 1) 
             {
-                NPC.alpha = 0;
-                NPC.ai[0] = 0;
+                if (NPC.ai[0] == 70) //shoot
+                {
+                    Vector2 Yoffset = new Vector2(0, -170);
+
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, default, 0, player.whoAmI);
+                }
+
+                if (NPC.ai[0] > 130)
+                {
+                    NPC.alpha = 0;
+                    NPC.ai[0] = 0;
+                }
+            }
+            //normal mode below half or expert mode above half
+            else
+            {
+                if (NPC.ai[0] >= 70 && NPC.ai[0] <= 160) //shoot
+                {
+                    if (NPC.ai[0] % 30 == 0) //shoot
+                    {
+                        Vector2 Yoffset = new Vector2(0, -170);
+
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, default, 0, player.whoAmI, NPC.whoAmI);
+                    }
+                }
+
+                if (NPC.ai[0] > 190)
+                {
+                    NPC.alpha = 0;
+                    NPC.ai[0] = 0;
+                }
             }
         }
 
@@ -671,11 +697,10 @@ namespace KirboMod.NPCs
             Player player = Main.player[NPC.target];
             Vector2 playerDistance = player.Center - NPC.Center;
 
-            Vector2 targetDistance = playerTargetArea - NPC.Center;
-
             float speed = 30f;
             float inertia = 10f;
 
+            Vector2 targetDistance = playerTargetArea - NPC.Center;
 
             if (NPC.ai[0] < 40)
             {
@@ -683,15 +708,13 @@ namespace KirboMod.NPCs
             }
             else if (NPC.ai[0] == 40)
             {
-                playerTargetArea = player.Center; //set dash target 
-
                 NPC.Center = player.Center + Main.rand.NextVector2CircularEdge(500, 500);
-
-                NPC.rotation = targetDistance.ToRotation(); //rotate towards target
 
                 animation = 1;
 
                 NPC.TargetClosest(); //flip direction once
+
+                playerTargetArea = player.Center; //set dash target 
             }
             else if (NPC.ai[0] < 60) //small backup
             {
@@ -700,6 +723,15 @@ namespace KirboMod.NPCs
                 targetDistance.Normalize();
                 targetDistance *= -speed;
                 NPC.velocity = (NPC.velocity * (inertia - 1) + targetDistance) / inertia;
+
+                /*if (NPC.direction == 1)
+                {
+                    NPC.rotation = -NPC.velocity.ToRotation();
+                }
+                else
+                {
+                    NPC.rotation = -NPC.velocity.ToRotation() - MathHelper.ToRadians(180);
+                }*/
 
                 Dust.NewDust(NPC.position, NPC.width, NPC.height, ModContent.DustType<DarkResidue>());
             }
@@ -734,36 +766,34 @@ namespace KirboMod.NPCs
             {
                 NPC.alpha += 30; //lemme be clear
             }
-            else if (NPC.ai[0] == 40)
+            else if (NPC.ai[0] < 100)
             {
-                playerTargetArea = player.Center; //set dash target 
-
-                float xlocation = -500;
-
-                if (Main.rand.NextBool(2))
-                {
-                    xlocation = 500;
-                }
-
-                //teleport to either side of the player
-                NPC.Center = player.Center + new Vector2(xlocation, Main.rand.Next(-200, 200));
+                //teleport to left side of the player
+                NPC.Center = player.Center + new Vector2(500, 0);
             }
-            if (NPC.ai[0] >= 70 && NPC.ai[0] <= 160) //shoot
+            if (NPC.ai[0] >= 100 && NPC.ai[0] <= 280) //shoot
             {
-                if (NPC.ai[0] % 30 == 0) //shoot
+                if (NPC.ai[0] % 20 == 0) //shoot
                 {
                     Vector2 Yoffset = new Vector2(0, -170);
 
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, default, 0, player.whoAmI, NPC.whoAmI);
                 }
+
+                //spin around player
+                NPC.Center = player.Center + new Vector2(MathF.Cos((NPC.ai[0] - 100) / 30) * 500, MathF.Sin((NPC.ai[0] - 100) / 30) * 500);
             }
 
+            Vector2 targetDistance = playerTargetArea - NPC.Center;
+
+            playerTargetArea = player.Center; //set dash target 
+            
             if (NPC.ai[0] > 40)
             {
                 NPC.alpha -= 30;
             }
             
-            if (NPC.ai[0] > 190)
+            if (NPC.ai[0] > 310)
             {
                 NPC.alpha = 0;
                 NPC.ai[0] = 0;
@@ -778,6 +808,7 @@ namespace KirboMod.NPCs
             NPC.velocity *= 0.95f;
             NPC.dontTakeDamage = true;
             NPC.damage = 0;
+            NPC.rotation = 0;
 
             Vector2 speed = Main.rand.NextVector2Circular(15f, 15f); //circle
             Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 1); //Makes dust in a messy circle
@@ -794,7 +825,7 @@ namespace KirboMod.NPCs
 
         public override void FindFrame(int frameHeight) // animation
         {
-			if (animation == 0) //phase 1
+			if (animation == 0) //idle
 			{
                 NPC.frameCounter += 1.0;
                 if (NPC.frameCounter < 12.0)
@@ -900,20 +931,15 @@ namespace KirboMod.NPCs
             return false;
         }
 
-        // This npc uses additional textures for drawing
-        public static Asset<Texture2D> afterimage;
-
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            /*Main.instance.LoadNPC(NPC.type);
-            afterimage = ModContent.Request<Texture2D>(Texture);
-            Texture2D texture = afterimage.Value;
+            /*Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
 
             //afterimage
             for (int k = 1; k < NPC.oldPos.Length; k++) //start at 1 so not ontop of actual npc
             {
                 Vector2 drawOrigin = new Vector2(texture.Width / 2, texture.Height / 2);
-                Vector2 drawPos = NPC.oldPos[k] - Main.screenPosition + new Vector2(0f, 1758 + NPC.gfxOffY);
+                Vector2 drawPos = NPC.oldPos[k] - Main.screenPosition + new Vector2(0f, 0 + NPC.gfxOffY);
 
                 SpriteEffects direction = SpriteEffects.None;
 
@@ -925,8 +951,10 @@ namespace KirboMod.NPCs
                 Color color = NPC.GetAlpha(Color.White * NPC.Opacity) * ((NPC.oldPos.Length - k) / (float)NPC.oldPos.Length);
 
                 Main.EntitySpriteDraw(texture, drawPos, NPC.frame, color, NPC.rotation, drawOrigin, 1, direction);
-            }*/
-
+            
+            }
+             
+            */
             return true;
         }
 
@@ -947,17 +975,27 @@ namespace KirboMod.NPCs
                 offset = new Vector2(-50, 30);
             }
 
-            if ((attacktype == DarkMatterAttackType.Orbs && phase == 3) && NPC.ai[0] >= 70 && NPC.ai[0] <= 160) //enraged
+            //orb animation
+            if (attacktype == DarkMatterAttackType.Orbs)
             {
-                rotation = MathHelper.ToRadians(0);
-                direction = SpriteEffects.None;
-                offset = new Vector2(0, -20);
-            }
-            else if ((attacktype == DarkMatterAttackType.Orbs) && NPC.ai[0] >= 70 && NPC.ai[0] <= 90)  //regular
-            {
-                rotation = MathHelper.ToRadians(0);
-                direction = SpriteEffects.None;
-                offset = new Vector2(0, -20);
+                if (phase == 3 && NPC.ai[0] >= 100) //second phase
+                {
+                    rotation = MathHelper.ToRadians(0);
+                    direction = SpriteEffects.None;
+                    offset = new Vector2(0, -20);
+                }
+                else if (phase == 2 && NPC.ai[0] >= 70 && NPC.ai[0] <= 190) //buffed phase
+                {
+                    rotation = MathHelper.ToRadians(0);
+                    direction = SpriteEffects.None;
+                    offset = new Vector2(0, -20);
+                }
+                else if (phase == 1 && NPC.ai[0] >= 70 && NPC.ai[0] <= 90)  //regular
+                {
+                    rotation = MathHelper.ToRadians(0);
+                    direction = SpriteEffects.None;
+                    offset = new Vector2(0, -20);
+                }
             }
 
             if ((attacktype == DarkMatterAttackType.Dash && phase == 2) && NPC.ai[0] > 40) //change rotation for enrage dash
@@ -966,19 +1004,11 @@ namespace KirboMod.NPCs
             }
 
             Texture2D blade = DarkBlade.Value;
-            spriteBatch.Draw(blade, NPC.Center - Main.screenPosition + offset, null, new Color(255, 255, 255) * NPC.Opacity, rotation, new Vector2(19, 64), 1f, direction, 0f);
-        }
 
-        public override void BossHeadSlot(ref int index)
-        {
-            if (phase == 1 || phase == 2) //if in first phase or transitioning
-			{
-				index = ModContent.GetModBossHeadSlot("KirboMod/NPCs/DarkMatter_Head_Boss");
-			}
-			else //second phase
+            if (phase != 4) //draw when not transitioning
             {
-				index = ModContent.GetModBossHeadSlot("KirboMod/NPCs/DarkMatter_Head_Boss2");
-			}
+                spriteBatch.Draw(blade, NPC.Center - Main.screenPosition + offset, null, new Color(255, 255, 255) * NPC.Opacity, rotation, new Vector2(19, 64), 1f, direction, 0f);
+            }
         }
     }
 }

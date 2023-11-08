@@ -14,7 +14,6 @@ namespace KirboMod.NPCs
 {
 	public class ParosolDee : ModNPC
 	{
-        public ref float ranan => ref NPC.ai[1];
 
         public override void SetStaticDefaults() {
 			// DisplayName.SetDefault("Parasol Waddle Dee");
@@ -43,7 +42,8 @@ namespace KirboMod.NPCs
 			BannerItem = ModContent.ItemType<Items.Banners.ParosolWaddleDeeBanner>();
 			NPC.aiStyle = -1;
 			NPC.noGravity = false;
-		}
+            NPC.direction = Main.rand.NextBool(2) == true ? 1 : -1;
+        }
 
 		public override float SpawnChance(NPCSpawnInfo spawnInfo) 
 		{
@@ -133,31 +133,50 @@ namespace KirboMod.NPCs
             NPC.GravityMultiplier /= 4; 
 			NPC.MaxFallSpeedMultiplier /= 4;
 
-            if (NPC.ai[0] == 0)
+            //reroll direction
+            ++NPC.ai[0];
+
+            if (NPC.ai[0] >= 300)
             {
-                ranan = Main.rand.Next(0, 10);
-                NPC.netUpdate = true;
+                if (NPC.ai[0] >= 300)
+                {
+                    int ranan = Main.rand.Next(0, 10);
+
+                    if (ranan > 5)
+                    {
+                        NPC.direction = 1;
+                    }
+                    else
+                    {
+                        NPC.direction = -1;
+                    }
+                    NPC.netUpdate = true;
+
+                    NPC.ai[0] = 0f;
+                }
+
+                NPC.ai[0] = 0f;
             }
 
-            if (ranan > 5)
+            //turn around if touching wall for a while
+            if (NPC.collideX && NPC.velocity.Y == 0)
             {
-				NPC.direction = 1;
-			}
-            else
-            {
-				NPC.direction = -1;
-			}
-            
-			//reroll direction
-			++NPC.ai[0];
+                NPC.ai[1]++;
 
-			if (NPC.ai[0] >= 300)
+                if (NPC.ai[1] >= 180) //turn around
+                {
+                    NPC.direction *= -1;
+                    NPC.ai[1] = 0f;
+                    NPC.ai[0] = 1f;
+                }
+            }
+            else //reset
             {
-				NPC.ai[0] = 0f;
+                NPC.ai[1] = 0;
             }
 
-			//movement
-			float speed = 0.7f;
+            //movement
+            float speed = 0.7f;
 			float inertia = 20f;
 
 			Vector2 moveTo = NPC.Center + new Vector2(NPC.direction * 200, 0);

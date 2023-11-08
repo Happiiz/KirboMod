@@ -18,7 +18,9 @@ namespace KirboMod.NPCs
 		private int attack = -60; //0 is attack point
 		private bool attacking = false;
 
-		public override void SetStaticDefaults()
+        private bool jumped = false;
+
+        public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Burning Leo");
 			Main.npcFrameCount[NPC.type] = 8;
@@ -203,11 +205,22 @@ namespace KirboMod.NPCs
 
 			direction.Normalize();
 			direction *= speed;
-			if (NPC.velocity.Y == 0) //on ground (so it doesn't interfere with knockback)
-			{
+			if (NPC.velocity.Y == 0 || jumped == true) //walking/jumping (so it doesn't interfere with knockback)
+            {
 				NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
 			}
-		}
+
+            if (NPC.collideX && NPC.velocity.Y == 0) //hop if touching wall
+            {
+                NPC.velocity.Y = -5;
+                jumped = true;
+            }
+
+            if (NPC.velocity.Y == 0) //on ground
+            {
+                jumped = false;
+            }
+        }
 		private void Burn()
         {
 			Player player = Main.player[NPC.target];
@@ -247,22 +260,6 @@ namespace KirboMod.NPCs
 			}
         }
 
-		/*public override void OnKill()
-		{
-			if (Main.expertMode)
-			{
-				weaponchance = Main.rand.Next(1, 20);
-			}
-			else
-			{
-				weaponchance = Main.rand.Next(1, 40);
-			}
-			if (weaponchance == 1)
-			{
-				Item.NewItem(NPC.getRect(), ModContent.ItemType<Items.Weapons.Fire>());
-			}
-			Item.NewItem(NPC.getRect(), ModContent.ItemType<Items.Starbit>(), Main.rand.Next(4, 6));
-		}*/
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<Items.Weapons.Fire>(), 20, 10)); // 1 in 20 (5%) chance in Normal. 1 in 10 (10%) chance in Expert
