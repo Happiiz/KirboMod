@@ -260,8 +260,8 @@ namespace KirboMod
             DarkDashMovement(); //dark dash
 
             //KIRBY BALLOON (checks if already used all double jumps and rockets and player doesn't have mount)
-            if (kirbyballoon == true && airborne & player.canJumpAgain_Blizzard == false & player.canJumpAgain_Cloud == false 
-                & player.canJumpAgain_Fart == false & player.canJumpAgain_Sail == false & player.canJumpAgain_Sandstorm == false
+            if (kirbyballoon == true && airborne & player.GetJumpState(ExtraJump.BlizzardInABottle).Available == false & player.GetJumpState(ExtraJump.CloudInABottle).Available == false 
+                & player.GetJumpState(ExtraJump.FartInAJar).Available == false & player.GetJumpState(ExtraJump.TsunamiInABottle).Available == false & player.GetJumpState(ExtraJump.SandstormInABottle).Available == false
                 & !player.mount.Active)
             {
                 kirbyballoonwait -= 1; //go down

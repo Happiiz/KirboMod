@@ -23,16 +23,8 @@ namespace KirboMod.NPCs
 				Direction = -1,
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(NPC.type, value);
-
-            NPCDebuffImmunityData debuffData = new NPCDebuffImmunityData
-            {
-                SpecificallyImmuneTo = new int[]
-                {
-                    BuffID.Confused, // Most NPCs have this
-                }
-            };
-            NPCID.Sets.DebuffImmunitySets[Type] = debuffData;
-        }
+			NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true;
+		}
 
 		public override void SetDefaults() {
 			NPC.width = 38;

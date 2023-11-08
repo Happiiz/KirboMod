@@ -18,15 +18,8 @@ namespace KirboMod.NPCs
 			// DisplayName.SetDefault("Kabu");
 			Main.npcFrameCount[NPC.type] = 4;
 
-            NPCDebuffImmunityData debuffData = new NPCDebuffImmunityData
-            {
-                SpecificallyImmuneTo = new int[]
-                {
-                    BuffID.Confused, // Most NPCs have this
-                }
-            };
-            NPCID.Sets.DebuffImmunitySets[Type] = debuffData;
-        }
+			NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true;
+		}
 
 		public override void SetDefaults() {
 			NPC.width = 30;

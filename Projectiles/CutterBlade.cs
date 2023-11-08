@@ -111,7 +111,7 @@ namespace KirboMod.Projectiles
             return true; //kill like normal
         }
 
-        public override void Kill(int timeLeft)
+        public override void OnKill(int timeLeft)
 		{
 			if (Projectile.ai[1] != 1) //checks if not killed by player contact
 			{

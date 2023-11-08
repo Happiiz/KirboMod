@@ -85,7 +85,6 @@ namespace KirboMod.Items.DarkSword
         public float VisualRotation { get => Projectile.rotation - MathF.PI / 4; }
         public override void AI()
         {
-            Player player = Main.player[Projectile.owner];
             if (Dead)
             {
                 Projectile.timeLeft = 100;
@@ -138,7 +137,7 @@ namespace KirboMod.Items.DarkSword
             player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, VisualRotation - MathF.PI / 2 - player.fullRotation);
             Vector2 dirToPlayer = VisualRotation.ToRotationVector2();
             Projectile.position = player.RotatedRelativePoint(player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation)) - Projectile.Size / 2f + GetExtraUpdateAdjustmentOffset(player);
-            Projectile.position += dirToPlayer * 170 * Projectile.scale;
+            Projectile.position += dirToPlayer * 60 * Projectile.scale;
         }
         private Vector2 GetExtraUpdateAdjustmentOffset(Player player)
         {
@@ -179,27 +178,27 @@ namespace KirboMod.Items.DarkSword
             float timeLeft = UseTime - Timer;
 
             float fade = Utils.GetLerpValue(0, 5, timeLeft, true);
-            for (int i = rotations.Count - 1; i >= 1; i--)
-            {
-                float brightness = centers[i].Distance(centers[i - 1]);
-                brightness *= 0.02f;
-                (float toMin, float toMax) lightnessRemap = (0.5f, 0.85f);
-                if (Main.dayTime)
-                {
-                    lightnessRemap.toMin = 0.5f;
-                    lightnessRemap.toMax = 1;
-                    brightness *= 4;
-                }
-                float lightness = Utils.Remap(i, rotations.Count, 0.1f, lightnessRemap.toMin, lightnessRemap.toMax);
-                hslvec.Z = lightness;
-                Color col = Main.hslToRgb(hslvec);
-                if (!Main.dayTime)
-                    col.A = 0;
+            //for (int i = rotations.Count - 1; i >= 1; i--)
+            //{
+            //    float brightness = centers[i].Distance(centers[i - 1]);
+            //    brightness *= 0.02f;
+            //    (float toMin, float toMax) = (0.5f, 0.85f);
+            //    if (Main.dayTime)
+            //    {
+            //        toMin = 0.5f;
+            //        toMax = 1;
+            //        brightness *= 4;
+            //    }
+            //    float lightness = Utils.Remap(i, rotations.Count, 0.1f, toMin, toMax);
+            //    hslvec.Z = lightness;
+            //    Color col = Main.hslToRgb(hslvec);
+            //    if (!Main.dayTime)
+            //        col.A = 0;
 
-                brightness *= Utils.GetLerpValue(-Projectile.oldPos.Length, 0, timeLeft, true);
-                brightness *= fade;
-                Main.EntitySpriteDraw(texBack, centers[i], null, col * brightness * Utils.GetLerpValue(rotations.Count, rotations.Count / 2f, i, true), rotations[i], texBack.Size() / 2, Projectile.scale, SpriteEffects.None);
-            }
+            //    brightness *= Utils.GetLerpValue(-Projectile.oldPos.Length, 0, timeLeft, true);
+            //    brightness *= fade;
+            //    Main.EntitySpriteDraw(texBack, centers[i], null, col * brightness * Utils.GetLerpValue(rotations.Count, rotations.Count / 2f, i, true), rotations[i], texBack.Size() / 2, Projectile.scale, SpriteEffects.None);
+            //}
 
             if (Dead)
                 return false;
@@ -209,7 +208,7 @@ namespace KirboMod.Items.DarkSword
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
             float a = 0;
-            return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center - VisualRotation.ToRotationVector2() * 170 * Projectile.scale, Projectile.Center + VisualRotation.ToRotationVector2() * 170 * Projectile.scale, 70, ref a);
+            return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center - VisualRotation.ToRotationVector2() * 56.5f * Projectile.scale, Projectile.Center + VisualRotation.ToRotationVector2() * 56.5f * Projectile.scale, 70, ref a);
 
         }
     }

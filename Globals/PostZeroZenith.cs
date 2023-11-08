@@ -12,6 +12,7 @@ using Terraria.Graphics.Shaders;
 using Terraria.Graphics;
 using Microsoft.Xna.Framework.Audio;
 using Terraria.Audio;
+using KirboMod.Items.DarkSword;
 
 namespace KirboMod.Globals
 {

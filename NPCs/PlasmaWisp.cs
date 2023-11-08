@@ -20,15 +20,8 @@ namespace KirboMod.NPCs
 			// DisplayName.SetDefault("Plasma Wisp");
 			Main.npcFrameCount[NPC.type] = 6;
 
-            NPCDebuffImmunityData debuffData = new NPCDebuffImmunityData
-            {
-                SpecificallyImmuneTo = new int[]
-                {
-                    BuffID.Confused, // Most NPCs have this
-                }
-            };
-            NPCID.Sets.DebuffImmunitySets[Type] = debuffData;
-        }
+			NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true;
+		}
 
 		public override void SetDefaults()
 		{

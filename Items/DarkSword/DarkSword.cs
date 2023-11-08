@@ -52,22 +52,23 @@ namespace KirboMod.Items.DarkSword
             switch (projToShoot)
             {
                 case ProjectileShootType.DarkOrb:
-					for (float i = 0; i < 0.99f; i += 1f / 3f)
+					int amountOfOrbs = 4;
+					for (float i = 0; i < 1.01f; i += 1f / amountOfOrbs)
                     {
 						Vector2 shootVel = velocity.RotatedBy(MathHelper.Lerp(-1, 1, i));
 						Projectile.NewProjectile(source, position, shootVel, ModContent.ProjectileType<DarkSwordOrb>(), damage, knockback, player.whoAmI);
                     }
                     break;
                 case ProjectileShootType.DarkBeam:
-					for (float i = 0; i < 0.99f; i += 1f / 7f)
+					int amountOfBeams = 10;
+					for (float i = 0; i < 1.01f; i += 1f / amountOfBeams)
 					{
 						Vector2 shootVel = velocity.RotatedBy(MathHelper.Lerp(-1.6f, 1.6f, i));
-						float offset = direction == 1 ? MathHelper.Lerp(10, 0, i) : MathHelper.Lerp(0, 10, i);
-						Projectile.NewProjectile(source, position + Vector2.Normalize(shootVel) * offset, shootVel, ModContent.ProjectileType<DarkSwordBeam>(), damage, knockback, player.whoAmI);
+						Projectile.NewProjectile(source, position, shootVel * 0.5f, ModContent.ProjectileType<DarkSwordBeam>(), damage, knockback, player.whoAmI);
 					}
 					break;
                 case ProjectileShootType.DarkWave:
-					Projectile.NewProjectile(source, position + Vector2.Normalize(velocity) * 16, velocity, ModContent.ProjectileType<DarkSwordWave>(), damage, knockback, player.whoAmI);
+					Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<DarkSwordWave>(), damage, knockback, player.whoAmI);
                     break;
             }
             return false;

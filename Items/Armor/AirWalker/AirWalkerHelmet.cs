@@ -34,7 +34,7 @@ namespace KirboMod.Items.Armor.AirWalker
 		public override void UpdateArmorSet(Player player)  //set bonus perks
 		{
 			player.setBonus = "You have a cloud double jump";
-			player.hasJumpOption_Cloud = true;
+			player.GetJumpState(ExtraJump.CloudInABottle).Enable()/* tModPorter Suggestion: Call Enable() if setting this to true, otherwise call Disable(). */;
 		}
 	}
 }

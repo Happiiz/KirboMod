@@ -65,7 +65,7 @@ namespace KirboMod.Projectiles
 				Projectile.velocity = move; //movemove = player.Center - projectile.Center; //update player position
 			}
 		}
-		public override void Kill(int timeLeft) //when the projectile dies
+		public override void OnKill(int timeLeft) //when the projectile dies
         {
 			/*for (int i = 0; i < 10; i++)
 			{

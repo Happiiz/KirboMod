@@ -17,12 +17,12 @@ namespace KirboMod.Items.DarkSword
 			Projectile.height = 25;
 			Projectile.friendly = true;
 			Projectile.hostile = false;
-			Projectile.timeLeft = 60;
+			Projectile.timeLeft = 120;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
-
+			Projectile.extraUpdates = 1;
 			Projectile.usesLocalNPCImmunity = true;
-			Projectile.localNPCHitCooldown = 10;
+			Projectile.localNPCHitCooldown = 20;
 		}
 
 		ref float Timer { get => ref Projectile.ai[0]; }
@@ -31,7 +31,7 @@ namespace KirboMod.Items.DarkSword
 			Timer++;
 			Projectile.Opacity = Utils.GetLerpValue(0, 5, Timer, true);
 			Projectile.rotation = Projectile.velocity.ToRotation();
-			Projectile.velocity *= 0.96f;
+			Projectile.velocity *= 0.985f;
 
 			if (Main.rand.NextBool(10))
 			{
@@ -41,7 +41,7 @@ namespace KirboMod.Items.DarkSword
 			}
 		}
 
-		public override void Kill(int timeLeft) //when the projectile dies
+		public override void OnKill(int timeLeft) //when the projectile dies
 		{
 			for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 			{

@@ -58,7 +58,7 @@ namespace KirboMod.Projectiles
 			return true; //kill proj
 		}
 
-        public override void Kill(int timeLeft)
+        public override void OnKill(int timeLeft)
         {
 			SoundEngine.PlaySound(SoundID.NPCDeath15.WithVolumeScale(0.8f), Projectile.position); //snow
 

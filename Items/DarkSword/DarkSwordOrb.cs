@@ -28,11 +28,10 @@ namespace KirboMod.Items.DarkSword
         public override void AI()
         {
             Timer++;
-            Projectile.Opacity = Utils.GetLerpValue(0, 6, Timer, true);
+            Projectile.alpha -= 51;
             if(Timer > 1200)
                 Projectile.Kill();
-
-            Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, ModContent.DustType<Dusts.DarkResidue>(), Projectile.velocity.X * 0.25f, Projectile.velocity.Y * -0.5f, 200, default, 0.8f); //dust
+            Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, ModContent.DustType<Dusts.DarkResidue>(), Projectile.velocity.X * 0.3f, Projectile.velocity.Y * 0.3f, 200, default, 0.8f); //dust
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
@@ -43,8 +42,8 @@ namespace KirboMod.Items.DarkSword
             Projectile.penetrate--;
             return false;
         }
-        public override Color? GetAlpha(Color lightColor) => Color.White;
-        public override void Kill(int timeLeft)
+        public override Color? GetAlpha(Color lightColor) => Color.White * Projectile.Opacity;
+        public override void OnKill(int timeLeft)
         {
             for (int i = 0; i < 20; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
             {

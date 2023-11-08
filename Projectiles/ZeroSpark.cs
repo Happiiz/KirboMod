@@ -30,7 +30,7 @@ namespace KirboMod.Projectiles
 
 			Projectile.velocity *= 0.96f;
 		}
-         public override void Kill(int timeLeft) //when the projectile dies
+         public override void OnKill(int timeLeft) //when the projectile dies
          {
 			Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity *= 0, ModContent.ProjectileType<Projectiles.ZeroSparkExplosion>(), 100 / 2, 12f, Main.myPlayer);
          }

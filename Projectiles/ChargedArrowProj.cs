@@ -49,7 +49,7 @@ namespace KirboMod.Projectiles
 			return Color.White; // Makes it uneffected by light
 		}
 
-        public override void Kill(int timeLeft) //when the projectile dies
+        public override void OnKill(int timeLeft) //when the projectile dies
         {
             for (int i = 0; i < 5; i++)
             {
