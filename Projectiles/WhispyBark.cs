@@ -33,7 +33,7 @@ namespace KirboMod.Projectiles
             }
 			Projectile.rotation += 0.1f; // rotates projectile
 		}
-        public override void Kill(int timeLeft) //when the projectile dies
+        public override void OnKill(int timeLeft) //when the projectile dies
          {
              for (int i = 0; i < 5; i++)
              {

@@ -37,7 +37,7 @@ namespace KirboMod.Projectiles
 			Projectile.velocity.X *= 0; //stop
 		}
 
-        public override void Kill(int timeLeft) //when the projectile dies
+        public override void OnKill(int timeLeft) //when the projectile dies
          {
 			//crystal
 			for (int i = 0; i < 2; i++)

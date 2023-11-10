@@ -1,3 +1,4 @@
+using KirboMod.NPCs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -32,8 +33,6 @@ namespace KirboMod.Projectiles
 		{
 			Player player = Main.player[(int)Projectile.ai[1]]; //chooses npc target player
 
-			NPC darky = Main.npc[(int)Projectile.ai[2]];
-
 			if (Main.netMode == NetmodeID.SinglePlayer)
             {
 				player = Main.player[Main.myPlayer];
@@ -51,15 +50,9 @@ namespace KirboMod.Projectiles
 				Projectile.hostile = true; //hurt
 				move.Normalize();
 
-				if (darky.GetLifePercent() > 75 && !Main.expertMode)
-				{
-					move *= 15;
-				}
-				else //move faster if low or if expert mode
-				{
-                    move *= 30;
-                }
-				Projectile.velocity = move; //move
+                move *= 30;
+
+                Projectile.velocity = move; //move
 			}
 		}
 
@@ -76,7 +69,7 @@ namespace KirboMod.Projectiles
 			}
         }
 
-        public override void Kill(int timeLeft)
+        public override void OnKill(int timeLeft)
         {
 			for (int i = 0; i < 20; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 			{

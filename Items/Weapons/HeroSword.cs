@@ -37,6 +37,13 @@ namespace KirboMod.Items.Weapons
 
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {
+				velocity.X = 20;
+			}
+            else 
+            {
+                velocity.X = -20;
+            }
+            velocity.Y = 0;
         }
 
         public override void AddRecipes()

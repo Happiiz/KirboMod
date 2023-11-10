@@ -49,7 +49,7 @@ namespace KirboMod.Projectiles
 			Collision.StepUp(ref Projectile.position, ref Projectile.velocity, Projectile.width, Projectile.height, ref stepspeed, ref localgfxOffY);
 		}
 
-        public override void Kill(int timeLeft) //when the projectile dies
+        public override void OnKill(int timeLeft) //when the projectile dies
         {
             SoundEngine.PlaySound(SoundID.Item14, Projectile.position); //bomb sound
 

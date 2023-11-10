@@ -79,7 +79,7 @@ namespace KirboMod.Projectiles
                 }
             }
         }
-         public override void Kill(int timeLeft) //when the projectile dies
+         public override void OnKill(int timeLeft) //when the projectile dies
          {
             //damage is 10% of projectile damage times amount of chains made
 			Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * 0.01f, //no zero else it won't launch right

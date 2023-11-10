@@ -42,7 +42,7 @@ namespace KirboMod.Projectiles
 			}
         }
 
-        public override void Kill(int timeLeft) //when the projectile dies
+        public override void OnKill(int timeLeft) //when the projectile dies
         {
             for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
             {

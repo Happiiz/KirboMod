@@ -23,7 +23,7 @@ namespace KirboMod.Biomes
 
         public override bool IsSceneEffectActive(Player player)
         {
-            if (NPC.AnyNPCs(ModContent.NPCType<Zero>()) || NPC.AnyNPCs(ModContent.NPCType<PureDarkMatter>()) || NPC.AnyNPCs(ModContent.NPCType<ZeroEye>()))
+            if (NPC.AnyNPCs(ModContent.NPCType<Zero>()) || NPC.AnyNPCs(ModContent.NPCType<ZeroEye>()))
             {
                 //Disable these specific sky effects
                 SkyManager.Instance["Party"].Deactivate();

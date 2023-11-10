@@ -166,11 +166,11 @@ namespace KirboMod.Items.Weapons
 					//extra...
 					player.maxFallSpeed = 20;
 					player.noKnockback = true;
-                    player.canJumpAgain_Blizzard = false;
-                    player.canJumpAgain_Cloud = false;
-                    player.canJumpAgain_Sandstorm = false;
-                    player.canJumpAgain_Sail = false;
-                    player.canJumpAgain_Fart = false;
+                    player.GetJumpState(ExtraJump.BlizzardInABottle).Available = false;
+                    player.GetJumpState(ExtraJump.CloudInABottle).Available = false;
+                    player.GetJumpState(ExtraJump.SandstormInABottle).Available = false;
+                    player.GetJumpState(ExtraJump.TsunamiInABottle).Available = false;
+                    player.GetJumpState(ExtraJump.FartInAJar).Available = false;
                     player.dash = 0;
 
 					player.canRocket = false;
@@ -182,17 +182,11 @@ namespace KirboMod.Items.Weapons
 					player.GetModPlayer<KirbPlayer>().kirbyballoonwait = 1;
 
                     //double jump effects
-                    player.hasJumpOption_Blizzard = false;
-                    player.hasJumpOption_Cloud = false;
-                    player.hasJumpOption_Sandstorm = false;
-                    player.hasJumpOption_Sail = false;
-                    player.hasJumpOption_Fart = false;
-
-					player.isPerformingJump_Blizzard = false;
-                    player.isPerformingJump_Cloud = false;
-                    player.isPerformingJump_Sandstorm = false;
-                    player.isPerformingJump_Sail = false;
-                    player.isPerformingJump_Fart = false;
+                    player.GetJumpState(ExtraJump.BlizzardInABottle).Disable();
+                    player.GetJumpState(ExtraJump.CloudInABottle).Disable();
+                    player.GetJumpState(ExtraJump.SandstormInABottle).Disable();
+                    player.GetJumpState(ExtraJump.TsunamiInABottle).Disable();
+                    player.GetJumpState(ExtraJump.FartInAJar).Disable();
 
                     player.DryCollision(true, true); //fall through platforms
 

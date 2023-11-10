@@ -66,7 +66,7 @@ namespace KirboMod.Projectiles
                 }
             }
         }
-        public override void Kill(int timeLeft) //when the projectile dies
+        public override void OnKill(int timeLeft) //when the projectile dies
         {
 			Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + Projectile.velocity * 2, Projectile.velocity * 0.01f, //no zero else it won't launch right
                 ModContent.ProjectileType<Projectiles.RangerStarExplode>(), Projectile.damage, 8, Projectile.owner);

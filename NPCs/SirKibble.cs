@@ -16,7 +16,9 @@ namespace KirboMod.NPCs
         public ref float attack => ref NPC.localAI[0]; //the attack timer
         private bool attacking = false; //controls if in attacking state
 
-		public override void SetStaticDefaults()
+        private bool jumped = false;
+
+        public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Sir Kibble");
 			Main.npcFrameCount[NPC.type] = 7;
@@ -219,11 +221,22 @@ namespace KirboMod.NPCs
 			direction.Normalize(); //reduce to 1
 			direction *= speed; //equal speed
 
-			if (NPC.velocity.Y == 0) //on ground (so it doesn't interfere with knockback)
-			{
+			if (NPC.velocity.Y == 0 || jumped == true) //walking/jumping (so it doesn't interfere with knockback)
+            {
 				NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
 			}
-		}
+
+            if (NPC.collideX && NPC.velocity.Y == 0) //hop if touching wall
+            {
+                NPC.velocity.Y = -5;
+                jumped = true;
+            }
+
+            if (NPC.velocity.Y == 0) //on ground
+            {
+                jumped = false;
+            }
+        }
 		private void Throw()
         {
 			Player player = Main.player[NPC.target];
@@ -256,23 +269,6 @@ namespace KirboMod.NPCs
             }
         }
 
-        /*public override void OnKill()
-		{
-			if (Main.expertMode)
-			{
-				weaponchance = Main.rand.Next(1, 10);
-			}
-			else
-			{
-				weaponchance = Main.rand.Next(1, 20);
-			}
-			if (weaponchance == 1)
-			{
-				Item.NewItem(NPC.getRect(), ModContent.ItemType<Items.Weapons.Cutter>());
-			}
-			Item.NewItem(NPC.getRect(), ModContent.ItemType<Items.Starbit>(), Main.rand.Next(2, 3));
-		}*/
-
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<Items.Weapons.Cutter>(), 40, 20)); // 1 in 40 (2.5%) chance in Normal. 1 in 20 (5%) chance in Expert
@@ -285,10 +281,10 @@ namespace KirboMod.NPCs
             {
                 if (NPC.life <= 0)
                 {
-                    for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+                    for (int i = 0; i < 10; i++)
                     {
-                        Vector2 speed = Main.rand.NextVector2Unit(); //circle edge
-                        Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.LilStar>(), speed * 5, Scale: 1f); //Makes dust in a messy circle
+                        Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle edge
+                        Gore.NewGorePerfect(NPC.GetSource_FromAI(), NPC.Center, speed, Main.rand.Next(16, 18));
                     }
                     for (int i = 0; i < 5; i++)
                     {

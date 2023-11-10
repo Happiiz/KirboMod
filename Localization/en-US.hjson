@@ -479,7 +479,7 @@ Mods: {
 				Tooltip:
 					'''
 					Gives good dreams during the day
-					'Perfect place to attract nocturnal evil doers!'
+					'Its dreamlike aura attracts wicked nightmares to its presence'
 					'''
 			}
 
@@ -1348,6 +1348,9 @@ Mods: {
 			BioMinionSlashHitbox.DisplayName: Slash
 			RainbowSwordHeld.DisplayName: Rainbow Sword Held
 			RainbowSwordCraftingAnimation.DisplayName: Rainbow Sword Crafting Animation
+			DarkMatterLaser.DisplayName: Dark Matter Laser
+			DarkMatterLaserTelegraph.DisplayName: Dark Matter Laser Telegraph
+			MatterOrbVertical.DisplayName: Matter Orb
 		}
 
 		NPCs: {

@@ -39,7 +39,7 @@ namespace KirboMod.Projectiles
 			Projectile.Kill();
         }
 
-        public override void Kill(int timeLeft) //when the projectile dies
+        public override void OnKill(int timeLeft) //when the projectile dies
 		{
 			for (int i = 0; i < 4; i++)
 			{

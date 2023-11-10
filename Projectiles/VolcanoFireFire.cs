@@ -63,7 +63,7 @@ namespace KirboMod.Projectiles
                 }
             }
         }
-         public override void Kill(int timeLeft) //when the projectile dies
+         public override void OnKill(int timeLeft) //when the projectile dies
          {
 			Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * 0.01f, //no zero else it won't launch right
 				ModContent.ProjectileType<Projectiles.VolcanoFireExplode>(), Projectile.damage, 7f, Projectile.owner);

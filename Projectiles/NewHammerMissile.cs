@@ -37,7 +37,7 @@ namespace KirboMod.Projectiles
 
 			Projectile.spriteDirection = Projectile.direction; //face way its facing
 		}
-        public override void Kill(int timeLeft) //when the projectile dies
+        public override void OnKill(int timeLeft) //when the projectile dies
         {
 			for (int i = 0; i < 10; i++)
 			{

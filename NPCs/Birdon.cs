@@ -116,10 +116,10 @@ namespace KirboMod.NPCs
             {
                 if (NPC.life <= 0)
                 {
-                    for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+                    for (int i = 0; i < 10; i++)
                     {
-                        Vector2 speed = Main.rand.NextVector2Unit(); //circle edge
-                        Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.LilStar>(), speed * 5, Scale: 1f); //Makes dust in a messy circle
+                        Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle edge
+                        Gore.NewGorePerfect(NPC.GetSource_FromAI(), NPC.Center, speed, Main.rand.Next(16, 18));
                     }
                     for (int i = 0; i < 5; i++)
                     {
@@ -129,36 +129,6 @@ namespace KirboMod.NPCs
                 }
             }
         }
-
-		/*public override void OnKill()
-		{
-			Item.NewItem(NPC.getRect(), ModContent.ItemType<Items.DreamEssence>(), Main.rand.Next(2, 4));
-
-			if (Main.expertMode)
-			{
-				if (Main.rand.NextBool(2))
-				{
-					Item.NewItem(NPC.getRect(), ItemID.SoulofFlight, 1);
-				}
-
-				if (Main.rand.NextBool(50)) //drop sky blanket because kracko jr no longer spawns naturally in hardmode
-				{
-					Item.NewItem(NPC.getRect(), ModContent.ItemType<Items.SkyBlanket>(), 1);
-				}
-			}
-			else
-			{
-				if (Main.rand.NextBool(4))
-				{
-					Item.NewItem(NPC.getRect(), ItemID.SoulofFlight, 1);
-				}
-
-				if (Main.rand.NextBool(100)) //drop sky blanket because kracko jr no longer spawns naturally in hardmode
-				{
-					Item.NewItem(NPC.getRect(), ModContent.ItemType<Items.SkyBlanket>(), 1);
-				}
-			}
-		}*/
 
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {

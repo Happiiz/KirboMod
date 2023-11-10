@@ -133,7 +133,7 @@ namespace KirboMod.NPCs
 				new HyperzoneBackgroundProvider(), //I totally didn't reference the vanilla code what no way
 
 				// Sets the description of this NPC that is listed in the bestiary.
-				new FlavorTextBestiaryInfoElement("The ultimate leader of all dark matter. Uses it's leigon to blanket entire worlds in darkness.")
+				new FlavorTextBestiaryInfoElement("The ultimate leader of all dark matter. Uses its leigon to blanket entire worlds in darkness.")
 			}); 
         }
 

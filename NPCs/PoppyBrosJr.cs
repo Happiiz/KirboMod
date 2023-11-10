@@ -18,6 +18,8 @@ namespace KirboMod.NPCs
 	{
 		public ref float attackTimer => ref NPC.ai[0];
 		public ref float attacktype => ref NPC.ai[1];
+        
+        private bool jumped = false;
 
         public override void SetStaticDefaults()
 		{
@@ -196,10 +198,21 @@ namespace KirboMod.NPCs
 
             direction.Normalize();
             direction *= speed;
-			if (NPC.velocity.Y == 0) //on ground (so it doesn't interfere with knockback)
-			{
+			if (NPC.velocity.Y == 0 || jumped == true) //walking/jumping (so it doesn't interfere with knockback)
+            {
 				NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement	
 			}
+
+            if (NPC.collideX && NPC.velocity.Y == 0) //hop if touching wall
+            {
+                NPC.velocity.Y = -5;
+                jumped = true;
+            }
+
+            if (NPC.velocity.Y == 0) //on ground
+            {
+                jumped = false;
+            }
         }
 		private void Bomb()
         {
@@ -268,10 +281,10 @@ namespace KirboMod.NPCs
 		{
             if (NPC.life <= 0)
             {
-                for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+                for (int i = 0; i < 10; i++)
                 {
-                    Vector2 speed = Main.rand.NextVector2Unit(); //circle edge
-                    Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.LilStar>(), speed * 5, Scale: 1f); //Makes dust in a messy circle
+                    Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle edge
+                    Gore.NewGorePerfect(NPC.GetSource_FromAI(), NPC.Center, speed, Main.rand.Next(16, 18));
                 }
                 for (int i = 0; i < 5; i++)
                 {

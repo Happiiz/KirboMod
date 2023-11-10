@@ -129,7 +129,7 @@ namespace KirboMod.NPCs
 				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Surface,
 
 				// Sets the description of this NPC that is listed in the bestiary.
-				new FlavorTextBestiaryInfoElement("Flutters through the air in a zig-zag. Will push others out of the way to keep on it's path.")
+				new FlavorTextBestiaryInfoElement("Flutters through the air in a wave pattern. Will push others out of the way to keep on it's path.")
             });
         }
 
@@ -234,10 +234,10 @@ namespace KirboMod.NPCs
             {
                 if (NPC.life <= 0)
                 {
-                    for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+                    for (int i = 0; i < 10; i++)
                     {
-                        Vector2 speed = Main.rand.NextVector2Unit(); //circle edge
-                        Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.LilStar>(), speed * 5, Scale: 1f); //Makes dust in a messy circle
+                        Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle edge
+                        Gore.NewGorePerfect(NPC.GetSource_FromAI(), NPC.Center, speed, Main.rand.Next(16, 18));
                     }
                     for (int i = 0; i < 5; i++)
                     {

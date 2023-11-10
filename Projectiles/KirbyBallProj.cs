@@ -116,13 +116,13 @@ namespace KirboMod.Projectiles
 			return false; //no destroy plants and pots
         }
 
-        public override void Kill(int timeLeft) //when the projectile dies
+        public override void OnKill(int timeLeft) //when the projectile dies
 		{
 			for (int i = 0; i < 10; i++)
-			{
-				Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-				Dust d = Dust.NewDustPerfect(Projectile.Center, ModContent.DustType<Dusts.LilStar>(), speed, Scale: 1f); //Makes dust in a messy circle
-			}
+            {
+                Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
+                Gore.NewGorePerfect(Projectile.GetSource_FromAI(), Projectile.Center, speed, Main.rand.Next(16, 18));
+            }
 		}
 	}
 }

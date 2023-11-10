@@ -70,7 +70,7 @@ namespace KirboMod.Projectiles
             //Step up half tiles
             Collision.StepUp(ref Projectile.position, ref Projectile.velocity, Projectile.width, Projectile.height, ref Projectile.stepSpeed, ref Projectile.gfxOffY);
 		}
-        public override void Kill(int timeLeft) //when the projectile dies
+        public override void OnKill(int timeLeft) //when the projectile dies
         {
             Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * 0.01f, //no zero else it won't launch right
                 ModContent.ProjectileType<Projectiles.BombExplosion>(), Projectile.damage, 12, Projectile.owner);

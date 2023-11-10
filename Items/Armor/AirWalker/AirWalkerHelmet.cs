@@ -2,6 +2,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
 using Terraria.GameContent.Creative;
+using Terraria.DataStructures;
 
 namespace KirboMod.Items.Armor.AirWalker
 {
@@ -34,7 +35,7 @@ namespace KirboMod.Items.Armor.AirWalker
 		public override void UpdateArmorSet(Player player)  //set bonus perks
 		{
 			player.setBonus = "You have a cloud double jump";
-			player.hasJumpOption_Cloud = true;
+			player.GetJumpState(ExtraJump.CloudInABottle).Enable();
 		}
 	}
 }

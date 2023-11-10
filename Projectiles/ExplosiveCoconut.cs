@@ -41,7 +41,7 @@ namespace KirboMod.Projectiles
                 Projectile.rotation -= MathHelper.ToRadians(18);
             }
 		}
-         public override void Kill(int timeLeft) //when the projectile dies
+         public override void OnKill(int timeLeft) //when the projectile dies
          {
 			SoundEngine.PlaySound(SoundID.Item14, Projectile.position); //bomb sound
 
