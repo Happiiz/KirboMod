@@ -48,7 +48,7 @@ namespace KirboMod.NPCs
 				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Sky,
 
 				// Sets the description of this NPC that is listed in the bestiary.
-				new FlavorTextBestiaryInfoElement("Some speak of outer-planetary invaders zipping through the atmosphere. Will activate it's deadly defenses when approached by an unknown life form.")
+				new FlavorTextBestiaryInfoElement("Rarely some may see mysterious constructs floating around the atmosphere. They tend to open fire on suspicious life forms that get too close.")
             });
         }
 

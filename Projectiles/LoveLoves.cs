@@ -61,7 +61,7 @@ namespace KirboMod.Projectiles
 			}
 			return heartOffsets;
 		}
-		public override void Kill(int timeLeft)
+		public override void OnKill(int timeLeft)
         {
 			List<Vector2> offsets = Heart();
             for (int i = 0; i < offsets.Count; i++)

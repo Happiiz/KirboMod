@@ -108,12 +108,12 @@ namespace KirboMod.NPCs
                     if (NPC.GetLifePercent() < 0.5f && Main.expertMode)
                     {
                         phase = 3;
-                    }
 
-                    //Spin Move Time
-                    if (NPC.GetLifePercent() < 0.25f && Main.expertMode)
-                    {
-                        phase = 4;
+                        //Spin Move Percent
+                        if (NPC.GetLifePercent() < 0.25f && Main.expertMode)
+                        {
+                            phase = 4;
+                        }
                     }
                 }
                 else if (NPC.ai[0] > 30)
@@ -252,7 +252,7 @@ namespace KirboMod.NPCs
             //set dash amount
             if (NPC.ai[0] == 31 && phase != 1)
             {
-                NPC.ai[1] = 2;
+                NPC.ai[1] = 2; //actually 3
             }
 
             if (NPC.ai[0] < 150) //follow predicted player y for 120 ticks
@@ -662,7 +662,7 @@ namespace KirboMod.NPCs
             }
         }
 
-        private void AttackSpin() //"Then I hit 'em with my spin move"
+        private void AttackSpin() //"...Then I get it with my spin move"
         {
             Player player = Main.player[NPC.target];
             float speed = 30f;
