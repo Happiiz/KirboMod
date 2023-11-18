@@ -139,12 +139,12 @@ namespace KirboMod.Items.Weapons
                 player.GetModPlayer<KirbPlayer>().kirbyballoon = false;
                 player.GetModPlayer<KirbPlayer>().kirbyballoonwait = 1;
 
-                //double jump effects
-                player.GetJumpState(ExtraJump.BlizzardInABottle).Disable()/* tModPorter Suggestion: Remove. Active cannot be assigned a value. */;
-                player.GetJumpState(ExtraJump.CloudInABottle).Disable()/* tModPorter Suggestion: Remove. Active cannot be assigned a value. */;
-                player.GetJumpState(ExtraJump.SandstormInABottle).Disable()/* tModPorter Suggestion: Remove. Active cannot be assigned a value. */;
-                player.GetJumpState(ExtraJump.TsunamiInABottle).Disable()/* tModPorter Suggestion: Remove. Active cannot be assigned a value. */;
-                player.GetJumpState(ExtraJump.FartInAJar).Disable()/* tModPorter Suggestion: Remove. Active cannot be assigned a value. */;
+				//double jump effects
+				player.GetJumpState(ExtraJump.BlizzardInABottle).Disable();
+                player.GetJumpState(ExtraJump.CloudInABottle).Disable();
+                player.GetJumpState(ExtraJump.SandstormInABottle).Disable();
+                player.GetJumpState(ExtraJump.TsunamiInABottle).Disable();
+                player.GetJumpState(ExtraJump.FartInAJar).Disable();
 
                 player.DryCollision(true, true); //fall through platforms
 

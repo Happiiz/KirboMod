@@ -35,10 +35,6 @@ namespace KirboMod.Items.Weapons
 			Item.shootSpeed = 10f;
 		}
 
-        public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
-        {
-        }
-
         public override void AddRecipes()
 		{
 			Recipe recipe1 = CreateRecipe();//the result is herosword

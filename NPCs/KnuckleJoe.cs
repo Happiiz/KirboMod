@@ -21,6 +21,8 @@ namespace KirboMod.NPCs
         int walkTimer = 0;
         int walkDirection = 1; //determines whether the enemy will walk forward or backward
 
+        private bool jumped = false;
+
         public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Knuckle Joe");
@@ -305,6 +307,8 @@ namespace KirboMod.NPCs
             {
                 walkDirection = -1; //walk forward
             }
+
+            Jump();
         }
 
 		private void Sidestep() //back up or move forward randomly
@@ -340,7 +344,23 @@ namespace KirboMod.NPCs
                 }
             }
 
+            Jump();
+
             NPC.velocity.X = walkDirection * 1.6f;
+        }
+
+        private void Jump()
+        {
+            if (NPC.collideX && NPC.velocity.Y == 0) //hop if touching wall
+            {
+                NPC.velocity.Y = -5;
+                jumped = true;
+            }
+
+            if (NPC.velocity.Y == 0) //on ground
+            {
+                jumped = false;
+            }
         }
 
 		private void RapidPunch() //fires punches
@@ -417,10 +437,10 @@ namespace KirboMod.NPCs
             {
                 if (NPC.life <= 0)
                 {
-                    for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+                    for (int i = 0; i < 10; i++)
                     {
-                        Vector2 speed = Main.rand.NextVector2Unit(); //circle edge
-                        Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.LilStar>(), speed * 5, Scale: 1f); //Makes dust in a messy circle
+                        Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle edge
+                        Gore.NewGorePerfect(NPC.GetSource_FromAI(), NPC.Center, speed, Main.rand.Next(16, 18));
                     }
                     for (int i = 0; i < 5; i++)
                     {

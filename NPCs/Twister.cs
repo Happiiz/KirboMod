@@ -7,6 +7,8 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 
 namespace KirboMod.NPCs
 {
@@ -19,14 +21,19 @@ namespace KirboMod.NPCs
 		{
 			// DisplayName.SetDefault("Twister");
 			Main.npcFrameCount[NPC.type] = 4;
-		}
+
+            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
+            {
+                CustomTexturePath = "KirboMod/NPCs/BestiaryTextures/TwisterPortrait",
+            };
+            NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
+        }
 
 		public override void SetDefaults()
 		{
-			NPC.width = 33;
-			NPC.height = 33;
-			DrawOffsetY = -2; //make sprite line up with hitbox
-			NPC.damage = 30;
+			NPC.width = 34;
+			NPC.height = 34;
+            NPC.damage = 30;
 			NPC.defense = 10;
 			NPC.lifeMax = 50;
 			NPC.HitSound = SoundID.NPCHit4; //metal
@@ -60,7 +67,7 @@ namespace KirboMod.NPCs
 				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Marble,
 
 				// Sets the description of this NPC that is listed in the bestiary.
-				new FlavorTextBestiaryInfoElement("Look out! This little yellow top has the knack to spin violently towards intruders! But how does it go about without eyes or a mouth?")
+				new FlavorTextBestiaryInfoElement("Look out! This little yellow top has the knack to spin violently towards intruders! One could wonder how it goes about doing so without eyes.")
             });
         }
 
@@ -89,7 +96,7 @@ namespace KirboMod.NPCs
 			Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
 		}
 
-		public override void FindFrame(int frameHeight) // SPEEN
+		public override void FindFrame(int frameHeight) 
 		{
 			counting += 1.0;
 			if (counting < 5.0)
@@ -113,22 +120,6 @@ namespace KirboMod.NPCs
 				counting = 0.0;
 			}
 		}
-		/*public override void OnKill()
-		{
-			if (Main.expertMode)
-			{
-				weaponchance = Main.rand.Next(1, 10);
-			}
-			else
-			{
-				weaponchance = Main.rand.Next(1, 20);
-			}
-			if (weaponchance == 1)
-			{
-				Item.NewItem(NPC.getRect(), ModContent.ItemType<Items.Weapons.Tornado>());
-			}
-			Item.NewItem(NPC.getRect(), ModContent.ItemType<Items.Starbit>(), Main.rand.Next(4, 5));
-		}*/
 
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
@@ -142,10 +133,10 @@ namespace KirboMod.NPCs
             {
                 if (NPC.life <= 0)
                 {
-                    for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+                    for (int i = 0; i < 10; i++) 
                     {
-                        Vector2 speed = Main.rand.NextVector2Unit(); //circle edge
-                        Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.LilStar>(), speed * 5, Scale: 1f); //Makes dust in a messy circle
+                        Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle edge
+                        Gore.NewGorePerfect(NPC.GetSource_FromAI(), NPC.Center, speed, Main.rand.Next(16, 18));
                     }
                     for (int i = 0; i < 5; i++)
                     {
@@ -155,5 +146,22 @@ namespace KirboMod.NPCs
                 }
             }
         }
-	}
+
+        public static Asset<Texture2D> Twisty;
+
+        public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+        {
+            Main.instance.LoadNPC(NPC.type);
+            Twisty = ModContent.Request<Texture2D>(Texture);
+            Texture2D texture = Twisty.Value;
+
+            Vector2 drawOrigin = new Vector2(texture.Width / 2, 40);
+            Vector2 drawPos = NPC.Center - Main.screenPosition + new Vector2(0f, 20 + NPC.gfxOffY);
+
+            Main.EntitySpriteDraw(texture, drawPos, NPC.frame, drawColor, MathHelper.ToRadians(NPC.velocity.X * 2), drawOrigin, 1f, SpriteEffects.None);
+
+            return false;
+        }
+
+    }
 }

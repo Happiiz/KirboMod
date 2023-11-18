@@ -103,8 +103,7 @@ namespace KirboMod.Items.Weapons
             for (int i = 0; i < 5; i++) // inital statement ; conditional ; loop
             {
                 Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-                Dust dust = Dust.NewDustPerfect(target.Center, ModContent.DustType<Dusts.LilStar>(), speed, Main.rand.Next(1, 2)); //Makes dust in a messy circle
-                dust.noGravity = true;
+                Gore.NewGorePerfect(target.GetSource_FromThis(), target.Center, speed, Main.rand.Next(16, 18));
             }
 
             SoundStyle Squeak = new SoundStyle("KirboMod/Sounds/Item/Squeak");
@@ -118,8 +117,7 @@ namespace KirboMod.Items.Weapons
             for (int i = 0; i < 5; i++) // inital statement ; conditional ; loop
             {
                 Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-                Dust dust = Dust.NewDustPerfect(target.Center, ModContent.DustType<Dusts.LilStar>(), speed, Main.rand.Next(1, 2)); //Makes dust in a messy circle
-                dust.noGravity = true;
+                Gore.NewGorePerfect(target.GetSource_FromThis(), target.Center, speed, Main.rand.Next(16, 18));
             }
 
             SoundStyle Squeak = new SoundStyle("KirboMod/Sounds/Item/Squeak");

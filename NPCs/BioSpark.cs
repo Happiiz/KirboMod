@@ -22,7 +22,10 @@ namespace KirboMod.NPCs
         int walkDirection = 1; //determines whether the enemy will walk forward or backward
 
         private int attacktype = 0;
-		public override void SetStaticDefaults()
+
+        private bool jumped = false;
+
+        public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Bio Spark");
 			Main.npcFrameCount[NPC.type] = 16;
@@ -213,6 +216,8 @@ namespace KirboMod.NPCs
             {
                 walkDirection = -1; //walk forward
             }
+
+            Jump();
         }
 
 		private void Sidestep()
@@ -248,10 +253,26 @@ namespace KirboMod.NPCs
                 }
             }
 
+            Jump();
+
             NPC.velocity.X = walkDirection * 2.5f;
         }
 
-		private void Slash() //draws sword
+        private void Jump()
+        {
+            if (NPC.collideX && NPC.velocity.Y == 0) //hop if touching wall
+            {
+                NPC.velocity.Y = -5;
+                jumped = true;
+            }
+
+            if (NPC.velocity.Y == 0) //on ground
+            {
+                jumped = false;
+            }
+        }
+
+        private void Slash() //draws sword
         {
             if (attackTimer < 120 + 30) //stance
             {
@@ -406,17 +427,17 @@ namespace KirboMod.NPCs
 		{
 			if (NPC.life <= 0)
 			{
-				for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-				{
-					Vector2 speed = Main.rand.NextVector2Unit(); //circle edge
-					Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.LilStar>(), speed * 5, Scale: 1f); //Makes dust in a messy circle
-				}
-				for (int i = 0; i < 5; i++)
-				{
-					Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-					Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center, speed, Main.rand.Next(11, 13), Scale: 1f); //double jump smoke
-				}
-			}
+                for (int i = 0; i < 10; i++)
+                {
+                    Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle edge
+                    Gore.NewGorePerfect(NPC.GetSource_FromAI(), NPC.Center, speed, Main.rand.Next(16, 18));
+                }
+                for (int i = 0; i < 5; i++)
+                {
+                    Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
+                    Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center, speed, Main.rand.Next(11, 13), Scale: 1f); //double jump smoke
+                }
+            }
 		}
 
         public override void ModifyHoverBoundingBox(ref Rectangle boundingBox) //box where NPC name and health is shown

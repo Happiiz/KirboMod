@@ -33,7 +33,7 @@ namespace KirboMod.Projectiles
 
             if (Main.rand.NextBool(10)) // happens 1/10 times
             {
-                int dustnumber = Dust.NewDust(Projectile.position, 14, 14, ModContent.DustType<Dusts.LilStar>(), Projectile.velocity.X, Projectile.velocity.Y, 0, default, 0.5f); //dust
+                int dustnumber = Dust.NewDust(Projectile.position, 14, 14, DustID.Enchanted_Gold, 0f, 0f, 200, default, 1f); //dust
                 Main.dust[dustnumber].velocity *= 0.2f;
                 Main.dust[dustnumber].noGravity = true;
             }
@@ -44,7 +44,7 @@ namespace KirboMod.Projectiles
             for (int i = 0; i < 3; i++)
             {
                 Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-                Dust.NewDustPerfect(Projectile.Center + Projectile.velocity, ModContent.DustType<Dusts.LilStar>(), speed, Scale: 1f); //Makes dust in a messy circle
+                Dust.NewDustPerfect(Projectile.Center + Projectile.velocity, DustID.Enchanted_Gold, speed, Scale: 1f); //Makes dust in a messy circle
             }
         }
 

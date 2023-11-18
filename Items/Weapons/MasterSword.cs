@@ -188,6 +188,12 @@ namespace KirboMod.Items.Weapons
                     player.GetJumpState(ExtraJump.TsunamiInABottle).Disable()/* tModPorter Suggestion: Call Enable() if setting this to true, otherwise call Disable(). */;
                     player.GetJumpState(ExtraJump.FartInAJar).Disable()/* tModPorter Suggestion: Call Enable() if setting this to true, otherwise call Disable(). */;
 
+					player.isPerformingJump_Blizzard = false;
+                    player.isPerformingJump_Cloud = false;
+                    player.isPerformingJump_Sandstorm = false;
+                    player.isPerformingJump_Sail = false;
+                    player.isPerformingJump_Fart = false;
+
                     player.DryCollision(true, true); //fall through platforms
 
 					player.mount.Dismount(player); //dismount mounts

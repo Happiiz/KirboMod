@@ -31,24 +31,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\User\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\abdou\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\User\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\KirboMod\\KirboMod.csproj",
+      "projectUniqueName": "C:\\Users\\abdou\\OneDrive\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\KirboMod\\KirboMod.csproj",
       "projectName": "KirboMod",
-      "projectPath": "C:\\Users\\User\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\KirboMod\\KirboMod.csproj",
-      "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\User\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\KirboMod\\obj\\",
+      "projectPath": "C:\\Users\\abdou\\OneDrive\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\KirboMod\\KirboMod.csproj",
+      "packagesPath": "C:\\Users\\abdou\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\abdou\\OneDrive\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\KirboMod\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\abdou\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -85,7 +80,8 @@
           "net47",
           "net471",
           "net472",
-          "net48"
+          "net48",
+          "net481"
         ],
         "assetTargetFallback": true,
         "warn": true,
@@ -94,7 +90,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.125\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.100\\RuntimeIdentifierGraph.json"
       }
     }
   }

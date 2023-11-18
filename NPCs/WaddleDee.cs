@@ -11,8 +11,6 @@ namespace KirboMod.NPCs
 {
 	public class WaddleDee : ModNPC
 	{
-        public ref float ranan => ref NPC.ai[2];
-
         public override void SetStaticDefaults() {
 			// DisplayName.SetDefault("Waddle Dee");
 			Main.npcFrameCount[NPC.type] = 8;
@@ -31,6 +29,7 @@ namespace KirboMod.NPCs
 			BannerItem = ModContent.ItemType<Items.Banners.WaddleDeeBanner>();
 			NPC.aiStyle = -1;
 			NPC.noGravity = false;
+			NPC.direction = Main.rand.NextBool(2) == true ? 1 : -1;
 		}
 
 		public override float SpawnChance(NPCSpawnInfo spawnInfo) 
@@ -129,42 +128,51 @@ namespace KirboMod.NPCs
 			}); 
         }
 
-        public override void SendExtraAI(BinaryWriter writer)
-        {
-            writer.Write(ranan); //send non NPC.ai array info to servers
-        }
-
-        public override void ReceiveExtraAI(BinaryReader reader)
-        {
-            ranan = reader.ReadInt32(); //sync in multiplayer
-        }
-
         public override void AI() //constantly cycles each time
         {
 			NPC.spriteDirection = NPC.direction;
-
-            if (NPC.ai[0] == 0)
-            {
-                ranan = Main.rand.Next(0, 10);
-                NPC.netUpdate = true;
-            }
-
-            if (ranan > 5)
-            {
-                NPC.direction = 1;
-            }
-            else
-            {
-                NPC.direction = -1;
-            }
 
             //reroll direction
             ++NPC.ai[0];
 
             if (NPC.ai[0] >= 300)
             {
+                if (NPC.ai[0] >= 300)
+                {
+                    int ranan = Main.rand.Next(0, 10);
+
+                    if (ranan > 5)
+                    {
+                        NPC.direction = 1;
+                    }
+                    else
+                    {
+                        NPC.direction = -1;
+                    }
+                    NPC.netUpdate = true;
+
+                    NPC.ai[0] = 0f;
+                }
+
                 NPC.ai[0] = 0f;
             }
+
+            //turn around if touching wall for a while
+            if (NPC.collideX && NPC.velocity.Y == 0) 
+            {
+				NPC.ai[1]++;
+
+				if (NPC.ai[1] >= 180) //turn around
+				{
+                    NPC.direction *= -1;
+					NPC.ai[1] = 0f;
+                    NPC.ai[0] = 1f;
+                }
+            }
+			else //reset
+			{
+				NPC.ai[1] = 0;
+			}
 
             //movement
             float speed = 0.7f;
@@ -228,10 +236,10 @@ namespace KirboMod.NPCs
 		{
             if (NPC.life <= 0)
             {
-                for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+                for (int i = 0; i < 5; i++) //first section makes inital statement once //second declares the conditional they must follow // third declares the loop
                 {
-                    Vector2 speed = Main.rand.NextVector2Unit(); //circle edge
-                    Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.LilStar>(), speed * 5, Scale: 1f); //Makes dust in a messy circle
+                    Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle edge
+                    Gore.NewGorePerfect(NPC.GetSource_FromAI(), NPC.Center, speed, Main.rand.Next(16, 18));
                 }
                 for (int i = 0; i < 5; i++)
                 {

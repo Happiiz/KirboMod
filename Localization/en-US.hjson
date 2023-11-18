@@ -479,7 +479,7 @@ Mods: {
 				Tooltip:
 					'''
 					Gives good dreams during the day
-					'Perfect place to attract nocturnal evil doers!'
+					'Its dreamlike aura attracts wicked nightmares to its presence'
 					'''
 			}
 
@@ -1352,6 +1352,9 @@ Mods: {
 			DarkSwordHeld.DisplayName: Dark Sword Held
 			DarkSwordOrb.DisplayName: Dark Sword Orb
 			DarkSwordWave.DisplayName: Dark Sword Wave
+			DarkMatterLaser.DisplayName: Dark Matter Laser
+			DarkMatterLaserTelegraph.DisplayName: Dark Matter Laser Telegraph
+			MatterOrbVertical.DisplayName: Matter Orb
 		}
 
 		NPCs: {
