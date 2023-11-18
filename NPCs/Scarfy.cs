@@ -18,20 +18,13 @@ namespace KirboMod.NPCs
 			// DisplayName.SetDefault("Scarfy");
 			Main.npcFrameCount[NPC.type] = 6;
 
-			NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
+			NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers()
 			{
 				Direction = -1,
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(NPC.type, value);
 
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true; //immune to not mess up movement
-        }
-                SpecificallyImmuneTo = new int[]
-                {
-                    BuffID.Confused, // Most NPCs have this
-                }
-            };
-            NPCID.Sets.DebuffImmunitySets[Type] = debuffData;
         }
 
 		public override void SetDefaults() {
