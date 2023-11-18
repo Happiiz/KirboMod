@@ -222,8 +222,6 @@ namespace KirboMod.Items.Weapons
 		public override void AddRecipes()
 		{
 			Recipe recipe1 = CreateRecipe();//the result is mastersword
-			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.HeroSword>()); //Hero Sword
-			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.GigantSword>()); //Big Hero Sword
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.MetaKnightSword>()); //Knight Hero Sword
 			recipe1.AddIngredient(ModContent.ItemType<Items.RainbowSword.RainbowSword>()); //Epilespy Hero Sword
 			recipe1.AddIngredient(ModContent.ItemType<Items.DarkSword.DarkSword>()); //Edgy Hero Sword
