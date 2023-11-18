@@ -27,13 +27,6 @@ namespace KirboMod.Items.DarkSword
             Projectile.scale *= 1.9f;
             Projectile.timeLeft = 10 * 60 * Projectile.MaxUpdates;
         }
-        //delete this
-        static void AABBLineVisualizer(Vector2 lineStart, Vector2 lineEnd, float lineWidth)
-        {
-            Texture2D blankTexture = Terraria.GameContent.TextureAssets.Extra[195].Value;
-            Vector2 texScale = new Vector2((lineStart - lineEnd).Length(), lineWidth) * 0.00390625f;//1/256, texture is 256x256
-            Main.EntitySpriteDraw(blankTexture, (lineStart) - Main.screenPosition, null, Color.Red, (lineEnd - lineStart).ToRotation(), new Vector2(0, 128), texScale, SpriteEffects.None);
-        }
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
             float a = 86;
