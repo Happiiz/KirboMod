@@ -682,7 +682,7 @@ Mods: {
 
 			DarkSword: {
 				DisplayName: Dark Sword
-				Tooltip: Fire dark beams within a short range
+				Tooltip: Fires dark beams, dark orbs, and large dark Waves
 			}
 
 			DooStaff: {
@@ -1348,6 +1348,10 @@ Mods: {
 			BioMinionSlashHitbox.DisplayName: Slash
 			RainbowSwordHeld.DisplayName: Rainbow Sword Held
 			RainbowSwordCraftingAnimation.DisplayName: Rainbow Sword Crafting Animation
+			DarkSwordBeam.DisplayName: Dark Sword Beam
+			DarkSwordHeld.DisplayName: Dark Sword Held
+			DarkSwordOrb.DisplayName: Dark Sword Orb
+			DarkSwordWave.DisplayName: Dark Sword Wave
 			DarkMatterLaser.DisplayName: Dark Matter Laser
 			DarkMatterLaserTelegraph.DisplayName: Dark Matter Laser Telegraph
 			MatterOrbVertical.DisplayName: Matter Orb

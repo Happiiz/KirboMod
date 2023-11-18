@@ -34,8 +34,8 @@ namespace KirboMod.Projectiles
 			Projectile.penetrate = -1;
 			Projectile.usesLocalNPCImmunity = true; //uses own immunity frames
 			Projectile.extraUpdates = 3;//detect collision more often to more accurately get a collision point
-			Projectile.localNPCHitCooldown = 10; //time before hit again, very short to really get the feeling that this grinds enemies
-			Projectile.ArmorPenetration = 10; 
+			Projectile.localNPCHitCooldown = 7; //time before hit again, very short to really get the feeling that this grinds enemies
+			Projectile.ArmorPenetration = 18; 
 		}
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
@@ -45,7 +45,7 @@ namespace KirboMod.Projectiles
         public override void AI()
 		{
 			Player player = Main.player[Projectile.owner];
-			Projectile.rotation -= 0.07f; // rotates projectile
+			Projectile.rotation -= 0.12f; // rotates projectile
 			if (Projectile.ai[0] == 0)
 				NPCToStickTo = -1;
 			Projectile.ai[0]++;
@@ -114,7 +114,7 @@ namespace KirboMod.Projectiles
 			{
 				Projectile.ai[1]++;
 				Projectile.ai[0] = 39;
-                Projectile.damage = Projectile.originalDamage / 9; //reduce damage while grinding
+				Projectile.damage = Projectile.originalDamage / 3;
                 if (NPCToStickTo == -1)
 				{
 					Projectile.velocity *= 0;
@@ -126,11 +126,14 @@ namespace KirboMod.Projectiles
 			}
 
             //dust
-            for (int i = 0; i < 3; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+            for (int i = 0; i < 4; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
             {
 				Vector2 speed = Vector2.Normalize(posOffsetToNPCCenter).RotatedBy(MathF.PI / 2);
+				int dustType = Main.rand.NextBool() ? DustID.Torch : DustID.SpelunkerGlowstickSparkle;
 				speed = speed.RotatedByRandom(0.3f) *( 10 + Main.rand.NextFloat() * 5f);
-                Dust d = Dust.NewDustPerfect(Projectile.Center - Vector2.Normalize(posOffsetToNPCCenter) * 55, DustID.Torch, speed, Scale: 2f);
+				if (dustType != DustID.Torch)
+					speed *= 2;
+                Dust d = Dust.NewDustPerfect(Projectile.Center - Vector2.Normalize(posOffsetToNPCCenter) * 55, dustType, speed, Scale: 2f);
                 d.noGravity = false;
             }
         }

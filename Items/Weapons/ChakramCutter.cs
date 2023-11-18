@@ -33,7 +33,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = false;
 			Item.shoot = ModContent.ProjectileType<Projectiles.ChakramCutterProj>();
-			Item.shootSpeed = 35f;
+			Item.shootSpeed = 45;
 			Item.autoReuse = true; 
 			Item.noUseGraphic = true;
 		}
@@ -41,10 +41,10 @@ namespace KirboMod.Items.Weapons
         {
 			if (Main.myPlayer != player.whoAmI)
 				return false;
-            for (int i = 0; i < 2; i++)
+            for (int i = -1; i < 2; i+=2)
             {
-				int delayBeforeSecondChakramFires = 16;
-				Projectile.NewProjectileDirect(source, position + velocity.RotatedBy(MathF.PI / 2 + i * MathF.PI), velocity, type, damage, knockback, player.whoAmI, -delayBeforeSecondChakramFires * i, i == 0 ? 1 : -1);
+				int delayBeforeSecondChakramFires = 16 * (i == -1 ? 0 : 1);
+				Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockback, player.whoAmI, -delayBeforeSecondChakramFires, i);
             }
 			return false;
         }

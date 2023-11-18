@@ -181,12 +181,12 @@ namespace KirboMod.Items.Weapons
 					player.GetModPlayer<KirbPlayer>().kirbyballoon = false;
 					player.GetModPlayer<KirbPlayer>().kirbyballoonwait = 1;
 
-                    //double jump effects
-                    player.GetJumpState(ExtraJump.BlizzardInABottle).Disable();
-                    player.GetJumpState(ExtraJump.CloudInABottle).Disable();
-                    player.GetJumpState(ExtraJump.SandstormInABottle).Disable();
-                    player.GetJumpState(ExtraJump.TsunamiInABottle).Disable();
-                    player.GetJumpState(ExtraJump.FartInAJar).Disable();
+					//double jump effects
+					player.GetJumpState(ExtraJump.BlizzardInABottle).Disable();/* tModPorter Suggestion: Call Enable() if setting this to true, otherwise call Disable(). */;
+                    player.GetJumpState(ExtraJump.CloudInABottle).Disable()/* tModPorter Suggestion: Call Enable() if setting this to true, otherwise call Disable(). */;
+                    player.GetJumpState(ExtraJump.SandstormInABottle).Disable()/* tModPorter Suggestion: Call Enable() if setting this to true, otherwise call Disable(). */;
+                    player.GetJumpState(ExtraJump.TsunamiInABottle).Disable()/* tModPorter Suggestion: Call Enable() if setting this to true, otherwise call Disable(). */;
+                    player.GetJumpState(ExtraJump.FartInAJar).Disable()/* tModPorter Suggestion: Call Enable() if setting this to true, otherwise call Disable(). */;
 
                     player.DryCollision(true, true); //fall through platforms
 
@@ -222,11 +222,9 @@ namespace KirboMod.Items.Weapons
 		public override void AddRecipes()
 		{
 			Recipe recipe1 = CreateRecipe();//the result is mastersword
-			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.HeroSword>()); //Hero Sword
-			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.GigantSword>()); //Big Hero Sword
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.MetaKnightSword>()); //Knight Hero Sword
 			recipe1.AddIngredient(ModContent.ItemType<Items.RainbowSword.RainbowSword>()); //Epilespy Hero Sword
-			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.DarkSword>()); //Edgy Hero Sword
+			recipe1.AddIngredient(ModContent.ItemType<Items.DarkSword.DarkSword>()); //Edgy Hero Sword
 			recipe1.AddIngredient(ModContent.ItemType<MiracleMatter>()); //Zero material drop
 			recipe1.AddTile(TileID.LunarCraftingStation); //crafted at ancient manipulator
 			recipe1.Register(); //adds this recipe to the game

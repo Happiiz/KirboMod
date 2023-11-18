@@ -150,7 +150,7 @@ namespace KirboMod.NPCs
 			// DisplayName.SetDefault("Kracko");
 			Main.npcFrameCount[NPC.type] = 2;
 
-			NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
+			NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers()
 			{
 				CustomTexturePath = "KirboMod/NPCs/BestiaryTextures/KrackoPortrait",
 				PortraitScale = 0.75f, // Portrait refers to the full picture when clicking on the icon in the bestiary

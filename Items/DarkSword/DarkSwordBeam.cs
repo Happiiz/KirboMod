@@ -1,0 +1,73 @@
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Terraria;
+using Terraria.ModLoader;
+namespace KirboMod.Items.DarkSword
+{
+    internal class DarkSwordBeam : ModProjectile
+    {
+		public override void SetDefaults()
+		{
+			Projectile.width = 25;
+			Projectile.height = 25;
+			Projectile.friendly = true;
+			Projectile.hostile = false;
+			Projectile.timeLeft = 120;
+			Projectile.tileCollide = false;
+			Projectile.penetrate = -1;
+			Projectile.extraUpdates = 1;
+			Projectile.usesLocalNPCImmunity = true;
+			Projectile.localNPCHitCooldown = 20;
+			Projectile.alpha = 255;
+		}
+
+		ref float Timer { get => ref Projectile.ai[0]; }
+		public override void AI()
+		{
+			Timer++;
+			if (Timer < 0)
+			{
+				Player player = Main.player[Projectile.owner];
+				Projectile.Center = player.RotatedRelativePoint(player.MountedCenter) - Projectile.velocity;
+				return;
+			}
+			Projectile.Opacity = Utils.GetLerpValue(0, 5, Timer, true);
+			Projectile.rotation = Projectile.velocity.ToRotation();
+			Projectile.velocity *= 0.985f;
+
+			if (Main.rand.NextBool(10))
+			{
+				int dustnumber = Dust.NewDust(Projectile.position, 76, 18, ModContent.DustType<Dusts.DarkResidue>(), 0f, 0f, 200, default, 0.8f); //dust
+				Main.dust[dustnumber].velocity *= 0.3f;
+				Main.dust[dustnumber].noGravity = true;
+			}
+		}
+
+		public override void OnKill(int timeLeft) //when the projectile dies
+		{
+			for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+			{
+				Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
+				Dust d = Dust.NewDustPerfect(Projectile.Center, ModContent.DustType<Dusts.DarkResidue>(), speed); //Makes dust in a messy circle
+				d.noGravity = true;
+			}
+		}
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+        {
+			float unused = 86555;
+			Vector2 length = new Vector2(50, 0).RotatedBy(Projectile.rotation);
+            return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center - length, Projectile.Center + length, 24, ref unused);
+        }
+        public override bool PreDraw(ref Color lightColor)
+        {
+			Texture2D tex = Terraria.GameContent.TextureAssets.Projectile[Type].Value;
+			Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, null, Color.White * Projectile.Opacity, Projectile.rotation, tex.Size() / 2, Projectile.scale, SpriteEffects.None);
+			return false;
+        }
+    }
+}
