@@ -24,18 +24,33 @@ namespace KirboMod.Items.DarkSword
             Projectile.usesLocalNPCImmunity = true;
             Projectile.penetrate = -1;
             Projectile.alpha = 255;
+            Projectile.scale *= 1.9f;
+            Projectile.timeLeft = 10 * 60 * Projectile.MaxUpdates;
+        }
+        //delete this
+        static void AABBLineVisualizer(Vector2 lineStart, Vector2 lineEnd, float lineWidth)
+        {
+            Texture2D blankTexture = Terraria.GameContent.TextureAssets.Extra[195].Value;
+            Vector2 texScale = new Vector2((lineStart - lineEnd).Length(), lineWidth) * 0.00390625f;//1/256, texture is 256x256
+            Main.EntitySpriteDraw(blankTexture, (lineStart) - Main.screenPosition, null, Color.Red, (lineEnd - lineStart).ToRotation(), new Vector2(0, 128), texScale, SpriteEffects.None);
         }
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
             float a = 86;
-            Vector2 offset = new Vector2(0, 128).RotatedBy(Projectile.rotation);
+            Vector2 offset = 64 * (Projectile.rotation + MathF.PI * 0.5f).ToRotationVector2() * Projectile.scale;
             return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center - offset, Projectile.Center + offset, 132, ref a);
         }
         public override void AI()
         {
-            Projectile.rotation = Projectile.velocity.ToRotation();
-            Projectile.Opacity += 0.33f;
             Projectile.ai[0]++;
+            if(Projectile.ai[0] < 0)
+            {
+                Player player = Main.player[Projectile.owner];
+                Projectile.Center = player.RotatedRelativePoint(player.MountedCenter) - Projectile.velocity;
+                return;
+            }
+            Projectile.rotation = Projectile.velocity.ToRotation();
+            Projectile.Opacity += .111f;
 
         }
         public override bool PreDraw(ref Color lightColor)

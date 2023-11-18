@@ -23,12 +23,19 @@ namespace KirboMod.Items.DarkSword
 			Projectile.extraUpdates = 1;
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = 20;
+			Projectile.alpha = 255;
 		}
 
 		ref float Timer { get => ref Projectile.ai[0]; }
 		public override void AI()
 		{
 			Timer++;
+			if (Timer < 0)
+			{
+				Player player = Main.player[Projectile.owner];
+				Projectile.Center = player.RotatedRelativePoint(player.MountedCenter) - Projectile.velocity;
+				return;
+			}
 			Projectile.Opacity = Utils.GetLerpValue(0, 5, Timer, true);
 			Projectile.rotation = Projectile.velocity.ToRotation();
 			Projectile.velocity *= 0.985f;

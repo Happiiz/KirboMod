@@ -42,7 +42,12 @@ namespace KirboMod.NPCs
                     BuffID.ShadowFlame,
                 }
             };
-            NPCID.Sets.DebuffImmunitySets[Type] = debuffData;
+            NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true;
+            NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Poisoned] = true;
+            NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Venom] = true;
+            NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.OnFire] = true;
+            NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.CursedInferno] = true;
+            NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.ShadowFlame] = true;
         }
 
 		public override void SetDefaults()

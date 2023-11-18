@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
@@ -13,10 +12,9 @@ namespace KirboMod.Items.DarkSword
 {
     public class DarkSwordHeld : ModProjectile
     {
-        public override string Texture => "KirboMod/Items/DarkSword/DarkSword";
         public override void SetStaticDefaults()
         {
-            ProjectileID.Sets.TrailCacheLength[Type] = 40;
+            ProjectileID.Sets.TrailCacheLength[Type] = 50;
             ProjectileID.Sets.TrailingMode[Type] = 2;
         }
         public override void SetDefaults()
@@ -30,6 +28,8 @@ namespace KirboMod.Items.DarkSword
             Projectile.localNPCHitCooldown = -1;
             Projectile.DamageType = DamageClass.Melee;
             Projectile.scale = 1;
+            ProjectileID.Sets.TrailCacheLength[Type] = 50;
+
         }
         ref float Timer { get => ref Projectile.localAI[0]; }
         ref float TrailCancelCount { get => ref Projectile.localAI[1]; }
@@ -45,23 +45,14 @@ namespace KirboMod.Items.DarkSword
             Projectile.velocity.Normalize();
             Main.instance.LoadProjectile(Type);
         }
-        List<Vector2> SparklePoints = new();
-        Vector2[] oldRotCenters = new Vector2[40];
+        Vector2[] oldRotCenters = new Vector2[ProjectileID.Sets.TrailCacheLength[ModContent.ProjectileType<DarkSwordHeld>()]];
         List<float> rotations = new();
         List<Vector2> centers = new();
-        static Effect rainbowEffect;
         static float EaseBackOut(float progress)
         {
             const float c1 = 1.70158f;
             const float c3 = c1 + 1;
             return 1 + c3 * MathF.Pow(progress - 1, 3) + c1 * MathF.Pow(progress - 1, 2);
-        }
-        static float Derivative(float progress)
-        {
-            const float c1 = 1.70158f;
-            const float c3 = c1 + 1;
-            float derivative = 3 * c3 * MathF.Pow(progress - 1, 2) + 2 * c1 * (progress - 1);
-            return derivative;
         }
         static float AngleLerpLongWay(float curAngle, float targetAngle, float amount)
         {
@@ -90,7 +81,7 @@ namespace KirboMod.Items.DarkSword
                 Projectile.timeLeft = 100;
                 if (TrailCancelCount > Projectile.oldPos.Length)
                     Projectile.Kill();
-                TrailCancelCount++;
+                TrailCancelCount += 1;
                 return;
             }
             float progress = EaseBackOut(Progress);
@@ -106,8 +97,6 @@ namespace KirboMod.Items.DarkSword
             {
                 Projectile.rotation = Utils.AngleLerp(Projectile.rotation - SwingAngle / 2f, Projectile.rotation + SwingAngle / 2f, progress);
             }
-            if (SwingDir == -1)
-                progress = 1 - progress;
             MakePlayerHoldMe();
             Timer++;
             GetInterpolatedPoints(out rotations, out centers);
@@ -137,7 +126,7 @@ namespace KirboMod.Items.DarkSword
             player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, VisualRotation - MathF.PI / 2 - player.fullRotation);
             Vector2 dirToPlayer = VisualRotation.ToRotationVector2();
             Projectile.position = player.RotatedRelativePoint(player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation)) - Projectile.Size / 2f + GetExtraUpdateAdjustmentOffset(player);
-            Projectile.position += dirToPlayer * 60 * Projectile.scale;
+            Projectile.position += dirToPlayer * 117 * Projectile.scale;
         }
         private Vector2 GetExtraUpdateAdjustmentOffset(Player player)
         {
@@ -147,7 +136,7 @@ namespace KirboMod.Items.DarkSword
         {
             rotations = new();
             centers = new();
-            float lerpAmount = (UseTime / Projectile.MaxUpdates) <= 20 ? 0.33f : 0.5f;
+            float lerpAmount = ((UseTime / Projectile.MaxUpdates) <= 20 && Main.gfxQuality > 0) ? .5f : 1;
             for (int i = (int)TrailCancelCount; i < Projectile.oldPos.Length; i++)
             {
                 for (float j = 0; j < 0.98f; j += lerpAmount)
@@ -172,33 +161,23 @@ namespace KirboMod.Items.DarkSword
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            Texture2D texBack = ModContent.Request<Texture2D>("KirboMod/Items/RainbowSword/RainbowSwordHeldGlow").Value;
+
+            Texture2D texBack = ModContent.Request<Texture2D>("KirboMod/Items/DarkSword/DarkSwordGlow").Value;
             Texture2D texMain = TextureAssets.Projectile[Type].Value;
-            Vector3 hslvec = Main.rgbToHsl(Main.DiscoColor);
             float timeLeft = UseTime - Timer;
-
+            timeLeft /= Projectile.MaxUpdates;
             float fade = Utils.GetLerpValue(0, 5, timeLeft, true);
-            //for (int i = rotations.Count - 1; i >= 1; i--)
-            //{
-            //    float brightness = centers[i].Distance(centers[i - 1]);
-            //    brightness *= 0.02f;
-            //    (float toMin, float toMax) = (0.5f, 0.85f);
-            //    if (Main.dayTime)
-            //    {
-            //        toMin = 0.5f;
-            //        toMax = 1;
-            //        brightness *= 4;
-            //    }
-            //    float lightness = Utils.Remap(i, rotations.Count, 0.1f, toMin, toMax);
-            //    hslvec.Z = lightness;
-            //    Color col = Main.hslToRgb(hslvec);
-            //    if (!Main.dayTime)
-            //        col.A = 0;
+            for (int i = rotations.Count - 1 - (int)TrailCancelCount; i >= 1; i--)
+            {
+                float brightness = centers[i].Distance(centers[i - 1]);
+                brightness *= 0.08f;
+                float lightness = Utils.GetLerpValue(rotations.Count, 0.1f, i);
+                Color col = Color.Lerp(Color.DarkMagenta, Color.Black, lightness);
+                brightness *= Utils.GetLerpValue(-centers.Count, 0, timeLeft, true);
+                brightness *= fade;
+                Main.EntitySpriteDraw(texBack, centers[i], null, col * brightness * Utils.GetLerpValue(rotations.Count, rotations.Count / 2f, i, true), rotations[i], texBack.Size() / 2, Projectile.scale, SpriteEffects.None);
+            }
 
-            //    brightness *= Utils.GetLerpValue(-Projectile.oldPos.Length, 0, timeLeft, true);
-            //    brightness *= fade;
-            //    Main.EntitySpriteDraw(texBack, centers[i], null, col * brightness * Utils.GetLerpValue(rotations.Count, rotations.Count / 2f, i, true), rotations[i], texBack.Size() / 2, Projectile.scale, SpriteEffects.None);
-            //}
 
             if (Dead)
                 return false;
@@ -208,7 +187,8 @@ namespace KirboMod.Items.DarkSword
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
             float a = 0;
-            return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center - VisualRotation.ToRotationVector2() * 56.5f * Projectile.scale, Projectile.Center + VisualRotation.ToRotationVector2() * 56.5f * Projectile.scale, 70, ref a);
+            Vector2 offset = VisualRotation.ToRotationVector2() * 118;
+            return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center - offset * Projectile.scale, Projectile.Center + offset * Projectile.scale, 70, ref a);
 
         }
     }

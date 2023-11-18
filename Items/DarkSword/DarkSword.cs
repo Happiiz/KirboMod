@@ -48,15 +48,19 @@ namespace KirboMod.Items.DarkSword
 			KirbPlayer mPlayer = player.GetModPlayer<KirbPlayer>();
 			mPlayer.GetDarkSwordSwingStats(out int direction, out ProjectileShootType projToShoot);
 			Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI, player.itemAnimationMax, MathHelper.Lerp(6.15f, 4, Main.rand.NextFloat()), direction);
-
+			float delayMultiplier = player.itemAnimationMax / 2f;
             switch (projToShoot)
             {
                 case ProjectileShootType.DarkOrb:
 					int amountOfOrbs = 4;
+					delayMultiplier *= .5f; //orbs fire at a smaller angle so needs less delay to look smooth
 					for (float i = 0; i < 1.01f; i += 1f / amountOfOrbs)
                     {
 						Vector2 shootVel = velocity.RotatedBy(MathHelper.Lerp(-1, 1, i));
-						Projectile.NewProjectile(source, position, shootVel, ModContent.ProjectileType<DarkSwordOrb>(), damage, knockback, player.whoAmI);
+						float delay = -i * delayMultiplier;
+						if (direction == -1)
+							delay = Utils.Remap(delay, 0, -delayMultiplier, -delayMultiplier, 0, false);
+						Projectile.NewProjectile(source, position, shootVel, ModContent.ProjectileType<DarkSwordOrb>(), damage, knockback, player.whoAmI, delay);
                     }
                     break;
                 case ProjectileShootType.DarkBeam:
@@ -64,11 +68,14 @@ namespace KirboMod.Items.DarkSword
 					for (float i = 0; i < 1.01f; i += 1f / amountOfBeams)
 					{
 						Vector2 shootVel = velocity.RotatedBy(MathHelper.Lerp(-1.6f, 1.6f, i));
-						Projectile.NewProjectile(source, position, shootVel * 0.5f, ModContent.ProjectileType<DarkSwordBeam>(), damage, knockback, player.whoAmI);
+						float delay = -i * delayMultiplier;
+						if (direction == -1)
+							delay = Utils.Remap(delay, 0, -delayMultiplier, -delayMultiplier, 0, false);
+						Projectile.NewProjectile(source, position, shootVel * 0.5f, ModContent.ProjectileType<DarkSwordBeam>(), damage, knockback, player.whoAmI, delay);
 					}
 					break;
                 case ProjectileShootType.DarkWave:
-					Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<DarkSwordWave>(), damage, knockback, player.whoAmI);
+					Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<DarkSwordWave>(), damage, knockback, player.whoAmI, -delayMultiplier / 3);
                     break;
             }
             return false;

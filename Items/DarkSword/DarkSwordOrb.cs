@@ -28,6 +28,12 @@ namespace KirboMod.Items.DarkSword
         public override void AI()
         {
             Timer++;
+            if (Timer < 0)
+            {
+                Player player = Main.player[Projectile.owner];
+                Projectile.Center = player.RotatedRelativePoint(player.MountedCenter);
+                return;
+            }
             Projectile.alpha -= 51;
             if(Timer > 1200)
                 Projectile.Kill();

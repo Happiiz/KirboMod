@@ -682,7 +682,7 @@ Mods: {
 
 			DarkSword: {
 				DisplayName: Dark Sword
-				Tooltip: Fire dark beams within a short range
+				Tooltip: Fires dark beams, dark orbs, and large dark Waves
 			}
 
 			DooStaff: {
