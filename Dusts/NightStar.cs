@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using System;
 using Terraria;
 using Terraria.ModLoader;
 
@@ -15,16 +16,20 @@ namespace KirboMod.Dusts
 		}
 
 		public override bool Update(Dust dust)
-		{
-			dust.position += dust.velocity *= 0.9f; //slows down
-			dust.scale *= 0.95f;
+        {
+            dust.position += dust.velocity *= 0.9f; //slows down
 
-			if (dust.scale <= 0.001)
-			{
-				dust.active = false;
-			}
-			return false;
-		}
+            if (Math.Abs(dust.velocity.X) < 0.1f && Math.Abs(dust.velocity.Y) < 0.1f) //slowed
+            {
+                dust.scale *= 0.9f;
+            }
+
+            if (dust.scale <= 0.01)
+            {
+                dust.active = false;
+            }
+            return false;
+        }
 
         public override Color? GetAlpha(Dust dust, Color lightColor)
         {

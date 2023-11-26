@@ -3,6 +3,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.GameContent.Creative;
+using Terraria.Audio;
 
 namespace KirboMod.Items
 {
@@ -27,10 +28,7 @@ namespace KirboMod.Items
 			Item.useTime = 16;
 			Item.useAnimation = 16;
 			Item.UseSound = SoundID.Item1;
-			Item.useStyle = ItemUseStyleID.Swing;
-			Item.noUseGraphic = true;
-			Item.shoot = ModContent.ProjectileType<Projectiles.DarkMirrorProj>();
-			Item.shootSpeed = 10f;
+			Item.useStyle = ItemUseStyleID.HoldUp;
 		}
 
         public override bool CanUseItem(Player player)
@@ -43,28 +41,32 @@ namespace KirboMod.Items
             {
 				return player.ownedProjectileCounts[ModContent.ProjectileType<Projectiles.DarkMirrorProj>()] < 1;
             }
-		}
-
-        public override void HoldItem(Player player)
+        }
+        public override bool? UseItem(Player player)
         {
-			for (int i = 0; i < Main.maxNPCs; i++)
-			{
-				NPC npc = Main.npc[i];
-
-				if (npc.boss == false) //no bosses around
-				{
-					player.AddBuff(Mod.Find<ModBuff>("DarkFeeling").Type, 2);
-				}
-			}
+            if (player.whoAmI == Main.myPlayer) //if the player using the item is the client
+            {
+                if (Main.netMode != NetmodeID.MultiplayerClient) // If the player is not in multiplayer, spawn directly
+                {
+                    NPC.SpawnOnPlayer(player.whoAmI, ModContent.NPCType<NPCs.DarkMatter>());
+                }
+                else // If the player is in multiplayer, request a spawn
+                {
+                    //this will only work if NPCID.Sets.MPAllowedEnemies[type] is set in boss
+                    NetMessage.SendData(MessageID.SpawnBossUseLicenseStartEvent, number: player.whoAmI, number2: ModContent.NPCType<NPCs.DarkMatter>());
+                }
+                SoundEngine.PlaySound(SoundID.Roar, player.position);
+            }
+            return true;
         }
 
         public override void AddRecipes()
         {
 			Recipe recipe = CreateRecipe();//the result is dark mirror
-			recipe.AddIngredient(ModContent.ItemType<Items.NightCloth>(), 10); //10 nightcloth
+			recipe.AddIngredient(ModContent.ItemType<Items.NightCloth>(), 5); //5 nightcloth
 			recipe.AddIngredient(ItemID.SoulofNight, 20); //20 souls of night
-			recipe.AddIngredient(ItemID.Glass, 10); //10 glass
-			recipe.AddTile(TileID.MythrilAnvil); //crafted at hardmode anvil
+			recipe.AddIngredient(ItemID.Ectoplasm, 10); //10 ectoplasm
+            recipe.AddTile(TileID.MythrilAnvil); //crafted at hardmode anvil
 			recipe.Register(); //adds this recipe to the game
 		}
     }

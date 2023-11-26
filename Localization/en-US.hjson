@@ -304,8 +304,8 @@ Mods: {
 				DisplayName: Dark Mirror
 				Tooltip:
 					'''
-					Left click to throw it out, walk up to it to collect it
-					'What would happen if you shot a beam of light at a dark reflection?'
+					Gives off an eerie feeling
+					Summons Dark Matter
 					'''
 			}
 
@@ -583,7 +583,6 @@ Mods: {
 					'''
 					Shoots a flying sawblade that bounces off nearby walls and grinds on enemies
 					Returns to the player if it can't reach any walls to bounce off of
-					Five can be out at a time
 					'''
 			}
 
@@ -601,8 +600,8 @@ Mods: {
 				DisplayName: Chakram Cutter
 				Tooltip:
 					'''
-					Comes back after a while
-					Only four can be out at a time
+					Shoots out in an arc
+					Returns to the player after a bit
 					'''
 			}
 
@@ -655,11 +654,7 @@ Mods: {
 
 			Cutter: {
 				DisplayName: Cutter
-				Tooltip:
-					'''
-					Flies in the opposite direction
-					Only two can be out at a time
-					'''
+				Tooltip: Turns in the opposite direction horizontally after a bit
 			}
 
 			CyborgArcherBow: {
@@ -719,11 +714,7 @@ Mods: {
 
 			FinalCutter: {
 				DisplayName: Final Cutter
-				Tooltip:
-					'''
-					Flies in the opposite direction
-					Twenty can be out at a time
-					'''
+				Tooltip: Flies in the opposite direction
 			}
 
 			Fire: {

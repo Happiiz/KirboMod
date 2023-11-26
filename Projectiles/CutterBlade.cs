@@ -91,18 +91,6 @@ namespace KirboMod.Projectiles
             {
 				Projectile.Kill();
             }
-
-
-			//Kill when touching player after turn
-			if (Projectile.ai[0] >= 15)
-			{
-				Rectangle box = Projectile.Hitbox;
-				if (box.Intersects(player.Hitbox)) //if touching player
-				{
-					Projectile.ai[1] = 1;
-					Projectile.Kill(); //KILL
-				}
-			}
 		}
 
         public override bool OnTileCollide(Vector2 oldVelocity) 
