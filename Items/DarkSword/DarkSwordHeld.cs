@@ -178,6 +178,7 @@ namespace KirboMod.Items.DarkSword
                 Main.EntitySpriteDraw(texBack, centers[i], null, col * brightness * Utils.GetLerpValue(rotations.Count, rotations.Count / 2f, i, true), rotations[i], texBack.Size() / 2, Projectile.scale, SpriteEffects.None);
             }
 
+            //DarkSwordTrailSystem.subtractivePosToRender = centers.ToArray();
 
             if (Dead)
                 return false;

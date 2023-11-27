@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria.ID;
 using Terraria.Audio;
+using KirboMod.Particles;
 
 namespace KirboMod.Items.RainbowSword
 {
@@ -288,8 +289,13 @@ namespace KirboMod.Items.RainbowSword
             extraVel = extraVel.RotatedByRandom(0.3f);
             extraVel *= MathHelper.Lerp(0.9f, 1.5f, Main.rand.NextFloat());
             float hue = Utils.Remap((centerVel - extraVel).ToRotation(), -MathF.PI, MathF.PI, 0, 1);
-            Sparkle spalrkle = Sparkle.NewSparkle(targetHitbox.Center.ToVector2() - centerVel * 5 + Main.rand.NextVector2Circular(1000, 1000) / 80, Main.hslToRgb(hue, 1, 0.5f), new Vector2(1, 1.5f) * 1.6f, extraVel, 30, Vector2.One * 1.6f, null, 1, 0, 0.93f);
-            spalrkle.Rotation = spalrkle.Velocity.ToRotation() + MathF.PI / 2f;
+            Sparkle spalrkle = new Sparkle(
+                targetHitbox.Center.ToVector2() - centerVel * 5 + Main.rand.NextVector2Circular(1000, 1000) / 80,
+                Main.hslToRgb(hue, 1, 0.5f),
+                extraVel,
+                new Vector2(1, 1.5f) * 1.6f);
+            spalrkle.RotateToVel();
+            spalrkle.Confirm();
         }
         private void SparklesFromSwing(float progress, Vector2 lightStart, Vector2 lightEnd)
         {
@@ -305,8 +311,9 @@ namespace KirboMod.Items.RainbowSword
                 float backFactor = Main.rand.NextFloat();
                 backFactor = 1 - (1 - backFactor) * (1 - backFactor);
                 Vector2 spawnPosOffset = Vector2.Lerp(origin, spawnPos, MathHelper.Lerp(0.5f, 1f, backFactor));
-                Sparkle sparkle = Sparkle.NewSparkle(spawnPos + (spawnPosOffset - spawnPos), Main.DiscoColor, new Vector2(1, 1.5f) * 1.5f, VisualRotation.ToRotationVector2().RotatedBy(SwingDir * MathF.PI / 2).RotatedByRandom(0.3f) * GetSparkleVel(spawnPos/*, -extraProgress*/) * backFactor, 30, Vector2.One * 1.5f, null, 1, 0, 0.95f);
-                sparkle.Rotation = sparkle.Velocity.ToRotation() + MathF.PI / 2f;
+                Sparkle sparkle = new(spawnPos + (spawnPosOffset - spawnPos), Main.DiscoColor, VisualRotation.ToRotationVector2().RotatedBy(SwingDir * MathF.PI / 2).RotatedByRandom(0.3f) * GetSparkleVel(spawnPos/*, -extraProgress*/) * backFactor, new Vector2(1, 1.5f) * 1.5f, Vector2.One * 1.5f, 30);
+                sparkle.RotateToVel();
+                sparkle.Confirm();
             }
         }
 
