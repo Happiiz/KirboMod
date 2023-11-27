@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using KirboMod.Particles;
 
 namespace KirboMod.Items
 {
@@ -23,10 +24,10 @@ namespace KirboMod.Items
 			Item.height = 22;
 			Item.value = Item.buyPrice(0, 420, 69, 21);
 			Item.rare = ItemRarityID.Cyan;
-			Item.useAnimation = 45;
-            Item.useTime = 45;
+			Item.useAnimation = 10;
+            Item.useTime = 10;
             Item.useStyle = ItemUseStyleID.HoldUp;
-			Item.UseSound = SoundID.ScaryScream;
+			Item.UseSound = SoundID.DD2_MonkStaffSwing;
             Item.consumable = false;
         }
 

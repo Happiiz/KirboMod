@@ -136,16 +136,13 @@ namespace KirboMod.Items.RainbowSword
                 List<int> rainbowDropIDsTaken = new List<int>();
                 for (int i = 0; i < Main.LocalPlayer.inventory.Length; i++)
                 {
-                    bool existsAnimationAlready = false;
                     for (int j = 0; j < Main.maxProjectiles; j++)
                     {
                         Projectile projToCheck = Main.projectile[j];
                         if (!projToCheck.active || projToCheck.type != ModContent.ProjectileType<RainbowSwordCraftingAnimation>())
                             continue;
-                        existsAnimationAlready = true;
-                    }
-                    if (existsAnimationAlready)
                         return;
+                    }
                     Item item = Main.LocalPlayer.inventory[i];
                     if (rainbowDropIDsTaken.Contains(item.type) || !IsARainbowDropID(item.type))
                         continue;
@@ -164,7 +161,7 @@ namespace KirboMod.Items.RainbowSword
                 Projectile.NewProjectile(Item.GetSource_ReleaseEntity(), Main.LocalPlayer.Center - new Vector2(0, 150), Vector2.Zero, ModContent.ProjectileType<RainbowSwordCraftingAnimation>(), -1, 0, Main.myPlayer); ;
                 return;
             }
-            orig.Invoke(r);
+            orig(r);
         }
     }
 }

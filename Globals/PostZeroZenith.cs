@@ -149,7 +149,7 @@ namespace KirboMod.Globals
         {		
 			if((int)proj.ai[1] != ModContent.ItemType<Items.RainbowSword.RainbowSword>())
             {
-				orig.Invoke(ref self, proj);
+				orig(ref self, proj);
 				return;
             }
 			FinalFractalProfile finalFractalProfile = GetFinalFractalProfile((int)proj.ai[1]);
