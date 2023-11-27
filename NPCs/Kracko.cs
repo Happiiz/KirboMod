@@ -33,7 +33,7 @@ namespace KirboMod.NPCs
         {
             Player player = Main.player[NPC.target];
 
-            if (NPC.ai[1] <= 60 || (NPC.ai[0] >= 60 && NPC.ai[0] < 90 && frenzy == true)) //be harmless upon spawn (or when moving during frenzy
+            if (NPC.ai[1] <= 60 || (NPC.ai[0] >= 60 && NPC.ai[0] < 90 && frenzy)) //be harmless upon spawn (or when moving during frenzy
             {
                 NPC.damage = 0;
             }
@@ -50,7 +50,7 @@ namespace KirboMod.NPCs
             }
             NPC.ai[1]++;
 
-            if (NPC.life <= NPC.lifeMax * 0.25 && Main.expertMode == true) //transition
+            if (NPC.life <= NPC.lifeMax * 0.5 && Main.expertMode) //transition
             {
                 transitioning = true;
             }
