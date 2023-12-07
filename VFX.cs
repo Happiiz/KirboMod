@@ -51,11 +51,12 @@ namespace KirboMod
             GlowBall = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowBallPremultiplied").Value;
             glowLine = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowLinePremultiplied").Value;
             glowLineCap = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowLineCapPremultiplied").Value;
+            ringShine = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/RingShinePremultiplied").Value;
         }
         public static Texture2D glowLine;
         public static Texture2D glowLineCap;
         public static Texture2D Circle;
-
+        public static Texture2D ringShine;
         public static Texture2D GlowBall;
 
         public static Texture2D Ring;
@@ -133,6 +134,9 @@ namespace KirboMod
             Circle = null;
             GlowBall = null;
             Ring = null;
+            ringShine = null;
+            glowLine = null;
+            glowLineCap = null;
         }
 
         public static void DrawProjWithStarryTrail(Projectile proj, Color drawColorMainTrail, Color drawColorSmallInnerTrail, Color drawColorStar, float drawColorMult = 0.2f, byte innerTrailAlpha = 0, byte trailAlpha = 0, byte starAlpha = 0)

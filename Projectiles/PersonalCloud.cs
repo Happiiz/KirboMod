@@ -115,8 +115,17 @@ namespace KirboMod.Projectiles
                 {
 					Vector2 distance = aggroTarget.Center - Projectile.Center;
 					distance.Normalize();
-					distance *= 5;
-					Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, distance, ModContent.ProjectileType<PersonalCloudBeam>(), 12, 4, Projectile.owner);
+					distance *= 10;
+					int damage = 30;
+                    if (Main.masterMode)
+                    {
+						damage = ((int)(damage * 1.5f));
+                    }
+					if(ModLoader.TryGetMod("CalamityMod", out _))
+                    {
+						damage = (int)(damage * 2f);
+                    }
+					Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, distance, ModContent.ProjectileType<PersonalCloudBeam>(), 30, 4, Projectile.owner);
 
 					Projectile.ai[0] = 0;
 				}

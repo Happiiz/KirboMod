@@ -6,12 +6,20 @@ using Microsoft.Xna.Framework;
 
 namespace KirboMod
 {
-    public static class AIUtils
+    public static class Helper
+
     {
-        //todo: add clamp param
-        public static float RemapEasing(float fromValue, float fromMin, float fromMax, float toMin, float toMax, Func<float, float> easingFunction)
+        public static void DustExplosion(Entity entity, int type, bool noGravity = false)
         {
-            return MathHelper.Lerp(toMin, toMax, easingFunction(Utils.GetLerpValue(fromMin, fromMax, fromValue, true)));
+            int count = (int)(entity.width * entity.height * .08f);
+            for (int i = 0; i < count; i++)
+            {
+                Dust.NewDustDirect(entity.position, entity.width, entity.height, type).noGravity = noGravity;
+            }
+        }
+        public static float RemapEasing(float fromValue, float fromMin, float fromMax, float toMin, float toMax, Func<float, float> easingFunction, bool clamp = true)
+        {
+            return MathHelper.Lerp(toMin, toMax, easingFunction(Utils.GetLerpValue(fromMin, fromMax, fromValue, clamp)));
         }
         public static void DustCircle(int dustAmount, float radius, Vector2 circleOrigin, int dustID = DustID.MagnetSphere)
         {
@@ -46,15 +54,15 @@ namespace KirboMod
             {
                 if (proj.usesLocalNPCImmunity)
                 {
-                    npcImmuneToProj = proj.localNPCImmunity[npc.whoAmI] > 0;
+                    npcImmuneToProj = proj.localNPCImmunity[npc.whoAmI] != 0;
                 }
                 else if (proj.usesIDStaticNPCImmunity)
                 {
-                    npcImmuneToProj = Projectile.perIDStaticNPCImmunity[proj.type][npc.type] > 0;
+                    npcImmuneToProj = Projectile.perIDStaticNPCImmunity[proj.type][npc.type] != 0;
                 }
                 else
                 {
-                    npcImmuneToProj = npc.immune[proj.owner] > 0;
+                    npcImmuneToProj = npc.immune[proj.owner] != 0;
                 }
             }//eol becomes invincible during dash, phasde transition and spawn animation, so ignore donttake damage if EoL to avoid some weirdness
             //      ai0 as 8 or 9 is if she's dashng, so that she doesn't get targeted during the phase transition or spawn animation

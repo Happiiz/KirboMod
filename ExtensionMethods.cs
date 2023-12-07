@@ -12,6 +12,11 @@ namespace KirboMod
 {
     public static class ExtensionMethods
     {
+        public static Vector2 Normalized(this Vector2 vec, float lengthMultiplier)
+        {
+            vec.Normalize();
+            return vec * lengthMultiplier;
+        }
         public static bool DrawSelf(this Projectile proj, bool fullbright = true)
         {
             SpriteEffects fx = proj.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;

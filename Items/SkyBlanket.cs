@@ -1,3 +1,4 @@
+using KirboMod.NPCs;
 using System;
 using Terraria;
 using Terraria.Audio;
@@ -35,14 +36,11 @@ namespace KirboMod.Items
 
         public override bool CanUseItem(Player player)
         {
-			if (!NPC.AnyNPCs(Mod.Find<ModNPC>("KrackoJr").Type) && !NPC.AnyNPCs(Mod.Find<ModNPC>("Kracko").Type)) //can use item if no krackos
+			if (!NPC.AnyNPCs(ModContent.NPCType<KrackoJr>()) && !NPC.AnyNPCs(ModContent.NPCType<NPCs.Kracko>())) //can use item if no krackos
 			{
 				return true;
-			}
-			else
-			{
-				return false;
-			}
+			}			
+			return false;
 		}
 
         public override bool? UseItem(Player player)

@@ -7,16 +7,20 @@ using Terraria.ModLoader;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using KirboMod.Bestiary;
+using KirboMod.Projectiles;
 
 namespace KirboMod.NPCs
 {
 	public class SirKibble : ModNPC 
 	{
 		private int frame = 0; //different types of animation cycles / frames
-        public ref float attack => ref NPC.localAI[0]; //the attack timer
+        public ref float AttackTimer => ref NPC.localAI[0]; //the attack timer
         private bool attacking = false; //controls if in attacking state
-
+		public ref float TimeWhenCutterBladeReachesKibbleAgain => ref NPC.ai[1];
+		public ref float MostRecentCutterYVelocity => ref NPC.ai[2];
+		float moveSpeedMultiplier = 1;
         private bool jumped = false;
+		bool jumpToGrabCutterBack = false;
 
         public override void SetStaticDefaults()
 		{
@@ -29,8 +33,8 @@ namespace KirboMod.NPCs
 			NPC.width = 48;
 			NPC.height = 48;
 			NPC.damage = 6;
-			NPC.defense = 3;
-			NPC.lifeMax = 35;
+			NPC.defense = 4;
+			NPC.lifeMax = 80;
 			NPC.HitSound = SoundID.NPCHit4; //metal
 			NPC.DeathSound = SoundID.NPCDeath14; //explosive metal
 			NPC.value = Item.buyPrice(0, 0, 0, 5); // money it drops
@@ -141,12 +145,16 @@ namespace KirboMod.NPCs
 			NPC.spriteDirection = NPC.direction;
 			Player player = Main.player[NPC.target];
 			Vector2 distance = player.Center - NPC.Center;
-
+			Main.hardMode = false;
+			NPC.downedPlantBoss = false;
 			bool lineOfSight = Collision.CanHitLine(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height);
-
-			if (distance.X < 270 & distance.X > -270 & distance.Y > -120 & distance.Y < 50 && lineOfSight && !player.dead) //checks if the kibble is in range
+			float range = 265;
+			if (Main.expertMode)
+				range *= 1.33f;
+			if (distance.X < range & distance.X > -range & distance.Y > -range & distance.Y < range && lineOfSight && !player.dead && NPC.velocity.Y == 0) //checks if the kibble is in range
 			{
 				attacking = true;
+				jumpToGrabCutterBack = false;
 			}
 
 			//declaring attacktype values
@@ -165,6 +173,11 @@ namespace KirboMod.NPCs
 
 		public override void FindFrame(int frameHeight) // animation
 		{
+			if (jumpToGrabCutterBack)
+			{
+				NPC.frame.Y = frameHeight;
+				return;
+			}
 			if (attacking == false) //walking
 			{
                 NPC.frameCounter += 1.0;
@@ -220,7 +233,12 @@ namespace KirboMod.NPCs
 
 			direction.Normalize(); //reduce to 1
 			direction *= speed; //equal speed
-
+            if (jumpToGrabCutterBack)
+            {
+				if (NPC.velocity.Y == 0)
+					jumpToGrabCutterBack = false;
+				return;
+            }
 			if (NPC.velocity.Y == 0 || jumped == true) //walking/jumping (so it doesn't interfere with knockback)
             {
 				NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
@@ -239,15 +257,11 @@ namespace KirboMod.NPCs
         }
 		private void Throw()
         {
-			Player player = Main.player[NPC.target];
-			Vector2 projshoot = NPC.Center + new Vector2(NPC.direction * 50, 0) - NPC.Center;
 			//this instead of player.Center so it throws in the direction it's facing
-			projshoot.Normalize();
-			projshoot *= 10f;
-			attack++;
+			AttackTimer++;
 
 			//facing
-			if (attack == 1)
+			if (AttackTimer == 1)
             {
 				NPC.TargetClosest(true); //don't face target
                 NPC.frameCounter = 0; //reset frame counter
@@ -255,21 +269,44 @@ namespace KirboMod.NPCs
 
 			NPC.velocity.X *= 0.9f; //slow
 
-			if (attack == 60) //throw
+			//make player index be the target to follow
+			//or maybe just calculate a Y velocity based on height difference(probably better)
+			//calculate time to reach x
+			const int attackThreshold = 60;
+			float cutterAcceleration = 1;
+			if (AttackTimer == attackThreshold) //throw
 			{
-				if (Main.netMode != NetmodeID.MultiplayerClient)
-				{
-					Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projshoot, Mod.Find<ModProjectile>("BadCutter").Type, 8 / 2, 10f, Main.myPlayer, 0, 0);
-				}
+				float shotVelocity = 13;
+				if (Main.expertMode)
+					shotVelocity *= 1.333f;
+				//this also sets TimeWhenCutterBladeReachesKibbleAgain
+				BadCutter.ShootBadCutter(NPC, shotVelocity, cutterAcceleration);
 			}
-			if (attack == 180)
+			float heightWhenReachesKibbleAgain = MostRecentCutterYVelocity;
+			float relativeHeightWhenReachesKibbleAgain = heightWhenReachesKibbleAgain - NPC.Center.Y;
+			if(relativeHeightWhenReachesKibbleAgain > -200 && relativeHeightWhenReachesKibbleAgain < -16)
             {
-				attack = 0; //ready next attack
+				if(AttackTimer >= TimeWhenCutterBladeReachesKibbleAgain  / 2 + 60 && TimeWhenCutterBladeReachesKibbleAgain > 0 && NPC.velocity.Y >= 0 && Collision.CanHitLine(NPC.position,NPC.width,NPC.height, NPC.position + new Vector2(0,relativeHeightWhenReachesKibbleAgain), NPC.width, NPC.height))
+                {
+					NPC.velocity.Y = GetVelFromMRUV(NPC.Bottom.Y, heightWhenReachesKibbleAgain, TimeWhenCutterBladeReachesKibbleAgain / 2, NPC.gravity);
+					jumpToGrabCutterBack = true;
+					attacking = false;
+					AttackTimer = 0;
+                }
+
+			}
+			if (AttackTimer >= TimeWhenCutterBladeReachesKibbleAgain + attackThreshold && TimeWhenCutterBladeReachesKibbleAgain > 0)
+            {
+				AttackTimer = 0; //ready next attack
+				jumpToGrabCutterBack = false;
 				attacking = false; //stop attacking
             }
         }
-
-        public override void ModifyNPCLoot(NPCLoot npcLoot)
+		static float GetVelFromMRUV(float initialSpace, float targetSpace, float time, float acceleration)
+		{
+			return (targetSpace - initialSpace - .5f * acceleration * time * time) / time;
+		}
+		public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<Items.Weapons.Cutter>(), 40, 20)); // 1 in 40 (2.5%) chance in Normal. 1 in 20 (5%) chance in Expert
             npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Starbit>(), 1, 2, 4));

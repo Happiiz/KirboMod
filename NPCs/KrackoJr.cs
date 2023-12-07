@@ -1,8 +1,13 @@
+using KirboMod.Particles;
+using KirboMod.Projectiles.KrackoJrBomb;
+using KirboMod.Projectiles.KrackoJrCannonball;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
+using System.Collections.Generic;
 using Terraria;
+using Terraria.Audio;
 using Terraria.Chat;
 using Terraria.GameContent.Bestiary;
 using Terraria.ID;
@@ -13,16 +18,43 @@ namespace KirboMod.NPCs
 { 
 	public class KrackoJr : ModNPC
 	{
-		private float cloudsrotation = 0;
-
+        enum KrackoJrAttackType
+        {
+			Spawn,
+			Bombs,
+			CannonBall,
+			Dash
+        }
+        private struct KrackoJrCloud
+        {
+			public int timeLeft;
+			public Vector2 position;
+			public float rotation;
+            public KrackoJrCloud(Vector2 pos, float rotation)
+            {
+				timeLeft = 13;
+				this.rotation = rotation;
+				position = pos;
+            }
+			public void Draw(Texture2D tex)
+            {
+				Main.spriteBatch.Draw(tex, position - Main.screenPosition, null, Color.White * Utils.GetLerpValue(0, 4, timeLeft, true), rotation, tex.Size() / 2, 1, SpriteEffects.None, 0); ;
+            }
+			public static void SpawnCloud(KrackoJr kracko)
+			{
+				if (kracko.trail.Count < 13)
+				{
+					kracko.trail.Add(new KrackoJrCloud(kracko.NPC.Center, kracko.NPC.rotation));
+				}
+			}
+        }
+		List<KrackoJrCloud> trail = new(13);
         public override void SetStaticDefaults() {
 			// DisplayName.SetDefault("Kracko Jr.");
 			Main.npcFrameCount[NPC.type] = 1;
-
             // Add this in for bosses(in this case minibosses) that have a summon item, requires corresponding code in the item
             NPCID.Sets.MPAllowedEnemies[Type] = true;
-
-            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
+            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers()
 			{
 				CustomTexturePath = "KirboMod/NPCs/BestiaryTextures/KrackoJrPortrait",
 				PortraitScale = 0.75f, // Portrait refers to the full picture when clicking on the icon in the bestiary
@@ -36,9 +68,9 @@ namespace KirboMod.NPCs
 			NPC.width = 58;
 			NPC.height = 58;
 			NPC.damage = 15;
-			NPC.defense = 3;
+			NPC.defense = 6;
 			NPC.noTileCollide = true;
-			NPC.lifeMax = 300;
+			NPC.lifeMax = 800;
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
 			NPC.knockBackResist = 0f;
@@ -53,7 +85,7 @@ namespace KirboMod.NPCs
 		{
 			if (spawnInfo.Player.ZoneSkyHeight && NPC.downedBoss2 && !Main.hardMode) //if player is within space height, not in hardmode and defeated evil boss
 			{
-				return !NPC.AnyNPCs(Mod.Find<ModNPC>("Kracko").Type) ? 0.15f : 0; //return spawn rate if kracko isn't here
+				return !NPC.AnyNPCs(ModContent.NPCType<NPCs.Kracko>()) ? 0.15f : 0; //return spawn rate if kracko isn't here
 			}
 			else
 			{
@@ -74,24 +106,18 @@ namespace KirboMod.NPCs
             });
         }
 
+		ref float Timer { get => ref NPC.ai[0]; }
+		KrackoJrAttackType CurrentAttack { get => (KrackoJrAttackType)NPC.ai[1]; set => NPC.ai[1] = (float)value; }
+		
         public override void AI() //constantly cycles each time
 		{
-			Player player = Main.player[NPC.target];
-			NPC.TargetClosest();
-
-			//rotato
-			// First, calculate a Vector pointing towards what you want to look at
-			Vector2 distance = player.Center - NPC.Center;
-			// Second, use the ToRotation method to turn that Vector2 into a float representing a rotation in radians.
-			float desiredRotation = distance.ToRotation();
-
-			NPC.rotation = desiredRotation;
+			//will be used as the rotation of the cloud sprite
+			NPC.rotation += .1f;
 
 			//DESPAWNING
-			if (NPC.target < 0 || NPC.target == 255 || player.dead || !player.active)
+			if (NPC.target < 0 || NPC.target == 255 || Main.player[NPC.target].dead || !Main.player[NPC.target].active)
 			{
-				
-
+				NPC.TargetClosest(false);
 				NPC.velocity.Y = NPC.velocity.Y - 0.2f;
 				NPC.ai[0] = 0;
 
@@ -101,10 +127,6 @@ namespace KirboMod.NPCs
 					return;
 				}
 			}
-			else if (NPC.life <= 0) //Transformation
-			{
-				NPC.ai[1]++;
-			}
 			else //regular attack
 			{
 				AttackPattern();
@@ -112,51 +134,127 @@ namespace KirboMod.NPCs
 		}
 
 		private void AttackPattern()
-		{
-			Player player = Main.player[NPC.target];
-			Vector2 distance = player.Center - NPC.Center; //start - end
-            Vector2 randomDistanceFromPlayer = player.Center + new Vector2(Main.rand.Next(-200, 200), Main.rand.Next(-200, 200)) - NPC.Center;
-
-            NPC.ai[0]++;
-
-			if (NPC.ai[0] >= 120 & NPC.ai[0] <= 179)
+        {
+            Player player = Main.player[NPC.target];
+			Timer++;
+            switch (CurrentAttack)
             {
-				if (NPC.ai[0] == 120)
-				{
-					NPC.velocity = randomDistanceFromPlayer / 10;
-					NPC.netUpdate = true; //sync cause random
-				}
-				else
-				{
-					NPC.velocity *= 0.9f;
+				case KrackoJrAttackType.Spawn:
+					NPC.velocity = NPC.velocity.MoveTowards(NPC.DirectionTo(player.Center - new Vector2(0, 128)) * 30, 1);
+					NPC.velocity *= Utils.GetLerpValue(16, 256, NPC.Distance(player.Center), true);
+					if (Timer > 120)
+					{
+						CurrentAttack = KrackoJrAttackType.Bombs;
+						Timer = 0;
+					}
+					break;
+				case KrackoJrAttackType.Bombs:
 
-					if (NPC.ai[0] == 179)
+					float flyEnd = 150;
+					float flyStart = 60;
+
+					if (Timer == 30)
                     {
-						NPC.velocity *= 0;
+                        FacePlayer();
+                        NPC.velocity = player.Center + new Vector2(500 * NPC.spriteDirection, -300) - NPC.Center;
                     }
-				}
+                    NPC.velocity *= .5f;
 
-				NPC.damage = 0;
+					if (Timer >= flyStart - 10 && Timer <= flyEnd)
+                    {
+						float progress = Utils.GetLerpValue(flyStart - 10, flyStart, Timer, true) * Utils.GetLerpValue(flyEnd, flyEnd - 10, Timer, true);
+						progress = Easings.EaseInOutSine(progress);
+						NPC.velocity.X = -NPC.spriteDirection * progress * 20;
+                    }
+        
+					if(CheckShouldShoot(20, 5, (int)flyStart))
+                    {
+						SoundEngine.PlaySound(SoundID.Item73 with { MaxInstances = 0, Pitch = -1, PitchVariance = .15f }, NPC.Center);
+						SoundEngine.PlaySound(SoundID.Item73 with { MaxInstances = 0, Pitch = 0, PitchVariance = .15f }, NPC.Center);
+						SpawnBomb();
+                    }
+					if(Timer > flyStart + 20 * 5 + GetExtraAttackWaitTime())
+                    {
+						Timer = 0;
+						CurrentAttack = KrackoJrAttackType.CannonBall;
+                    }
+                    break;
+                case KrackoJrAttackType.CannonBall:
+					NPC.damage = 0;
+					int spinStart = 10;
+					int spinDuration = 120;
+					int decelerationDuration = 8;
+					if(Timer == spinStart)
+                    {
+						FacePlayer();
+                    }
+					if(Timer >= spinStart && Timer < spinStart + spinDuration + decelerationDuration)
+                    {
+						float progress = Utils.GetLerpValue(spinStart, spinStart + spinDuration, Timer, true);
+						float progressWithDeceleration = progress *Utils.GetLerpValue(spinStart + spinDuration + decelerationDuration, spinStart + spinDuration, Timer, true);
+						progress = Easings.EaseInOutSine(progress);
+						progressWithDeceleration = Easings.EaseInOutSine(progressWithDeceleration);
+						Vector2 offset = -Vector2.UnitY.RotatedBy(NPC.spriteDirection * progress * MathF.Tau) * MathHelper.Lerp(90, 260, progress);
+						offset.X += progress * progress * progress * progress * progress * 400 * NPC.spriteDirection;
+						NPC.Center = Vector2.Lerp(NPC.Center, player.Center + offset, progressWithDeceleration);
+                    }
+					if(CheckShouldShoot(1,1, spinStart + spinDuration + decelerationDuration))
+                    {
+						SoundEngine.PlaySound(SoundID.Item45 with { Volume = 2, MaxInstances = 0, Pitch = 0f }, NPC.Center);
+						SoundEngine.PlaySound(SoundID.Item45 with { Volume = 2, MaxInstances = 0, Pitch = -.2f }, NPC.Center);
+						SoundEngine.PlaySound(SoundID.Item66 with { Volume = 2, MaxInstances = 0, Pitch = .8f }, NPC.Center);
+						SoundEngine.PlaySound(SoundID.Item66 with { Volume = 2, MaxInstances = 0, Pitch = 1f }, NPC.Center);
+						ShootCannonBalls();
+                    }
+					
+                    if (Timer > spinStart + spinDuration + decelerationDuration + GetExtraAttackWaitTime())//change 14 to a higher number to increase how much cooldown between attacks
+                    {
+						Timer = 0;
+						CurrentAttack = KrackoJrAttackType.Dash;
+                    }
+					break;
+                case KrackoJrAttackType.Dash:
+					int decelerateStart = 300;
+					int decelerateDuration = 80;
+					float maxSpeed = Utils.GetLerpValue(0, 100, Timer, true) * Utils.GetLerpValue(decelerateStart + decelerateDuration / 2f, decelerateStart, Timer, true);
+					maxSpeed = Easings.EaseInOutSine(maxSpeed) * 30;//30 is the actual speed
+					float steeringSpeed = .01f + Utils.Remap(Timer, decelerateStart + decelerateDuration, decelerateStart, .2f, 0f);
+					NPC.velocity = Vector2.Lerp(NPC.velocity, NPC.DirectionTo(player.Center) * maxSpeed, steeringSpeed) ;
+					NPC.damage = Timer < decelerateStart ? NPC.defDamage : 0;
+					if(Timer > decelerateStart + decelerateDuration + GetExtraAttackWaitTime())
+                    {
+						CurrentAttack = KrackoJrAttackType.Bombs;
+						Timer = 0;
+                    }
+                    break;
             }
 
-			if (NPC.ai[0] == 180)
-            {
-				NPC.damage = 25;
 
-				distance.Normalize();
-				distance *= 10;
-				NPC.velocity = distance;
-			}
+            MakeClouds();
+        }
 
-			if (NPC.ai[0] >= 180 & NPC.ai[0] % 5 == 0)
-            {
-				Dust d = Dust.NewDustPerfect(NPC.Center, DustID.Cloud, NPC.velocity * 0, Scale: 1.5f);
-			}
+        private void FacePlayer()
+        {
+            NPC.spriteDirection = MathF.Sign(NPC.Center.X - Main.player[NPC.target].Center.X);
+        }
 
-			if (NPC.ai[0] >= 240)
+        private void MakeClouds()
+        {
+            if ((NPC.position - NPC.oldPosition).LengthSquared() > 0.3f && Main.timeForVisualEffects % 4 == 0)
             {
-				NPC.velocity *= 0;
-				NPC.ai[0] = 0;
+                KrackoJrCloud.SpawnCloud(this);
+            }
+            for (int i = 0; i < trail.Count; i++)
+            {
+                KrackoJrCloud cld = trail[i];
+                cld.timeLeft--;
+                if (cld.timeLeft <= 0)
+                {
+                    trail.RemoveAt(i);
+                    i--;
+                    continue;
+                }
+                trail[i] = cld;
             }
         }
 
@@ -201,16 +299,88 @@ namespace KirboMod.NPCs
 
         // This npc uses an additional texture for drawing
         public static Asset<Texture2D> Clouds;
+        public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+		{
+			Clouds = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoJrClouds");
+			//Draw clouds
+			Texture2D clouds = Clouds.Value;
+            for (int i = trail.Count - 1; i >= 0; i--)
+            {
+				trail[i].Draw(clouds);
+			}
+			spriteBatch.Draw(clouds, NPC.Center - Main.screenPosition, null, new Color(255, 255, 255), NPC.rotation, new Vector2(55, 55), 1f, SpriteEffects.None, 0f);
+			Texture2D eye = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoEyeBase").Value;
+			Texture2D pupil = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoEyePupil").Value;
+			Player player = Main.player[NPC.target];
+			float offsetLength = 6.5f;
+			Vector2 pupilOffset = Vector2.Normalize(player.Center - NPC.Center) * offsetLength;//the multipier is just what looks good
+			spriteBatch.Draw(eye, NPC.Center - Main.screenPosition, null, new Color(255, 255, 255), 0, new Vector2(29, 29), 1f, SpriteEffects.None, 0f);
+			spriteBatch.Draw(pupil, NPC.Center - Main.screenPosition + pupilOffset, null, Color.White, 0, pupil.Size() / 2, 1, SpriteEffects.None, 0);
+			return false;
+		}
 
-        public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+		bool CheckShouldShoot(int fireRate, int numberOfShots, int start, float shootVelMagnitude, Vector2 shotOrigin, Vector2 shootTarget, out Vector2 projVelocity)
+		{
+			projVelocity = Vector2.Normalize(shootTarget - shotOrigin) * shootVelMagnitude;
+			return (NPC.ai[0] - start) % fireRate == 0 && NPC.ai[0] < (start + fireRate * numberOfShots) && NPC.ai[0] >= start && Main.netMode != NetmodeID.MultiplayerClient;
+		}
+		bool CheckShouldShoot(int fireRate, int numberOfShots, int start)
+		{
+			return (NPC.ai[0] - start) % fireRate == 0 && NPC.ai[0] < (start + fireRate * numberOfShots) && NPC.ai[0] >= start;
+		}
+		void ShootCannonBalls()
         {
-            Clouds = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoJrClouds");
+			float numCannonballs = 5;
+			if (Main.expertMode)
+				numCannonballs++;
+			if (Main.getGoodWorld)
+				numCannonballs++;
 
-			cloudsrotation += 0.1f; //go up
+			float totalSpread = 2.5f;
+			float shootSpeed = 7;
+			if (Main.getGoodWorld)
+				shootSpeed *= 1.5f;
+			if (Main.expertMode)
+				shootSpeed *= 1.5f;
+			Player plr = Main.player[NPC.target];
+            for (float i = 0; i < 1 - (.5f / numCannonballs); i+= 1 / numCannonballs)
+            {
+				Vector2 velocity = NPC.DirectionTo(plr.Center);
+				velocity = velocity.RotatedBy(MathHelper.Lerp(-totalSpread / 2, totalSpread / 2, i)) * shootSpeed;
+                for (int j = 0; j < 20; j++)
+                {
+					Dust dust = Dust.NewDustPerfect(NPC.Center + Main.rand.NextVector2Circular(32, 32), DustID.Asphalt, velocity.RotatedByRandom(.1f) * Utils.Remap(j, 0,20, 3,6), 0, default, 1.4f);
+					dust.noGravity = true;
+					dust.velocity *= Main.rand.NextFloat() * .2f + .2f;
+                }
+				if (Main.netMode != NetmodeID.MultiplayerClient)
+					Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, velocity, ModContent.ProjectileType<KrackoJrCannonball>(), 40, 0);
+			}
+		}
+		int GetExtraAttackWaitTime()
+        {
 
-            //Draw clouds
-            Texture2D clouds = Clouds.Value;
-            spriteBatch.Draw(clouds, NPC.Center - Main.screenPosition, null, new Color(255, 255, 255), cloudsrotation, new Vector2(55, 55), 1f, SpriteEffects.None, 0f);
+			if (Main.getGoodWorld)
+				return 0;
+			if (Main.expertMode)
+				return NPC.GetLifePercent() < .5f ? 20 : 10;
+			return 40;
+
         }
-    }
+		void SpawnBomb()
+        {
+			Sparkle[] sparkles = Sparkle.EyeShine(NPC.Center, Color.Orange, duration: 14);
+			
+
+            foreach (var sparkle in sparkles)
+            {
+				sparkle.scale *= 2f;
+				sparkle.fatness.Y *= 3;
+				sparkle.fadeOutTime = 4;
+            }
+			if (Main.netMode == NetmodeID.MultiplayerClient)
+				return;
+			Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<KrackoJrBomb>(), 40, 0, 0, NPC.target);
+        }
+	}
 }

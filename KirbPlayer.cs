@@ -1,3 +1,4 @@
+using KirboMod.Globals;
 using KirboMod.Items;
 using KirboMod.Items.Weapons;
 using KirboMod.Projectiles;
@@ -71,14 +72,115 @@ namespace KirboMod
         public int plasmaTimer = 0; //if 60 then takes plasma charge down a bit
         public int plasmacharge = 0;  //charge amount for plasma weapon
         public int darkSwordSwingCounter;
+
+        public int rainbowSwordSwingCounter;
+        public int NextRainbowSwordSwingDirection { get => rainbowSwordSwingCounter++ % 2 * 2 - 1; }
+        public int finalCutterAnimationCounter = 0;
+        public int finalCutterDamageCounter = 0;//should cap out at 5
+        public List<int> currentFinalCutterTargets = new();
+        
+
         public void GetDarkSwordSwingStats(out int direction, out Items.DarkSword.DarkSword.ProjectileShootType projToShoot)
         {
             projToShoot = (Items.DarkSword.DarkSword.ProjectileShootType)(darkSwordSwingCounter % 3);
             direction = darkSwordSwingCounter++ % 2 * 2 - 1;
         }
+        public bool TryStartingFinalCutter()
+        {
+            if (finalCutterAnimationCounter > 0)
+                return false;
+            int horizontalRange = 16 * 4;//4 tiles
+            Rectangle hitbox = new Rectangle((int)Player.Center.X, (int)Player.position.Y, horizontalRange, Player.height);
+            if(Player.direction == -1)
+            {
+                hitbox.X -= horizontalRange;
+            }
+            currentFinalCutterTargets = new List<int>();
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                NPC npc = Main.npc[i];
+                if(npc.CanBeChasedBy() && npc.knockBackResist > .2f && !npc.boss && hitbox.Intersects(npc.Hitbox) )
+                {
+                    currentFinalCutterTargets.Add(i);
+                }
+            }
+            if (currentFinalCutterTargets.Count <= 0)
+                return false;//failed to start final cutter.
+            ModPacket packet;
+            if (currentFinalCutterTargets.Count == 1)
+            {
+                if(Main.netMode == NetmodeID.SinglePlayer)
+                {
+                    StartFinalCutter();
+                    return true;
+                }
+                packet = Mod.GetPacket(3);
+                packet.Write((byte)KirboMod.ModPacketType.StartFinalCutter);
+                packet.Write((byte)Main.myPlayer);
+                packet.Write((byte)currentFinalCutterTargets[0]);
+                packet.Send(-1, Main.myPlayer);
+                return true;
+            }
+            if(Main.netMode == NetmodeID.SinglePlayer)
+            {
+                StartFinalCutter();
+                return true;
+            }
+            packet = Mod.GetPacket();
+            packet.Write((byte)KirboMod.ModPacketType.StartFinalCutterMultiNPC);
+            packet.Write((byte)Main.myPlayer);
+            packet.Write((byte)currentFinalCutterTargets.Count);
+            for (int i = 0; i < currentFinalCutterTargets.Count; i++)
+            {
+                packet.Write((byte)currentFinalCutterTargets[i]);
+            }
+            packet.Send(-1, Main.myPlayer);
+            return false;
+        }
+        public void StartFinalCutter()
+        {
+            finalCutterAnimationCounter = 80;
+            for (int i = 0; i < currentFinalCutterTargets.Count; i++)
+            {
+                //cursed line of code
+                Main.npc[currentFinalCutterTargets[i]].GetGlobalNPC<KirbNPC>().StartFinalCutter(finalCutterAnimationCounter + 10);
+            }
+            
+        }
+        void UpdateFinalCutter()
+        {
 
-        public int rainbowSwordSwingCounter;
-        public int NextRainbowSwordSwingDirection { get => rainbowSwordSwingCounter++ % 2 * 2 - 1; }
+            if (finalCutterAnimationCounter <= 0 || currentFinalCutterTargets.Count <= 0)
+                return;
+            //perhaps dont damage npc and just spawn combat text and play hit sfx?
+            for (int i = 0; i < currentFinalCutterTargets.Count; i++)
+            {
+                NPC target = Main.npc[currentFinalCutterTargets[i]];
+                target.Bottom = Player.Bottom;//might not work well with mounts
+                target.position.X = Player.Center.X + Player.direction * target.width - target.width / 2;
+            }
+            int finalCutterJumpStart = 60;
+            if(finalCutterAnimationCounter < finalCutterJumpStart)
+            {
+                float progress = Utils.Remap(finalCutterAnimationCounter, finalCutterJumpStart, 0, -1.53f, 1);
+
+                Player.position.Y += progress * 30;
+            }
+            if(finalCutterAnimationCounter == 1)//last frame
+            {
+                Player.velocity = new Vector2(Player.direction * 10, 10);
+                for (int i = 0; i < currentFinalCutterTargets.Count; i++)
+                {
+                    NPC npc = Main.npc[currentFinalCutterTargets[i]];
+                    npc.position.Y += 8;
+                    npc.SimpleStrikeNPC(100, Player.direction, true, 60, Player.HeldItem.DamageType, true, Player.luck);//boom
+                }
+                if(Player.whoAmI == Main.myPlayer)
+                {
+                    Projectile.NewProjectile(Player.GetSource_ItemUse(Player.HeldItem), Player.Center, new Vector2(Player.direction * 20, 0), ModContent.ProjectileType<Projectiles.Star>(), 100, 11);
+                }
+            }
+        }
         public override void ResetEffects() //restart accesory stats so if not wearing one then it stops doing the effects
         {
             whispbush = false;
@@ -104,6 +206,9 @@ namespace KirboMod
         public override void PreUpdate()
         {
             kirbyballoonwait -= 1;
+            //-1 to compensate when you detect right click it adds to the counter
+            if (finalCutterAnimationCounter > -1)
+                finalCutterAnimationCounter--;
 
             //fighter glove
             if (fighterComboResetDelay > 0) //go down 'til 0
@@ -249,6 +354,7 @@ namespace KirboMod
             {
                 player.GetModPlayer<KirbPlayer>().plasmacharge = 15;
             }
+            UpdateFinalCutter();
         }
 
         public override void PostUpdateEquips()
@@ -256,6 +362,11 @@ namespace KirboMod
             Player player = Main.player[Main.myPlayer];
 
             bool airborne = player.velocity.Y != 0f;
+
+            if (Player.controlUseItem)
+            {
+                finalCutterAnimationCounter++;
+            }
 
             DarkDashMovement(); //dark dash
 

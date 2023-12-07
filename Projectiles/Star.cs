@@ -1,3 +1,4 @@
+using KirboMod.Particles;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
@@ -36,7 +37,7 @@ namespace KirboMod.Projectiles
 
 			if (Main.rand.NextBool(3)) // happens 1/3 times
 			{
-				Sparkle.NewSparkle(Projectile.Center + Main.rand.NextVector2Circular(20,20) - Projectile.velocity, Main.rand.NextBool(3, 5) ? Color.Yellow : Color.Blue, new Vector2(1, 1.5f), Projectile.velocity * 0.1f + Main.rand.NextVector2Circular(30, 30) / 10, 40, new Vector2(2, 2), null, 1, 0, 0.98f);
+				Sparkle.NewSparkle(Projectile.Center + Main.rand.NextVector2Circular(20,20) - Projectile.velocity, Main.rand.NextBool(3, 5) ? Color.Yellow : Color.Blue, new Vector2(1, 1.5f), Projectile.velocity * 0.1f + Main.rand.NextVector2Circular(30, 30) / 10, 40, new Vector2(2, 2));
 			}
 
 			if (Projectile.soundDelay == 0)
@@ -72,7 +73,7 @@ namespace KirboMod.Projectiles
             {
                 Vector2 velocity = Main.rand.NextVector2Circular(10, 10); //burst of sparkles
                 Sparkle.NewSparkle(Projectile.Center + Projectile.velocity, Main.rand.NextBool(3, 5) ? Color.Yellow : Color.Blue, 
-					new Vector2(1, 1f), velocity, 40, new Vector2(2, 2), null, 1, 0, 0.98f);
+					new Vector2(1, 1f), velocity, 40, new Vector2(2, 2));
             }
 		}
         public override bool PreDraw(ref Color lightColor)
@@ -87,7 +88,7 @@ namespace KirboMod.Projectiles
 		}
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
-			return AIUtils.CheckCircleCollision(targetHitbox, Projectile.Center, 50) || AIUtils.CheckCircleCollision(targetHitbox, Projectile.Center - Projectile.velocity * 4, 50); ;
+			return Helper.CheckCircleCollision(targetHitbox, Projectile.Center, 50) || Helper.CheckCircleCollision(targetHitbox, Projectile.Center - Projectile.velocity * 4, 50); ;
         }
         public override Color? GetAlpha(Color lightColor)
         {

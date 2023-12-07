@@ -26,3 +26,10 @@ obj/project.nuget.cache
 .vs/KirboMod/v17/.suo
 .vs/KirboMod/v17/.futdcache.v1
 .vs/KirboMod/DesignTimeBuild/.dtbcache.v2
+obj/Debug/net6.0/KirboMod.assets.cache
+obj/Debug/net6.0/KirboMod.csproj.AssemblyReference.cache
+obj/Debug/net6.0/KirboMod.GeneratedMSBuildEditorConfig.editorconfig
+obj/KirboMod.csproj.nuget.dgspec.json
+obj/KirboMod.csproj.nuget.g.props
+obj/project.assets.json
+obj/project.nuget.cache

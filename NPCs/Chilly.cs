@@ -13,13 +13,12 @@ namespace KirboMod.NPCs
 {
 	public class Chilly : ModNPC
 	{
-		private int frame = 0;
-		private double counting;
-
 		private int attacktype = 0;
-		private int attackcooldown = 120; //60 is attack point
+		private int attackTimer; 
+		private int attackStart = 70;
+		private int attackDuration = 90;
+		private int TotalAttackCycleDuration { get => attackStart + attackDuration; }
 		private bool attacking = false;
-
         private bool jumped = false;
 
         public override void SetStaticDefaults()
@@ -27,7 +26,6 @@ namespace KirboMod.NPCs
 			// DisplayName.SetDefault("Chilly");
 			Main.npcFrameCount[NPC.type] = 8;
 		}
-
 		public override void SetDefaults()
 		{
 			NPC.width = 28;
@@ -38,7 +36,7 @@ namespace KirboMod.NPCs
 			NPC.HitSound = SoundID.NPCHit11;
 			NPC.DeathSound = SoundID.NPCDeath15;
 			NPC.value = Item.buyPrice(0, 0, 0, 10);
-			NPC.knockBackResist = 1f;
+			NPC.knockBackResist = .8f;
 			Banner = NPC.type;
 			BannerItem = ModContent.ItemType<Items.Banners.ChillyBanner>();
 			NPC.aiStyle = -1;
@@ -46,7 +44,6 @@ namespace KirboMod.NPCs
 			NPC.noGravity = false;
 			NPC.coldDamage = true;
 		}
-
 		public override float SpawnChance(NPCSpawnInfo spawnInfo)
 		{
 			//if player is in snow biome and daytime or underground and not in water
@@ -95,10 +92,10 @@ namespace KirboMod.NPCs
 			NPC.spriteDirection = NPC.direction;
 			Player player = Main.player[NPC.target];
 			Vector2 distance = player.Center - NPC.Center;
-
+			float range = 120;
 			bool lineOfSight = Collision.CanHitLine(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height);
 
-			if (distance.X < 120 & distance.X > -120 & distance.Y > -120 & distance.Y < 120 && lineOfSight && !player.dead) //checks if chills is in range
+			if (distance.X < range & distance.X > -range & distance.Y > -range & distance.Y < range && lineOfSight && !player.dead) //checks if chills is in range
 			{
 				attacking = true; //now attack
 			}
@@ -154,7 +151,7 @@ namespace KirboMod.NPCs
 			{
                 NPC.frameCounter++;
 
-                if (attackcooldown > 60 && attackcooldown <= 120) //getting ready
+                if (attackTimer < attackStart) //getting ready
 				{
                     if (NPC.frameCounter < 2.0)
                     {
@@ -221,31 +218,33 @@ namespace KirboMod.NPCs
 			Player player = Main.player[NPC.target];
 			Vector2 projshoot = player.Center - NPC.Center;
 			projshoot.Normalize();
-			projshoot *= 10f;
+			projshoot *= 8;//this is the max range
+			if (Main.expertMode)
+				projshoot *= 1.2f;//expert mode range multiplier
+			projshoot *= Easings.EaseInOutSine(Utils.GetLerpValue(attackStart, TotalAttackCycleDuration, attackTimer + attackDuration / 3f, true));
 
 			NPC.velocity.X *= 0.9f; //slow
-			attackcooldown--; //goes down by 1 each tick
+			attackTimer++; //goes up by 1 each tick
 			NPC.TargetClosest(true);
 
-			if (attackcooldown <= 60) //attack for 60 ticks
+			if (attackTimer > attackStart) //attack for 60 ticks
 			{
 				if (Main.netMode != NetmodeID.MultiplayerClient)
 				{
-					Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projshoot.RotatedByRandom(MathHelper.ToRadians(360)), Mod.Find<ModProjectile>("BadIce").Type, 40 / 2, 1, Main.myPlayer, 0, 0);
+					if(Main.expertMode)
+						Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projshoot.RotatedByRandom(MathF.Tau), ModContent.ProjectileType<Projectiles.BadIce>(), 40 / 2, 1, Main.myPlayer, 0, 0);
+					Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projshoot.RotatedByRandom(MathF.Tau), ModContent.ProjectileType<Projectiles.BadIce>(), 40 / 2, 1, Main.myPlayer, 0, 0);
 				}
-
-                if (attackcooldown % 10 == 0) //every 10th tick
+				Dust.NewDustPerfect(NPC.Center + Main.rand.NextVector2Circular(16, 16), DustID.WhiteTorch, -Vector2.UnitY);
+				if (attackTimer % 10 == 0) //every 10th tick
                 {
-                    SoundEngine.PlaySound(SoundID.Item24, NPC.Center); //spectre boots
+					Particles.Ring.EmitRing(NPC.Center + Main.rand.NextVector2Circular(16, 16), Color.SkyBlue);
+					SoundEngine.PlaySound(SoundID.Item24 with { MaxInstances = 0, Volume = 2, Pitch = 1}, NPC.Center); //spectre boots
                 }
             }
-			if (attackcooldown <= 0)
+			if (attackTimer >= TotalAttackCycleDuration)
 			{
-				attackcooldown = 180; //cooldown for 60 ticks
-			}
-			if (attackcooldown == 121)
-			{
-				attackcooldown = 120; //ready next attack
+				attackTimer = 0; //ready next attack
 				attacking = false; //stop attacking
 			}
         }

@@ -6,6 +6,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
+using KirboMod.Projectiles;
 
 namespace KirboMod.NPCs
 {
@@ -23,7 +24,8 @@ namespace KirboMod.NPCs
 			NPC.height = 36;
 			//drawOffsetY = -18; //make sprite line up with hitbox
 			NPC.damage = 40;
-			NPC.lifeMax = 220;
+			NPC.lifeMax = 300;
+			NPC.defense = 18;
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
 			NPC.value = Item.buyPrice(0, 0, 2, 50); // money it drops
@@ -62,27 +64,52 @@ namespace KirboMod.NPCs
         {
 			NPC.spriteDirection = NPC.direction;
 			Player player = Main.player[NPC.target];
-			Vector2 distance = player.Center - NPC.Center;
             NPC.TargetClosest(true); //face target
 
             NPC.rotation = NPC.velocity.X * 0.1f;
 
             NPC.ai[0]++;
-			if (NPC.ai[0] % 120 == 0)
+			int fireRate = Main.getGoodWorld ? 90 : Main.expertMode ? 120 : 180; 
+			if (NPC.ai[0] % fireRate == 0)
             {
-				distance.Normalize();
-				distance *= 5;
-
-				if (Main.netMode != NetmodeID.MultiplayerClient)
+				Vector2 shootVel = Vector2.Normalize(player.Center - NPC.Center);
+				shootVel *= 5;
+				if (Main.expertMode)
 				{
-					Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, distance, Mod.Find<ModProjectile>("BirdonFeatherBad").Type, 60 / 2, 1, Main.myPlayer, 0, 0);
-					Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, distance.RotatedBy(MathHelper.ToRadians(20)), Mod.Find<ModProjectile>("BirdonFeatherBad").Type, 60 / 2, 1, Main.myPlayer, 0, 0);
-					Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, distance.RotatedBy(MathHelper.ToRadians(-20)), Mod.Find<ModProjectile>("BirdonFeatherBad").Type, 60 / 2, 1, Main.myPlayer, 0, 0);
+					shootVel *= 1.33f;
+					Utils.ChaseResults results = Utils.GetChaseResults(NPC.Center, shootVel.Length(), player.Center, player.velocity);
+					shootVel = results.InterceptionHappens ? results.ChaserVelocity : (Vector2.Normalize(player.velocity) * shootVel.Length());
+				}
+				int featherAmount = 3;
+				if (Main.expertMode)
+                {
+                    featherAmount = 4;
+                }
+                if (Main.getGoodWorld)
+                {
+                    featherAmount = 8;
+                }
+
+                float spread = .6f;
+				if (Main.expertMode)
+					spread = 1;
+				if (Main.getGoodWorld)
+                {
+                    spread = 1.5f;
+                }
+
+                for (int i = -featherAmount / 2; i <= featherAmount / 2; i++)
+                {
+					ShootFeather(shootVel.RotatedBy(Utils.Remap(i, -featherAmount / 2, featherAmount / 2, -spread / 2, spread / 2)));
 				}
 			}
 		}
-
-        public override void FindFrame(int frameHeight) // animation
+		void ShootFeather(Vector2 velocity)
+		{
+			if(Main.netMode != NetmodeID.MultiplayerClient)
+			Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, velocity, ModContent.ProjectileType<BirdonFeatherBad>(), 60 / 2, 1, Main.myPlayer, 0, 0);
+		}
+		public override void FindFrame(int frameHeight) // animation
         {
 			if (frame == 0)
 			{

@@ -21,8 +21,9 @@ namespace KirboMod.Projectiles
 			Projectile.timeLeft = 300;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
+			Projectile.extraUpdates = 3;
 			Projectile.usesLocalNPCImmunity = true;
-			Projectile.localNPCHitCooldown = 10; //default
+			Projectile.localNPCHitCooldown = -1; //default
 		}
 
 		public override void AI()
@@ -39,6 +40,15 @@ namespace KirboMod.Projectiles
 		}
         public override bool PreDraw(ref Color lightColor)
         {
+			if(Projectile.ai[1] == 0)
+            {
+				Projectile.ai[1] = Projectile.velocity.Length();
+            }
+			NPC npc = Main.npc[(int)Projectile.ai[0]];
+			if(Helper.ValidHomingTarget(npc, Projectile, false))
+            {
+				Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.DirectionTo(npc.Center) * Projectile.ai[1], .2f); 
+            }
 			VFX.DrawElectricOrb(Projectile.Center, Vector2.One * 1.3f, Projectile.Opacity, Projectile.rotation);
 			return false;
         }

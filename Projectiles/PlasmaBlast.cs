@@ -43,7 +43,7 @@ namespace KirboMod.Projectiles
         //TODO OVERRIDE PREDRAW AND MAKE THIS LOOK COOL
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
-			return AIUtils.CheckCircleCollision(targetHitbox, Projectile.Center, 80);
+			return Helper.CheckCircleCollision(targetHitbox, Projectile.Center, 80);
         }
         public override void AI()
 		{

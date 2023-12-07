@@ -7,6 +7,8 @@ using Terraria.ModLoader;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.DataStructures;
+using KirboMod.Particles;
+using Terraria.Audio;
 
 namespace KirboMod.NPCs
 {
@@ -30,8 +32,9 @@ namespace KirboMod.NPCs
 		public override void SetDefaults() {
 			NPC.width = 38;
 			NPC.height = 38;
-			NPC.lifeMax = 80;
-			NPC.damage = 15;
+			NPC.lifeMax = 180;
+			NPC.defense = 10;
+			NPC.damage = 0;//damage will be from the explosion. Don't deal damage while passive
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
 			NPC.value = Item.buyPrice(0, 0, 0, 15);
@@ -137,10 +140,10 @@ namespace KirboMod.NPCs
 			else //angry
             {
                 NPC.chaseable = true; //now homable
+				NPC.ai[0]++; //go up by 1 each tick
 
-                if (NPC.ai[0] <= 60)
+				if (NPC.ai[0] <= 30)
 				{
-                    NPC.ai[0]++; //go up by 1 each tick
 					if (NPC.ai[0] == 1)
 					{
 						NPC.TargetClosest(true); //face perpetrator for one tick
@@ -157,8 +160,12 @@ namespace KirboMod.NPCs
 				{
 					NPC.TargetClosest();
 					Player player = Main.player[NPC.target];
+					if (player.Hitbox.Intersects(NPC.Hitbox))
+                    {
+						Boom();
+                    }
 
-					float speed = 10f;
+					float speed = Helper.RemapEasing(NPC.ai[0], 30, 70, 0, 15, Easings.EaseInOutSine);
 					float inertia = 20f;
 
 					Vector2 moveTo = player.Center;
@@ -177,7 +184,48 @@ namespace KirboMod.NPCs
 				}
 			}
         }
+		static float GetExplosionSizeMultiplier()
+		{
+			if (Main.getGoodWorld)
+			{
+				return 4;
+			}
+			if (Main.expertMode)
+			{
+				return 2;
+			}
+			return 1;
+		}
+		Vector2 RndCircleOffset { get => Main.rand.NextVector2Circular(NPC.width, NPC.height); }
+		void Boom()
+        {
+			int max = (int)(3 * GetExplosionSizeMultiplier() * GetExplosionSizeMultiplier());
+			for (int i = 0; i < max; i++)
+			{
+				Vector2 scale = new Vector2(1, 1).RotatedByRandom(.5f) * 1.2f;
+				Vector2 offset = RndCircleOffset / 2f;
+				Sparkle sparkle = new(NPC.Center + offset, Color.OrangeRed, Vector2.Zero, scale * 2, scale * 2, 3);
+				sparkle.rotation = Main.rand.NextBool() ? 0 : MathHelper.PiOver4;
+				sparkle.Confirm();
+				Ring ring = Ring.EmitRing(NPC.Center + offset, Color.Lerp(Color.Orange * .7f, Color.Black, Main.rand.NextFloat()));
+				ring.squish = scale;
+				Gore gore = Gore.NewGoreDirect(NPC.GetSource_Death(), NPC.Center + Main.rand.NextVector2Circular(4, 4) * GetExplosionSizeMultiplier(), Main.rand.NextVector2Circular(4, 4), Main.rand.NextFromList(GoreID.Smoke1, GoreID.Smoke2, GoreID.Smoke2), Main.rand.NextFloat() * .3f + .9f);
+				gore.rotation = Main.rand.NextFloat() * MathF.Tau;
+				Dust.NewDustPerfect(NPC.Center + RndCircleOffset / 3, DustID.Torch, -Vector2.UnitY.RotatedByRandom(1) * (Main.rand.NextFloat() * 4 + 2), 0, default, 3);
+			}
+			//die from explosion
+			NPC.active = false;
+			SoundEngine.PlaySound(SoundID.Item38 with { MaxInstances = 0 }, NPC.Center);
+			NPC.Hitbox = Utils.CenteredRectangle(NPC.Center, NPC.Size * GetExplosionSizeMultiplier());
+			int dmg = NPC.GetAttackDamage_ScaledByStrength(100);
+            for (int i = 0; i < Main.maxPlayers; i++)
+            {
+				Player plr = Main.player[i];
+				if (plr.active && !plr.dead && plr.Hitbox.Intersects(NPC.Hitbox))
+					Main.player[NPC.target].Hurt(PlayerDeathReason.ByNPC(NPC.whoAmI), dmg, NPC.direction);
+			}
 
+		}
 		private void CheckPlatform() //trust me this is totally unique and original code and definitely not stolen from Spirit Mod's public source code(thx so much btw you don't know the hell I went through with this)
 		{
 			bool onplatform = true;
