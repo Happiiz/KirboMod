@@ -34,7 +34,7 @@ namespace KirboMod.NPCs
             NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
             {
                 PortraitScale = 1f, // Portrait refers to the full picture when clicking on the icon in the bestiary
-                PortraitPositionYOverride = 90f,
+                PortraitPositionYOverride = 70f,
                 Position = new Vector2(0, 80),
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
@@ -44,8 +44,8 @@ namespace KirboMod.NPCs
         public override void SetDefaults()
         {
             NPC.width = 114;
-            NPC.height = 152;
-            DrawOffsetY = -20;
+            NPC.height = 114;
+            DrawOffsetY = 20;
             NPC.damage = 70; 
             NPC.noTileCollide = true;
             NPC.defense = 6;

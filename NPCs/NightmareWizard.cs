@@ -98,10 +98,10 @@ namespace KirboMod.NPCs
 
                 animation = 0;
             }
-			else //beginning of cycle
+			else 
 			{
-				if (NPC.ai[0] == 120)
-				{
+				if (NPC.ai[0] == 120) //beginning of cycle
+                {
 					animation = 0;
 
 					NPC.damage = 0; //reset
@@ -111,30 +111,75 @@ namespace KirboMod.NPCs
                     NPC.TargetClosest(false);
 
 					AttackDecideNext();
+
+                    if (NPC.GetLifePercent() < 0.5f) 
+                    {
+                        phase = 2; //change phase
+                    }
                 }
 
                 if (attacktype == NightmareAttackType.SpreadStars)
                 {
-					AttackSpreadStars(NPC.ai[0] - 120, player);
+                    if (phase == 1)
+                    {
+                        AttackSpreadStars(NPC.ai[0] - 120, player);
+                    }
+                    else
+                    { 
+                        EnrageSpreadStars(NPC.ai[0] - 120, player);
+                    }
                 }
                 if (attacktype == NightmareAttackType.RingStars)
                 {
-                    AttackRingStars(NPC.ai[0] - 120, player);
+                    if (phase == 1)
+                    {
+                        AttackRingStars(NPC.ai[0] - 120, player);
+                    }
+                    else
+                    {
+                        EnrageRingStars(NPC.ai[0] - 120, player);
+                    }
                 }
                 if (attacktype == NightmareAttackType.Swoop)
                 {
-					AttackSwoop(NPC.ai[0] - 120, player);
+                    if (phase == 1)
+                    {
+                        AttackSwoop(NPC.ai[0] - 120, player);
+                    }
+                    else
+                    {
+                        EnrageSwoop(NPC.ai[0] - 120, player);
+                    }
                 }
                 if (attacktype == NightmareAttackType.Tornado)
                 {
-                    AttackTornado(NPC.ai[0] - 120, player);
+                    if (phase == 1)
+                    {
+                        AttackTornado(NPC.ai[0] - 120, player);
+                    }
+                    else
+                    {
+                        EnrageTornado(NPC.ai[0] - 120, player);
+                    }
                 }
                 if (attacktype == NightmareAttackType.Stoop)
                 {
-                    AttackStoop(NPC.ai[0] - 120, player);
+                    if (phase == 1)
+                    {
+                        AttackStoop(NPC.ai[0] - 120, player);
+                    }
+                    else
+                    {
+                        EnrageStoop(NPC.ai[0] - 120, player);
+                    }
                 }
             }
-		}
+
+            if (tpEffectCounter <= 12) //teleporting
+            {
+                animation = 2;
+            }
+        }
 
 		private void AttackSpreadStars(float timer, Player player) //NPC.ai[0] subtracted by 60 to make counting more simple
 		{
@@ -150,34 +195,33 @@ namespace KirboMod.NPCs
 				animation = 1; 
 				if (NPC.Center.X > player.Center.X)
 				{
-					NPC.velocity.X = 10;
+					NPC.velocity.X = 20;
 					NPC.direction = -1;
 				}
                 else
                 {
-                    NPC.velocity.X = -10;
+                    NPC.velocity.X = -20;
                     NPC.direction = 1;
                 }
             }
 			if (timer >= 120)
 			{
-				if (timer == 120)
-				{
-					animation = 3; //damageable
-                    NPC.velocity /= 2;
-                }
-
+                animation = 3; //damageable
+                NPC.velocity *= 0.975f;
 
                 if (timer % 10 == 0)
 				{
                     Vector2 direction = player.Center - NPC.Center;
 
                     direction.Normalize();
-                    direction *= 20;
+                    direction *= 15;
 
                     SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
 
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, direction.RotatedByRandom(MathHelper.ToRadians(30)),
+                    //spawn on top of hand
+                    Vector2 startpos = NPC.Center + new Vector2(NPC.direction * -50, -100);
+
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction.RotatedByRandom(MathHelper.ToRadians(30)),
                         ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
                 }
             }
@@ -231,10 +275,7 @@ namespace KirboMod.NPCs
         private void AttackSwoop(float timer, Player player)
         {
             Vector2 playerDistance = player.Center - NPC.Center;
-
-            float speed = 30f;
-            float inertia = 15f;
-
+            
             //teleport 
             if (timer == 1)
             {
@@ -242,60 +283,35 @@ namespace KirboMod.NPCs
             }
             Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
 
-			if (timer >= 60 && timer < 180)
+			if (timer >= 60)
             {
                 animation = 4; //swoop
 
-                float xOffset = 800;
-
-                if (playerDistance.X <= 0) //if player is behind enemy
+                if (timer == 60)
                 {
-                    xOffset = 800; // go in front of player 
+                    if (playerDistance.X <= 0) //if player is right of enemy
+                    {
+                        NPC.velocity.X = 30f;
+                    }
+                    else
+                    {
+                        NPC.velocity.X = -30f;
+                    }
+
+                    NPC.TargetClosest(true); //face player only for inital backing up
                 }
-                else
-                {
-                    xOffset = -800; // go behind player
-                }
 
-                Vector2 playerXOffest = player.Center + new Vector2(xOffset, 0f); //go in front of player
-                Vector2 move = playerXOffest - NPC.Center;
+                NPC.velocity.X += NPC.direction * 1f;
 
-                NPC.TargetClosest(true); //face player only for charge
-
-                move.Normalize();
-                move *= speed;
-                NPC.velocity = (NPC.velocity * (inertia - 1) + move) / inertia;
-            }
-			else if (timer >= 180)
-			{
-                NPC.velocity.X += NPC.direction * 1.5f;
-
-                speed = 10f; //make slower
+                float speed = 20f;
+                float inertia = 15f;
 
                 playerDistance.Normalize();
                 playerDistance *= speed;
                 NPC.velocity.Y = (NPC.velocity.Y * (inertia - 1) + playerDistance.Y) / inertia;
-
-                if (NPC.ai[0] == 180) //reset velocity for sweep
-                {
-                    NPC.velocity.X = 0;
-                }
-
-                //make hitbox
-                int x = (int)NPC.position.X;
-                int y = (int)NPC.position.Y - 75; //move up a bit 
-
-                
-                Rectangle hitbox = new Rectangle(x, y, NPC.width, NPC.height);
-
-                //hurt
-                if (hitbox.Intersects(player.getRect()) && player.immune == false)
-				{
-					player.Hurt(PlayerDeathReason.ByNPC(NPC.whoAmI), 70, NPC.direction);
-				}
             }
 
-			if (timer > 240)
+			if (timer > 180)
             {
                 NPC.velocity *= 0.01f;
 
@@ -353,7 +369,7 @@ namespace KirboMod.NPCs
 				if (timer < 60) //rise
                 {
                     //hover over player
-                    Vector2 playerDistance = player.Center + new Vector2(0, -200) - NPC.Center;
+                    Vector2 playerDistance = player.Center + new Vector2(0, -400) - NPC.Center;
 
                     float speed = 15f;
                     float inertia = 10f;
@@ -393,7 +409,322 @@ namespace KirboMod.NPCs
             }
         }
 
-		private void Teleport(float timer, Player player, Vector2 location)
+        //EXPERT LOW HEALTH ATTACKS
+
+        private void EnrageSpreadStars(float timer, Player player)
+        {
+            //teleport 
+            if (timer == 1)
+            {
+                NPC.ai[1] = timer; //time to start teleport
+            }
+            Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
+
+            if (timer == 60) //move to side
+            {
+                animation = 1;
+                if (NPC.Center.X > player.Center.X)
+                {
+                    NPC.velocity.X = 20;
+                    NPC.direction = -1;
+                }
+                else
+                {
+                    NPC.velocity.X = -20;
+                    NPC.direction = 1;
+                }
+            }
+            if (timer >= 90)
+            {
+                animation = 3; //damageable
+                NPC.velocity *= 0.95f;
+
+                if (timer % 8 == 0)
+                {
+                    Vector2 direction = player.Center - NPC.Center;
+
+                    direction.Normalize();
+                    direction *= 15;
+
+                    SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
+
+                    //spawn on top of hand
+                    Vector2 startpos = NPC.Center + new Vector2(NPC.direction * -50, -100);
+
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction.RotatedByRandom(MathHelper.ToRadians(30)),
+                        ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
+                }
+            }
+
+            if (timer >= 210)
+            {
+                NPC.ai[0] = 119; //restart
+            }
+        }
+
+        private void EnrageRingStars(float timer, Player player)
+        {
+            //teleport 
+            if (timer == 1)
+            {
+                NPC.ai[1] = timer; //time to start teleport
+            }
+            Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
+
+            if (timer < 240)
+            {
+                //teleport throughout attack
+                if (timer % 40 == 0)
+                {
+                    NPC.ai[1] = timer; //time to start teleport
+                }
+                Teleport(timer - NPC.ai[1], player, new Vector2(Main.rand.Next(-300, 300), -400));
+
+                animation = 5; //damageable
+
+                if ((timer + 20) % 40 == 0)
+                {
+                    for (float i = 0; i < 12; i += 1f)
+                    {
+                        float angle = ((timer - 60) * 2f) + (i * (MathF.PI / 6));
+
+                        Vector2 vel = new Vector2(MathF.Cos(angle) * 10, MathF.Sin(angle) * 10);
+
+                        SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
+
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, vel,
+                            ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
+                    }
+                }
+            }
+
+            if (timer >= 300)
+            {
+                NPC.ai[0] = 119; //restart
+            }
+        }
+
+        private void EnrageSwoop(float timer, Player player)
+        {
+
+            //teleport 
+            if (timer == 1)
+            {
+                NPC.ai[1] = timer; //time to start teleport
+            }
+            Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
+
+            float side = Main.rand.NextBool() == true ? 1 : -1;
+
+            //teleport again
+            if (timer == 30)
+            {
+                NPC.ai[1] = timer; //time to start teleport
+            }
+            Teleport(timer - NPC.ai[1], player, new Vector2(side * 600, 0));
+
+            if (timer > 30)
+            {
+                Vector2 playerDistance = player.Center - NPC.Center;
+
+                animation = 4; //swoop
+
+                if (timer == 31)
+                {
+                    if (playerDistance.X <= 0) //if player is right of enemy
+                    {
+                        NPC.velocity.X = 20f;
+                    }
+                    else
+                    {
+                        NPC.velocity.X = -20f;
+                    }
+
+                    NPC.TargetClosest(true); //face player only for inital backing up
+                }
+
+                NPC.velocity.X += NPC.direction * 1f;
+
+                float speed = 20f;
+                float inertia = 15f;
+
+                playerDistance.Normalize();
+                playerDistance *= speed;
+                NPC.velocity.Y = (NPC.velocity.Y * (inertia - 1) + playerDistance.Y) / inertia;
+
+
+                //make hitbox
+                int x = (int)NPC.position.X;
+                int y = (int)NPC.position.Y - 75; //move up a bit 
+
+
+                Rectangle hitbox = new Rectangle(x, y, NPC.width, NPC.height);
+
+                //hurt
+                if (hitbox.Intersects(player.getRect()) && player.immune == false)
+                {
+                    player.Hurt(PlayerDeathReason.ByNPC(NPC.whoAmI), 70, NPC.direction);
+                }
+            }
+
+            if (timer > 150)
+            {
+                NPC.velocity *= 0.01f;
+
+                NPC.ai[0] = 119; //restart
+            }
+        }
+
+        private void EnrageTornado(float timer, Player player)
+        {
+            //teleport 
+            if (timer == 1)
+			{
+				NPC.ai[1] = timer; //time to start teleport
+            }
+			Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
+
+			if (timer >= 30) //initiate animation
+			{
+				animation = 6;
+
+                if (timer >= 60) //glide towards player
+                {
+                    Vector2 playerDistance = player.Center - NPC.Center;
+
+                    float speed = 18f;
+                    float inertia = 20f;
+
+                    playerDistance.Normalize();
+                    playerDistance *= speed;
+                    NPC.velocity = (NPC.velocity * (inertia - 1) + playerDistance) / inertia;
+
+                    if ((timer % 120 == 0) && timer != 120) //every 120 excluding 120
+                    {
+                        NPC.ai[1] = timer; //time to start teleport
+                    }
+                    Teleport(timer - NPC.ai[1], player, Main.rand.NextVector2CircularEdge(600, 600));
+                    //teleport 'round a circle
+                }
+            }
+
+			if (timer >= 420)
+			{
+                NPC.velocity *= 0.01f;
+
+                NPC.ai[0] = 119; //restart
+            }
+        }
+
+        private void EnrageStoop(float timer, Player player)
+        {
+            //teleport 
+            if (timer == 1)
+            {
+                NPC.ai[1] = timer; //time to start teleport
+            }
+            Teleport(timer - NPC.ai[1], player, new Vector2(0, -400));
+
+            if (timer >= 12)
+            {
+                animation = 7;
+
+                if (timer < 60) //follow
+                {
+                    //hover over player
+                    Vector2 playerDistance = player.Center + new Vector2(0, -400) - NPC.Center;
+
+                    float speed = 15f;
+                    float inertia = 10f;
+
+                    playerDistance.Normalize();
+                    playerDistance *= speed;
+                    NPC.velocity = (NPC.velocity * (inertia - 1) + playerDistance) / inertia;
+                }
+                else if (timer < 120)
+                {
+                    NPC.velocity.Y *= 0.9f; //slow while stooping
+
+                    NPC.velocity.X *= 0.01f;
+
+                    if (timer == 60) //stoop
+                    {
+                        NPC.velocity.Y = (player.Center.Y - NPC.Center.Y) / 5; //distance depends on player distance
+
+                        //caps
+
+                        if (NPC.velocity.Y < 30)
+                        {
+                            NPC.velocity.Y = 30;
+                        }
+
+                        if (NPC.velocity.Y > 60)
+                        {
+                            NPC.velocity.Y = 60;
+                        }
+                    }
+                }
+
+                //AGAIN!
+
+                //teleport 
+                if (timer == 120)
+                {
+                    NPC.ai[1] = timer; //time to start teleport
+                }
+                Teleport(timer - NPC.ai[1], player, new Vector2(-400, 0));
+
+                if (timer >= 132)
+                {
+                    animation = 7;
+
+                    if (timer < 180) //follow but with slightly more time to escape
+                    {
+                        //hover over player
+                        Vector2 playerDistance = player.Center + new Vector2(-400, 0) - NPC.Center;
+                        NPC.rotation = -MathF.PI / 2; //facing right
+
+                        float speed = 15f;
+                        float inertia = 10f;
+
+                        playerDistance.Normalize();
+                        playerDistance *= speed;
+                        NPC.velocity = (NPC.velocity * (inertia - 1) + playerDistance) / inertia;
+                    }
+                    else if (timer < 270) 
+                    {
+                        NPC.velocity.X *= 0.9f; //slow while stooping
+
+                        NPC.velocity.Y *= 0.01f;
+
+                        if (timer == 180) //stoop
+                        {
+                            NPC.velocity.X = (player.Center.X - NPC.Center.X) / 5; //distance depends on player distance
+
+                            //caps
+
+                            if (NPC.velocity.X < 30)
+                            {
+                                NPC.velocity.X = 30;
+                            }
+
+                            if (NPC.velocity.X > 60)
+                            {
+                                NPC.velocity.X = 60;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (timer >= 270)
+            {
+                NPC.rotation = 0;
+                NPC.ai[0] = 119; //restart
+            }
+        }
+
+        private void Teleport(float timer, Player player, Vector2 location)
 		{
             if (timer == 1)
             {
@@ -402,6 +733,8 @@ namespace KirboMod.NPCs
 
                 NPC.Center = player.Center + location;
 				NPC.frameCounter = 0;
+
+                NPC.TargetClosest(false); //just in case
             }
             if (timer < 12)
 			{
@@ -535,6 +868,8 @@ namespace KirboMod.NPCs
 				}
 
                 NPC.dontTakeDamage = true;
+
+                NPC.damage = NPC.defDamage; //set to inital damage
             }
 
             if (animation == 5) //fully open robe
