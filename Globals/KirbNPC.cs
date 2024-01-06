@@ -12,10 +12,7 @@ namespace KirboMod.Globals
         public int finalCutteredCounter = 0;//
         public override void OnHitByProjectile(NPC npc, Projectile projectile, NPC.HitInfo hit, int damageDone)
         {
-            if (projectile.type == ModContent.ProjectileType<CutterBlade>())
-            {
 
-            }
         }
         public void StartFinalCutter(int duration)
         {

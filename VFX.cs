@@ -46,21 +46,25 @@ namespace KirboMod
         }
         public static void LoadTextures()
         {
-            Circle = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/CirclePremultiplied").Value;
-            Ring = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/RingPremultiplied").Value;
-            GlowBall = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowBallPremultiplied").Value;
-            glowLine = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowLinePremultiplied").Value;
-            glowLineCap = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowLineCapPremultiplied").Value;
-            ringShine = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/RingShinePremultiplied").Value;
+            circle = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/CirclePremultiplied");
+            ring = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/RingPremultiplied");
+            glowBall = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowBallPremultiplied");
+            glowLine = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowLinePremultiplied");
+            glowLineCap = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowLineCapPremultiplied");
+            ringShine = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/RingShinePremultiplied");
         }
-        public static Texture2D glowLine;
-        public static Texture2D glowLineCap;
-        public static Texture2D Circle;
-        public static Texture2D ringShine;
-        public static Texture2D GlowBall;
-
-        public static Texture2D Ring;
-
+        public static Asset<Texture2D> glowLine;
+        public static Asset<Texture2D> glowLineCap;
+        public static Asset<Texture2D> circle;
+        public static Asset<Texture2D> ringShine;
+        public static Asset<Texture2D> glowBall;
+        public static Asset<Texture2D> ring;
+        public static Texture2D GlowLine { get => glowLine.Value; }
+        public static Texture2D GlowLineCap { get => glowLineCap.Value; }
+        public static Texture2D Circle { get => circle.Value; }
+        public static Texture2D RingShine { get => ringShine.Value; }
+        public static Texture2D Ring { get => ring.Value; }
+        public static Texture2D GlowBall { get => glowBall.Value; }
         public override void OnWorldLoad()
         {
             LoadTextures();//hopefully this fixes the textures not being loaded??
@@ -131,9 +135,9 @@ namespace KirboMod
         public override void Unload()
         {
             //annoying thing we need to do to static fields, free up the memory they are using.
-            Circle = null;
-            GlowBall = null;
-            Ring = null;
+            circle = null;
+            glowBall = null;
+            ring = null;
             ringShine = null;
             glowLine = null;
             glowLineCap = null;

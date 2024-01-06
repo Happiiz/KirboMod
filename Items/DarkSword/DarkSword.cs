@@ -49,6 +49,8 @@ namespace KirboMod.Items.DarkSword
 			mPlayer.GetDarkSwordSwingStats(out int direction, out ProjectileShootType projToShoot);
 			Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI, player.itemAnimationMax, MathHelper.Lerp(6.15f, 4, Main.rand.NextFloat()), direction);
 			float delayMultiplier = player.itemAnimationMax / 2f;
+
+
             switch (projToShoot)
             {
                 case ProjectileShootType.DarkOrb:
@@ -75,7 +77,7 @@ namespace KirboMod.Items.DarkSword
 					}
 					break;
                 case ProjectileShootType.DarkWave:
-					Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<DarkSwordWave>(), damage, knockback, player.whoAmI, -delayMultiplier / 3);
+					Projectile.NewProjectile(source, position + velocity * .6f, velocity, ModContent.ProjectileType<DarkSwordWave>(), damage, knockback, player.whoAmI, -delayMultiplier / 3, direction);
                     break;
             }
             return false;

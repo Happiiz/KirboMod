@@ -15,42 +15,60 @@ namespace KirboMod
 	{
         internal FighterComboMeter fighterComboMeter;
         internal UserInterface fighterComboMeterInterface;
+
         public enum ModPacketType : byte
         {
+            //byte: playerWhoAmI
             StartFinalCutter = 0,
+            //byte: playerWhoAmI, byte: number of npcs, bytes: indexes of npcs caught in effect
             StartFinalCutterMultiNPC = 1,
+            /// <summary>
+            /// byte: player whoAmI
+            /// </summary>
+            PlasmaChargeUp = 2,
         }
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
-            //ModPacketType packetType = (ModPacketType)reader.ReadByte();
-            //switch (packetType)
-            //{
-            //    case ModPacketType.StartFinalCutter:
-            //        if (npcsInFinalCutter.Count == 1)
-            //        {
-            //            packet = Mod.GetPacket(3);
-            //            packet.Write((byte)KirboMod.ModPacketType.StartFinalCutter);
-            //            packet.Write((byte)Main.myPlayer);
-            //            packet.Write((byte)npcsInFinalCutter[0].whoAmI);
-            //            packet.Send(-1, Main.myPlayer);
-            //            return true;
-            //        }
-            //        Player plr = Main.player[reader.ReadByte()];
-            //        KirbPlayer kPlr = plr.GetModPlayer<KirbPlayer>();
-            //        kPlr.TryStartingFinalCutter
-            //        break;
-            //    case ModPacketType.StartFinalCutterMultiNPC:
-            //        packet = Mod.GetPacket();
-            //        packet.Write((byte)KirboMod.ModPacketType.StartFinalCutterMultiNPC);
-            //        packet.Write((byte)Main.myPlayer);
-            //        packet.Write((byte)npcsInFinalCutter.Count);
-            //        for (int i = 0; i < npcsInFinalCutter.Count; i++)
-            //        {
-            //            packet.Write((byte)npcsInFinalCutter[i].whoAmI);
-            //        }
-            //        packet.Send(-1, Main.myPlayer);
-            //        break;
-            //}
+            ModPacketType packetType = (ModPacketType)reader.ReadByte();
+            switch (packetType)
+            {
+                //case ModPacketType.StartFinalCutter:
+                //    if (npcsInFinalCutter.Count == 1)
+                //    {
+                //        packet = Mod.GetPacket(3);
+                //        packet.Write((byte)KirboMod.ModPacketType.StartFinalCutter);
+                //        packet.Write((byte)Main.myPlayer);
+                //        packet.Write((byte)npcsInFinalCutter[0].whoAmI);
+                //        packet.Send(-1, Main.myPlayer);
+                //        return true;
+                //    }
+                //    Player plr = Main.player[reader.ReadByte()];
+                //    KirbPlayer kPlr = plr.GetModPlayer<KirbPlayer>();
+                //    kPlr.TryStartingFinalCutter
+                //    break;
+                //case ModPacketType.StartFinalCutterMultiNPC:
+                //    packet = Mod.GetPacket();
+                //    packet.Write((byte)KirboMod.ModPacketType.StartFinalCutterMultiNPC);
+                //    packet.Write((byte)Main.myPlayer);
+                //    packet.Write((byte)npcsInFinalCutter.Count);
+                //    for (int i = 0; i < npcsInFinalCutter.Count; i++)
+                //    {
+                //        packet.Write((byte)npcsInFinalCutter[i].whoAmI);
+                //    }
+                //    packet.Send(-1, Main.myPlayer);
+                //    break;
+                case ModPacketType.PlasmaChargeUp:
+                    Player plr = Main.player[reader.ReadByte()];
+                    KirbPlayer mplr = plr.GetModPlayer<KirbPlayer>();
+                    mplr.plasmaCharge++;
+                    mplr.plasmaTimer = 0;
+                    if(mplr.plasmaCharge > 20)
+                    {
+                        mplr.plasmaCharge = 20;
+                    }
+                    break;
+
+            }
         }
         public override void Unload()
         {

@@ -24,7 +24,7 @@ namespace KirboMod.Projectiles.KrackoJrBomb
         }
         static float GetExplosionSizeMultiplier()
         {
-           if (Main.getGoodWorld)
+            if (Main.getGoodWorld)
             {
                 return 4;
             }
@@ -38,7 +38,7 @@ namespace KirboMod.Projectiles.KrackoJrBomb
         {
             if (Main.getGoodWorld)
             {
-                return 60 * 3;
+                return 60 * 5;
             }
             if (Main.expertMode)
             {
@@ -47,8 +47,6 @@ namespace KirboMod.Projectiles.KrackoJrBomb
             return 10;
         }
         Vector2 RndCircleOffset { get => Main.rand.NextVector2Circular(Projectile.width, Projectile.height); }
-        Vector2 RndInCircle { get => Projectile.Center + Main.rand.NextVector2Circular(Projectile.width, Projectile.height); }
-        Vector2 RndInHitbox { get => Main.rand.NextVector2FromRectangle(Projectile.Hitbox); }
         int TargetPlayerIndex { get => (int)Projectile.ai[0]; }
         ref float Timer { get => ref Projectile.ai[1]; }
         bool Exploding { get => Projectile.ai[2] == 1; set => Projectile.ai[2] = value ? 1 : 0; }

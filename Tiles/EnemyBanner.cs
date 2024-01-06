@@ -142,7 +142,7 @@ namespace KirboMod.Tiles
 						type = ModContent.NPCType<NPCs.ParosolDee>();
 						break;
 					case 9:
-						type = ModContent.NPCType<NPCs.PlasmaWisp>();
+						type = ModContent.NPCType<NPCs.PlasmaWisp.PlasmaWisp>();
 						break;
 					case 10:
 						type = ModContent.NPCType<NPCs.PoppyBrosJr>();

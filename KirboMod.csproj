@@ -15,6 +15,14 @@
     <None Remove="Items\RainbowSword\RainbowSwordHeld.png" />
     <None Remove="Items\RainbowSword\RainbowSwordHeldGlow.png" />
     <None Remove="Items\RainbowSword\RainbowSwordMask.png" />
+    <None Remove="NPCs\PlasmaWisp\fire_01.png" />
+    <None Remove="NPCs\PlasmaWisp\fire_02.png" />
+    <None Remove="NPCs\PlasmaWisp\flame_01.png" />
+    <None Remove="NPCs\PlasmaWisp\flame_02.png" />
+    <None Remove="NPCs\PlasmaWisp\flame_03.png" />
+    <None Remove="NPCs\PlasmaWisp\flame_04.png" />
+    <None Remove="NPCs\PlasmaWisp\PlasmaWispEyes.png" />
+    <None Remove="NPCs\PlasmaWisp\PlasmaWispHand.png" />
     <None Remove="Projectiles\KrackoJrBomb\KrackoJrBomb.png" />
     <None Remove="Projectiles\KrackoJrCannonball\KrackoJrCannonball.png" />
   </ItemGroup>

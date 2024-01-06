@@ -1,3 +1,4 @@
+using KirboMod.Particles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -30,12 +31,16 @@ namespace KirboMod.Projectiles
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1; //infinite
 		}
-
+		
+		//the way it works is 
+		//time to reach target is ai0
+		//make it explode when timer is > ai0
 		public override void AI()
 		{
 
-			Projectile.ai[0]++;
 			//Animation
+
+
 			if (++Projectile.frameCounter >= 4) //changes frames every 4 ticks 
 			{
 				Projectile.frameCounter = 0;
@@ -44,7 +49,11 @@ namespace KirboMod.Projectiles
 					Projectile.frame = 0;
 				}
 			}
-
+			if(Projectile.ai[0] < Projectile.ai[1])
+            {
+				Projectile.Kill();
+            }
+			Projectile.ai[1]++;
 			//dust effects
 			if (Main.rand.NextBool(2)) // happens 1/2 times
 			{
@@ -56,12 +65,17 @@ namespace KirboMod.Projectiles
 
 		public override void OnKill(int timeLeft)
 		{
-			for (int i = 0; i < 40; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+			//Projectile.Hitbox = Utils.CenteredRectangle(Projectile.Center, Projectile.Size * 1.75f);
+			for (int i = 0; i < 80; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 			{
 				Vector2 speed = Main.rand.NextVector2Circular(20, 20); //circle
-				Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.TerraBlade, speed, Scale: 1f); //Makes dust in a messy circle
+				Dust d = Dust.NewDustPerfect(Projectile.Center + Vector2.Normalize(speed) * 10, DustID.TerraBlade, speed, Scale: 2f); //Makes dust in a messy circle
 				d.noGravity = true;
 			}
+			Vector2 scale = new Vector2(3);
+			Sparkle.EyeShine(Projectile.Center, Color.LimeGreen, scale, scale, 10);
+			Sparkle.NewSparkle(Projectile.Center, Color.LimeGreen, scale * 2, Vector2.Zero, 10, scale);
+			//Projectile.Damage();
 		}
 
 		public override Color? GetAlpha(Color lightColor)

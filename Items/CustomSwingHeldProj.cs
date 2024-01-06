@@ -8,11 +8,12 @@ using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace KirboMod.Items.DarkSword
+namespace KirboMod.Items
 {
-    public class DarkSwordHeld : ModProjectile
+    public abstract class CustomSwingHeldProj : ModProjectile
     {
         ref float Timer { get => ref Projectile.localAI[0]; }
+        float TimeLeft { get => (UseTime - Timer) / Projectile.MaxUpdates; }
         ref float TrailCancelCount { get => ref Projectile.localAI[1]; }
         ref float UseTime { get => ref Projectile.ai[0]; }
         ref float SwingAngle { get => ref Projectile.ai[1]; }
@@ -20,6 +21,8 @@ namespace KirboMod.Items.DarkSword
         bool Dead { get => Progress > 1; }
         float VisualRotation { get => Projectile.rotation - MathF.PI / 4; }
         float Progress { get => Utils.GetLerpValue(0, Projectile.ai[0], Projectile.localAI[0]); }
+
+        protected abstract float BladeLength { get; }
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.TrailCacheLength[Type] = 100;
@@ -45,11 +48,9 @@ namespace KirboMod.Items.DarkSword
             Projectile.velocity.Normalize();
             Main.instance.LoadProjectile(Type);
         }
-        static float EaseBackOut(float progress)
+        protected virtual float SwingEasingFunction(float progress)
         {
-            const float c1 = 1.70158f;
-            const float c3 = c1 + 1;
-            return 1 + c3 * MathF.Pow(progress - 1, 3) + c1 * MathF.Pow(progress - 1, 2);
+            return 1 + 2.70158f * MathF.Pow(progress - 1, 3) + 1.70158f * MathF.Pow(progress - 1, 2);
         }
         static float AngleLerpLongWay(float curAngle, float targetAngle, float amount)
         {
@@ -80,7 +81,7 @@ namespace KirboMod.Items.DarkSword
                 TrailCancelCount += 1;
                 return;
             }
-            float progress = EaseBackOut(Progress);
+            float progress = SwingEasingFunction(Progress);
             Projectile.rotation = Projectile.velocity.ToRotation();
             if (SwingDir == -1)
                 progress = 1 - progress;
@@ -94,6 +95,10 @@ namespace KirboMod.Items.DarkSword
                 Projectile.rotation = Utils.AngleLerp(Projectile.rotation - SwingAngle / 2f, Projectile.rotation + SwingAngle / 2f, progress);
             }
             MakePlayerHoldMe();
+            TimerIncrease();
+        }
+        protected virtual void TimerIncrease()
+        {
             Timer++;
         }
         void MakePlayerHoldMe()
@@ -103,39 +108,42 @@ namespace KirboMod.Items.DarkSword
             player.ChangeDir(Projectile.direction);
             player.heldProj = Projectile.whoAmI;
             if (UseTime - Timer > 1)
+            {
                 player.SetDummyItemTime(2);
+            }
             player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, VisualRotation - MathF.PI / 2 - player.fullRotation);
             Vector2 dirToPlayer = VisualRotation.ToRotationVector2();
-            Projectile.position = GetCenterPoint();
-            Projectile.position += dirToPlayer * 117 * Projectile.scale;
-        }
-        Vector2 GetCenterPoint()
-        {
-            Player player = Main.player[Projectile.owner];
-            return player.RotatedRelativePoint(player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation)) - Projectile.Size / 2f + GetExtraUpdateAdjustmentOffset(player);
-        }
-        Vector2 GetExtraUpdateAdjustmentOffset(Player player)
-        {
-            return Utils.GetLerpValue(0, Projectile.MaxUpdates, Projectile.numUpdates + 1) * -player.velocity;
+            Projectile.position = player.RotatedRelativePoint(player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation)) - Projectile.Size / 2f + (Utils.GetLerpValue(0, Projectile.MaxUpdates, Projectile.numUpdates + 1) * -player.velocity);
+            Projectile.position += dirToPlayer * BladeLength * Projectile.scale;
         }
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D texMain = TextureAssets.Projectile[Type].Value;
-            float timeLeft = UseTime - Timer;
-            timeLeft /= Projectile.MaxUpdates;
-            float fade = Utils.GetLerpValue(0, 5, timeLeft, true);
+            float fade = Utils.GetLerpValue(0, 5, TimeLeft, true);
             fade *= Projectile.Opacity;
-            HeldProjTrailSystem.Trail.AddSubtractive(Projectile, 200, Color.Green * fade, Color.Gray * fade);
+            AddTrail();
             if (Dead)
                 return false;
             Main.EntitySpriteDraw(texMain, Projectile.Center - Main.screenPosition, null, Color.White * fade, Projectile.rotation, texMain.Size() / 2, Projectile.scale, SpriteEffects.None);
             return false;
         }
+        protected virtual void AddTrail()
+        {
+        }
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
             float a = 0;
-            Vector2 offset = VisualRotation.ToRotationVector2() * 118;
+            Vector2 offset = VisualRotation.ToRotationVector2() * BladeLength;
             return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center - offset * Projectile.scale, Projectile.Center + offset * Projectile.scale, 70, ref a);
+        }
+        public static bool SpawnSwing(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, int knockback)
+        {
+            if (player.whoAmI == Main.myPlayer)
+            {
+                KirbPlayer mPlayer = player.GetModPlayer<KirbPlayer>();
+                Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI, player.itemAnimationMax, MathHelper.Lerp(6.15f, 4, Main.rand.NextFloat()), mPlayer.NextCustomSwingDirection);
+            }
+            return false;
         }
     }
 }

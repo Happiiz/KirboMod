@@ -1,9 +1,12 @@
+using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Mono.Cecil;
 using System;
 using Terraria;
+using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.GameContent;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -44,67 +47,62 @@ namespace KirboMod.Items.Weapons
 
         public override bool CanUseItem(Player player)
         {
-			if (player.GetModPlayer<KirbPlayer>().plasmacharge < 3)
+			if (player.GetModPlayer<KirbPlayer>().plasmaCharge < 3)
 			{
                 Item.UseSound = SoundID.Item12; //laser beam
             }
-			else if (player.GetModPlayer<KirbPlayer>().plasmacharge < 12)
+			else if (player.GetModPlayer<KirbPlayer>().plasmaCharge < 12)
 			{
                 Item.UseSound = SoundID.Item75; //pulse bow (not boss laser beam because I don't want ptsd)
             }
-			else if (player.GetModPlayer<KirbPlayer>().plasmacharge >= 12)
+			else if (player.GetModPlayer<KirbPlayer>().plasmaCharge >= 12)
 			{
+				SoundEngine.PlaySound(SoundID.Item38, player.Center);//tactical shotgun
                 Item.UseSound = SoundID.Item117; //conjure arcanum 
             }
                 return true;
         }
-
+        public override void ModifyManaCost(Player player, ref float reduce, ref float mult)
+        {
+            base.ModifyManaCost(player, ref reduce, ref mult);
+        }
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
 		{
-            if (player.GetModPlayer<KirbPlayer>().plasmacharge < 3)
+			float timeToPressKey = 16;
+			float chargeBonus = 1;
+			float chargeFromShot = player.GetModPlayer<KirbPlayer>().plasmaCharge;
+            if (chargeFromShot < 3)
             {
+				chargeFromShot = 1;
+				velocity *= 1.3f;
                 type = ModContent.ProjectileType<Projectiles.PlasmaZap>();
-                damage *= 1;
-                player.GetModPlayer<KirbPlayer>().plasmacharge = 0;
             }
-            else if (player.GetModPlayer<KirbPlayer>().plasmacharge < 12)
+            else if (chargeFromShot < 12)
             {
                 type = ModContent.ProjectileType<Projectiles.PlasmaLaser>();
-                velocity *= 1.25f; //make velocity 25
-				position += velocity * 5; //start away from player
-                damage *= 4;
-                player.statMana -= 9; //+ -3 is -12 mana
-                player.GetModPlayer<KirbPlayer>().plasmacharge = 0;
+                velocity *= 2;
+				position += velocity;
+				chargeBonus = 3;
             }
-            else if (player.GetModPlayer<KirbPlayer>().plasmacharge >= 12)
+            else
             {
                 type = ModContent.ProjectileType<Projectiles.PlasmaBlast>();
-                velocity *= 0.5f; //make velocity 10
-                position += velocity * 5; //start away from player
-                damage *= 16;
-                player.statMana -= 37; //+ -3 is -40 mana
-                player.GetModPlayer<KirbPlayer>().plasmacharge = 0;
+                velocity *= 3;
+                position += velocity; //start away from player
+				chargeBonus = 7;
             }
-        }
+			//higher time to press key = higher damage
+			//higher use time = less damage because then dthe time taken to charge is less of a difference compared to normal firing
+			//higher charge from shot = higher damage bonus 
+			//
+			damage = (int)(damage * chargeFromShot * (timeToPressKey / Item.useTime) * chargeBonus);
+			player.GetModPlayer<KirbPlayer>().ResetPlasmaCharge();//make reset charge method with packet handling
+			velocity /= ContentSamples.ProjectilesByType[type].MaxUpdates;
+		}
 
-        public override void HoldItem(Player player)
+		public override void HoldItem(Player player)
         {
-			//if pressing right or left(not holding)
-			if ((player.controlRight || player.controlLeft) && holdingbutton == false)
-			{
-				player.GetModPlayer<KirbPlayer>().plasmacharge++;
-                player.GetModPlayer<KirbPlayer>().plasmaTimer = 0; //reset timer
 
-                int dustnumber = Dust.NewDust(player.position, player.width, player.height, DustID.TerraBlade, Main.rand.Next(-10, 10), -10, 200, default, 2f); //dust
-				Main.dust[dustnumber].velocity *= 0.3f;
-				Main.dust[dustnumber].noGravity = true;
-
-				holdingbutton = true;
-			}
-			if (player.releaseRight & player.releaseLeft) //release
-			{
-				holdingbutton = false;
-			}
         }
 		
 		public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
@@ -128,5 +126,32 @@ namespace KirboMod.Items.Weapons
 				0f
 			);
 		}
+
 	}
+    class PlasmaDrawLayer : PlayerDrawLayer
+    {
+        public override bool GetDefaultVisibility(PlayerDrawSet drawInfo)
+        {
+			KirbPlayer mplr = drawInfo.drawPlayer.GetModPlayer<KirbPlayer>();
+			return mplr.plasmaCharge >= 3; 
+        }
+        public override Position GetDefaultPosition()
+        {
+			return PlayerDrawLayers.BeforeFirstVanillaLayer;
+        }
+
+        protected override void Draw(ref PlayerDrawSet drawInfo)
+        {
+			if (drawInfo.shadow != 0)
+				return;
+			KirbPlayer mplr = drawInfo.drawPlayer.GetModPlayer<KirbPlayer>();
+			Texture2D tex;
+			int orb = ModContent.ProjectileType<PlasmaOrb>();
+			int shiel = ModContent.ProjectileType<PlasmaShield>();
+			bool bigCharge = mplr.plasmaCharge > 12;
+			tex = TextureAssets.Projectile[bigCharge ? orb : shiel].Value;
+			float scale = (bigCharge ? KirbPlayer.plasmaShieldRadiusLarge : KirbPlayer.plasmaShieldRadiusSmall) / (float)tex.Width;
+			drawInfo.DrawDataCache.Add(new DrawData(tex, drawInfo.Center - Main.screenPosition, null, Color.White, 0, tex.Size() / 2, scale, SpriteEffects.None));
+        }
+    }
 }

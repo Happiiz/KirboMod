@@ -90,7 +90,7 @@ namespace KirboMod.Items.RainbowSword
 			if(Main.myPlayer != player.whoAmI)
 			return false;
 			KirbPlayer mPlayer = player.GetModPlayer<KirbPlayer>();									
-			Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI, player.itemAnimationMax, MathHelper.Lerp(6.15f, 4, Main.rand.NextFloat()), mPlayer.NextRainbowSwordSwingDirection);
+			Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI, player.itemAnimationMax, MathHelper.Lerp(6.15f, 4, Main.rand.NextFloat()), mPlayer.NextCustomSwingDirection);
 			return false;
         }
 		public override void AddRecipes()

@@ -47,7 +47,12 @@ namespace KirboMod.Projectiles
 				Main.dust[dustnumber].noGravity = true;
 			}
 		}
-		public override Color? GetAlpha(Color lightColor)
+        public override bool PreDraw(ref Color lightColor)
+        {
+            Items.DarkSword.DarkSwordBeam.DrawDarkBeam(Projectile);
+			return false;
+        }
+        public override Color? GetAlpha(Color lightColor)
 		{
 			return Color.White; // Makes it uneffected by light
 		}

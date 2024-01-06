@@ -20,33 +20,29 @@ namespace KirboMod.Projectiles
 			Projectile.height = 140;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Magic;
-			Projectile.timeLeft = 2;
+			Projectile.timeLeft = int.MaxValue;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
+			Projectile.usesLocalNPCImmunity = true;
+			Projectile.localNPCHitCooldown = 5;
 			Projectile.alpha = 150;
             Projectile.hide = true;
         }
-
-		public override void AI()
+        public override bool PreDraw(ref Color lightColor)
+        {
+			return false;
+        }
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+        {
+			return Helper.CheckCircleCollision(targetHitbox, Projectile.Center, Projectile.ai[0]);
+        }
+        public override void AI()
 		{
 			Player player = Main.player[Projectile.owner];
+			KirbPlayer mplr = player.GetModPlayer<KirbPlayer>();
+			Projectile.ai[0] = mplr.PlasmaShieldRadius;
 			Projectile.Center = player.Center;
 			Lighting.AddLight(Projectile.Center, 0, 1, 0);
 		}
-
-		public override bool? CanCutTiles()
-		{
-			return false;
-        }
-
-        public override Color? GetAlpha(Color lightColor)
-        {
-            return Color.White * Projectile.Opacity; //unaffected by light, but can be transparent
-        }
-
-        public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
-        {
-            behindNPCs.Add(index);
-        }
     }
 }

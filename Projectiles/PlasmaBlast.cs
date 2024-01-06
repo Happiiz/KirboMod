@@ -292,25 +292,25 @@ namespace KirboMod.Projectiles
                 public void DrawLine(float width)
 				{
 					Vector2 texScale = new Vector2((startVertex.vertexPos - endVertex.vertexPos).Length(), width) * 0.0078125f;//1/128, texture is 128x128
-					Main.EntitySpriteDraw(VFX.glowLine, (startVertex.vertexPos) - Main.screenPosition, null, Color.Red, (endVertex.vertexPos - startVertex.vertexPos).ToRotation(), new Vector2(0, 128), texScale, SpriteEffects.None);
+					Main.EntitySpriteDraw(VFX.glowLine.Value, (startVertex.vertexPos) - Main.screenPosition, null, Color.Red, (endVertex.vertexPos - startVertex.vertexPos).ToRotation(), new Vector2(0, 128), texScale, SpriteEffects.None);
 				}
 				public void DrawLineWithCap(float width, bool drawWhiteInside = true)
 				{
 					Vector2 texScale = new Vector2((startVertex.vertexPos - endVertex.vertexPos).Length(), width) * 0.0078125f;//1/128, texture is 128x128
 					Vector2 capScale = new Vector2(width) * 0.0078125f;//1/128, texture is 128x128
 					float rotation = (endVertex.vertexPos - startVertex.vertexPos).ToRotation();
-					Main.EntitySpriteDraw(VFX.glowLine, (startVertex.vertexPos) - Main.screenPosition, null, startVertex.vertexColor, rotation, new Vector2(0, 128), texScale, SpriteEffects.None);
-					Main.EntitySpriteDraw(VFX.glowLineCap, (startVertex.vertexPos) - Main.screenPosition, null, startVertex.vertexColor, rotation + MathF.PI, new Vector2(64), capScale, SpriteEffects.None);
-					Main.EntitySpriteDraw(VFX.glowLineCap, (endVertex.vertexPos) - Main.screenPosition, null, startVertex.vertexColor, rotation, new Vector2(64), capScale, SpriteEffects.None);
+					Main.EntitySpriteDraw(VFX.GlowLine, (startVertex.vertexPos) - Main.screenPosition, null, startVertex.vertexColor, rotation, new Vector2(0, 128), texScale, SpriteEffects.None);
+					Main.EntitySpriteDraw(VFX.GlowLineCap, (startVertex.vertexPos) - Main.screenPosition, null, startVertex.vertexColor, rotation + MathF.PI, new Vector2(64), capScale, SpriteEffects.None);
+					Main.EntitySpriteDraw(VFX.GlowLineCap, (endVertex.vertexPos) - Main.screenPosition, null, startVertex.vertexColor, rotation, new Vector2(64), capScale, SpriteEffects.None);
                     if (drawWhiteInside)
                     {
 						texScale.X *= 0.5f;
 						capScale *= 0.5f;
 						//account for the y multiplication with offsets
 						Vector2 posOffset = Direction * width * 0.5f;
-						Main.EntitySpriteDraw(VFX.glowLine, (startVertex.vertexPos) - Main.screenPosition, null, startVertex.vertexColor, rotation, new Vector2(0, 128), texScale, SpriteEffects.None);
-						Main.EntitySpriteDraw(VFX.glowLineCap, (startVertex.vertexPos) - Main.screenPosition + posOffset, null, startVertex.vertexColor, rotation + MathF.PI, new Vector2(64), capScale, SpriteEffects.None);
-						Main.EntitySpriteDraw(VFX.glowLineCap, (endVertex.vertexPos) - Main.screenPosition - posOffset, null, startVertex.vertexColor, rotation, new Vector2(64), capScale, SpriteEffects.None);
+						Main.EntitySpriteDraw(VFX.GlowLine, (startVertex.vertexPos) - Main.screenPosition, null, startVertex.vertexColor, rotation, new Vector2(0, 128), texScale, SpriteEffects.None);
+						Main.EntitySpriteDraw(VFX.GlowLineCap, (startVertex.vertexPos) - Main.screenPosition + posOffset, null, startVertex.vertexColor, rotation + MathF.PI, new Vector2(64), capScale, SpriteEffects.None);
+						Main.EntitySpriteDraw(VFX.GlowLineCap, (endVertex.vertexPos) - Main.screenPosition - posOffset, null, startVertex.vertexColor, rotation, new Vector2(64), capScale, SpriteEffects.None);
 
 					}
 				}

@@ -12,13 +12,14 @@ namespace KirboMod
 {
     public static class ExtensionMethods
     {
-        public static Vector2 Normalized(this Vector2 vec, float lengthMultiplier)
+        public static Vector2 Normalized(this Vector2 vec, float lengthMultiplier = 1)
         {
             vec.Normalize();
             return vec * lengthMultiplier;
         }
         public static bool DrawSelf(this Projectile proj, bool fullbright = true)
         {
+            Main.instance.LoadProjectile(proj.type);
             SpriteEffects fx = proj.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
             Texture2D tex = TextureAssets.Projectile[proj.type].Value;
             Rectangle frame = tex.Frame(1, Main.projFrames[proj.type], 0, proj.frame);

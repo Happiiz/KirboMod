@@ -13,7 +13,7 @@ namespace KirboMod.Particles
         public Ring(Vector2 position)
         {
             this.position = position;
-            texture = VFX.Ring;
+            texture = VFX.ring;
             timeLeft = 160;
             squish = Vector2.One;
             scale = 1;
@@ -42,8 +42,8 @@ namespace KirboMod.Particles
         }
         public override void Draw()
         {
-            Main.EntitySpriteDraw(texture, position - Main.screenPosition, null, color * opacity, rotation, texture.Size() / 2, squish * scale, SpriteEffects.None);
-            Main.EntitySpriteDraw(VFX.ringShine, position - Main.screenPosition, null, Color.White with { A = 0 } * opacity * shineBrightness, rotation, texture.Size() / 2, squish * scale, SpriteEffects.None);
+            Main.EntitySpriteDraw(texture.Value, position - Main.screenPosition, null, color * opacity, rotation, texture.Size() / 2, squish * scale, SpriteEffects.None);
+            Main.EntitySpriteDraw(VFX.ringShine.Value, position - Main.screenPosition, null, Color.White with { A = 0 } * opacity * shineBrightness, rotation, texture.Size() / 2, squish * scale, SpriteEffects.None);
         }
         public static Ring ShotRing(Vector2 position, Color color, Vector2 direction)
         {
@@ -90,9 +90,14 @@ namespace KirboMod.Particles
         public static Ring DarkMatterSwordShot(Vector2 position)
         {
             Ring ring = new(position);
-            ring.scaleUpTime = 30;
-            ring.timeLeft = 50;
+            ring.minScale = .1f;
+            ring.maxScale = 1;
+            ring.scaleUpTime = 10;
+            ring.timeLeft = 15;
+            ring.fadeInTime = 2;
+            ring.fadeOutTime = 5;
             ring.shineBrightness = 0;
+            ring.color = Color.Black;
             ring.Confirm();
             return ring;
         }
@@ -102,6 +107,13 @@ namespace KirboMod.Particles
             for (int i = 0; i < 2; i++)
             {
                 Ring ring = DarkMatterSwordShot(position);
+                ring.scaleUpTime = 10;
+                ring.timeLeft = 15;
+                ring.fadeInTime = 2;
+                ring.fadeOutTime = 5;
+                ring.minScale = .05f;
+                ring.maxScale = .8f;
+                ring.shineBrightness = 0;
                 ring.squish = new Vector2(Main.rand.NextFloat() * .75f + .25f, Main.rand.NextFloat() *.75f + .25f);
                 ring.Confirm();
             }

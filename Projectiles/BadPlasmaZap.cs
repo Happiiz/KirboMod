@@ -20,7 +20,8 @@ namespace KirboMod.Projectiles
 			DrawOffsetX = -4; //make hitbox line up with sprite middle
 			Projectile.friendly = false;
 			Projectile.hostile = true;
-			Projectile.timeLeft = 20;
+			Projectile.timeLeft = 3000;
+			Projectile.extraUpdates = 3;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = 3;
 		}
@@ -28,6 +29,8 @@ namespace KirboMod.Projectiles
 		{
 			Projectile.spriteDirection = Projectile.direction;
 			Projectile.rotation = Projectile.velocity.ToRotation();
+			Lighting.AddLight(Projectile.Center, Color.Green.ToVector3());
+			Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.GreenFairy);
 		}
 
 		public override Color? GetAlpha(Color lightColor)

@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
+using ReLogic.Content;
 
 namespace KirboMod.Particles
 {
@@ -93,7 +94,7 @@ namespace KirboMod.Particles
     }
     public abstract class Particle
     {
-        public Texture2D texture;
+        public Asset<Texture2D> texture;
         public ushort frame = 0;
         public ushort frameSpeed = 0;
         public ushort amountOfFrames = 1;
@@ -120,7 +121,7 @@ namespace KirboMod.Particles
         {
             duration = timeLeft;
             fadeInTime = MathF.Max(.00001f, fadeInTime);
-            fadeOutTime = MathF.Max(.00001f, fadeInTime);
+            fadeOutTime = MathF.Max(.00001f, fadeOutTime);
             if (frameSpeed == 0)
                 frameSpeed = ushort.MaxValue;
             if (behindProjs)
@@ -163,7 +164,7 @@ namespace KirboMod.Particles
         }
         public virtual void Draw()
         {
-            Main.EntitySpriteDraw(texture, position - Main.screenPosition, Frame, color * opacity, rotation, texture.Size() / 2, scale, SpriteEffects.None);
+            Main.EntitySpriteDraw(texture.Value, position - Main.screenPosition, Frame, color * opacity, rotation, texture.Size() / 2, scale, SpriteEffects.None);
         }
     }
 

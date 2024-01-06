@@ -34,7 +34,7 @@ namespace KirboMod.Projectiles
 			Projectile.rotation = Projectile.velocity.ToRotation();
 			Projectile.velocity *= 0.93f;
 
-			if (Main.rand.NextBool(10)) // happens 1/5 times
+			if (Main.rand.NextBool(5)) // happens 1/5 times
 			{
 				int dustnumber = Dust.NewDust(Projectile.position, 76, 18, ModContent.DustType<Dusts.DarkResidue>(), 0f, 0f, 200, default, 0.8f); //dust
 				Main.dust[dustnumber].velocity *= 0.3f;
@@ -51,7 +51,11 @@ namespace KirboMod.Projectiles
                 d.noGravity = true;
             }
         }
-
+        public override bool PreDraw(ref Color lightColor)
+        {
+			Items.DarkSword.DarkSwordBeam.DrawDarkBeam(Projectile);
+			return false;
+        }
         public override Color? GetAlpha(Color lightColor)
         {
             return Color.White; // Makes it uneffected by light

@@ -1,4 +1,5 @@
 using KirboMod.NPCs;
+using KirboMod.NPCs.DarkMatter;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -159,7 +160,7 @@ namespace KirboMod.Systems
                 nameof(DarkMatter),
                 13.5f, //before Betsy
                 () => DownedBossSystem.downedDarkMatterBoss,
-                ModContent.NPCType<NPCs.DarkMatter>(),
+                ModContent.NPCType<DarkMatter>(),
                 new Dictionary<string, object>()
                 {
                     ["spawnInfo"] = Language.GetText($"Throw out a [i:{summonItem2}] and right click towards it with a [i:{summonItem2two}]."),

@@ -89,6 +89,7 @@ namespace KirboMod.Particles
             Sparkle sparkle = new(position, color, velocity, scale, fatness, duration);
             sparkle.friction = .98f;
             sparkle.Confirm();
+            sparkle.fadeOutTime = 6;
             return sparkle;
         }
     }
