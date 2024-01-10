@@ -145,7 +145,6 @@ namespace KirboMod.NPCs.PlasmaWisp
                 progress = .5f - MathF.Cos(progress * MathF.PI) * .5f;
             }
         }
-
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[NPC.type] = 6;
@@ -168,10 +167,10 @@ namespace KirboMod.NPCs.PlasmaWisp
             NPC.damage = 60;
             NPC.defense = 25;
             NPC.lifeMax = 500;
+            NPC.knockBackResist = .5f; //how much knockback is applied
             NPC.HitSound = SoundID.NPCHit5; //pixie
             NPC.DeathSound = SoundID.NPCDeath7; //pixie
-            NPC.value = Item.buyPrice(0, 0, 4, 0); // money it drops
-            NPC.knockBackResist = 0f; //how much knockback is applied
+            NPC.value = Item.buyPrice(0, 1, 0, 0); // money it drops
             Banner = NPC.type;
             BannerItem = ModContent.ItemType<Items.Banners.PlasmaWispBanner>();
             NPC.aiStyle = -1;
@@ -218,26 +217,33 @@ namespace KirboMod.NPCs.PlasmaWisp
         {
 
             Particles();
+
             NPC.spriteDirection = NPC.direction;
             Player player = Main.player[NPC.target];
             NPC.TargetClosest(true);
 
-            //passive effects
             if (Main.rand.NextBool(4)) //1/4 chance
             {
                 int index = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.TerraBlade, 0f, -20f, 200, default, 1.5f); //dust
                 Main.dust[index].velocity *= 0.3f;
                 Main.dust[index].noGravity = true;
             }
+
             float speed = Main.expertMode ? 4 : 2; //top speed
             float inertia = 10f; //acceleration and decceleration speed
 
-            if (player.dead == false) //player is alive
+            if (!player.dead) //player is alive
             {
                 Vector2 direction = player.Center - NPC.Center; //start - end 
-
-                direction.Normalize();
-                direction *= speed;
+                if (NPC.ai[0] < 300)//not attacking
+                {
+                    direction.Normalize();
+                    direction *= speed;
+                }
+                else
+                {
+                    direction = Vector2.Zero;
+                }
                 NPC.velocity = (NPC.velocity * (inertia - 1) + direction) / inertia; //move
             }
             else //player is dead
@@ -275,7 +281,6 @@ namespace KirboMod.NPCs.PlasmaWisp
             }
             if (NPC.ai[0] >= 300) //attack phase
             {
-                NPC.velocity *= 0f;
                 if (NPC.ai[0] == 375 || NPC.ai[0] == 450 || NPC.ai[0] == 525)
                 {
                     //setting projectiles
@@ -298,7 +303,6 @@ namespace KirboMod.NPCs.PlasmaWisp
                 NPC.ai[0] = 0;
             }
         }
-
         private void GetProjShootData(out int type, out int damage, out Vector2 velocity, out float ai0, out SoundStyle soundToPlay)
         {
             ai0 = 0;
@@ -308,24 +312,24 @@ namespace KirboMod.NPCs.PlasmaWisp
             {
                 soundToPlay = SoundID.Item12;
                 velocity *= 20;
-                damage = 30;
+                damage = 60;
                 type = ModContent.ProjectileType<Projectiles.BadPlasmaZap>();
             }
             else if (NPC.ai[0] == 450)
             {
                 soundToPlay = SoundID.Item33;
-                velocity *= 30;
-                damage = 40;
+                velocity *= 25;
+                damage = 80;
                 type = ModContent.ProjectileType<Projectiles.BadPlasmaLaser>();
             }
             else
             {
                 soundToPlay = SoundID.Item117;
-                damage = 120;
+                damage = 100;
                 float shootSpeed = 13;
                 velocity *= shootSpeed;
                 Utils.ChaseResults results = Utils.GetChaseResults(NPC.Center, shootSpeed, player.Center, player.velocity);
-                if (results.InterceptionHappens)
+                if (results.InterceptionHappens && Main.expertMode)
                 {
                     ai0 = results.InterceptionTime;
                     velocity = results.ChaserVelocity;
@@ -344,14 +348,11 @@ namespace KirboMod.NPCs.PlasmaWisp
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             PlasmaWispFlame.Draw(ref flames, screenPos);
-
             float time = (float)Main.timeForVisualEffects * .07f + NPC.whoAmI * 20392;
             GetHandPositionAndRotationOffsets(out Vector2 leftHand, out Vector2 rightHand, out float rotLeftHand, out float rotRightHand, out float xOffset, out SpriteEffects leftHandFx, out SpriteEffects rightHandFx);
             Vector2 offset = new Vector2(xOffset, MathF.Sin(time) * 7);
             Main.EntitySpriteDraw(eyes.Value, NPC.Center - screenPos + offset, null, Color.White * NPC.Opacity, NPC.rotation, eyes.Size() / 2, NPC.scale, NPC.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
-
             Main.EntitySpriteDraw(hand.Value, NPC.Center - screenPos + rightHand, null, Color.White * NPC.Opacity, NPC.rotation + rotRightHand, eyes.Size() / 2, NPC.scale, rightHandFx);
-
             Main.EntitySpriteDraw(hand.Value, NPC.Center - screenPos + leftHand, null, Color.White * NPC.Opacity, NPC.rotation + rotLeftHand, eyes.Size() / 2, NPC.scale, leftHandFx);
             return false;
         }
@@ -359,10 +360,9 @@ namespace KirboMod.NPCs.PlasmaWisp
         {
             t = 0.5f - 0.5f * MathF.Cos(t * MathF.PI);
         }
+
         void GetHandPositionAndRotationOffsets(out Vector2 leftHand, out Vector2 rightHand, out float rotLeftHand, out float rotRightHand, out float xOffset, out SpriteEffects leftHandFx, out SpriteEffects rightHandFx)
         {
-            leftHandFx = SpriteEffects.FlipHorizontally;
-            rightHandFx = SpriteEffects.None;
             Vector2 offset;
             Vector2 toPlayer = Vector2.Zero;
             xOffset = 0;
@@ -370,35 +370,55 @@ namespace KirboMod.NPCs.PlasmaWisp
             {
                 Player plr = Main.player[NPC.target];
                 toPlayer = NPC.DirectionTo(plr.Center);
+                if (Main.expertMode)
+                {
+                    float timerToPredictive = Utils.GetLerpValue(450, 490, NPC.ai[0], true);
+                    toPlayer = Vector2.Lerp(toPlayer, Vector2.Normalize(Utils.GetChaseResults(NPC.Center, 13, plr.Center, plr.velocity).ChaserVelocity), timerToPredictive);
+                }
                 xOffset = MathHelper.Clamp((plr.Center.X - NPC.Center.X) * .2f, -16, 16);
             }
+            Vector2 xOffsetVector = new Vector2(xOffset, 0);
             float time = (float)Main.timeForVisualEffects * .11f + NPC.whoAmI * 20392;
-            offset = new Vector2(32 + xOffset, 10);
-            offset += time.ToRotationVector2() * 4;
-            rightHand = offset;
-            offset = new Vector2(xOffset - 32, 10);
-            offset += (time + 1).ToRotationVector2() * 4;
-            leftHand = offset;
+            Vector2 rightHandDefaultPos = new Vector2(32 + xOffset, 10) + time.ToRotationVector2() * 4;
+            Vector2 leftHandDefaultPos = new Vector2(xOffset - 32, 10) + (time + 1).ToRotationVector2() * 4;
             //600
             float endTimer = Utils.GetLerpValue(570, 530, NPC.ai[0], true);
             Easing(ref endTimer);
             //375 || 450 || 525
             float attackTimer = Utils.GetLerpValue(300, 350, NPC.ai[0], true);
+            float attackProgressUnclamped = Utils.GetLerpValue(300, 375, NPC.ai[0]) % 1;
+            if(attackProgressUnclamped < 0)
+            {
+                attackProgressUnclamped = 0;
+            }
+            float attackProgressNoEasing = attackProgressUnclamped;
+            attackProgressUnclamped = 1 - attackProgressUnclamped;
+            attackProgressUnclamped *= attackProgressUnclamped * attackProgressUnclamped;
+            attackProgressUnclamped = 1 - attackProgressUnclamped;
             attackTimer *= attackTimer * endTimer;
             Easing(ref attackTimer);
             float handWobbleIntensity = Utils.GetLerpValue(330, 360, NPC.ai[0], true) * endTimer;
             Easing(ref handWobbleIntensity);
-            rotLeftHand = -MathF.PI / 2;
-            rotLeftHand = Utils.AngleLerp(0, rotLeftHand, attackTimer);
-            rotRightHand = MathF.PI / 2;
-            rotRightHand = Utils.AngleLerp(0, rotRightHand, attackTimer);
-            float handWobble = MathF.Sin((float)Main.timeForVisualEffects * .4f) * 3 * handWobbleIntensity;
-            offset = new Vector2(10 + xOffset, -35 + handWobble);
-            rightHand = Vector2.Lerp(rightHand, offset, attackTimer);
-            offset = new Vector2(xOffset - 10, -35 + handWobble);
-            leftHand = Vector2.Lerp(leftHand, offset, attackTimer);
-
-            //todo: lerp offset of hands towards direction to player * some magnitude that looks good
+            Easing(ref attackProgressUnclamped);
+            float toPlayerRotation = toPlayer.ToRotation();
+            float handForwardAmount = MathHelper.Lerp(15, 50, attackProgressUnclamped);
+            float rotationOffsetFromAttackAnimation = Utils.AngleLerp(-.7f, .3f, attackProgressNoEasing) * handWobbleIntensity;
+            rotLeftHand = Utils.AngleLerp(0, toPlayerRotation + MathF.PI, attackTimer) + rotationOffsetFromAttackAnimation;
+            rotRightHand = Utils.AngleLerp(0, toPlayerRotation, attackTimer) - rotationOffsetFromAttackAnimation;
+            offset = toPlayer * handForwardAmount + (toPlayerRotation + MathF.PI / 2).ToRotationVector2() * 15;
+            leftHand = Vector2.Lerp(leftHandDefaultPos, offset + xOffsetVector, attackTimer);
+            offset = toPlayer * handForwardAmount - (toPlayerRotation + MathF.PI / 2).ToRotationVector2() * 15;
+            rightHand = Vector2.Lerp(rightHandDefaultPos, offset + xOffsetVector, attackTimer);
+            if (attackTimer < .5f)
+            {
+                leftHandFx = SpriteEffects.FlipHorizontally;
+                rightHandFx = SpriteEffects.None;
+            }
+            else
+            {
+                leftHandFx = SpriteEffects.None;
+                rightHandFx = SpriteEffects.FlipHorizontally;
+            }
         }
         public override void FindFrame(int frameHeight)
         {
@@ -406,56 +426,7 @@ namespace KirboMod.NPCs.PlasmaWisp
             {
                 Particles();
             }
-            if (NPC.ai[0] < 300) //float
-            {
-                NPC.frameCounter += 1.0;
-                if (NPC.frameCounter < 7.0)
-                {
-                    NPC.frame.Y = 0;
-                }
-                else if (NPC.frameCounter < 14.0)
-                {
-                    NPC.frame.Y = frameHeight;
-                }
-                else if (NPC.frameCounter < 21.0)
-                {
-                    NPC.frame.Y = frameHeight * 2;
-                }
-                else if (NPC.frameCounter < 28.0)
-                {
-                    NPC.frame.Y = frameHeight * 3;
-                }
-                else
-                {
-                    NPC.frameCounter = 0.0;
-                }
-            }
-            else //attack
-            {
-                NPC.frameCounter += 1.0;
-                if (NPC.frameCounter < 5.0)
-                {
-                    NPC.frame.Y = frameHeight * 4;
-                }
-                else if (NPC.frameCounter < 10.0)
-                {
-                    NPC.frame.Y = frameHeight * 5;
-                }
-                else
-                {
-                    NPC.frameCounter = 0.0;
-                }
-            }
         }
-        /*public override void OnKill()
-		{
-			if (Main.rand.NextBool(Main.expertMode ? 10 : 20))
-			{
-				Item.NewItem(NPC.getRect(), ModContent.ItemType<Items.Weapons.Plasma>());
-			}
-			Item.NewItem(NPC.getRect(), ModContent.ItemType<Items.DreamEssence>(), Main.rand.Next(5, 10));
-		}*/
-
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             // 1 in 20 (5%) chance in Normal. 1 in 10 (10%) chance in Expert
@@ -463,7 +434,6 @@ namespace KirboMod.NPCs.PlasmaWisp
 
             npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<DreamEssence>(), 1, 4, 8));
         }
-
         public override void HitEffect(NPC.HitInfo hit)
         {
             if (NPC.life <= 0)

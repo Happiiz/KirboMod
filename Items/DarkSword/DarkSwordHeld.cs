@@ -10,7 +10,7 @@ using Terraria.ModLoader;
 
 namespace KirboMod.Items.DarkSword
 {
-    public class DarkSwordHeld : ModProjectile
+    public class DarkSwordHeld : ModProjectile, ITrailedHeldProjectile
     {
         ref float Timer { get => ref Projectile.localAI[0]; }
         ref float TrailCancelCount { get => ref Projectile.localAI[1]; }
@@ -120,14 +120,13 @@ namespace KirboMod.Items.DarkSword
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            Texture2D texMain = TextureAssets.Projectile[Type].Value;
+            if (Dead)
+                return false;
             float timeLeft = UseTime - Timer;
             timeLeft /= Projectile.MaxUpdates;
             float fade = Utils.GetLerpValue(0, 5, timeLeft, true);
             fade *= Projectile.Opacity;
-            HeldProjTrailSystem.Trail.AddSubtractive(Projectile, 200, Color.Green * fade, Color.Gray * fade);
-            if (Dead)
-                return false;
+            Texture2D texMain = TextureAssets.Projectile[Type].Value;
             Main.EntitySpriteDraw(texMain, Projectile.Center - Main.screenPosition, null, Color.White * fade, Projectile.rotation, texMain.Size() / 2, Projectile.scale, SpriteEffects.None);
             return false;
         }
@@ -136,6 +135,15 @@ namespace KirboMod.Items.DarkSword
             float a = 0;
             Vector2 offset = VisualRotation.ToRotationVector2() * 118;
             return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center - offset * Projectile.scale, Projectile.Center + offset * Projectile.scale, 70, ref a);
+        }
+
+        public void AddTrail()
+        {
+            float timeLeft = UseTime - Timer;
+            timeLeft /= Projectile.MaxUpdates;
+            float fade = Utils.GetLerpValue(0, 5, timeLeft, true);
+            fade *= Projectile.Opacity;
+            HeldProjTrailSystem.Trail.AddSubtractive(Projectile, 200, Color.Green * fade, Color.Gray * fade);
         }
     }
 }

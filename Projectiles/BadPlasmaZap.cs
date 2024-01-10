@@ -1,3 +1,4 @@
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
@@ -6,19 +7,20 @@ using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles
 {
-	public class BadPlasmaZap : ModProjectile
+    public class BadPlasmaZap : ModProjectile, ITrailedProjectile
 	{
 		public override void SetStaticDefaults()
 		{
-			// DisplayName.SetDefault("Plasma Zap");
+			ProjectileID.Sets.TrailCacheLength[Type] = 40;
+			ProjectileID.Sets.TrailingMode[Type] = 2;
 		}
 
 		public override void SetDefaults()
 		{
 			Projectile.width = 8;
 			Projectile.height = 8;
-			DrawOffsetX = -4; //make hitbox line up with sprite middle
 			Projectile.friendly = false;
+			Projectile.DamageType = DamageClass.Magic;
 			Projectile.hostile = true;
 			Projectile.timeLeft = 3000;
 			Projectile.extraUpdates = 3;
@@ -27,15 +29,24 @@ namespace KirboMod.Projectiles
 		}
 		public override void AI()
 		{
+			
+			Dust dust = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.TerraBlade);
+			dust.noGravity = true;
+			dust.velocity *= .5f;
+			dust.fadeIn = 1;
 			Projectile.spriteDirection = Projectile.direction;
 			Projectile.rotation = Projectile.velocity.ToRotation();
 			Lighting.AddLight(Projectile.Center, Color.Green.ToVector3());
-			Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.GreenFairy);
 		}
+        public override bool PreDraw(ref Color lightColor)
+		{		
+			return Projectile.DrawSelf();
+        }
 
-		public override Color? GetAlpha(Color lightColor)
-		{
-			return Color.White; // Makes it uneffected by light
+        public void AddTrail()
+        {
+			TrailSystem.Trail.AddAlphaBlend(Projectile, 6, Color.Cyan, Color.LimeGreen);
+			TrailSystem.Trail.AddAlphaBlend(Projectile, 3, Color.White, Color.White);
 		}
-	}
+    }
 }

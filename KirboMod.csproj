@@ -15,6 +15,7 @@
     <None Remove="Items\RainbowSword\RainbowSwordHeld.png" />
     <None Remove="Items\RainbowSword\RainbowSwordHeldGlow.png" />
     <None Remove="Items\RainbowSword\RainbowSwordMask.png" />
+    <None Remove="Items\Weapons\MaskedHammerHeld.png" />
     <None Remove="NPCs\PlasmaWisp\fire_01.png" />
     <None Remove="NPCs\PlasmaWisp\fire_02.png" />
     <None Remove="NPCs\PlasmaWisp\flame_01.png" />

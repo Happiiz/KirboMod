@@ -16,6 +16,8 @@ namespace KirboMod.NPCs
 {
 	public class BladeKnight : ModNPC
 	{
+		int AttackTimeDecrease { get => Main.expertMode ? 20 : 0; }
+
 		private byte attacktype = 0;
 		private bool jumped = false;
 		public override void SetStaticDefaults()
@@ -149,13 +151,13 @@ namespace KirboMod.NPCs
 			Player player = Main.player[NPC.target];
 			Vector2 distance = player.Center - NPC.Center;
 			bool lineOfSight = Collision.CanHitLine(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height);
-			float rangeX = 80;
-			float rangeY = 40;
+			float rangeX = 100;
+			float rangeY = 60;
 			if (distance.X < rangeX & distance.X > -rangeX & distance.Y > -rangeY & distance.Y < rangeY && lineOfSight && !player.dead) //checks if the knight is in range
 			{
 				NPC.ai[1] = 1; //starts attacking if in range
 			}
-			if (NPC.ai[0] >= 60)
+			if (NPC.ai[0] >= 60 - AttackTimeDecrease)
 			{
 				attacktype = 2;
 			}
@@ -310,7 +312,7 @@ namespace KirboMod.NPCs
 
             NPC.velocity.X *= 0.9f; //slow
 
-			if (NPC.ai[0] == 61) //unleash slash
+			if (NPC.ai[0] == 61 - AttackTimeDecrease) //unleash slash
 			{
                 NPC.frameCounter = 0; //reset frame counter
 
@@ -320,7 +322,7 @@ namespace KirboMod.NPCs
 				}
 				SoundEngine.PlaySound(SoundID.Item1, NPC.Center); 
 			}
-			if (NPC.ai[0] >= 120) //restart
+			if (NPC.ai[0] >= 120 - AttackTimeDecrease) //restart
             {
 				NPC.ai[0] = 0;
 				NPC.ai[1] = 0;
@@ -329,7 +331,7 @@ namespace KirboMod.NPCs
 
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
-            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<Items.Weapons.HeroSword>(), 40, 20)); // 1 in 40 (2.5%) chance in Normal. 1 in 20 (5%) chance in Expert
+            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<Items.Weapons.HeroSword>(), 20, 10)); // 1 in 40 (2.5%) chance in Normal. 1 in 20 (5%) chance in Expert
             npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Starbit>(), 1, 2, 4));
         }
 

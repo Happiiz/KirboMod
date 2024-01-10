@@ -5,7 +5,14 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 namespace KirboMod.Systems
-{
+{    /// <summary>
+     /// add this to every held projectile you want to use the custom trail system in. 
+     /// <br>It's a workaround to issues with layering and draw delay I was having</br>
+     /// </summary>
+    public interface ITrailedHeldProjectile
+    {
+        void AddTrail();
+    }
     public class HeldProjTrailSystem : ModSystem
     {
         public class Trail
@@ -114,6 +121,13 @@ namespace KirboMod.Systems
                 return result.ToArray();
             }
         }
+        public static bool IsDarkEnvironment(Player plr, out byte spaceAlpha)
+        {
+            //Main.atmo is the transparency of stars
+            spaceAlpha = (byte)(Main.atmo * 255);
+            return !plr.ZoneUnderworldHeight && (plr.ZoneOverworldHeight && !Main.dayTime);
+
+        }
         static BasicEffect effect;
         static GraphicsDevice _device = Main.instance.GraphicsDevice;
         private static Trail[] subtractiveTrails = null;//rename to subtractive trails
@@ -136,6 +150,15 @@ namespace KirboMod.Systems
             {
                 orig(self);
                 return;
+            }
+            for (int i = 0; i < Main.maxProjectiles; i++)
+            {
+                Projectile proj = Main.projectile[i];
+                if (!proj.active || proj.ModProjectile is not ITrailedHeldProjectile)
+                {
+                    continue;
+                }
+                ((ITrailedHeldProjectile)proj.ModProjectile).AddTrail();
             }
             SetupGraphicsDeviceAttributes();
             TryDrawingTrailsInArray(ref subtractiveTrails, GetSubtractiveBlendState());
@@ -181,28 +204,6 @@ namespace KirboMod.Systems
             Viewport viewport = Main.instance.GraphicsDevice.Viewport;
             effect.Projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, -1, 1);
             _device.RasterizerState = RasterizerState.CullNone;
-        }
-        private static void DrawTrailsInArray(ref Trail[] trails)
-        {
-            for (int j = 0; j < trails.Length; j++)
-            {
-                Trail trail = trails[j];
-                if (trail == null)
-                {
-                    continue;
-                }
-                VertexPositionColor[] trailVertices = trail.GetVertexPositionColorDataAndIndices(out int[] indices);
-                if (trailVertices.Length <= 2)
-                {
-                    continue;
-                }
-                for (int i = 0; i < effect.CurrentTechnique.Passes.Count; i++)
-                {
-                    EffectPass pass = effect.CurrentTechnique.Passes[i];
-                    pass.Apply();
-                    _device.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, trailVertices, vertexOffset: 0, trailVertices.Length, indices, indexOffset: 0, primitiveCount: indices.Length / 3);
-                }
-            }
         }
         public override void Unload()
         {

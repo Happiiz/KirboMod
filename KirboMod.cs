@@ -13,9 +13,9 @@ namespace KirboMod
 {
 	public class KirboMod : Mod
 	{
+        public static KirboMod instance;
         internal FighterComboMeter fighterComboMeter;
         internal UserInterface fighterComboMeterInterface;
-
         public enum ModPacketType : byte
         {
             //byte: playerWhoAmI
@@ -23,9 +23,46 @@ namespace KirboMod
             //byte: playerWhoAmI, byte: number of npcs, bytes: indexes of npcs caught in effect
             StartFinalCutterMultiNPC = 1,
             /// <summary>
+            /// increases the player's plasma charge by 1.
             /// byte: player whoAmI
             /// </summary>
-            PlasmaChargeUp = 2,
+            PlasmaCharge1 = 2,
+            /// <summary>
+            /// increases the player's plasma charge by 2.
+            /// byte: player whoAmI
+            /// </summary>
+            PlasmaCharge2 = 3,
+            /// <summary>
+            /// increases the player's plasma charge by 3.
+            /// byte: player whoAmI
+            /// </summary>
+            PlasmaCharge3 = 4,
+            /// <summary>
+            /// increases the player's plasma charge by 4.
+            /// byte: player whoAmI
+            /// </summary>
+            PlasmaCharge4 = 5,
+            /// <summary>
+            /// sets the player's right click bool in the array to false.
+            /// byte: player whoAmI
+            /// </summary>
+            PlayerRightClickFalse = 6,
+            /// <summary>
+            /// sets the player's right click bool in the array to true.
+            /// byte: player whoAmI
+            /// /// </summary>
+            PlayerRightClickTrue = 7,
+            /// <summary>
+            /// updates the player's position.
+            /// byte: player whoAmI. Vector2: player position (not center!).
+            /// </summary>
+            PlayerPosition = 8,
+            /// <summary>
+            /// updates the player's position and velocity.
+            /// byte: player whoAmI. Vector2: player position(not center!). Vector2 player velocity.
+            /// </summary>
+            PlayerPositionAndVelocity = 9,
+
         }
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
@@ -57,14 +94,34 @@ namespace KirboMod
                 //    }
                 //    packet.Send(-1, Main.myPlayer);
                 //    break;
-                case ModPacketType.PlasmaChargeUp:
+                case ModPacketType.PlasmaCharge1 or ModPacketType.PlasmaCharge2 or ModPacketType.PlasmaCharge3 or ModPacketType.PlasmaCharge4:
                     Player plr = Main.player[reader.ReadByte()];
                     KirbPlayer mplr = plr.GetModPlayer<KirbPlayer>();
                     mplr.plasmaCharge++;
+                    if (packetType >= ModPacketType.PlasmaCharge2)
+                        mplr.plasmaCharge++;
+                    if (packetType >= ModPacketType.PlasmaCharge3)
+                        mplr.plasmaCharge++;
+                    if (packetType == ModPacketType.PlasmaCharge4)
+                        mplr.plasmaCharge++;
                     mplr.plasmaTimer = 0;
                     if(mplr.plasmaCharge > 20)
                     {
                         mplr.plasmaCharge = 20;
+                    }
+                    break;
+                case ModPacketType.PlayerRightClickFalse:
+                    KirbPlayer.playerRightClicks[reader.ReadByte()] = false;
+                    break;
+                case ModPacketType.PlayerRightClickTrue:
+                    KirbPlayer.playerRightClicks[reader.ReadByte()] = true;
+                    break;
+                case ModPacketType.PlayerPosition or ModPacketType.PlayerPositionAndVelocity:
+                    plr = Main.player[reader.ReadByte()];
+                    plr.position = reader.ReadVector2();
+                    if(packetType == ModPacketType.PlayerPositionAndVelocity)
+                    {
+                        plr.velocity = reader.ReadVector2();
                     }
                     break;
 
@@ -72,11 +129,12 @@ namespace KirboMod
         }
         public override void Unload()
         {
-             
+            instance = null;
         }
 
         public override void Load()
         {
+            instance = this;
             // All code below runs only if we're not loading on a server
             if (!Main.dedServ)
             {

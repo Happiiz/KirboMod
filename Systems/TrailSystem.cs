@@ -6,6 +6,14 @@ using Terraria;
 using Terraria.ModLoader;
 namespace KirboMod.Systems
 {
+    /// <summary>
+    /// add this to every projectile you want to use the custom trail system in. 
+    /// <br>It's a workaround to issues with layering and draw delay I was having</br>
+    /// </summary>
+    public interface ITrailedProjectile
+    {
+        void AddTrail();
+    }
     public class TrailSystem : ModSystem
     {
         public class Trail
@@ -15,6 +23,10 @@ namespace KirboMod.Systems
             float width;
             Color startColor;
             Color endColor;
+            Func<float, Color> colorFunction;
+            Func<float, float> widthFunction;
+            Color DefaultColorFunction(float progress) => Color.Lerp(startColor, endColor, progress) * Utils.GetLerpValue(0, .75f, progress, true);
+            float DefaultWidthFunction(float progress) => width;
             public static void AddSubtractive(Projectile proj, float width, Color startColor, Color endColor)
             {
                 Trail trail = TrailFromProj(proj, width, startColor, endColor);
@@ -31,6 +43,14 @@ namespace KirboMod.Systems
                     AddToArray(trail, ref alphaBlendTrails);
                 }
             }
+            public static void AddAlphaBlend(Projectile proj, Func<float, float> widthFunction, Func<float, Color> colorFunction)
+            {
+                Trail trail = TrailFromProj(proj, 0, default, default, widthFunction, colorFunction);
+                if (trail != null)
+                {
+                    AddToArray(trail, ref alphaBlendTrails);
+                }
+            }
             public static void AddAdditive(Projectile proj, float width, Color startColor, Color endColor)
             {
                 Trail trail = TrailFromProj(proj, width, startColor, endColor);
@@ -39,7 +59,8 @@ namespace KirboMod.Systems
                     AddToArray(trail, ref additiveTrails);
                 }
             }
-            static Trail TrailFromProj(Projectile proj, float width, Color startColor, Color endColor)
+            //add method that uses pos and rotation arrays as input instead of proj
+            static Trail TrailFromProj(Projectile proj, float width, Color startColor, Color endColor, Func<float, float> widthFunction = null, Func<float, Color> colorFunction = null)
             {
                 Trail trail = new Trail();
                 int trailLength = 0;
@@ -66,6 +87,10 @@ namespace KirboMod.Systems
                 trail.width = width;
                 trail.startColor = startColor;
                 trail.endColor = endColor;
+                colorFunction ??= trail.DefaultColorFunction;//assign default function if function parameters are null
+                widthFunction ??= trail.DefaultWidthFunction;
+                trail.widthFunction = widthFunction;
+                trail.colorFunction = colorFunction;
                 return trail;
             }
             static void AddToArray(Trail trail, ref Trail[] trails)
@@ -93,10 +118,10 @@ namespace KirboMod.Systems
                     }
                     float progress = (float)i / trailLength;
                     float opacity = Utils.GetLerpValue(trailLength, trailLength * .5f, i, true);
-                    Vector2 normal = (rotations[i / 2] - MathHelper.PiOver4).ToRotationVector2() * width * .5f;
-                    Color color = Color.Lerp(endColor, startColor, progress) * opacity;
 
-                    //color.A = (byte)(255 * opacity);
+                    Vector2 normal = (rotations[i / 2] + MathF.PI / 2).ToRotationVector2() * widthFunction(progress) * .5f;
+                    Color color = colorFunction(progress);
+
                     result.Add(new VertexPositionColor(new Vector3(positions[i / 2] + normal, 0), color));
                     result.Add(new VertexPositionColor(new Vector3(positions[i / 2] - normal, 0), color));
                 }
@@ -132,10 +157,14 @@ namespace KirboMod.Systems
         }
         private void On_Main_DrawProjectiles(On_Main.orig_DrawProjectiles orig, Main self)
         {
-            if (subtractiveTrails == null && additiveTrails == null && alphaBlendTrails == null)
+            for (int i = 0; i < Main.maxProjectiles; i++)
             {
-                orig(self);
-                return;
+                Projectile proj = Main.projectile[i];
+                if (!proj.active || proj.ModProjectile is not ITrailedProjectile)
+                {
+                    continue;
+                }
+                ((ITrailedProjectile)proj.ModProjectile).AddTrail();
             }
             SetupGraphicsDeviceAttributes();
             TryDrawingTrailsInArray(ref subtractiveTrails, GetSubtractiveBlendState());

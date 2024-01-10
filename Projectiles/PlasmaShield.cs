@@ -1,3 +1,4 @@
+using KirboMod.Items.Weapons;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,6 @@ namespace KirboMod.Projectiles
 			Projectile.penetrate = -1;
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = 5;
-			Projectile.alpha = 150;
             Projectile.hide = true;
         }
         public override bool PreDraw(ref Color lightColor)
@@ -38,11 +38,36 @@ namespace KirboMod.Projectiles
         }
         public override void AI()
 		{
+		
 			Player player = Main.player[Projectile.owner];
+			if(player.HeldItem.type != ModContent.ItemType<Plasma>())
+            {
+				Projectile.Kill();
+				return;
+            }
 			KirbPlayer mplr = player.GetModPlayer<KirbPlayer>();
+			if(mplr.PlasmaShieldLevel < 1)
+            {
+				Projectile.Kill();
+				return;
+            }
+			Projectile.damage = mplr.PlasmaShieldLevel == 1 ? 50 : 100;
 			Projectile.ai[0] = mplr.PlasmaShieldRadius;
 			Projectile.Center = player.Center;
 			Lighting.AddLight(Projectile.Center, 0, 1, 0);
 		}
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+			if (target.boss || target.type == NPCID.TargetDummy)
+				return;
+			Vector2 push = Vector2.Normalize(target.Center - Projectile.Center) * 40;
+			push *= target.knockBackResist < .1f ? .1f : target.knockBackResist;
+			target.velocity = push;
+			NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, target.whoAmI);
+        }
+        public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
+        {
+			modifiers.Knockback *= 0;
+        }
     }
 }

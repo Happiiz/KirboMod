@@ -136,12 +136,12 @@ namespace KirboMod.Items
             Vector2 offset = VisualRotation.ToRotationVector2() * BladeLength;
             return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center - offset * Projectile.scale, Projectile.Center + offset * Projectile.scale, 70, ref a);
         }
-        public static bool SpawnSwing(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, int knockback)
+        public static bool SpawnSwing<T>(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int damage, int knockback) where T : CustomSwingHeldProj
         {
             if (player.whoAmI == Main.myPlayer)
             {
                 KirbPlayer mPlayer = player.GetModPlayer<KirbPlayer>();
-                Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI, player.itemAnimationMax, MathHelper.Lerp(6.15f, 4, Main.rand.NextFloat()), mPlayer.NextCustomSwingDirection);
+                Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<T>(), damage, knockback, player.whoAmI, player.itemAnimationMax, MathHelper.Lerp(6.15f, 4, Main.rand.NextFloat()), mPlayer.NextCustomSwingDirection);
             }
             return false;
         }

@@ -7,11 +7,46 @@ using Microsoft.Xna.Framework;
 namespace KirboMod
 {
     public static class Helper
-
     {
-        public static void DustExplosion(Entity entity, int type, bool noGravity = false)
+        public static bool SpawnInfoNotInAnySpecialBiome(NPCSpawnInfo info)
         {
-            int count = (int)(entity.width * entity.height * .08f);
+            if (info.Player.ZoneJungle)
+            {
+                return false;
+            }
+            if (info.Player.ZoneSnow)
+            {
+                return false;
+            }
+            if (info.Player.ZoneBeach) //don't spawn on beach
+            {
+                return false;
+            }
+            if (info.Player.ZoneDesert) //don't spawn on beach
+            {
+                return false;
+            }
+            if (info.Player.ZoneCorrupt) //don't spawn on beach
+            {
+                return false;
+            }
+            if (info.Player.ZoneCrimson) //don't spawn on beach
+            {
+                return false;
+            }
+            if (info.Player.ZoneDungeon) //don't spawn in dungeon
+            {
+                return false;
+            }
+            if (info.Water) //don't spawn in water
+            {
+                return false;
+            }
+            return true;
+        }
+        public static void DustExplosion(Entity entity, int type, bool noGravity = false, float dustAmountMultiplier = 1f)
+        {
+            int count = (int)(entity.width * entity.height * .08f * dustAmountMultiplier);
             for (int i = 0; i < count; i++)
             {
                 Dust.NewDustDirect(entity.position, entity.width, entity.height, type).noGravity = noGravity;

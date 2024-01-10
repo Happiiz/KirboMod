@@ -1,4 +1,5 @@
 using KirboMod.Particles;
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -14,11 +15,8 @@ namespace KirboMod.Projectiles
 	{
 		public override void SetStaticDefaults()
 		{
-			// DisplayName.SetDefault("Plasma Blast");
-
-            //for space jump trail
-            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 5; // The length of old position to be recorded
-            ProjectileID.Sets.TrailingMode[Projectile.type] = 0; // The recording mode
+            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 30; // The length of old position to be recorded
+            ProjectileID.Sets.TrailingMode[Projectile.type] = 2; // The recording mode
         }
 
 		public override void SetDefaults()
@@ -37,19 +35,9 @@ namespace KirboMod.Projectiles
 		//make it explode when timer is > ai0
 		public override void AI()
 		{
+			Projectile.rotation = Projectile.velocity.ToRotation();
 
-			//Animation
-
-
-			if (++Projectile.frameCounter >= 4) //changes frames every 4 ticks 
-			{
-				Projectile.frameCounter = 0;
-				if (++Projectile.frame >= Main.projFrames[Projectile.type])
-				{
-					Projectile.frame = 0;
-				}
-			}
-			if(Projectile.ai[0] < Projectile.ai[1])
+			if (Projectile.ai[0] < Projectile.ai[1])
             {
 				Projectile.Kill();
             }
@@ -78,26 +66,16 @@ namespace KirboMod.Projectiles
 			//Projectile.Damage();
 		}
 
-		public override Color? GetAlpha(Color lightColor)
-		{
-			return Color.White; // Makes it uneffected by light
-		}
-
         public override bool PreDraw(ref Color lightColor)
-        {
-            Main.instance.LoadProjectile(Projectile.type);
-            Texture2D texture = TextureAssets.Projectile[Projectile.type].Value;
+		{
 
-            // Redraw the projectile with the color not influenced by light
-            Vector2 drawOrigin = new Vector2(texture.Width * 0.5f, Projectile.height * 0.5f);
-            for (int k = 0; k < Projectile.oldPos.Length; k++)
-            {
-                Vector2 drawPos = (Projectile.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
-                Color color = Projectile.GetAlpha(lightColor) * ((Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);
-                Main.EntitySpriteDraw(texture, drawPos, null, color, Projectile.rotation, drawOrigin, Projectile.scale, SpriteEffects.None, 0);
-            }
-
-            return true;
+			TrailSystem.Trail.AddAdditive(Projectile, 100, Color.Cyan * Projectile.Opacity, Color.LimeGreen * Projectile.Opacity);
+			TrailSystem.Trail.AddAdditive(Projectile, 50, Color.White * Projectile.Opacity, Color.White * Projectile.Opacity);
+			float rotation = Projectile.rotation;
+			Projectile.rotation = 0;
+			VFX.DrawElectricOrb(Projectile, new Vector2(6));
+			Projectile.rotation = rotation;
+            return false;
         }
     }
 }

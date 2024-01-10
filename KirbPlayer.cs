@@ -15,6 +15,14 @@ namespace KirboMod
 {
     public class KirbPlayer : ModPlayer
     {
+        /// <summary>
+        /// for checking right clicks of each player because player.channel does not exist for right click.
+        /// </summary>
+        public static bool[] playerRightClicks = new bool[Main.maxPlayers];
+        public bool RightClicking { get => playerRightClicks[Player.whoAmI]; }
+
+        public int hammerCharge = 0;
+
         public bool whispbush; //for whispy shrub accesory true or false
 
         public bool kirbyballoon; //for kirby ballon accesory true or false
@@ -71,6 +79,9 @@ namespace KirboMod
         bool plasmaReleaseUp = false;
         bool plasmaReleaseDown = false;
         public int PlasmaShieldRadius { get => plasmaCharge < 3 ? 0 : plasmaCharge < 12 ? plasmaShieldRadiusSmall : plasmaShieldRadiusLarge; }
+        /// <summary>
+        /// 0: none. 1: small. 2: max
+        /// </summary>
         public int PlasmaShieldLevel { get => plasmaCharge < 3 ? 0 : plasmaCharge < 12 ? 1 : 2; }
 
         public int customSwordSwingCounter;
@@ -150,7 +161,7 @@ namespace KirboMod
         public override void PostUpdate()
         {
             Player player = Main.player[Main.myPlayer];
-
+            UpdateRightClicksArray();
             if (darkDashDelay < 0) //dashing
             {
                 player.armorEffectDrawShadow = true; //afterimages
@@ -231,6 +242,26 @@ namespace KirboMod
 
             UpdateFinalCutter();
         }
+
+        private void UpdateRightClicksArray()
+        {
+            if (Player.whoAmI == Main.myPlayer)
+            {
+                if (Main.netMode == NetmodeID.MultiplayerClient && playerRightClicks[Main.myPlayer] != Main.mouseRight)
+                {
+                    ModPacketType packetType = Main.mouseRight ? ModPacketType.PlayerRightClickTrue : ModPacketType.PlayerRightClickFalse;
+                    ModPacket packet = Mod.GetPacket();
+                    packet.Write((byte)packetType);
+                    packet.Write((byte)Main.myPlayer);
+                    packet.Send();
+                }
+                if (Main.netMode == NetmodeID.SinglePlayer)
+                {
+                    playerRightClicks[Main.myPlayer] = Main.mouseRight;
+                }
+            }
+        }
+
         public override void PostUpdateEquips()
         {
             Player player = Main.player[Main.myPlayer];
@@ -568,16 +599,27 @@ namespace KirboMod
                 plasmaTimer = 0;
                 return;
             }
-            if ((Player.controlRight && plasmaReleaseRight) || (Player.controlLeft && plasmaReleaseLeft) || (Player.controlUp && plasmaReleaseUp) || (Player.controlDown && plasmaReleaseDown))
+            int plasmaChargeAmount = 0;
+            if(Player.controlRight && plasmaReleaseRight)
+                plasmaChargeAmount++;
+            if (Player.controlLeft && plasmaReleaseLeft)
+                plasmaChargeAmount++;
+            if (Player.controlUp && plasmaReleaseUp)
+                plasmaChargeAmount++;
+            if (Player.controlDown && plasmaReleaseDown)
+                plasmaChargeAmount++;
+            if (Main.myPlayer == Player.whoAmI && Main.netMode == NetmodeID.MultiplayerClient && plasmaChargeAmount > 0)
             {
-                if (Main.myPlayer == Player.whoAmI && Main.netMode == NetmodeID.MultiplayerClient)
-                {
-                    ModPacket packet = Mod.GetPacket();
-                    packet.Write((byte)ModPacketType.PlasmaChargeUp);
-                    packet.Write((byte)Player.whoAmI);
-                    packet.Send(-1, Main.myPlayer);
-                }
-                plasmaCharge++;
+                ModPacketType plasmaChargeUpPacketType = (ModPacketType)((byte)(ModPacketType.PlasmaCharge1 - 1) + plasmaChargeAmount);
+                ModPacket packet = Mod.GetPacket();
+                packet.Write((byte)plasmaChargeUpPacketType);
+                packet.Write((byte)Player.whoAmI);
+                packet.Send(-1, Main.myPlayer);
+                plasmaCharge += plasmaChargeAmount;
+            }
+            if (Main.netMode == NetmodeID.SinglePlayer)
+            {
+                plasmaCharge += plasmaChargeAmount;
             }
             plasmaReleaseLeft = Player.releaseLeft;
             plasmaReleaseRight = Player.releaseRight;
@@ -589,38 +631,15 @@ namespace KirboMod
             }
             if(plasmaCharge < 3)
             {
-                return;//don't check collision
+                return;//don't try to spawn shield
             }
-            float radiusToCheck;
-            int shieldDamag;
-            float kb;
-            if(plasmaCharge >= 12)
-            {
-                kb = 7;
-                shieldDamag = 70;
-                radiusToCheck = plasmaShieldRadiusLarge;
-            }
-            else
-            {
-                kb = 4;
-                shieldDamag = 30;
-                radiusToCheck = plasmaShieldRadiusSmall;
-            }
-            Helper.DustCircle(30, radiusToCheck, Player.Center);
             bool hasPlasmaShield = Player.ownedProjectileCounts[ModContent.ProjectileType<PlasmaShield>()] > 0;
-
-            ////beefy shield
-            //if (plasmacharge >= 12)
-            //{
-            //    Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, player.velocity * 0, ModContent.ProjectileType<Projectiles.PlasmaShield>(), 64, 0f, player.whoAmI, 0, 0);
-            //}
-            ////manlet shield
-            //else if (plasmacharge >= 3 && plasmacharge < 12)
-            //{
-            //    Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, player.velocity * 0, ModContent.ProjectileType<Projectiles.PlasmaOrb>(), 32, 0f, player.whoAmI, 0, 0);
-            //}
+            if (!hasPlasmaShield && Player.whoAmI == Main.myPlayer)
+            {
+                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, Vector2.Zero, ModContent.ProjectileType<PlasmaShield>(), 2, 20, Main.myPlayer, 2);
+            }
         }
-        internal void ResetPlasmaCharge()
+        public void ResetPlasmaCharge()
         {
             plasmaCharge = 0;
             plasmaTimer = 0;
@@ -772,7 +791,6 @@ namespace KirboMod
                 }
             }
         }
-
         private void DashHandling(out int dir, out bool initialdash)
         {
             Player player = Main.player[Main.myPlayer];
@@ -814,10 +832,9 @@ namespace KirboMod
                 }
             }
         }
-
         public override void OnHurt(Player.HurtInfo info)
         {
-            if (whispbush == true)
+            if (whispbush)
             {
                 for (int i = 0; i < 4; i++)
                 {
@@ -827,7 +844,7 @@ namespace KirboMod
             }
 
             //NIGHT CLOAK
-            if (nightcloak == true)
+            if (nightcloak)
             {
                 //Pretty self explanatory
                 int damage = Player.HeldItem.damage;

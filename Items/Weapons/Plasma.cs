@@ -15,7 +15,6 @@ namespace KirboMod.Items.Weapons
 {
 	public class Plasma : ModItem
 	{
-		private bool holdingbutton = false; //checks if you're holding WASD
 		public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Plasma Charge"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
@@ -64,7 +63,15 @@ namespace KirboMod.Items.Weapons
         }
         public override void ModifyManaCost(Player player, ref float reduce, ref float mult)
         {
-            base.ModifyManaCost(player, ref reduce, ref mult);
+			int plasmaChargeLevel = player.GetModPlayer<KirbPlayer>().PlasmaShieldLevel;
+			if(plasmaChargeLevel == 1)
+            {
+				reduce = -20;
+            }
+			else if(plasmaChargeLevel == 2)
+            {
+				reduce = -80;
+            }
         }
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
 		{
@@ -75,36 +82,30 @@ namespace KirboMod.Items.Weapons
             {
 				chargeFromShot = 1;
 				velocity *= 1.3f;
-                type = ModContent.ProjectileType<Projectiles.PlasmaZap>();
+                type = ModContent.ProjectileType<PlasmaZap>();
             }
             else if (chargeFromShot < 12)
             {
-                type = ModContent.ProjectileType<Projectiles.PlasmaLaser>();
+                type = ModContent.ProjectileType<PlasmaLaser>();
                 velocity *= 2;
 				position += velocity;
 				chargeBonus = 3;
             }
             else
             {
-                type = ModContent.ProjectileType<Projectiles.PlasmaBlast>();
+                type = ModContent.ProjectileType<PlasmaBlast>();
                 velocity *= 3;
-                position += velocity; //start away from player
+                position += velocity;
 				chargeBonus = 7;
             }
 			//higher time to press key = higher damage
 			//higher use time = less damage because then dthe time taken to charge is less of a difference compared to normal firing
 			//higher charge from shot = higher damage bonus 
-			//
+			//time to press key is an estimate of how much time on average fast people can mash keys while also mantaining the general movement they have.
 			damage = (int)(damage * chargeFromShot * (timeToPressKey / Item.useTime) * chargeBonus);
-			player.GetModPlayer<KirbPlayer>().ResetPlasmaCharge();//make reset charge method with packet handling
+			player.GetModPlayer<KirbPlayer>().ResetPlasmaCharge();
 			velocity /= ContentSamples.ProjectilesByType[type].MaxUpdates;
 		}
-
-		public override void HoldItem(Player player)
-        {
-
-        }
-		
 		public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
 		{
 			Texture2D texture = ModContent.Request<Texture2D>("KirboMod/Items/Weapons/Plasma_Glowmask").Value; //Glowmask
@@ -146,11 +147,11 @@ namespace KirboMod.Items.Weapons
 				return;
 			KirbPlayer mplr = drawInfo.drawPlayer.GetModPlayer<KirbPlayer>();
 			Texture2D tex;
-			int orb = ModContent.ProjectileType<PlasmaOrb>();
-			int shiel = ModContent.ProjectileType<PlasmaShield>();
+			int orb = ModContent.ProjectileType<PlasmaShield>();
+			int shiel = ModContent.ProjectileType<PlasmaOrb>();
 			bool bigCharge = mplr.plasmaCharge > 12;
 			tex = TextureAssets.Projectile[bigCharge ? orb : shiel].Value;
-			float scale = (bigCharge ? KirbPlayer.plasmaShieldRadiusLarge : KirbPlayer.plasmaShieldRadiusSmall) / (float)tex.Width;
+			float scale = (bigCharge ? KirbPlayer.plasmaShieldRadiusLarge : KirbPlayer.plasmaShieldRadiusSmall) / (float)tex.Width * 2f;
 			drawInfo.DrawDataCache.Add(new DrawData(tex, drawInfo.Center - Main.screenPosition, null, Color.White, 0, tex.Size() / 2, scale, SpriteEffects.None));
         }
     }
