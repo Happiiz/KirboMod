@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 namespace KirboMod.Systems
 {    /// <summary>
@@ -129,12 +130,17 @@ namespace KirboMod.Systems
 
         }
         static BasicEffect effect;
-        static GraphicsDevice _device = Main.instance.GraphicsDevice;
-        private static Trail[] subtractiveTrails = null;//rename to subtractive trails
+        static GraphicsDevice _device;
+        private static Trail[] subtractiveTrails = null;
         private static Trail[] alphaBlendTrails = null;
         private static Trail[] additiveTrails = null;
         public override void Load()
         {
+            if(Main.dedServ || Main.netMode == NetmodeID.Server)
+            {
+                return;
+            }
+            _device = Main.instance.GraphicsDevice;
             Main.QueueMainThreadAction(() =>
             {
                 effect = new BasicEffect(_device);

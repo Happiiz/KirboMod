@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 namespace KirboMod.Systems
 {
@@ -140,12 +141,17 @@ namespace KirboMod.Systems
             }
         }
         static BasicEffect effect;
-        static GraphicsDevice _device = Main.instance.GraphicsDevice;
+        static GraphicsDevice _device;
         private static Trail[] subtractiveTrails = null;//rename to subtractive trails
         private static Trail[] alphaBlendTrails = null;
         private static Trail[] additiveTrails = null;
         public override void Load()
         {
+            if (Main.dedServ || Main.netMode == NetmodeID.Server)
+            {
+                return;
+            }
+            _device = Main.instance.GraphicsDevice;
             Main.QueueMainThreadAction(() =>
             {
                 effect = new BasicEffect(_device);
@@ -153,7 +159,7 @@ namespace KirboMod.Systems
             });
             //will make it draw before held projectiles(which are not drawn in the same place as other projectiles)
             //it will also draw after most projectiles, making them affected by the trail's subtractive blending
-            On_Main.DrawProjectiles += On_Main_DrawProjectiles; ;
+            On_Main.DrawProjectiles += On_Main_DrawProjectiles;
         }
         private void On_Main_DrawProjectiles(On_Main.orig_DrawProjectiles orig, Main self)
         {
