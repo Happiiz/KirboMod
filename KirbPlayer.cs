@@ -245,21 +245,12 @@ namespace KirboMod
 
         private void UpdateRightClicksArray()
         {
-            if (Player.whoAmI == Main.myPlayer)
-            {
-                if (Main.netMode == NetmodeID.MultiplayerClient && playerRightClicks[Main.myPlayer] != Main.mouseRight)
-                {
-                    ModPacketType packetType = Main.mouseRight ? ModPacketType.PlayerRightClickTrue : ModPacketType.PlayerRightClickFalse;
-                    ModPacket packet = Mod.GetPacket();
-                    packet.Write((byte)packetType);
-                    packet.Write((byte)Main.myPlayer);
-                    packet.Send();
-                }
+
                 if (Main.netMode == NetmodeID.SinglePlayer)
                 {
                     playerRightClicks[Main.myPlayer] = Main.mouseRight;
                 }
-            }
+            
         }
 
         public override void PostUpdateEquips()
@@ -506,7 +497,7 @@ namespace KirboMod
             }
             if (currentFinalCutterTargets.Count <= 0)
                 return false;//failed to start final cutter.
-            ModPacket packet;
+            //ModPacket packet;
             if (currentFinalCutterTargets.Count == 1)
             {
                 if (Main.netMode == NetmodeID.SinglePlayer)
@@ -514,11 +505,11 @@ namespace KirboMod
                     StartFinalCutter();
                     return true;
                 }
-                packet = Mod.GetPacket(3);
-                packet.Write((byte)KirboMod.ModPacketType.StartFinalCutter);
-                packet.Write((byte)Main.myPlayer);
-                packet.Write((byte)currentFinalCutterTargets[0]);
-                packet.Send(-1, Main.myPlayer);
+                //packet = Mod.GetPacket(3);
+                //packet.Write((byte)KirboMod.ModPacketType.StartFinalCutter);
+                //packet.Write((byte)Main.myPlayer);
+                //packet.Write((byte)currentFinalCutterTargets[0]);
+                //packet.Send(-1, Main.myPlayer);
                 return true;
             }
             if (Main.netMode == NetmodeID.SinglePlayer)
@@ -526,15 +517,15 @@ namespace KirboMod
                 StartFinalCutter();
                 return true;
             }
-            packet = Mod.GetPacket();
-            packet.Write((byte)KirboMod.ModPacketType.StartFinalCutterMultiNPC);
-            packet.Write((byte)Main.myPlayer);
-            packet.Write((byte)currentFinalCutterTargets.Count);
-            for (int i = 0; i < currentFinalCutterTargets.Count; i++)
-            {
-                packet.Write((byte)currentFinalCutterTargets[i]);
-            }
-            packet.Send(-1, Main.myPlayer);
+            //packet = Mod.GetPacket();
+            //packet.Write((byte)KirboMod.ModPacketType.StartFinalCutterMultiNPC);
+            //packet.Write((byte)Main.myPlayer);
+            //packet.Write((byte)currentFinalCutterTargets.Count);
+            //for (int i = 0; i < currentFinalCutterTargets.Count; i++)
+            //{
+            //    packet.Write((byte)currentFinalCutterTargets[i]);
+            //}
+            //packet.Send(-1, Main.myPlayer);
             return false;
         }
         public void StartFinalCutter()
@@ -599,7 +590,7 @@ namespace KirboMod
                 plasmaTimer = 0;
                 return;
             }
-            int plasmaChargeAmount = 0;
+            sbyte plasmaChargeAmount = 0;
             if(Player.controlRight && plasmaReleaseRight)
                 plasmaChargeAmount++;
             if (Player.controlLeft && plasmaReleaseLeft)
@@ -610,14 +601,10 @@ namespace KirboMod
                 plasmaChargeAmount++;
             if (Main.myPlayer == Player.whoAmI && Main.netMode == NetmodeID.MultiplayerClient && plasmaChargeAmount > 0)
             {
-                ModPacketType plasmaChargeUpPacketType = (ModPacketType)((byte)(ModPacketType.PlasmaCharge1 - 1) + plasmaChargeAmount);
-                ModPacket packet = Mod.GetPacket();
-                packet.Write((byte)plasmaChargeUpPacketType);
-                packet.Write((byte)Player.whoAmI);
-                packet.Send(-1, Main.myPlayer);
+                NetMethods.SyncPlasmaChargeChange(Player, plasmaChargeAmount, true);
                 plasmaCharge += plasmaChargeAmount;
             }
-            if (Main.netMode == NetmodeID.SinglePlayer)
+            else if (Main.netMode == NetmodeID.SinglePlayer)
             {
                 plasmaCharge += plasmaChargeAmount;
             }

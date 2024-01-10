@@ -60,7 +60,7 @@ namespace KirboMod.Items.RainbowSword
             }
             if (Timer > 590)
             {
-                if (Main.myPlayer == Projectile.owner)
+                if (Main.netMode != NetmodeID.MultiplayerClient)
                     Item.NewItem(Projectile.GetSource_Death(), Projectile.Center, ModContent.ItemType<RainbowSword>());
                 Array.ForEach(Main.dust, dust => dust.active = false);
                 for (int i = 0; i < 400; i++)
@@ -158,7 +158,7 @@ namespace KirboMod.Items.RainbowSword
                 SoundEngine.PlaySound(SoundID.Item4);
                 SoundEngine.PlaySound(SoundID.DD2_WinScene);
                 Recipe.FindRecipes();
-                Projectile.NewProjectile(Item.GetSource_ReleaseEntity(), Main.LocalPlayer.Center - new Vector2(0, 150), Vector2.Zero, ModContent.ProjectileType<RainbowSwordCraftingAnimation>(), -1, 0, Main.myPlayer); ;
+                Projectile.NewProjectile(Item.GetSource_ReleaseEntity(), Main.LocalPlayer.Center - new Vector2(0, 150), Vector2.Zero, ModContent.ProjectileType<RainbowSwordCraftingAnimation>(), -1, 0, 255);
                 return;
             }
             orig(r);
