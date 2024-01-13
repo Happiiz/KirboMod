@@ -245,11 +245,11 @@ namespace KirboMod
 
         private void UpdateRightClicksArray()
         {
-
-                if (Main.netMode == NetmodeID.SinglePlayer)
-                {
-                    playerRightClicks[Main.myPlayer] = Main.mouseRight;
-                }
+            if (Main.netMode == NetmodeID.SinglePlayer)
+            {
+                playerRightClicks[Main.myPlayer] = Main.mouseRight;
+            }
+            NetMethods.SyncPlayerRightClick(Player);
             
         }
 

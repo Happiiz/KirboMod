@@ -55,8 +55,7 @@ namespace KirboMod.Items.Weapons
 					}
 				}
 				
-				//player.velocity.X *= 0.9f; //slow
-                //player.endurance += 0.35f; //damage reduction of 35%
+				player.velocity.X *= 0.99f; //slow
                 for (int i = 0; i % 5 == 0; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 				{
 					Vector2 speed = Main.rand.NextVector2Circular(1f, 1f); //circle

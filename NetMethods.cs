@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using static KirboMod.KirboMod;
 
 namespace KirboMod
 {
