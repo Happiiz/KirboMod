@@ -97,7 +97,6 @@ namespace KirboMod.Projectiles
             if (Main.myPlayer == player.whoAmI)
             {
                 float dashTopSpeed = Utils.Remap(Projectile.localAI[1], 0, 80, 12, 22);
-                Main.NewText(dashTopSpeed);
                 float dashSteeringRate = .07f;
                 Vector2 targetVelocity = player.Center.DirectionTo(Main.MouseWorld) * dashTopSpeed;
                 player.velocity = Vector2.Lerp(player.velocity, targetVelocity, dashSteeringRate);

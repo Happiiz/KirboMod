@@ -80,7 +80,7 @@ namespace KirboMod.Systems
             {
                 if (trails == null)
                 {
-                    trails = new Trail[1] { trail };
+                    trails = [trail];
                 }
                 else
                 {
@@ -91,7 +91,7 @@ namespace KirboMod.Systems
             public VertexPositionColor[] GetVertexPositionColorDataAndIndices(out int[] indices, int indexOffset = 0)
             {
                 int trailLength = positions.Length * 2;
-                List<VertexPositionColor> result = new List<VertexPositionColor>();// new VertexPositionColor[positions.Length * 2];
+                VertexPositionColor[] result = new VertexPositionColor[trailLength];
 
                 for (int i = 1; i < trailLength; i += 2)
                 {
@@ -105,10 +105,10 @@ namespace KirboMod.Systems
                     Color color = Color.Lerp(endColor, startColor, progress) * opacity;
 
                     //color.A = (byte)(255 * opacity);
-                    result.Add(new VertexPositionColor(new Vector3(positions[i / 2] + normal, 0), color));
-                    result.Add(new VertexPositionColor(new Vector3(positions[i / 2] - normal, 0), color));
+                    result[i - 1] = new VertexPositionColor(new Vector3(positions[i / 2] + normal, 0), color);
+                    result[i] = new VertexPositionColor(new Vector3(positions[i / 2] - normal, 0), color);
                 }
-                int arrayLength = result.Count * 3 - 6;
+                int arrayLength = result.Length * 3 - 6;
                 if (arrayLength < 3)
                     arrayLength = 3;
 
@@ -119,7 +119,7 @@ namespace KirboMod.Systems
                     indices[i + 1] = i / 3 + 1 + indexOffset;
                     indices[i + 2] = i / 3 + 2 + indexOffset;
                 }
-                return result.ToArray();
+                return result;
             }
         }
         public static bool IsDarkEnvironment(Player plr, out byte spaceAlpha)

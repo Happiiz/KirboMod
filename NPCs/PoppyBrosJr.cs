@@ -167,7 +167,10 @@ namespace KirboMod.NPCs
                 else
                 {
                     NPC.frameCounter += 1.0;
-
+                    if (attackTimer > 90)
+                    {
+                        NPC.frame.Y = frameHeight * 5;
+                    }
                     if (NPC.frameCounter < 10.0)
                     {
                         NPC.frame.Y = frameHeight * 9;
@@ -183,7 +186,15 @@ namespace KirboMod.NPCs
                 }
             }
 		}
-
+        static float TimeToReachYPoint(float fromY, float toY, float accelY, float initialVelY)
+        {
+            bool hasSolution = Utils.SolveQuadratic(accelY * .5f, initialVelY, fromY - toY, out float result1, out float result2);
+            if (!hasSolution)
+            {
+                return float.NaN;
+            }
+            return MathF.Max(result2, result1);
+        }
 		private void Walk() //walk towards player
 		{
 			Player player = Main.player[NPC.target];
@@ -216,9 +227,14 @@ namespace KirboMod.NPCs
         }
 		private void Bomb()
         {
+            int attackDuration = Main.expertMode ? 90 : 160;
+
+
 			Player player = Main.player[NPC.target];
 			float Xprojshoot = player.Center.X - NPC.Center.X;
-			Xprojshoot /= 50; 
+            float timeToReach = TimeToReachYPoint(NPC.Center.Y, player.Center.Y, .4f, -8);
+
+			Xprojshoot /= timeToReach; 
 			if (Xprojshoot >= 10) //limit speed
             {
 				Xprojshoot = 10;
@@ -256,12 +272,12 @@ namespace KirboMod.NPCs
                 {
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, Xprojshoot, -8, ModContent.ProjectileType<PoppyBomb>(), 15 / 2, 0, Main.myPlayer, 0, 0);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, Xprojshoot, -8, ModContent.ProjectileType<PoppyBomb>(), 10, 0, Main.myPlayer, 0, 0);
                     }
                 }
             }
 
-			if (attackTimer > 90) //end attack after a second
+			if (attackTimer > attackDuration) //end attack after a second
             {
                 attacktype = 0; //can walk if out of range
                 attackTimer = 0; //ready next attack
