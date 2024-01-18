@@ -10,33 +10,33 @@ namespace KirboMod.NPCs
 {
 	public class UFO : ModNPC
 	{
-        public ref float movement => ref NPC.ai[2];
-
+        public ref float Movement => ref NPC.ai[2];
+        ref float MovementTimer => ref NPC.ai[0];
+        ref float AttackTimer => ref NPC.ai[1];
         private bool seen = false; //determines if the ufo was in range of the player's sight
 
-		private int ranan = Main.rand.Next(0, 4);
-		private int subranan = Main.rand.Next(0, 3);
 		public override void SetStaticDefaults() {
 			// DisplayName.SetDefault("UFO");
-			Main.npcFrameCount[NPC.type] = 4;
+			Main.npcFrameCount[NPC.type] = 5;
 		}
 
 		public override void SetDefaults() {
 			NPC.width = 46;
 			NPC.height = 44;
 			//drawOffsetY = -18; //make sprite line up with hitbox
-			NPC.damage = 30;
-			NPC.lifeMax = 400;
+			NPC.damage = 90;
+			NPC.lifeMax = 4000;
 			NPC.defense = 30;
 			NPC.HitSound = SoundID.NPCHit4; //metal
 			NPC.DeathSound = SoundID.NPCDeath14; //mech explode
-			NPC.value = Item.buyPrice( 0, 50, 0, 0); // money it drops
+			NPC.value = Item.buyPrice(10, 0, 0, 0); // money it drops
 			NPC.rarity = 4; //1 is dungeon slime, 4 is mimic
-			NPC.knockBackResist = 1f; //How much of the knockback it receives will actually apply
+			NPC.knockBackResist = 0; //How much of the knockback it receives will actually apply
 			Banner = NPC.type;
 			BannerItem = ModContent.ItemType<Items.Banners.UFOBanner>();
 			NPC.noGravity = true;
 			NPC.noTileCollide = true;
+            NPC.aiStyle = -1;
 		}
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
@@ -66,183 +66,95 @@ namespace KirboMod.NPCs
 
 		public override void AI() //constantly cycles each time
         {
-			NPC.spriteDirection = NPC.direction;
-			NPC.TargetClosest();
-			//switch movements(never twice in a row)
-			if (NPC.ai[0] == 0)
-			{
-                int ranan = Main.rand.Next(1, 4);
-
-                if (ranan == 3) //right
-                {
-                    if (movement == 4) //if already 4
-                    {
-                        int subranan = Main.rand.Next(1, 3);
-                        if (subranan == 3)
-                        {
-                            movement = 3;
-                        }
-                        else if (subranan == 2)
-                        {
-                            movement = 2;
-                        }
-                        else
-                        {
-                            movement = 1;
-                        }
-                    }
-                    else
-                    {
-                        movement = 4;
-                    }
-                }
-                else if (ranan == 2) // left
-                {
-                    if (movement == 3) //if already 3
-                    {
-                        int subranan = Main.rand.Next(1, 3);
-                        if (subranan == 3)
-                        {
-                            movement = 4;
-                        }
-                        else if (subranan == 2)
-                        {
-                            movement = 2;
-                        }
-                        else
-                        {
-                            movement = 1;
-                        }
-                    }
-                    else
-                    {
-                        movement = 3;
-                    }
-                }
-                else if (ranan == 1) //up
-                {
-                    if (movement == 2) //if already 2
-                    {
-                        int subranan = Main.rand.Next(1, 3);
-                        if (subranan == 3)
-                        {
-                            movement = 4;
-                        }
-                        else if (subranan == 2)
-                        {
-                            movement = 3;
-                        }
-                        else
-                        {
-                            movement = 1;
-                        }
-                    }
-                    else
-                    {
-                        movement = 2;
-                    }
-                }
-                else //down
-                {
-                    if (movement == 1) //if already 1
-                    {
-                        int subranan = Main.rand.Next(1, 3);
-                        if (subranan == 3)
-                        {
-                            movement = 4;
-                        }
-                        else if (subranan == 2)
-                        {
-                            movement = 3;
-                        }
-                        else
-                        {
-                            movement = 2;
-                        }
-                    }
-                    else
-                    {
-                        movement = 1;
-                    }
-                }
-
-                NPC.netUpdate = true;
-            }
-
-            //attack
+            Lighting.AddLight(NPC.Center, Vector3.One);
+            int attackRate = Main.expertMode ? 90 : 120;
+            NPC.spriteDirection = NPC.direction;
+            NPC.TargetClosest();
             Player player = Main.player[NPC.target];
             Vector2 distance = player.Center - NPC.Center;
-
-            //this if else statement is here so players don't get shot from where they can't see
-
+            //this is here so players don't get shot from where they can't see
             //within dimensions, not in unaccessible area and player not dead
-            if (Math.Abs(distance.Y) < 400 && Math.Abs(distance.X) < 800 && !player.dead) 
-			{
-				seen = true; //prepare attack
-			}
-
-			if (seen == true) //prepare attack
-			{
-                NPC.ai[1]++; //prepare attack
+            if (MathF.Abs(distance.Y) < 400 && MathF.Abs(distance.X) < 800 && !player.dead && player.active)
+                seen = true;//prepare attack
+            if (seen) //prepare attack
+            {
+                AttackTimer++; //prepare attack
             }
             else
             {
-                NPC.ai[1] = 0; //float around 
+                AttackTimer = 0; //float around 
             }
 
-            if (NPC.ai[1] >= 60) //warning
-			{
+            if (AttackTimer >= attackRate / 2) //warning
+            {
                 //Makes dust slightly above UFO
-                Dust d = Dust.NewDustPerfect(NPC.Center + new Vector2(0, -10), ModContent.DustType<Dusts.CyborgArcherLaser>(), Vector2.Zero, Scale: 1f); 
+                Dust d = Dust.NewDustPerfect(NPC.Center + new Vector2(0, -12), ModContent.DustType<Dusts.CyborgArcherLaser>(), Vector2.Zero, Scale: 1f);
                 d.noGravity = true;
             }
 
-			if (NPC.ai[1] >= 120) //shoot
+            CheckAttack(attackRate, player);
+
+            //how often it should switch directions
+            MovementTimer++;
+            if (MovementTimer >= attackRate)
             {
-				Vector2 projshoot = player.Center - NPC.Center;
-				projshoot.Normalize(); //make into 1
-				projshoot *= 40;
-
-				if (Main.netMode != NetmodeID.MultiplayerClient)
-				{
-					Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projshoot, ModContent.ProjectileType<Projectiles.UFOLaser>(), 80 / 2, 12, Main.myPlayer);
-				}
-				SoundEngine.PlaySound(SoundID.Item33, NPC.Center);
-
-				//reset
-                NPC.ai[1] = 0;
+                MovementTimer = 0f;
             }
+            else
+            {
+                return;
+            }
+            float movementSpeed = 3;
+            if (Main.expertMode)
+                movementSpeed *= 1.3333f;
+            bool moveVertically = MathF.Abs(NPC.Center.Y - player.Center.Y) > MathF.Abs(NPC.Center.X - player.Center.X);
+            if (distance.Length() < 600)
+                moveVertically = Main.rand.NextBool();
+            NPC.velocity = Vector2.Zero;
+            if (moveVertically)
+            {
+                NPC.velocity.Y = MathF.Sign(player.Center.Y - NPC.Center.Y);
+            }
+            else
+            {
+                NPC.velocity.X = MathF.Sign(player.Center.X - NPC.Center.X);
+            }
+            NPC.netUpdate = true;
+            NPC.velocity *= movementSpeed;
+        }
 
-			//switch directions
-			++NPC.ai[0];
+        void CheckAttack(int attackRate, Player player)
+        {
+            if (AttackTimer >= attackRate) //shoot
+            {
+                float projVelocity = Main.expertMode ? 20 : 13;
+                Vector2 projshoot = player.Center - NPC.Center;
+                projshoot.Normalize(); //make into 1
+                projshoot *= projVelocity;//projectile velocity.
+                ShootProj(projshoot);
+                SoundEngine.PlaySound(SoundID.Item158 with { Pitch = .7f }, NPC.Center);
+                //shoot an additional projectile
+                if (Main.expertMode && player.velocity.LengthSquared() > 0)
+                {
+                    //predicts player movement
+                    Utils.ChaseResults result = Utils.GetChaseResults(NPC.Center, projVelocity, player.Center, player.velocity);
+                    result.ChaserVelocity = result.InterceptionHappens ? result.ChaserVelocity : (Vector2.Normalize(player.velocity) * projVelocity);
+                    ShootProj(result.ChaserVelocity);
+                }
+                //reset
+                AttackTimer = 0;
+            }
+        }
 
-			if (NPC.ai[0] >= 120)
-			{
-				NPC.ai[0] = 0f;
-			}
-
-			//movement
-			if (movement == 1) //down
-			{
-				NPC.velocity.X = 0;
-				NPC.velocity.Y = 2;
-			}
-			else if (movement == 2) //up
-			{
-				NPC.velocity.X = 0;
-				NPC.velocity.Y = -2;
-			}
-			else if (movement == 3) //left
-			{
-				NPC.velocity.X = -2;
-				NPC.velocity.Y = 0;
-			}
-			else //right
-			{
-				NPC.velocity.X = 2;
-				NPC.velocity.Y = 0;
-			}
-		}
+        private void ShootProj(Vector2 velocity)
+        {
+            float projMaxUpdates = ContentSamples.ProjectilesByType[ModContent.ProjectileType<Projectiles.UFOLaser>()].MaxUpdates;
+            Particles.Ring.ShotRing(NPC.Center, Color.Red, velocity);
+            if (Main.netMode != NetmodeID.MultiplayerClient)
+            {
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, velocity / projMaxUpdates, ModContent.ProjectileType<Projectiles.UFOLaser>(), 80 / 2, 0);
+            }
+        }
 
         public override void FindFrame(int frameHeight) // animation
         {
@@ -268,8 +180,15 @@ namespace KirboMod.NPCs
                 NPC.frameCounter = 0.0;
             }
         }
-
-		public override void HitEffect(NPC.HitInfo hit)
+        public override bool PreKill()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                Dust.NewDustDirect(NPC.position, NPC.width, NPC.height, DustID.TheDestroyer).noGravity = true;
+            }
+            return true;
+        }
+        public override void HitEffect(NPC.HitInfo hit)
         {
             if (NPC.life <= 0)
             {

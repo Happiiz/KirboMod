@@ -11,11 +11,7 @@ namespace KirboMod.Items.Weapons
 {
 	public class MaskedHammer : ModItem
 	{
-		private int meleeCharge = 0;
-		private static int maxCharge = 30;
-		private int attackTime = 0;
-		private Vector2 dash = Main.MouseWorld;
-		private int uses = 0;
+		const int chargeNeededForTornado = 120;
 		public override void SetStaticDefaults() 
 		{
 			 // DisplayName.SetDefault("Wild Fire Hammer"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
@@ -42,177 +38,81 @@ namespace KirboMod.Items.Weapons
 			Item.noMelee = false;
 			Item.noUseGraphic = false;
 		}
-
 		public override void HoldItem(Player player)
 		{
-			if (Main.mouseRight == true & player.itemTime == 0) //holding up & not attacking
+			Item.noMelee = player.ownedProjectileCounts[ModContent.ProjectileType<Projectiles.MaskedFireTornado>()] > 0;
+			KirbPlayer kplr = player.GetModPlayer<KirbPlayer>();
+			if (kplr.RightClicking & player.ItemTimeIsZero) //holding up & not attacking
 			{
-				meleeCharge++; //go up
-				player.velocity.X *= 0.9f; //slow
-                player.endurance += 0.35f; //damage reduction of 35%
-
+				if(++kplr.hammerCharge >= chargeNeededForTornado)
+				{
+					kplr.hammerCharge = chargeNeededForTornado;
+					for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+					{
+						Vector2 speed = Main.rand.NextVector2Circular(1f, 1f); //circle
+						Dust d = Dust.NewDustPerfect(player.Center + Main.rand.NextVector2Circular(32,32), DustID.SolarFlare, speed * 5, Scale: 2f, newColor: Color.White); //Makes dust in a messy circle
+						d.noGravity = true;
+					}
+				}
+				
+				player.velocity.X *= 0.99f; //slow
                 for (int i = 0; i % 5 == 0; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 				{
 					Vector2 speed = Main.rand.NextVector2Circular(1f, 1f); //circle
 					Dust d = Dust.NewDustPerfect(player.Center, DustID.Smoke, speed * 5, Scale: 2f, newColor: Color.DarkGray); //Makes dust in a messy circle
 					d.noGravity = true;
 				}
+				
 			}
-
-			if (Main.mouseRight == false & player.itemTime == 0) //not attacking or charging
-			{
-				meleeCharge = 0; //reset
-			}
-
-			if (meleeCharge >= maxCharge) //cap
-			{
-				meleeCharge = maxCharge;
-
-                Item.DamageType = DamageClass.MeleeNoSpeed;
-                Item.damage = 512; //change damage
-				Item.useTime = 24;
-				Item.useAnimation = 24;
-				Item.noMelee = true;
-				player.dash = 0; //disable dashing
-
-				for (int i = 0; i % 3 == 0; i++) // inital statement ; conditional ; loop
-				{
-					Vector2 speed = Main.rand.NextVector2Circular(1f, 1f); //circle
-					Dust dust = Dust.NewDustPerfect(player.Center, DustID.SolarFlare, speed * 10, Scale: 2f); //Makes dust in a messy circle
-					dust.noGravity = true;
-				}
-			}
-			else if (meleeCharge < maxCharge)
-			{
-				Item.DamageType = DamageClass.Melee;
-                Item.damage = 128; //original damage 
-				Item.UseSound = SoundID.Item1;
-				Item.useTime = 8;
-				Item.useAnimation = 8;
-				Item.noMelee = false;
-			}
-
-			attackTime--; //go down
-
-			if (attackTime == 5) //restart when used while charged (2 otherwise there will be window to strong hit again)
-			{
-				meleeCharge = 0;
-			}
-
-			if (attackTime > 0 & meleeCharge == maxCharge) //still attacking with charge
+            if (!kplr.RightClicking)
             {
-				//MELEE TORNADO
-
-				if (attackTime >= 23) //inital strike
-				{
-					dash = Main.MouseWorld - player.Center;
-					dash.Normalize(); //reduce to a unit of 1
-					dash *= 15; //make a speed of 15
-					player.velocity = dash;
-
-					player.immuneTime = player.itemAnimationMax; //for invincibility timer
-				}
-				else
-                {
-					player.velocity = dash; //keep moving the way you were
-				}
-
-				//invincibility (timer above)
-				player.immune = true;
-				player.immuneNoBlink = true;
-
-                //extra...
-                player.maxFallSpeed = 20;
-                player.noKnockback = true;
-                player.GetJumpState(ExtraJump.BlizzardInABottle).Available = false;
-                player.GetJumpState(ExtraJump.CloudInABottle).Available = false;
-                player.GetJumpState(ExtraJump.SandstormInABottle).Available = false;
-                player.GetJumpState(ExtraJump.TsunamiInABottle).Available = false;
-                player.GetJumpState(ExtraJump.FartInAJar).Available = false;
-                player.dash = 0;
-
-                player.canRocket = false;
-                player.carpet = false;
-                player.carpetFrame = -1;
-
-                //disable kirby balloon
-                player.GetModPlayer<KirbPlayer>().kirbyballoon = false;
-                player.GetModPlayer<KirbPlayer>().kirbyballoonwait = 1;
-
-				//double jump effects
-				player.GetJumpState(ExtraJump.BlizzardInABottle).Disable();
-                player.GetJumpState(ExtraJump.CloudInABottle).Disable();
-                player.GetJumpState(ExtraJump.SandstormInABottle).Disable();
-                player.GetJumpState(ExtraJump.TsunamiInABottle).Disable();
-                player.GetJumpState(ExtraJump.FartInAJar).Disable();
-
-                player.DryCollision(true, true); //fall through platforms
-
-                player.mount.Dismount(player); //dismount mounts
-			}
-
-
-			if (Main.mouseLeft == false || Collision.down & player.gravDir == 1f) //not holding down or not in air
-			{
-				uses = 0;
-			}
+				kplr.hammerCharge = 0;
+            }
 		}
 
 		public override bool? UseItem(Player player)/* tModPorter Suggestion: Return null instead of false */
 		{
-			attackTime = Item.useTime;
-
-			if (meleeCharge == maxCharge)
+			KirbPlayer kplr = player.GetModPlayer<KirbPlayer>();
+			if (kplr.hammerCharge >= chargeNeededForTornado)
 			{
+				Item.noMelee = true;
+				kplr.hammerCharge = 0;
+				Item.noUseGraphic = true;
 				SoundEngine.PlaySound(SoundID.Item74, player.Center);  //inferno explosion
-				Projectile.NewProjectile(new EntitySource_ItemUse(Main.player[player.whoAmI], player.HeldItem), player.Center, player.velocity, ModContent.ProjectileType<Projectiles.MaskedFireTornado>(), Item.damage, Item.knockBack, player.whoAmI);
+				if (Main.myPlayer == player.whoAmI)
+				{
+					Projectile.NewProjectile(new EntitySource_ItemUse(Main.player[player.whoAmI], player.HeldItem), player.Center, player.velocity, ModContent.ProjectileType<Projectiles.MaskedFireTornado>(), Item.damage * 70, Item.knockBack, player.whoAmI);
+				}
+				return true;
 			}
-
-			bool airborne = player.velocity.Y != 0f; //not not moving
-
-			if (uses >= 3 & !airborne)
+			Item.noUseGraphic = false;
+			kplr.hammerCharge = 0;
+			Vector2 posToCheck = player.Bottom;
+			bool hasGroundToSlamHammer;
+			if(player.direction == -1)
+            {
+				hasGroundToSlamHammer = Collision.SolidTiles(player.Center - new Vector2(96, 0), 32, 32);
+            }
+            else
+            {
+				hasGroundToSlamHammer = Collision.SolidTiles(player.Center + new Vector2(74, 0), 32, 32);
+			}
+			if (hasGroundToSlamHammer)
 			{
 				SoundEngine.PlaySound(SoundID.Item14, player.Center);  //inferno explosion
-				Projectile.NewProjectile(new EntitySource_ItemUse(Main.player[player.whoAmI], player.HeldItem), player.Center.X + player.direction * 40, player.Center.Y - 40, player.direction * 10, 0, ModContent.ProjectileType<Projectiles.MaskedFireTornadoSmall>(), Item.damage, Item.knockBack, player.whoAmI);
-
+				if (Main.myPlayer == player.whoAmI)
+				{
+					Projectile.NewProjectile(new EntitySource_ItemUse(Main.player[player.whoAmI], player.HeldItem), player.Center.X + player.direction * 80, player.Center.Y - 40, player.direction * 10, 0, ModContent.ProjectileType<Projectiles.MaskedFireTornadoSmall>(), Item.damage, Item.knockBack, player.whoAmI);
+				}
 				for (int i = 0; i < 30; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 				{
 					Vector2 speed = Main.rand.NextVector2Unit(); //circle edge
-					Dust d = Dust.NewDustPerfect(player.Center + new Vector2(player.direction * 80, 0), DustID.SolarFlare, speed * 4, 0, default, 2f); //Makes dust in a messy circle
+					Dust d = Dust.NewDustPerfect(player.Center + new Vector2(player.direction * 96, 0), DustID.SolarFlare, speed * 4, 0, default, 2f); //Makes dust in a messy circle
 					d.noGravity = true;
 				}
-				uses = 0;
-			}
-			else
-			{
-				uses++; //go up by 1
 			}
 			return true;
 		}
-
-		public override void MeleeEffects(Player player, Rectangle hitbox)
-		{
-			if (Item.noMelee == false)
-			{
-				for (int i = 0; i < 2; i++) // inital statement ; conditional ; loop
-				{
-					int dust = Dust.NewDust(new Vector2(hitbox.X, hitbox.Y), hitbox.Width, hitbox.Height, DustID.Torch, Scale: 1f);
-					Main.dust[dust].velocity *= 0;
-					Main.dust[dust].noGravity = false;
-				}
-
-				for (int i = 0; i < 200; i++)
-				{
-					NPC npc = Main.npc[i];
-
-					if (hitbox.Intersects(npc.Hitbox) && npc.friendly == false)
-					{
-						npc.AddBuff(BuffID.Daybreak, 600); //10 seconds 
-					}
-				}
-			}
-		}
-
 		public override void AddRecipes()
 		{
 			Recipe maskedhammerrecipe = CreateRecipe();//the result is Wild Hammer

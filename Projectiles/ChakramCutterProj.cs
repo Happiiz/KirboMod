@@ -35,7 +35,7 @@ namespace KirboMod.Projectiles
 		}
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
-			return Projectile.ai[0] >= 0 && (AIUtils.CheckCircleCollision(targetHitbox, Projectile.Center, 35) || AIUtils.CheckCircleCollision(targetHitbox, Projectile.oldPos[0] + Projectile.Size / 2, 35));
+			return Projectile.ai[0] >= 0 && (Helper.CheckCircleCollision(targetHitbox, Projectile.Center, 35) || Helper.CheckCircleCollision(targetHitbox, Projectile.oldPos[0] + Projectile.Size / 2, 35));
         }
         public override bool PreAI()
         {
@@ -68,7 +68,7 @@ namespace KirboMod.Projectiles
                 {
 					Projectile.velocity = Vector2.Normalize( Projectile.velocity).RotatedBy(Projectile.ai[1] * MathF.PI / 2) * VelLength;
                 }
-				float speed = AIUtils.RemapEasing(Projectile.ai[0], 25, 1000, 25f, 100, Easings.EaseInOutSine); //top speed(original shoot speed)
+				float speed = Helper.RemapEasing(Projectile.ai[0], 25, 1000, 25f, 100, Easings.EaseInOutSine); //top speed(original shoot speed)
 				float inertia = 10f; //acceleration and decceleration speed
 
 				Vector2 direction = player.Center - Projectile.Center; 																	
@@ -84,7 +84,7 @@ namespace KirboMod.Projectiles
 				return;
             }
 			Projectile.velocity.Normalize();
-			Projectile.velocity *= AIUtils.RemapEasing(Projectile.ai[0], 0, 40, VelLength, 0.1f, Easings.EaseInOutSine);
+			Projectile.velocity *= Helper.RemapEasing(Projectile.ai[0], 0, 40, VelLength, 0.1f, Easings.EaseInOutSine);
 		}
 
         public static Asset<Texture2D> afterimage;

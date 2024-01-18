@@ -39,7 +39,7 @@ namespace KirboMod.Projectiles
 			Projectile.ai[0]++;
 			if (Projectile.ai[0] == 1)
 			{
-                for (int i = 0; i < 3; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+                for (int i = 0; i < 10; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
                 {
                     Vector2 speed = new Vector2(Main.rand.Next(2,4) * direction, 0);
                     Gore.NewGorePerfect(Projectile.GetSource_FromThis(), direction == -1 ? Projectile.Center - new Vector2(40, 0) : Projectile.Center, 

@@ -17,7 +17,6 @@ namespace KirboMod.NPCs
 {
 	public partial class NightmareOrb : ModNPC
 	{
-        static readonly int[] yOffsetsForSlashBeam = new int[6] { -2, 1, -1, 2, 0, 0 };//another 0 as a failsafe in case of index out of bounds
         Vector2 GetTargetPosOffset(float changeRate = 0.05f)
         {
             int moveType = AttacksPerformedSinceSpawn / 2 % 3;
@@ -54,7 +53,6 @@ namespace KirboMod.NPCs
 			NPC.TargetClosest(true);
 			{
 				NPC.damage = 70;
-                //DESPAWNING
                 if (NPC.target < 0 || NPC.target == 255 || player.dead || !player.active || Main.dayTime == true)
 				{
 					NPC.ai[0] = 0;
@@ -76,8 +74,7 @@ namespace KirboMod.NPCs
 			}
 		}
         void DecideNextAttack()
-        {
-                                
+        {                     
             if (AttackType == NightmareOrbAtkType.DecideNext && NPC.ai[0] >= 30)//time between attacks
             {
                 NightmareOrbAtkType[] atkOrder = new NightmareOrbAtkType[]
@@ -102,7 +99,6 @@ namespace KirboMod.NPCs
             if (AttackType != NightmareOrbAtkType.Dash)
             {
                 MainMovement(player);
-
             }
             if (AttackType == NightmareOrbAtkType.SingleStar)//stars
             {
@@ -125,7 +121,6 @@ namespace KirboMod.NPCs
                 AttackDash();
             }
         }
-
         private void MainMovement(Player player)
         {
             Vector2 move = player.Center - NPC.Center + GetTargetPosOffset(0.05f);
@@ -143,14 +138,13 @@ namespace KirboMod.NPCs
                 NPC.velocity *= speed / magnitude;//sets npc's velocity vector's magnitude to be speed
             }
         }
-
         private void AttackSlashBeam(Player player)
         {
             //>attempts to make code better
             //>actually make it worse
             //>wires.png
             const int startTime = 30;
-            float fireRate = GetValueMultipliedDependingOnPhaseAndDifficulty(30, 0.75f, 0.75f);
+            float fireRate = GetValueMultipliedDependingOnPhaseAndDifficulty(30, 0.85f, 0.85f);
             int currentSlashBeamIndex = (int)(NPC.ai[0] - startTime) / (int)fireRate;
             Vector2 playerDistance = player.Center - NPC.Center;
             Vector2 playerXOffset = player.Center + new Vector2(playerDistance.X <= 0 ? 650 : -650, 0); //go in front of player
@@ -172,10 +166,9 @@ namespace KirboMod.NPCs
                 EndAttack();
             }
         }
-
         private void AttackTripleStar()
         {
-            int startTime = frenzy ? 30 : 60;
+            int startTime = frenzy ? 40 : 60;
             int fireRate = frenzy ? 20 : 35;
             fireRate = GetValueDividedDependingOnPhaseAndDifficulty(fireRate);
             int numberOfShots = 4;
@@ -199,9 +192,6 @@ namespace KirboMod.NPCs
                 EndAttack();
             }
         }
-
-      
-
         private void AttackHomingStar()
         {
             int startTime = frenzy ? 30 : 60;
@@ -219,7 +209,6 @@ namespace KirboMod.NPCs
                             continue;
                         for (int j = 0; j < shotDirections.Length; j++)
                         {
-                            //todo: change homing night star ai to target the player with index ai1 and follow nightmare orb npc of index 0 before being fired. For proj use velocity as total offset, remember to subtract vel from pos in AI. use localAI0 as progress timer maybe?
                             Vector2 projVel = shotDirections[j] with { X = NPC.direction * shotDirections[j].X };
                             Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projVel * 2, ModContent.ProjectileType<HomingNightStar>(), dmgPerAtkType[AttackType], 0f, Main.myPlayer, NPC.whoAmI, i);
                         }
@@ -232,7 +221,6 @@ namespace KirboMod.NPCs
 				EndAttack();
 			}
         }
-
         private void AttackSingleStar(Player player)
         {
             Vector2 shootVel = player.Center - NPC.Center;
@@ -280,9 +268,12 @@ namespace KirboMod.NPCs
 				EndAttack();
 			}
             if (dashSpeed <= 40)
+            {
                 return;
+            }
             if ((int)NPC.ai[0] % 5 == 4)
-                for (float i = 0; i < MathF.Tau; i+= MathF.Tau/20f)
+            {
+                for (float i = 0; i < MathF.Tau; i += MathF.Tau / 20f)
                 {
                     Vector2 offset = i.ToRotationVector2() * 40;
                     offset.X *= 0.5f;
@@ -290,9 +281,8 @@ namespace KirboMod.NPCs
                     Dust dust = Dust.NewDustPerfect(NPC.Center + offset, DustID.RainbowMk2, offset * 0.1f);
                     dust.scale *= 0.75f;
                     SetDashDustStats(dust.dustIndex);
-                   
-
                 }
+            }
             for (int i = 0; i < 3; i++)
             {
                 int index = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.RainbowMk2);
@@ -309,17 +299,20 @@ namespace KirboMod.NPCs
             dust.scale *= 4.5f;
             dust.noGravity = true;
             dust = Dust.CloneDust(dust);
-            dust.color = Color.White with { A = 0 };
-            dust.scale *= 0.65f;
+            if (dust.dustIndex != 6000)
+            {
+                dust.color = Color.White with { A = 0 };
+                dust.scale *= 0.65f;
+            }
         }
 
-        int GetValueMultipliedDependingOnPhaseAndDifficulty(float value, float expertMultiplier = 1.25f, float frenzyMultiplier = 1.25f)
+        int GetValueMultipliedDependingOnPhaseAndDifficulty(float value, float expertMultiplier = 1.2f, float frenzyMultiplier = 1.2f)
         {
             value *= Main.expertMode ? expertMultiplier : 1;
             value *= frenzy ? frenzyMultiplier : 1;
             return (int)value;
         }
-        int GetValueDividedDependingOnPhaseAndDifficulty(float value, float expertDivisor = 1.25f, float frenzyDivisor = 1.25f)
+        int GetValueDividedDependingOnPhaseAndDifficulty(float value, float expertDivisor = 1.2f, float frenzyDivisor = 1.2f)
         {
             value /= Main.expertMode ? expertDivisor : 1;
             value /= frenzy ? frenzyDivisor : 1;

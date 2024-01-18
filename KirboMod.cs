@@ -1,5 +1,6 @@
 using KirboMod.NPCs;
 using KirboMod.UI;
+using System.IO;
 using Terraria;
 using Terraria.Graphics.Effects;
 using Terraria.Graphics.Shaders;
@@ -12,16 +13,25 @@ namespace KirboMod
 {
 	public class KirboMod : Mod
 	{
+        public static KirboMod instance;
         internal FighterComboMeter fighterComboMeter;
         internal UserInterface fighterComboMeterInterface;
+       
+        public override void HandlePacket(BinaryReader reader, int whoAmI)
+        {
+            NetMethods.HandlePacket(reader);
+        }
+
+       
 
         public override void Unload()
         {
-             
+            instance = null;
         }
 
         public override void Load()
         {
+            instance = this;
             // All code below runs only if we're not loading on a server
             if (!Main.dedServ)
             {

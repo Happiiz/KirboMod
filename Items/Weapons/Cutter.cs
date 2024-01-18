@@ -1,5 +1,7 @@
+using Microsoft.Xna.Framework;
 using System;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.Graphics.Shaders;
 using Terraria.ID;
@@ -33,10 +35,24 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.CutterBlade>();
-			Item.shootSpeed = 15f; //doesn't matter
+			Item.shootSpeed = 10;
 			Item.noUseGraphic = true;
 		}
-		public override void AddRecipes()
+        public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+        {
+			if (Main.myPlayer != player.whoAmI)
+				return false;
+			//KirbPlayer kPlr = player.GetModPlayer<KirbPlayer>();
+   //         if (kPlr.TryStartingFinalCutter() || kPlr.finalCutterAnimationCounter > 0)
+   //         {
+			//	return false;
+   //         }
+			float maxSpeed = Item.shootSpeed;
+			float acceleration = .15f;
+			Projectile.NewProjectile(source,position,velocity,type,damage,knockback, player.whoAmI, 0 , maxSpeed, acceleration);
+			return false;
+        }
+        public override void AddRecipes()
 		{
 			Recipe recipe1 = CreateRecipe();//the result is cutter
 			recipe1.AddIngredient(ModContent.ItemType<Starbit>(), 20); //20 starbits

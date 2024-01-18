@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -31,7 +32,7 @@ namespace KirboMod.NPCs
 
         public override void AI() //constantly cycles each time
         {
-            Player player = Main.player[NPC.target];
+
 
             if (NPC.ai[1] <= 60 || (NPC.ai[0] >= 60 && NPC.ai[0] < 90 && frenzy)) //be harmless upon spawn (or when moving during frenzy
             {
@@ -55,7 +56,7 @@ namespace KirboMod.NPCs
                 transitioning = true;
             }
             //DESPAWNING
-            if (NPC.target < 0 || NPC.target == 255 || player.dead || !player.active)
+            if (NPC.target < 0 || NPC.target >= 255 || Main.player[NPC.target].dead || !Main.player[NPC.target].active)
             {
                 NPC.TargetClosest(false);
 
@@ -109,7 +110,6 @@ namespace KirboMod.NPCs
         {
             Player player = Main.player[NPC.target];
             NPC.ai[0]++;
-            AttackSpawnDoo();
             float attackEnd = float.MaxValue;
             switch (attacktype)
             {
@@ -129,6 +129,8 @@ namespace KirboMod.NPCs
                     attackEnd = AttackLightning();
                     break;
             }
+            AttackSpawnDoo();
+
             if (NPC.ai[0] >= attackEnd) //end          
                 ResetVarsForNextAttack();
         }
@@ -137,7 +139,30 @@ namespace KirboMod.NPCs
         {
             if (NPC.ai[0] == (!frenzy ? 15 : 60)) //changes depending or not in frenzy
             {
-                if (doodelay == 1) //summon (multiplayer syncing stuff is because spawning npc)
+                int dooThreshold = 3;
+                int maxDoos = 2;// won't summon any more if there are more than this alive
+                if (Main.getGoodWorld)
+                {
+                    maxDoos = int.MaxValue;//infinite!!!
+                }
+                else if (Main.expertMode)
+                {
+                    maxDoos = 4;
+                }
+                int curAmountOfDoos = 0;
+                for (int i = 0; i < Main.maxNPCs; i++)
+                {
+                    NPC npc = Main.npc[i];
+                    if(npc.active && npc.ModNPC is WaddleDoo)
+                    {
+                        WaddleDoo doo = (WaddleDoo)npc.ModNPC;
+                        if (doo.SpawnedFromKracko)
+                        {
+                            curAmountOfDoos++;
+                        }
+                    }
+                }
+                if (doodelay > dooThreshold && curAmountOfDoos < maxDoos && attacktype != KrackoAttackType.SpinningBeamOrbs) //summon (multiplayer syncing stuff is because spawning npc)
                 {
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
@@ -167,7 +192,6 @@ namespace KirboMod.NPCs
                 if (NPC.GetLifePercent() < (Main.expertMode ? 0.75f : 0.4f))
                     possibleAttacks.Add(KrackoAttackType.Lightning);
                 possibleAttacks.Remove(lastattacktype);
-                possibleAttacks.TrimExcess();
                 attacktype = possibleAttacks[Main.rand.Next(possibleAttacks.Count)];
                 lastattacktype = attacktype;
                 NPC.ai[0] = 0;
@@ -189,14 +213,14 @@ namespace KirboMod.NPCs
 
             if (Main.expertMode)
             {
-                sweepDuration *= 0.75f;
-                speed *= 1.5f;
-                inertia *= 1.5f;
+                sweepDuration *= 0.85f;
+                speed *= 1.15f;
+                inertia *= 1.15f;
                 if (frenzy)
                 {
-                    speed *= 1.5f;
-                    inertia *= 1.5f;
-                    sweepDuration *= 0.75f;
+                    speed *= 1.15f;
+                    inertia *= 1.15f;
+                    sweepDuration *= 0.85f;
                 }
                 sweepEnd = sweepStart + sweepDuration;
             }
@@ -295,14 +319,14 @@ namespace KirboMod.NPCs
             float moveStart = 0f;
             float moveEnd = 100;
             float dashStart = 100;
-            float dashEnd = 250;
+            float dashEnd = 280;
             float dashDuration = dashEnd - dashStart;
             if (frenzy)
             {
-                dashDuration = MathF.Round(dashDuration * 0.75f);
+                dashDuration = MathF.Round(dashDuration * 0.85f);
                 dashEnd = dashStart + dashDuration;
             }
-            float dashDistanceY = 900;
+            float dashDistanceY = 1400;
             float dashDistanceX = 9000;
             dashDistanceX /= dashDuration;
             dashDistanceY /= dashDuration;
@@ -435,27 +459,43 @@ namespace KirboMod.NPCs
             distanceDiagonalRightOfPlayer.Normalize();
             return distanceDiagonalRightOfPlayer * speed;
         }
-        // This npc uses an additional texture for drawing
-        public static Asset<Texture2D> EyeTexture;
-        public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+        static Asset<Texture2D> eyeBase;
+        static Asset<Texture2D> pupil;
+        static Asset<Texture2D> eyelid;
+        static Asset<Texture2D> spikes;
+        public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            EyeTexture = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoEyeBase");
-            Texture2D pupil = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoEyePupil").Value;
-            Texture2D eyelid = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoEyeAngryEyelid").Value;
             Player player = Main.player[NPC.target];
             bool drawEyelid = (transitioning && NPC.ai[2] > 0 && NPC.ai[2] <= 180) || frenzy;
             float offsetLength = 6.5f;
             Vector2 pupilOffset = Vector2.Normalize(player.Center - NPC.Center) * offsetLength;//the multipier is just what looks good
+            Texture2D texture = TextureAssets.Npc[Type].Value;
+            spriteBatch.Draw(texture, NPC.Center - screenPos, NPC.frame, GetAlpha(Color.White).Value, NPC.rotation, NPC.frame.Size() / 2, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(spikes.Value, NPC.Center - screenPos, NPC.frame, new Color(255, 255, 255), NPC.rotation, NPC.frame.Size() / 2, 1f, SpriteEffects.None, 0f);
             if ((transitioning == true && NPC.ai[2] > 0 && NPC.ai[2] <= 180))
             {
                 pupilOffset = Vector2.Zero;
             }
-            Texture2D eye = EyeTexture.Value;
-            spriteBatch.Draw(eye, NPC.Center - Main.screenPosition, null, new Color(255, 255, 255), 0, new Vector2(29, 29), 1f, SpriteEffects.None, 0f);
-            spriteBatch.Draw(pupil, NPC.Center - Main.screenPosition + pupilOffset, null, Color.White, 0, pupil.Size() / 2, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(eyeBase.Value, NPC.Center - screenPos, null, new Color(255, 255, 255), 0, eyeBase.Size() / 2, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(pupil.Value, NPC.Center - screenPos + pupilOffset, null, Color.White, 0, pupil.Size() / 2, 1, SpriteEffects.None, 0);
             if (drawEyelid)
-                spriteBatch.Draw(eyelid, NPC.Center - Main.screenPosition, null, Color.White, 0, eyelid.Size() / 2, 1, SpriteEffects.None, 0);
+                spriteBatch.Draw(eyelid.Value, NPC.Center - screenPos, null, Color.White, 0, eyelid.Size() / 2, 1, SpriteEffects.None, 0);
+            return false;
         }
-       
+
+        public override void Load()
+        {
+            eyeBase = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoEyeBase");
+            pupil = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoEyePupil");
+            eyelid = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoEyeAngryEyelid");
+            spikes = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoSpikes");
+        }
+        public override void Unload()
+        {
+            eyeBase = null;
+            pupil = null;
+            eyelid = null;
+            spikes = null;
+        }
     }
 }

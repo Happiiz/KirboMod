@@ -18,8 +18,9 @@ namespace KirboMod.Dusts
 		{
 			dust.position += dust.velocity *= 0.95f; //slows down
 			dust.scale *= 0.98f;
+			dust.scale -= .01f;
 
-            if (dust.scale <= 0.001)
+            if (dust.scale <= 0.1f)
             {
                 dust.active = false;
             }

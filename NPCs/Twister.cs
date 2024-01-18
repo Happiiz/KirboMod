@@ -34,8 +34,8 @@ namespace KirboMod.NPCs
 			NPC.width = 34;
 			NPC.height = 34;
             NPC.damage = 30;
-			NPC.defense = 10;
-			NPC.lifeMax = 50;
+			NPC.defense = 14;
+			NPC.lifeMax = 70;
 			NPC.HitSound = SoundID.NPCHit4; //metal
 			NPC.DeathSound = SoundID.NPCDeath14; //also metal
 			NPC.value = Item.buyPrice(0, 0, 0, 10);

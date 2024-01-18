@@ -87,7 +87,7 @@ namespace KirboMod.Projectiles
                 int targetIndex = FindTargetCone(1000);
                 Vector2 targetPos = targetIndex == -1 ? Main.MouseWorld : Main.npc[targetIndex].Center;
                 float velLength = MathF.Max((targetPos - Projectile.Center).Length() / 20, 50f);
-                Projectile.velocity = targetIndex == -1 ? Vector2.Normalize(targetPos - Projectile.Center) * velLength : AIUtils.GetPredictiveAimVelocity(Projectile.Center, velLength, targetPos, Main.npc[targetIndex].velocity);
+                Projectile.velocity = targetIndex == -1 ? Vector2.Normalize(targetPos - Projectile.Center) * velLength : Helper.GetPredictiveAimVelocity(Projectile.Center, velLength, targetPos, Main.npc[targetIndex].velocity);
                 Projectile.netUpdate = true;
             }
             SoundEngine.PlaySound(SoundID.Item9, Projectile.position); //star sound       

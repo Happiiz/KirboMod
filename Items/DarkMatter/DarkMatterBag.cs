@@ -43,7 +43,7 @@ namespace KirboMod.Items.DarkMatter
 
             itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<DarkShield>()));
 
-            itemLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<NPCs.DarkMatter>())); // drop money
+            itemLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<NPCs.DarkMatter.DarkMatter>())); // drop money
         }
 
         // Below is code for the visuals

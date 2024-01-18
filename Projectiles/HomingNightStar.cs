@@ -44,10 +44,10 @@ namespace KirboMod.Projectiles
 				Projectile.rotation -= 0.3f;
 			}
 
-			if (Main.rand.NextBool(5)) // happens 1/5 times
+
+			if (Main.rand.NextBool(8)) // happens 1/5 times
 			{
-				int dustnumber = Dust.NewDust(Projectile.position, 50, 50, DustID.Shadowflame, 0f, 0f, 200, default, 1f); //dust
-				Main.dust[dustnumber].velocity *= 0.3f;
+				VFX.SpawnBlueStarParticle(Projectile, null, MathHelper.Lerp(2, 2.3f, Main.rand.NextFloat()));
 			}
 
 			//HOMING

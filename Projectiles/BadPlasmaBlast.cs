@@ -1,3 +1,5 @@
+using KirboMod.Particles;
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -13,11 +15,8 @@ namespace KirboMod.Projectiles
 	{
 		public override void SetStaticDefaults()
 		{
-			// DisplayName.SetDefault("Plasma Blast");
-
-            //for space jump trail
-            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 5; // The length of old position to be recorded
-            ProjectileID.Sets.TrailingMode[Projectile.type] = 0; // The recording mode
+            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 30; // The length of old position to be recorded
+            ProjectileID.Sets.TrailingMode[Projectile.type] = 2; // The recording mode
         }
 
 		public override void SetDefaults()
@@ -30,21 +29,19 @@ namespace KirboMod.Projectiles
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1; //infinite
 		}
-
+		
+		//the way it works is 
+		//time to reach target is ai0
+		//make it explode when timer is > ai0
 		public override void AI()
 		{
+			Projectile.rotation = Projectile.velocity.ToRotation();
 
-			Projectile.ai[0]++;
-			//Animation
-			if (++Projectile.frameCounter >= 4) //changes frames every 4 ticks 
-			{
-				Projectile.frameCounter = 0;
-				if (++Projectile.frame >= Main.projFrames[Projectile.type])
-				{
-					Projectile.frame = 0;
-				}
-			}
-
+			if (Projectile.ai[0] < Projectile.ai[1])
+            {
+				Projectile.Kill();
+            }
+			Projectile.ai[1]++;
 			//dust effects
 			if (Main.rand.NextBool(2)) // happens 1/2 times
 			{
@@ -56,34 +53,29 @@ namespace KirboMod.Projectiles
 
 		public override void OnKill(int timeLeft)
 		{
-			for (int i = 0; i < 40; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+			//Projectile.Hitbox = Utils.CenteredRectangle(Projectile.Center, Projectile.Size * 1.75f);
+			for (int i = 0; i < 80; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 			{
 				Vector2 speed = Main.rand.NextVector2Circular(20, 20); //circle
-				Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.TerraBlade, speed, Scale: 1f); //Makes dust in a messy circle
+				Dust d = Dust.NewDustPerfect(Projectile.Center + Vector2.Normalize(speed) * 10, DustID.TerraBlade, speed, Scale: 2f); //Makes dust in a messy circle
 				d.noGravity = true;
 			}
-		}
-
-		public override Color? GetAlpha(Color lightColor)
-		{
-			return Color.White; // Makes it uneffected by light
+			Vector2 scale = new Vector2(3);
+			Sparkle.EyeShine(Projectile.Center, Color.LimeGreen, scale, scale, 10);
+			Sparkle.NewSparkle(Projectile.Center, Color.LimeGreen, scale * 2, Vector2.Zero, 10, scale);
+			//Projectile.Damage();
 		}
 
         public override bool PreDraw(ref Color lightColor)
-        {
-            Main.instance.LoadProjectile(Projectile.type);
-            Texture2D texture = TextureAssets.Projectile[Projectile.type].Value;
+		{
 
-            // Redraw the projectile with the color not influenced by light
-            Vector2 drawOrigin = new Vector2(texture.Width * 0.5f, Projectile.height * 0.5f);
-            for (int k = 0; k < Projectile.oldPos.Length; k++)
-            {
-                Vector2 drawPos = (Projectile.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
-                Color color = Projectile.GetAlpha(lightColor) * ((Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);
-                Main.EntitySpriteDraw(texture, drawPos, null, color, Projectile.rotation, drawOrigin, Projectile.scale, SpriteEffects.None, 0);
-            }
-
-            return true;
+			TrailSystem.Trail.AddAdditive(Projectile, 100, Color.Cyan * Projectile.Opacity, Color.LimeGreen * Projectile.Opacity);
+			TrailSystem.Trail.AddAdditive(Projectile, 50, Color.White * Projectile.Opacity, Color.White * Projectile.Opacity);
+			float rotation = Projectile.rotation;
+			Projectile.rotation = 0;
+			VFX.DrawElectricOrb(Projectile, new Vector2(6));
+			Projectile.rotation = rotation;
+            return false;
         }
     }
 }

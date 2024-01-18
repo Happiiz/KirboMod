@@ -18,15 +18,13 @@ namespace KirboMod.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 60;
-			Projectile.height = 60;
+			Projectile.width = 30;
+			Projectile.height = 30;
 			Projectile.friendly = false;
 			Projectile.hostile = true;
-			Projectile.DamageType = DamageClass.Magic;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 			Projectile.scale = 3f;
-			VFX.LoadTextures();
 		}
 		public float startingTimeLeft = 300;//have this so I can customize the duration
 		public NPC Kracko { get => Main.npc[(int)Projectile.ai[0]]; set => Projectile.ai[0] = value.whoAmI; }
@@ -75,7 +73,7 @@ namespace KirboMod.Projectiles
         Color RndElectricCol { get => (Main.rand.NextBool(2, 5) ? Color.Yellow : Color.Cyan) * Projectile.Opacity; }
         public override bool PreDraw(ref Color lightColor)
         {
-			Color[] possibleColors = new Color[] { Color.Yellow, Color.Cyan, Color.Cyan };
+			Color[] possibleColors = [Color.Yellow, Color.Cyan, Color.Cyan];
 			Vector2 randomOffset = Main.rand.NextVector2Circular(4, 4);
 			Vector2 fatness = Vector2.One;//feel free to mess around with
 			Vector2 sparkleScale = Vector2.One;//these values to see what thet change

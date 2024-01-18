@@ -1,27 +1,28 @@
-using KirboMod.Items;
+using KirboMod.Globals;
 using KirboMod.Items.Weapons;
 using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
-using Terraria.GameInput;
-using Terraria.Graphics.Renderers;
-using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
+using static KirboMod.KirboMod;
 
 namespace KirboMod
 {
     public class KirbPlayer : ModPlayer
     {
+        /// <summary>
+        /// for checking right clicks of each player because player.channel does not exist for right click.
+        /// </summary>
+        public static bool[] playerRightClicks = new bool[Main.maxPlayers];
+        public bool RightClicking { get => playerRightClicks[Player.whoAmI]; }
+
+        public int hammerCharge = 0;
+
         public bool whispbush; //for whispy shrub accesory true or false
 
         public bool kirbyballoon; //for kirby ballon accesory true or false
@@ -30,7 +31,7 @@ namespace KirboMod
 
         public bool nightcloak; // for night cloak accesory true or false
 
-        public bool[] HasTripleStars = {false, false, false}; //targeting
+        public bool[] HasTripleStars = { false, false, false }; //targeting
         public int tripleStarRotationCounter = 0;
         public int[] tripleStarIndexes = new int[3];
 
@@ -69,16 +70,26 @@ namespace KirboMod
         public int gloombadgeattackcount = 0;
 
         public int plasmaTimer = 0; //if 60 then takes plasma charge down a bit
-        public int plasmacharge = 0;  //charge amount for plasma weapon
-        public int darkSwordSwingCounter;
-        public void GetDarkSwordSwingStats(out int direction, out Items.DarkSword.DarkSword.ProjectileShootType projToShoot)
-        {
-            projToShoot = (Items.DarkSword.DarkSword.ProjectileShootType)(darkSwordSwingCounter % 3);
-            direction = darkSwordSwingCounter++ % 2 * 2 - 1;
-        }
+        public int plasmaCharge = 0;  //charge amount for plasma weapon
+        public const int maxPlasmaCharge = 20;
+        public const int plasmaShieldRadiusSmall = 48;
+        public const int plasmaShieldRadiusLarge = 80;
+        bool plasmaReleaseLeft = false;
+        bool plasmaReleaseRight = false;
+        bool plasmaReleaseUp = false;
+        bool plasmaReleaseDown = false;
+        public int PlasmaShieldRadius { get => plasmaCharge < 3 ? 0 : plasmaCharge < 12 ? plasmaShieldRadiusSmall : plasmaShieldRadiusLarge; }
+        /// <summary>
+        /// 0: none. 1: small. 2: max
+        /// </summary>
+        public int PlasmaShieldLevel { get => plasmaCharge < 3 ? 0 : plasmaCharge < 12 ? 1 : 2; }
 
-        public int rainbowSwordSwingCounter;
-        public int NextRainbowSwordSwingDirection { get => rainbowSwordSwingCounter++ % 2 * 2 - 1; }
+        public int customSwordSwingCounter;
+        public int NextCustomSwingDirection { get => customSwordSwingCounter++ % 2 * 2 - 1; }
+        public int finalCutterAnimationCounter = 0;
+        public int finalCutterDamageCounter = 0;//should cap out at 5
+        public List<int> currentFinalCutterTargets = new();
+
         public override void ResetEffects() //restart accesory stats so if not wearing one then it stops doing the effects
         {
             whispbush = false;
@@ -100,27 +111,29 @@ namespace KirboMod
             darkMatterPet = false;
             zeroPet = false;
         }
-
         public override void PreUpdate()
         {
             kirbyballoonwait -= 1;
+            //-1 to compensate when you detect right click it adds to the counter
+            if (finalCutterAnimationCounter > -1)
+                finalCutterAnimationCounter--;
 
             //fighter glove
             if (fighterComboResetDelay > 0) //go down 'til 0
             {
                 fighterComboResetDelay -= 1;
             }
-            
+
             if (fighterComboResetDelay == 0 && fighterComboCounter != 0) //go down
             {
                 fighterComboCounter--;
             }
 
             //plasmacharge minimum
-            if (plasmacharge < 0)
+            if (plasmaCharge < 0)
             {
-                plasmacharge = 0;
-            }            
+                plasmaCharge = 0;
+            }
 
             darkDashTime -= 1;
 
@@ -148,7 +161,7 @@ namespace KirboMod
         public override void PostUpdate()
         {
             Player player = Main.player[Main.myPlayer];
-
+            UpdateRightClicksArray();
             if (darkDashDelay < 0) //dashing
             {
                 player.armorEffectDrawShadow = true; //afterimages
@@ -162,13 +175,13 @@ namespace KirboMod
 
             //TRIPLE STAR STARS
             tripleStarRotationCounter += 1;
-           
+
             int tripleStarID = ModContent.ItemType<TripleStar>();
             if (player.HeldItem.type == tripleStarID && !player.dead && player.active)
             {
                 float finalDamage = player.GetTotalDamage(Player.HeldItem.DamageType).ApplyTo(Player.HeldItem.damage); //final damage calculated
                 for (int i = 0; i < tripleStarIndexes.Length; i++)
-                {   
+                {
                     if (tripleStarIndexes[i] == -1 || !Main.projectile[tripleStarIndexes[i]].active)
                     {
                         tripleStarIndexes[i] = Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, Vector2.Zero,
@@ -223,32 +236,21 @@ namespace KirboMod
             //    HasTripleStars[0] = false;
             //}
 
-            //Plasma
 
-            //Go up
-            plasmaTimer++;
-            if (plasmaTimer >= 60) //every second not tapping
-            {
-                plasmacharge--;
-                plasmaTimer = 0;
-            }
+            UpdatePlasmaCharge();
 
-            //beefy shield
-            if (plasmacharge >= 12)
-            {
-                Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, player.velocity * 0, ModContent.ProjectileType<Projectiles.PlasmaShield>(), 64, 0f, player.whoAmI, 0, 0);
-            }
-            //manlet shield
-            else if (plasmacharge >= 3 && plasmacharge < 12)
-            {
-                Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, player.velocity * 0, ModContent.ProjectileType<Projectiles.PlasmaOrb>(), 32, 0f, player.whoAmI, 0, 0);
-            }
 
-            //cap
-            if (player.GetModPlayer<KirbPlayer>().plasmacharge >= 15)
+            UpdateFinalCutter();
+        }
+
+        private void UpdateRightClicksArray()
+        {
+            if (Main.netMode == NetmodeID.SinglePlayer)
             {
-                player.GetModPlayer<KirbPlayer>().plasmacharge = 15;
+                playerRightClicks[Main.myPlayer] = Main.mouseRight;
             }
+            NetMethods.SyncPlayerRightClick(Player);
+            
         }
 
         public override void PostUpdateEquips()
@@ -257,10 +259,15 @@ namespace KirboMod
 
             bool airborne = player.velocity.Y != 0f;
 
+            if (Player.controlUseItem)
+            {
+                finalCutterAnimationCounter++;
+            }
+
             DarkDashMovement(); //dark dash
 
             //KIRBY BALLOON (checks if already used all double jumps and rockets and player doesn't have mount)
-            if (kirbyballoon == true && airborne & player.GetJumpState(ExtraJump.BlizzardInABottle).Available == false & player.GetJumpState(ExtraJump.CloudInABottle).Available == false 
+            if (kirbyballoon == true && airborne & player.GetJumpState(ExtraJump.BlizzardInABottle).Available == false & player.GetJumpState(ExtraJump.CloudInABottle).Available == false
                 & player.GetJumpState(ExtraJump.FartInAJar).Available == false & player.GetJumpState(ExtraJump.TsunamiInABottle).Available == false & player.GetJumpState(ExtraJump.SandstormInABottle).Available == false
                 & !player.mount.CanHover())
             {
@@ -292,7 +299,7 @@ namespace KirboMod
             if (personalcloud == true && personalcloudalive == false && !player.dead && player.active)
             {
                 Projectile.NewProjectile(player.GetSource_FromThis(), player.Center + new Vector2(0, -50), player.velocity * 0, ModContent.ProjectileType<PersonalCloud>(), 0, 0, player.whoAmI);
-               personalcloudalive = true; //no more spawning
+                personalcloudalive = true; //no more spawning
             }
             if (personalcloud == false)
             {
@@ -356,7 +363,7 @@ namespace KirboMod
                         Projectile.NewProjectile(null, player.Center, Vector2.Zero, ModContent.ProjectileType<NightCrownEffect>(), 0, 0, player.whoAmI);
 
                         player.Teleport(Main.MouseWorld, -1);
-                        
+
                         player.AddBuff(ModContent.BuffType<Buffs.Nightmare>(), 720); //gives player nightmare effect for 12 seconds
 
                         //after effect
@@ -424,7 +431,7 @@ namespace KirboMod
                     falltime = 0; //reset
                 }
             }
-            
+
             //BADGE OF GLOOM
 
             if (badgeofgloom == true)
@@ -439,7 +446,7 @@ namespace KirboMod
                             Dust d = Dust.NewDustPerfect(player.Center, Mod.Find<ModDust>("DarkResidue").Type, Main.rand.NextVector2Circular(5f, 5f), Scale: 1f); //Makes dust in a messy circle
                             d.noGravity = true;
                         }
-                        Projectile.NewProjectile(player.GetSource_FromThis(), player.Center + new Vector2( Main.rand.Next(-100, 100), Main.rand.Next(-100, 100)), new Vector2(player.direction * 0.05f, 0), Mod.Find<ModProjectile>("SmallDarkMatterShot").Type, 80, 8f, Main.myPlayer, 0, player.whoAmI);
+                        Projectile.NewProjectile(player.GetSource_FromThis(), player.Center + new Vector2(Main.rand.Next(-100, 100), Main.rand.Next(-100, 100)), new Vector2(player.direction * 0.05f, 0), Mod.Find<ModProjectile>("SmallDarkMatterShot").Type, 80, 8f, Main.myPlayer, 0, player.whoAmI);
 
                         gloombadgeattackcount = 0;
                     }
@@ -448,7 +455,7 @@ namespace KirboMod
                         gloombadgeattackcount++;
                     }
                 }
-            }     
+            }
             else //also reset
             {
                 gloombadgeattackcount = 0;
@@ -456,7 +463,7 @@ namespace KirboMod
 
             //small things
 
-            if (darkShield == true) //wearing dark shield (keep this at the bottom because it's small)
+            if (darkShield) //wearing dark shield (keep this at the bottom because it's small)
             {
                 if (player.dashType > 0) //this disables vanila dashes
                 {
@@ -464,7 +471,166 @@ namespace KirboMod
                 }
             }
         }
+        public void GetDarkSwordSwingStats(out int direction, out Items.DarkSword.DarkSword.ProjectileShootType projToShoot)
+        {
+            projToShoot = (Items.DarkSword.DarkSword.ProjectileShootType)(customSwordSwingCounter % 3);
+            direction = customSwordSwingCounter++ % 2 * 2 - 1;
+        }
+        public bool TryStartingFinalCutter()
+        {
+            if (finalCutterAnimationCounter > 0)
+                return false;
+            int horizontalRange = 16 * 4;//4 tiles
+            Rectangle hitbox = new Rectangle((int)Player.Center.X, (int)Player.position.Y, horizontalRange, Player.height);
+            if (Player.direction == -1)
+            {
+                hitbox.X -= horizontalRange;
+            }
+            currentFinalCutterTargets = new List<int>();
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                NPC npc = Main.npc[i];
+                if (npc.CanBeChasedBy() && npc.knockBackResist > .2f && !npc.boss && hitbox.Intersects(npc.Hitbox))
+                {
+                    currentFinalCutterTargets.Add(i);
+                }
+            }
+            if (currentFinalCutterTargets.Count <= 0)
+                return false;//failed to start final cutter.
+            //ModPacket packet;
+            if (currentFinalCutterTargets.Count == 1)
+            {
+                if (Main.netMode == NetmodeID.SinglePlayer)
+                {
+                    StartFinalCutter();
+                    return true;
+                }
+                //packet = Mod.GetPacket(3);
+                //packet.Write((byte)KirboMod.ModPacketType.StartFinalCutter);
+                //packet.Write((byte)Main.myPlayer);
+                //packet.Write((byte)currentFinalCutterTargets[0]);
+                //packet.Send(-1, Main.myPlayer);
+                return true;
+            }
+            if (Main.netMode == NetmodeID.SinglePlayer)
+            {
+                StartFinalCutter();
+                return true;
+            }
+            //packet = Mod.GetPacket();
+            //packet.Write((byte)KirboMod.ModPacketType.StartFinalCutterMultiNPC);
+            //packet.Write((byte)Main.myPlayer);
+            //packet.Write((byte)currentFinalCutterTargets.Count);
+            //for (int i = 0; i < currentFinalCutterTargets.Count; i++)
+            //{
+            //    packet.Write((byte)currentFinalCutterTargets[i]);
+            //}
+            //packet.Send(-1, Main.myPlayer);
+            return false;
+        }
+        public void StartFinalCutter()
+        {
+            finalCutterAnimationCounter = 80;
+            for (int i = 0; i < currentFinalCutterTargets.Count; i++)
+            {
+                //cursed line of code
+                Main.npc[currentFinalCutterTargets[i]].GetGlobalNPC<KirbNPC>().StartFinalCutter(finalCutterAnimationCounter + 10);
+            }
 
+        }
+        void UpdateFinalCutter()
+        {
+
+            if (finalCutterAnimationCounter <= 0 || currentFinalCutterTargets.Count <= 0)
+                return;
+            //perhaps dont damage npc and just spawn combat text and play hit sfx?
+            for (int i = 0; i < currentFinalCutterTargets.Count; i++)
+            {
+                NPC target = Main.npc[currentFinalCutterTargets[i]];
+                target.Bottom = Player.Bottom;//might not work well with mounts
+                target.position.X = Player.Center.X + Player.direction * target.width - target.width / 2;
+            }
+            int finalCutterJumpStart = 60;
+            if (finalCutterAnimationCounter < finalCutterJumpStart)
+            {
+                float progress = Utils.Remap(finalCutterAnimationCounter, finalCutterJumpStart, 0, -1.53f, 1);
+
+                Player.position.Y += progress * 30;
+            }
+            if (finalCutterAnimationCounter == 1)//last frame
+            {
+                Player.velocity = new Vector2(Player.direction * 10, 10);
+                for (int i = 0; i < currentFinalCutterTargets.Count; i++)
+                {
+                    NPC npc = Main.npc[currentFinalCutterTargets[i]];
+                    npc.position.Y += 8;
+                    npc.SimpleStrikeNPC(100, Player.direction, true, 60, Player.HeldItem.DamageType, true, Player.luck);//boom
+                }
+                if (Player.whoAmI == Main.myPlayer)
+                {
+                    Projectile.NewProjectile(Player.GetSource_ItemUse(Player.HeldItem), Player.Center, new Vector2(Player.direction * 20, 0), ModContent.ProjectileType<Projectiles.Star>(), 100, 11);
+                }
+            }
+        }
+        void UpdatePlasmaCharge()
+        {
+            plasmaTimer++;
+            if(plasmaTimer>= 60)
+            {
+                plasmaCharge--;
+                if (plasmaCharge < 0)
+                {
+                    plasmaCharge = 0;
+                }
+                plasmaTimer = 0;
+            }
+            if (Player.HeldItem.type != ModContent.ItemType<Plasma>())
+            {
+                plasmaCharge = 0;
+                plasmaTimer = 0;
+                return;
+            }
+            sbyte plasmaChargeAmount = 0;
+            if(Player.controlRight && plasmaReleaseRight)
+                plasmaChargeAmount++;
+            if (Player.controlLeft && plasmaReleaseLeft)
+                plasmaChargeAmount++;
+            if (Player.controlUp && plasmaReleaseUp)
+                plasmaChargeAmount++;
+            if (Player.controlDown && plasmaReleaseDown)
+                plasmaChargeAmount++;
+            if (Main.myPlayer == Player.whoAmI && Main.netMode == NetmodeID.MultiplayerClient && plasmaChargeAmount > 0)
+            {
+                NetMethods.SyncPlasmaChargeChange(Player, plasmaChargeAmount, true);
+                plasmaCharge += plasmaChargeAmount;
+            }
+            else if (Main.netMode == NetmodeID.SinglePlayer)
+            {
+                plasmaCharge += plasmaChargeAmount;
+            }
+            plasmaReleaseLeft = Player.releaseLeft;
+            plasmaReleaseRight = Player.releaseRight;
+            plasmaReleaseUp = Player.releaseUp;
+            plasmaReleaseDown = Player.releaseDown;
+            if(plasmaCharge > 20)
+            {
+                plasmaCharge = 20;
+            }
+            if(plasmaCharge < 3)
+            {
+                return;//don't try to spawn shield
+            }
+            bool hasPlasmaShield = Player.ownedProjectileCounts[ModContent.ProjectileType<PlasmaShield>()] > 0;
+            if (!hasPlasmaShield && Player.whoAmI == Main.myPlayer)
+            {
+                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, Vector2.Zero, ModContent.ProjectileType<PlasmaShield>(), 2, 20, Main.myPlayer, 2);
+            }
+        }
+        public void ResetPlasmaCharge()
+        {
+            plasmaCharge = 0;
+            plasmaTimer = 0;
+        }
         private void DarkDashMovement()
         {
             Player player = Main.player[Main.myPlayer];
@@ -482,7 +648,7 @@ namespace KirboMod
             //collision 
             if (darkDashDelay < 0 && player.whoAmI == Main.myPlayer) //if dashing while using dark shield
             {
-                Rectangle rectangle = new Rectangle((int)((double)player.position.X + (double)player.velocity.X * 0.5 - 4.0), (int)((double)player.position.Y + (double)player.velocity.Y * 0.5 - 4.0), player.width + 8, player.height + 8);
+                Rectangle rectangle = new Rectangle((int)(player.position.X + player.velocity.X * 0.5 - 4.0), (int)(player.position.Y + player.velocity.Y * 0.5 - 4.0), player.width + 8, player.height + 8);
                 for (int i = 0; i < 200; i++)
                 {
                     NPC npc = Main.npc[i];
@@ -593,7 +759,7 @@ namespace KirboMod
                         player.velocity.X = 16f * dir;
 
                         //when on ground
-                        Point point = (player.Center + new Vector2(player.direction * player.width / 2 + 2, player.gravDir * (float)(-player.height) / 2f + player.gravDir * 2f)).ToTileCoordinates();
+                        Point point = (player.Center + new Vector2(player.direction * player.width / 2 + 2, player.gravDir * -player.height / 2f + player.gravDir * 2f)).ToTileCoordinates();
                         Point point2 = (player.Center + new Vector2(player.direction * player.width / 2 + 2, 0f)).ToTileCoordinates();
                         if (WorldGen.SolidOrSlopedTile(point.X, point.Y) || WorldGen.SolidOrSlopedTile(point2.X, point2.Y))
                         {
@@ -612,7 +778,6 @@ namespace KirboMod
                 }
             }
         }
-
         private void DashHandling(out int dir, out bool initialdash)
         {
             Player player = Main.player[Main.myPlayer];
@@ -654,10 +819,9 @@ namespace KirboMod
                 }
             }
         }
-
         public override void OnHurt(Player.HurtInfo info)
         {
-            if (whispbush == true)
+            if (whispbush)
             {
                 for (int i = 0; i < 4; i++)
                 {
@@ -667,7 +831,7 @@ namespace KirboMod
             }
 
             //NIGHT CLOAK
-            if (nightcloak == true)
+            if (nightcloak)
             {
                 //Pretty self explanatory
                 int damage = Player.HeldItem.damage;

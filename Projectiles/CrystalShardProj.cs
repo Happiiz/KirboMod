@@ -40,7 +40,7 @@ namespace KirboMod.Projectiles
 		{
 
 			const float rangeSQ = 600 * 600;
-			if(!Main.npc.IndexInRange(TargetIndex)|| !AIUtils.ValidHomingTarget(Main.npc[TargetIndex], Projectile))
+			if(!Main.npc.IndexInRange(TargetIndex)|| !Helper.ValidHomingTarget(Main.npc[TargetIndex], Projectile))
             {
 				Projectile.velocity = Vector2.Lerp(Projectile.velocity, Vector2.Normalize(Projectile.velocity) * InitialVelLength, 0.1f);
 				int closestNPC = -1;
@@ -48,7 +48,7 @@ namespace KirboMod.Projectiles
 				for(int i = 0; i < Main.npc.Length; i++)
                 {
 					NPC npc = Main.npc[i];
-					if (!AIUtils.ValidHomingTarget(npc, Projectile) || npc.DistanceSQ(center) > rangeSQ || !(Main.npc.IndexInRange(TargetIndex) && npc.DistanceSQ(center) < Main.npc[TargetIndex].DistanceSQ(center)))
+					if (!Helper.ValidHomingTarget(npc, Projectile) || npc.DistanceSQ(center) > rangeSQ || !(Main.npc.IndexInRange(TargetIndex) && npc.DistanceSQ(center) < Main.npc[TargetIndex].DistanceSQ(center)))
 						continue;
 					closestNPC = i;
                 }

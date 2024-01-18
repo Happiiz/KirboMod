@@ -16,35 +16,33 @@ namespace KirboMod.NPCs
 {
 	public class BladeKnight : ModNPC
 	{
-		private int attacktype = 0;
+		int AttackTimeDecrease { get => Main.expertMode ? 20 : 0; }
 
+		private byte attacktype = 0;
 		private bool jumped = false;
-
 		public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Blade Knight");
 			Main.npcFrameCount[NPC.type] = 13;
 		}
-
 		public override void SetDefaults()
 		{
 			NPC.width = 33;
 			NPC.height = 33;
 			DrawOffsetY = 6;
 			NPC.damage = 4;
-			NPC.defense = 0;
-			NPC.lifeMax = 40;
+			NPC.defense = 18;//he has armor and is a knight so high defense makes sense
+			NPC.lifeMax = 90;
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
 			NPC.value = Item.buyPrice(0, 0, 0, 5);
-			NPC.knockBackResist = 1f;
+			NPC.knockBackResist = .3f;
 			Banner = NPC.type;
 			BannerItem = ModContent.ItemType<Items.Banners.BladeKnightBanner>();
 			NPC.aiStyle = -1; 
 			NPC.friendly = false;
 			NPC.noGravity = false;
 		}
-
 		public override float SpawnChance(NPCSpawnInfo spawnInfo)
 		{
 			if (spawnInfo.Player.ZoneOverworldHeight && Main.dayTime) //if player is within surface height & daytime
@@ -123,7 +121,6 @@ namespace KirboMod.NPCs
 				return 0f; //no spawn rate
 			}
 		}
-
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
             // We can use AddRange instead of calling Add multiple times in order to add multiple items at once
@@ -144,25 +141,23 @@ namespace KirboMod.NPCs
         {
             writer.Write(attacktype); //send non NPC.ai array info to servers
         }
-
         public override void ReceiveExtraAI(BinaryReader reader)
         {
-            attacktype = reader.ReadInt32(); //sync in multiplayer
+            attacktype = reader.ReadByte(); //sync in multiplayer
         }
-
         public override void AI() //constantly cycles each time
 		{
 			NPC.spriteDirection = NPC.direction;
 			Player player = Main.player[NPC.target];
 			Vector2 distance = player.Center - NPC.Center;
-
 			bool lineOfSight = Collision.CanHitLine(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height);
-
-			if (distance.X < 80 & distance.X > -80 & distance.Y > -100 & distance.Y < 50 && lineOfSight && !player.dead) //checks if the knight is in range
+			float rangeX = 100;
+			float rangeY = 60;
+			if (distance.X < rangeX & distance.X > -rangeX & distance.Y > -rangeY & distance.Y < rangeY && lineOfSight && !player.dead) //checks if the knight is in range
 			{
 				NPC.ai[1] = 1; //starts attacking if in range
 			}
-			if (NPC.ai[0] >= 60)
+			if (NPC.ai[0] >= 60 - AttackTimeDecrease)
 			{
 				attacktype = 2;
 			}
@@ -273,9 +268,11 @@ namespace KirboMod.NPCs
 			Player player = Main.player[NPC.target];
 			NPC.TargetClosest(true);
 
-			float speed = 1f; //top speed
+			float speed = 3f; //top speed
+			if (Main.expertMode)
+				speed *= 1.3334f;
 			float inertia = 10f; //acceleration and decceleration speed
-
+			float jumpSpeed = 7;
 			Vector2 direction = NPC.Center + new Vector2( NPC.direction * 50, 0) - NPC.Center; //start - end 
 			//we put this instead of player.Center so it will always be moving top speed instead of slowing down when player is near
 
@@ -288,7 +285,7 @@ namespace KirboMod.NPCs
 
             if (NPC.collideX && NPC.velocity.Y == 0) //hop if touching wall
             {
-                NPC.velocity.Y = -5;
+                NPC.velocity.Y = -jumpSpeed;
 				jumped = true; 
             }
 
@@ -315,7 +312,7 @@ namespace KirboMod.NPCs
 
             NPC.velocity.X *= 0.9f; //slow
 
-			if (NPC.ai[0] == 61) //unleash slash
+			if (NPC.ai[0] == 61 - AttackTimeDecrease) //unleash slash
 			{
                 NPC.frameCounter = 0; //reset frame counter
 
@@ -325,7 +322,7 @@ namespace KirboMod.NPCs
 				}
 				SoundEngine.PlaySound(SoundID.Item1, NPC.Center); 
 			}
-			if (NPC.ai[0] >= 120) //restart
+			if (NPC.ai[0] >= 120 - AttackTimeDecrease) //restart
             {
 				NPC.ai[0] = 0;
 				NPC.ai[1] = 0;
@@ -334,7 +331,7 @@ namespace KirboMod.NPCs
 
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
-            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<Items.Weapons.HeroSword>(), 40, 20)); // 1 in 40 (2.5%) chance in Normal. 1 in 20 (5%) chance in Expert
+            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<Items.Weapons.HeroSword>(), 20, 10)); // 1 in 40 (2.5%) chance in Normal. 1 in 20 (5%) chance in Expert
             npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Starbit>(), 1, 2, 4));
         }
 

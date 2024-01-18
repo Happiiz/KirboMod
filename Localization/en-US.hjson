@@ -1346,6 +1346,8 @@ Mods: {
 			DarkMatterLaser.DisplayName: Dark Matter Laser
 			DarkMatterLaserTelegraph.DisplayName: Dark Matter Laser Telegraph
 			MatterOrbVertical.DisplayName: Matter Orb
+			KrackoJrCannonball.DisplayName: Kracko Jr Cannonball
+			KrackoJrBomb.DisplayName: Kracko Jr Bomb
 		}
 
 		NPCs: {

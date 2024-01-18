@@ -1,22 +1,15 @@
 using KirboMod.Items.DarkMatter;
-using KirboMod.Items.Zero;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using System;
 using Terraria;
-using Terraria.Audio;
-using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using KirboMod.Bestiary;
 using KirboMod.Systems;
-using Terraria.DataStructures;
 using System.IO;
 
-namespace KirboMod.NPCs
+namespace KirboMod.NPCs.DarkMatter
 {
 	public partial class DarkMatter : ModNPC
 	{
@@ -35,7 +28,7 @@ namespace KirboMod.NPCs
             // Add this in for bosses that have a summon item, requires corresponding code in the item
             NPCID.Sets.MPAllowedEnemies[Type] = true;
 
-            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
+            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers()
             {
                 Hide = true, //hide from bestiary
             };
@@ -50,7 +43,7 @@ namespace KirboMod.NPCs
 
         public override void Load() //I use this to allow me to use the boss head
         {
-            Mod.AddBossHeadTexture("KirboMod/NPCs/DarkMatter_Head_Boss2");
+            Mod.AddBossHeadTexture("KirboMod/NPCs/DarkMatter/DarkMatter_Head_Boss2");
         }
 
         public override void SetDefaults()
@@ -79,13 +72,11 @@ namespace KirboMod.NPCs
             Music = MusicID.Boss4;
             NPC.buffImmune[BuffID.Confused] = true;
         }
-
         public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */
         {
             NPC.lifeMax = (int)(NPC.lifeMax * 0.7 * balance);
             NPC.damage = (int)(NPC.damage * 0.6);
         }
-
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
             // We can use AddRange instead of calling Add multiple times in order to add multiple items at once
@@ -98,19 +89,15 @@ namespace KirboMod.NPCs
 				new FlavorTextBestiaryInfoElement("A mysterious monocular invader with a body as black as darkness itself. What hidden motives does it have descending upon this world?")
             });
         }
-
         public override void SendExtraAI(BinaryWriter writer)
         {
             //send non NPC.ai array info to servers
             writer.Write((byte)attacktype); 
             writer.Write((byte)lastattacktype); 
-
             writer.Write(animation);
             writer.Write(phase);
-
             writer.WriteVector2(playerTargetArea);
         }
-
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             //sync in multiplayer
@@ -122,13 +109,10 @@ namespace KirboMod.NPCs
 
             playerTargetArea = reader.ReadVector2();
         }
-
         public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
         {
             scale = 1.5f;
-
             position.Y = NPC.position.Y + NPC.height + 40;
-
             if (NPC.life == 1)
             {
                 return false; //no health bar
@@ -136,7 +120,6 @@ namespace KirboMod.NPCs
             else //health bar
             return true;
         }
-
         public override void BossLoot(ref string name, ref int potionType)
         {
             name = "Dark Matter"; //_ has been defeated!
@@ -172,17 +155,14 @@ namespace KirboMod.NPCs
                 }
             }
         }
-
         public override void OnKill()
         {
             NPC.SetEventFlagCleared(ref DownedBossSystem.downedDarkMatterBoss, -1);
         }
-
         public override Color? GetAlpha(Color lightColor)
         {
             return Color.White * NPC.Opacity; //make it unaffected by light
         }
-
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<DarkMatterBag>())); //only drops in expert

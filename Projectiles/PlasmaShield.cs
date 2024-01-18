@@ -1,3 +1,4 @@
+using KirboMod.Items.Weapons;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -20,33 +21,53 @@ namespace KirboMod.Projectiles
 			Projectile.height = 140;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Magic;
-			Projectile.timeLeft = 2;
+			Projectile.timeLeft = int.MaxValue;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
-			Projectile.alpha = 150;
+			Projectile.usesLocalNPCImmunity = true;
+			Projectile.localNPCHitCooldown = 5;
             Projectile.hide = true;
         }
-
-		public override void AI()
+        public override bool PreDraw(ref Color lightColor)
+        {
+			return false;
+        }
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+        {
+			return Helper.CheckCircleCollision(targetHitbox, Projectile.Center, Projectile.ai[0]);
+        }
+        public override void AI()
 		{
+		
 			Player player = Main.player[Projectile.owner];
+			if(player.HeldItem.type != ModContent.ItemType<Plasma>())
+            {
+				Projectile.Kill();
+				return;
+            }
+			KirbPlayer mplr = player.GetModPlayer<KirbPlayer>();
+			if(mplr.PlasmaShieldLevel < 1)
+            {
+				Projectile.Kill();
+				return;
+            }
+			Projectile.damage = mplr.PlasmaShieldLevel == 1 ? 50 : 100;
+			Projectile.ai[0] = mplr.PlasmaShieldRadius;
 			Projectile.Center = player.Center;
 			Lighting.AddLight(Projectile.Center, 0, 1, 0);
 		}
-
-		public override bool? CanCutTiles()
-		{
-			return false;
-        }
-
-        public override Color? GetAlpha(Color lightColor)
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-            return Color.White * Projectile.Opacity; //unaffected by light, but can be transparent
+			if (target.boss || target.type == NPCID.TargetDummy)
+				return;
+			Vector2 push = Vector2.Normalize(target.Center - Projectile.Center) * 40;
+			push *= target.knockBackResist < .1f ? .1f : target.knockBackResist;
+			target.velocity = push;
+			NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, target.whoAmI);
         }
-
-        public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+        public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
         {
-            behindNPCs.Add(index);
+			modifiers.Knockback *= 0;
         }
     }
 }

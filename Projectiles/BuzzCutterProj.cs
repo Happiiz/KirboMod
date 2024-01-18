@@ -39,7 +39,7 @@ namespace KirboMod.Projectiles
 		}
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
-			return AIUtils.CheckCircleCollision(targetHitbox, Projectile.Center, 60);
+			return Helper.CheckCircleCollision(targetHitbox, Projectile.Center, 60);
         }
         int amountOfTimesToGrindTarget = 30;
         public override void AI()

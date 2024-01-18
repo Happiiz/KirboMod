@@ -11,8 +11,10 @@ namespace KirboMod.Particles
         public Vector2 fatness;
         public new Vector2 scale;
         public bool drawHorizontalAxis;
+        public byte additiveAmount;
         public Sparkle(Vector2 position, Color color, Vector2? velocity = null, Vector2? scale = null, Vector2? fatness = null, int duration = 40)
         {
+            additiveAmount = (byte)(Main.dayTime ? 100 : 0);
             scale ??= Vector2.Zero;
             fatness ??= scale;
             velocity ??= Vector2.Zero;
@@ -26,14 +28,38 @@ namespace KirboMod.Particles
             this.position = position;
             this.rotation = 0;
         }
-   
+        public static Sparkle[] EyeShine(Vector2 pos, Color color, Vector2? scale = null, Vector2? fatness = null, int duration = 40, float opacity =1)
+        {
+            scale ??= new Vector2(1.5f, 1);
+            fatness ??= new Vector2(1.5f, 1);
+            Ring ring = Ring.EmitRing(pos, color);
+            ring.maxScale = 1.6f;
+            ring.fadeOutTime = 7;
+            ring.minScale = .5f;
+            ring.squish = scale.Value;
+            ring.rotation = 0;
+            Sparkle[] result = new Sparkle[4];
+            for (int i = 0; i < 4; i++)
+            {
+                Vector2 velocity = (i * MathF.Tau * .25f).ToRotationVector2() * scale.Value * 10;
+                Sparkle sparkle = new(pos, color, velocity, scale, fatness, duration);
+                sparkle.friction = .7f;
+                sparkle.scaleAcceleration = -.3f;
+                sparkle.fadeOutTime = 5;
+                sparkle.RotateToVel();
+                sparkle.drawHorizontalAxis = false;
+                sparkle.Confirm();
+                result[i] = sparkle;
+            }
+            return result;
+        }
         public override void Draw()
         {
             Vector2 drawpos = position - Main.screenPosition;
             Color bigShineColor = color;
-            bigShineColor.A = (byte)(Main.dayTime ? (100 * opacity) : 0);
+            bigShineColor.A = (byte)(additiveAmount * opacity);
             Vector2 origin = sparkleTexture.Size() / 2f;
-            float brightness = MathF.Cos(timeLeft * 0.4f) * 0.25f + 0.75f;
+            float brightness = MathF.Sin(timeLeft * 0.2f) * 0.25f + 0.75f;
             Vector2 scaleX = new Vector2(fatness.X * 0.5f, scale.X) * brightness;
             Vector2 scaleY = new Vector2(fatness.Y * 0.5f, scale.Y) * brightness;
             bigShineColor *= brightness;
@@ -57,6 +83,14 @@ namespace KirboMod.Particles
         {
            base.Update();
            velocity *= .95f;
+        }
+        public static Sparkle NewSparkle(Vector2 position, Color color, Vector2 scale, Vector2 velocity, int duration, Vector2 fatness)
+        {
+            Sparkle sparkle = new(position, color, velocity, scale, fatness, duration);
+            sparkle.friction = .98f;
+            sparkle.Confirm();
+            sparkle.fadeOutTime = 6;
+            return sparkle;
         }
     }
 }

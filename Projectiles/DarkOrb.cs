@@ -27,8 +27,9 @@ namespace KirboMod.Projectiles
 			Projectile.timeLeft = 120;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = 1;
+			Projectile.scale = .05f;
 		}
-
+		float Scale { get => Utils.GetLerpValue(0, 20, Projectile.ai[0], true); }
 		public override void AI()
 		{
 			Player player = Main.player[(int)Projectile.ai[1]]; //chooses npc target player
@@ -41,10 +42,10 @@ namespace KirboMod.Projectiles
             Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, ModContent.DustType<Dusts.DarkResidue>(), Projectile.velocity.X * 0.25f, Projectile.velocity.Y * 0.25f, 200, default, 0.8f); //dust
 
             Projectile.ai[0]++;
-
+			Projectile.scale = Scale;
 			if (Projectile.ai[0] == 30) //Start hurtin'
             {
-				SoundEngine.PlaySound(SoundID.Item117, Projectile.Center); //conjure arcanum
+				SoundEngine.PlaySound(SoundID.Item117, Projectile.Center); //conjure arcanum sfx
 
 				Vector2 move = (player.Center + player.velocity * 5) - Projectile.Center; //aims ahead of player
 				Projectile.hostile = true; //hurt
@@ -55,12 +56,6 @@ namespace KirboMod.Projectiles
                 Projectile.velocity = move; //move
 			}
 		}
-
-		public override Color? GetAlpha(Color lightColor)
-		{
-			return Color.White; // Makes it uneffected by light
-		}
-
         public override void OnHitPlayer(Player target, Player.HurtInfo info)
         {
 			if (Projectile.ai[0] > 20)
@@ -79,19 +74,18 @@ namespace KirboMod.Projectiles
 			}
 		}
 
-        public static Asset<Texture2D> image;
-
+		//todo: add draw effect to remaining dark orbs
         public override bool PreDraw(ref Color lightColor)
         {
-            Main.instance.LoadProjectile(Projectile.type);
-            image = ModContent.Request<Texture2D>("KirboMod/Projectiles/DarkOrb");
-            Texture2D texture = image.Value;
+			//         Main.instance.LoadProjectile(Projectile.type);
+			//         image = ModContent.Request<Texture2D>("KirboMod/Projectiles/DarkOrb");
+			//         Texture2D texture = image.Value;
 
-			float size = Projectile.ai[0] / 20 < 1 ? Projectile.ai[0] / 20 : 1; //keep growing until proj ai0 = 20
+			//float size = Projectile.ai[0] / 20 < 1 ? Projectile.ai[0] / 20 : 1; //keep growing until proj ai0 = 20
 
-            Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, null, Color.White, 0, new Vector2(45, 45), size, SpriteEffects.None);
-
-			return false;
+			//         Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, null, Color.White, 0, new Vector2(45, 45), size, SpriteEffects.None);
+			Items.DarkSword.DarkSwordOrb.DrawDarkOrb(Projectile);
+            return false;
         }
     }
 }

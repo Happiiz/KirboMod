@@ -48,12 +48,12 @@ namespace KirboMod.Items
             {
                 if (Main.netMode != NetmodeID.MultiplayerClient) // If the player is not in multiplayer, spawn directly
                 {
-                    NPC.SpawnOnPlayer(player.whoAmI, ModContent.NPCType<NPCs.DarkMatter>());
+                    NPC.SpawnOnPlayer(player.whoAmI, ModContent.NPCType<NPCs.DarkMatter.DarkMatter>());
                 }
                 else // If the player is in multiplayer, request a spawn
                 {
                     //this will only work if NPCID.Sets.MPAllowedEnemies[type] is set in boss
-                    NetMessage.SendData(MessageID.SpawnBossUseLicenseStartEvent, number: player.whoAmI, number2: ModContent.NPCType<NPCs.DarkMatter>());
+                    NetMessage.SendData(MessageID.SpawnBossUseLicenseStartEvent, number: player.whoAmI, number2: ModContent.NPCType<NPCs.DarkMatter.DarkMatter>());
                 }
                 SoundEngine.PlaySound(SoundID.Roar, player.position);
             }

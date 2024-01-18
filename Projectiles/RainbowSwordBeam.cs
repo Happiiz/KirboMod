@@ -1,3 +1,4 @@
+using KirboMod.NPCs.DarkMatter;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -55,18 +56,18 @@ namespace KirboMod.Projectiles
 				Projectile proj = Main.projectile[i];
 
 				if (Projectile.Hitbox.Intersects(proj.Hitbox) && proj.type == Mod.Find<ModProjectile>("DarkMirrorProj").Type && proj.active
-					&& !NPC.AnyNPCs(ModContent.NPCType<NPCs.DarkMatter>())) //summon NPC after contact with the mirror and no other NPCs of the same type are around
+					&& !NPC.AnyNPCs(ModContent.NPCType<DarkMatter>())) //summon NPC after contact with the mirror and no other NPCs of the same type are around
                 {
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
                         // If the player is not in multiplayer, spawn directly
-                        NPC.SpawnOnPlayer(player.whoAmI, ModContent.NPCType<NPCs.DarkMatter>());
+                        NPC.SpawnOnPlayer(player.whoAmI, ModContent.NPCType<DarkMatter>());
                     }
                     else
                     {
                         // If the player is in multiplayer, request a spawn
                         // This will only work if NPCID.Sets.MPAllowedEnemies[type] is true in the boss
-                        NetMessage.SendData(MessageID.SpawnBossUseLicenseStartEvent, number: player.whoAmI, number2: ModContent.NPCType<NPCs.DarkMatter>());
+                        NetMessage.SendData(MessageID.SpawnBossUseLicenseStartEvent, number: player.whoAmI, number2: ModContent.NPCType<DarkMatter>());
                     }
 
                     SoundEngine.PlaySound(SoundID.Roar, player.position);

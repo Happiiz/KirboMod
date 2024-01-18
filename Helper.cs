@@ -6,12 +6,55 @@ using Microsoft.Xna.Framework;
 
 namespace KirboMod
 {
-    public static class AIUtils
+    public static class Helper
     {
-        //todo: add clamp param
-        public static float RemapEasing(float fromValue, float fromMin, float fromMax, float toMin, float toMax, Func<float, float> easingFunction)
+        public static bool SpawnInfoNotInAnySpecialBiome(NPCSpawnInfo info)
         {
-            return MathHelper.Lerp(toMin, toMax, easingFunction(Utils.GetLerpValue(fromMin, fromMax, fromValue, true)));
+            if (info.Player.ZoneJungle)
+            {
+                return false;
+            }
+            if (info.Player.ZoneSnow)
+            {
+                return false;
+            }
+            if (info.Player.ZoneBeach) //don't spawn on beach
+            {
+                return false;
+            }
+            if (info.Player.ZoneDesert) //don't spawn on beach
+            {
+                return false;
+            }
+            if (info.Player.ZoneCorrupt) //don't spawn on beach
+            {
+                return false;
+            }
+            if (info.Player.ZoneCrimson) //don't spawn on beach
+            {
+                return false;
+            }
+            if (info.Player.ZoneDungeon) //don't spawn in dungeon
+            {
+                return false;
+            }
+            if (info.Water) //don't spawn in water
+            {
+                return false;
+            }
+            return true;
+        }
+        public static void DustExplosion(Entity entity, int type, bool noGravity = false, float dustAmountMultiplier = 1f)
+        {
+            int count = (int)(entity.width * entity.height * .08f * dustAmountMultiplier);
+            for (int i = 0; i < count; i++)
+            {
+                Dust.NewDustDirect(entity.position, entity.width, entity.height, type).noGravity = noGravity;
+            }
+        }
+        public static float RemapEasing(float fromValue, float fromMin, float fromMax, float toMin, float toMax, Func<float, float> easingFunction, bool clamp = true)
+        {
+            return MathHelper.Lerp(toMin, toMax, easingFunction(Utils.GetLerpValue(fromMin, fromMax, fromValue, clamp)));
         }
         public static void DustCircle(int dustAmount, float radius, Vector2 circleOrigin, int dustID = DustID.MagnetSphere)
         {
@@ -46,15 +89,15 @@ namespace KirboMod
             {
                 if (proj.usesLocalNPCImmunity)
                 {
-                    npcImmuneToProj = proj.localNPCImmunity[npc.whoAmI] > 0;
+                    npcImmuneToProj = proj.localNPCImmunity[npc.whoAmI] != 0;
                 }
                 else if (proj.usesIDStaticNPCImmunity)
                 {
-                    npcImmuneToProj = Projectile.perIDStaticNPCImmunity[proj.type][npc.type] > 0;
+                    npcImmuneToProj = Projectile.perIDStaticNPCImmunity[proj.type][npc.type] != 0;
                 }
                 else
                 {
-                    npcImmuneToProj = npc.immune[proj.owner] > 0;
+                    npcImmuneToProj = npc.immune[proj.owner] != 0;
                 }
             }//eol becomes invincible during dash, phasde transition and spawn animation, so ignore donttake damage if EoL to avoid some weirdness
             //      ai0 as 8 or 9 is if she's dashng, so that she doesn't get targeted during the phase transition or spawn animation
