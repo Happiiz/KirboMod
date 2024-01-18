@@ -170,7 +170,7 @@ namespace KirboMod.NPCs
 			NPC.damage = 30;
 			NPC.defense = 12;
 			NPC.noTileCollide = true;
-			NPC.lifeMax = 4000;
+			NPC.lifeMax = 5000;
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
 			NPC.value = Item.buyPrice(0, 5, 0, 0); // money it drops
@@ -188,8 +188,22 @@ namespace KirboMod.NPCs
 
 		public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */
 		{
-			NPC.lifeMax = (int)(NPC.lifeMax * 0.6f * balance);
-			NPC.damage = (int)(NPC.damage * 0.6f);
+			if(!Main.expertMode)
+			{
+				return;
+			}
+			if(Main.masterMode)
+			{
+				NPC.lifeMax /= 3;
+				NPC.damage /= 3;
+                NPC.lifeMax = (int)(NPC.lifeMax * 1.4f * balance);
+                NPC.damage = (int)(NPC.damage * 1.4f);
+				return;
+            }
+			NPC.lifeMax /= 2;
+			NPC.damage /= 2;
+			NPC.lifeMax = (int)(NPC.lifeMax * 1.7f * balance);
+			NPC.damage = (int)(NPC.damage * 1.7f);
 		}
 
 		public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)

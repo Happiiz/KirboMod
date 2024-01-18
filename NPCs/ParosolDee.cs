@@ -9,6 +9,7 @@ using Terraria.GameContent.ItemDropRules;
 using KirboMod.Bestiary;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using KirboMod.NPCs.NPCConfusionHelper;
 
 namespace KirboMod.NPCs
 {
@@ -19,7 +20,7 @@ namespace KirboMod.NPCs
 			// DisplayName.SetDefault("Parasol Waddle Dee");
 			Main.npcFrameCount[NPC.type] = 8;
 
-            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
+            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers()
             {
 				
             };
@@ -177,8 +178,14 @@ namespace KirboMod.NPCs
 
             //movement
             float speed = 0.7f;
+            if (Main.expertMode)
+                speed = 1;
+            if(NPC.confused)
+            {
+                speed *= -1;
+            }
 			float inertia = 20f;
-
+            Confusion.InvertDirection(NPC);
 			Vector2 moveTo = NPC.Center + new Vector2(NPC.direction * 200, 0);
 			Vector2 direction = moveTo - NPC.Center; //start - end
 			direction.Normalize();
@@ -187,7 +194,6 @@ namespace KirboMod.NPCs
 			{
 				NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
 			}
-
 			//for stepping up tiles
 			Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
 		}

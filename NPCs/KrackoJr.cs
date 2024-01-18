@@ -240,7 +240,7 @@ namespace KirboMod.NPCs
 
         private void MakeClouds()
         {
-            if ((NPC.position - NPC.oldPosition).LengthSquared() > 0.3f && Main.timeForVisualEffects % 4 == 0)
+            if ((NPC.position - NPC.oldPosition).LengthSquared() > 1 && Main.timeForVisualEffects % 4 == 0)
             {
                 KrackoJrCloud.SpawnCloud(this);
             }

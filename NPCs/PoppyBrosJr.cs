@@ -16,8 +16,9 @@ namespace KirboMod.NPCs
 {
 	public class PoppyBrosJr : ModNPC
 	{
-		public ref float attackTimer => ref NPC.ai[0];
-		public ref float attacktype => ref NPC.ai[1];
+        public ref float AttackTimer => ref NPC.ai[0];
+		public ref float Attacktype => ref NPC.ai[1];
+        static float BombYLaunchVelocity { get => Main.expertMode ? -10 : -8; }
         
         private bool jumped = false;
 
@@ -98,15 +99,15 @@ namespace KirboMod.NPCs
 
 			if (distance.X < 480 & distance.X > -480 & distance.Y > -120 & distance.Y < 120 && lineOfSight && !player.dead) //checks if da bomb is in range
 			{
-                attacktype = 1; //now start attacking
+                Attacktype = 1; //now start attacking
 			}
 
 			//declaring attacktype values
-			if (attacktype == 0)
+			if (Attacktype == 0)
 			{
 				Walk();
 			}
-			if (attacktype == 1)
+			if (Attacktype == 1)
 			{
 				Bomb();
 			}
@@ -117,7 +118,7 @@ namespace KirboMod.NPCs
 
 		public override void FindFrame(int frameHeight) // animation
 		{
-			if (attacktype == 0)
+			if (Attacktype == 0)
 			{
                 NPC.frameCounter += 1.0;
                 if (NPC.frameCounter < 8.0)
@@ -157,9 +158,9 @@ namespace KirboMod.NPCs
                     NPC.frameCounter = 0.0;
                 }
             }
-			if (attacktype == 1) //throwing bomb
+			if (Attacktype == 1) //throwing bomb
 			{
-				if (attackTimer < 30)
+				if (AttackTimer < 30)
                 {
                     NPC.frame.Y = frameHeight * 8; //throw 1
                     NPC.frameCounter = 0.0;
@@ -167,7 +168,7 @@ namespace KirboMod.NPCs
                 else
                 {
                     NPC.frameCounter += 1.0;
-                    if (attackTimer > 90)
+                    if (AttackTimer > 90)
                     {
                         NPC.frame.Y = frameHeight * 5;
                     }
@@ -186,27 +187,43 @@ namespace KirboMod.NPCs
                 }
             }
 		}
+        static float YPointInTrajectory(float initialPosY, float initialVelY, float accelY, float time)
+        {
+            return initialPosY + initialVelY * time +  accelY * time * time * 0.5f; 
+        }
+        static float TimeToReachYVel(float targetVelY, float initialVelY, float accelY)
+        {
+            return (targetVelY - initialVelY) / accelY;
+        }
         static float TimeToReachYPoint(float fromY, float toY, float accelY, float initialVelY)
         {
+            float bombTerminalYVel = Projectiles.PoppyBomb.BombMaxSpeed;
+            float timeToReachTerminalVel = (bombTerminalYVel - initialVelY) / accelY;
             bool hasSolution = Utils.SolveQuadratic(accelY * .5f, initialVelY, fromY - toY, out float result1, out float result2);
             if (!hasSolution)
             {
-                return float.NaN;
+                return 99999f;
             }
-            return MathF.Max(result2, result1);
+            float time = MathF.Max(result2, result1);
+            if (time > timeToReachTerminalVel)
+            {
+                time = timeToReachTerminalVel;
+                float yPointReachTerminalVelocity = fromY + initialVelY * timeToReachTerminalVel + accelY * timeToReachTerminalVel * timeToReachTerminalVel * 0.5f;
+                time -= (yPointReachTerminalVelocity - toY) / bombTerminalYVel;
+            }
+            return time;
         }
+
 		private void Walk() //walk towards player
 		{
-			Player player = Main.player[NPC.target];
 
-            NPC.TargetClosest(true);
+            NPC.TargetClosest();
 
             float speed = 1f; //top speed
             float inertia = 10f; //acceleration and decceleration speed
 
             Vector2 direction = NPC.Center + new Vector2(NPC.direction * 50, 0) - NPC.Center; //start - end 
                                                                                               //we put this instead of player.Center so it will always be moving top speed instead of slowing down when player is near
-
             direction.Normalize();
             direction *= speed;
 			if (NPC.velocity.Y == 0 || jumped == true) //walking/jumping (so it doesn't interfere with knockback)
@@ -229,58 +246,44 @@ namespace KirboMod.NPCs
         {
             int attackDuration = Main.expertMode ? 90 : 160;
 
-
-			Player player = Main.player[NPC.target];
-			float Xprojshoot = player.Center.X - NPC.Center.X;
-            float timeToReach = TimeToReachYPoint(NPC.Center.Y, player.Center.Y, .4f, -8);
-
-			Xprojshoot /= timeToReach; 
-			if (Xprojshoot >= 10) //limit speed
-            {
-				Xprojshoot = 10;
-            }
-			if (Xprojshoot <= -10) //limit speed
-			{
-				Xprojshoot = -10;
-			}
-
 			NPC.velocity.X *= 0.9f; //slow
 
-            attackTimer++; //goes up by 1 each tick
+            AttackTimer++; //goes up by 1 each tick
 
             NPC.TargetClosest(true);
-
-            if (attackTimer > 0) //begin attack
+     
+            if (AttackTimer == 1) //when begin
             {
-                if (attackTimer == 1) //when begin
+                //convert vector floats to point inches
+
+                for (int i = 0; i < NPC.width; i++)
                 {
-                    //convert vector floats to point inches
+                    Point rightbelow = new Vector2(NPC.position.X + i, NPC.position.Y + NPC.height).ToTileCoordinates();
 
-                    for (int i = 0; i < NPC.width; i++)
+                    if (Main.tile[rightbelow.X, rightbelow.Y].HasTile) //ground has tile
                     {
-                        Point rightbelow = new Vector2(NPC.position.X + i, NPC.position.Y + NPC.height).ToTileCoordinates();
-
-                        if (Main.tile[rightbelow.X, rightbelow.Y].HasTile) //ground has tile
-                        {
-                            NPC.velocity.Y = -10f; //jump...bum..bum..bum..bum might as weeell jump
-                            return; //end loop here
-                        }
-                    }
-                }
-
-                if (attackTimer == 30) //when halfway through attack
-                {
-                    if (Main.netMode != NetmodeID.MultiplayerClient)
-                    {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, Xprojshoot, -8, ModContent.ProjectileType<PoppyBomb>(), 10, 0, Main.myPlayer, 0, 0);
+                        NPC.velocity.Y = -10f; //jump...bum..bum..bum..bum might as weeell jump
+                        return; //end loop here
                     }
                 }
             }
-
-			if (attackTimer > attackDuration) //end attack after a second
+            if (AttackTimer == 30) //when halfway through attack
             {
-                attacktype = 0; //can walk if out of range
-                attackTimer = 0; //ready next attack
+                if (Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    Player player = Main.player[NPC.target];
+                    float Xprojshoot = player.Center.X - NPC.Center.X;
+
+                    float timeToReach = TimeToReachYPoint(NPC.Center.Y, player.Center.Y, Projectiles.PoppyBomb.BombAcceleration, BombYLaunchVelocity);
+                    Xprojshoot /= timeToReach;
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, Xprojshoot, 0, ModContent.ProjectileType<PoppyBomb>(), 10, 0, Main.myPlayer, 0, BombYLaunchVelocity);
+                }
+            }
+            
+			if (AttackTimer > attackDuration) //end attack after a second
+            {
+                Attacktype = 0; //can walk if out of range
+                AttackTimer = 0; //ready next attack
             }
         }
 
@@ -311,14 +314,13 @@ namespace KirboMod.NPCs
         }
 
         // This npc uses additional textures for drawing
-        public static Asset<Texture2D> PoppyBomb;
+        static Asset<Texture2D> poppyBomb;
         public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            PoppyBomb = ModContent.Request<Texture2D>("KirboMod/Projectiles/PoppyBomb");
 
-            if (attacktype == 1 && attackTimer < 30) //about to throw
+            if (Attacktype == 1 && AttackTimer < 30) //about to throw
             {
-                Texture2D bomb = PoppyBomb.Value;
+                Texture2D bomb = poppyBomb.Value;
                 Vector2 origin = new Vector2(bomb.Width / 2, bomb.Height / 2); //center
                 Vector2 offset = new Vector2(-14, -30);
                 float rotation = NPC.direction * MathHelper.ToRadians(-45);
@@ -330,6 +332,14 @@ namespace KirboMod.NPCs
                 
                 spriteBatch.Draw(bomb, NPC.Center - Main.screenPosition + offset, null, drawColor, rotation, origin, 1f, SpriteEffects.None, 0f);
             }
+        }
+        public override void Load()
+        {
+            poppyBomb = ModContent.Request<Texture2D>("KirboMod/Projectiles/PoppyBomb");
+        }
+        public override void Unload()
+        {
+            poppyBomb = null;
         }
     }
 }

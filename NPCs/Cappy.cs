@@ -12,7 +12,6 @@ namespace KirboMod.NPCs
 	public class Cappy : ModNPC
 	{
 		private int animation = 0;
-		private double counting;
 
 		private int ranan = Main.rand.Next(0, 10);
 
@@ -43,54 +42,10 @@ namespace KirboMod.NPCs
 		{
 			if (spawnInfo.Player.ZoneOverworldHeight && Main.dayTime && !Main.raining) //if player is within surface height, daytime and not raining
 			{
-				if (spawnInfo.Player.ZoneJungle)
+				if (spawnInfo.Player.ZoneJungle || spawnInfo.Player.ZoneSnow || spawnInfo.Player.ZoneBeach || spawnInfo.Player.ZoneDesert || spawnInfo.Player.ZoneCorrupt || spawnInfo.Player.ZoneCrimson || spawnInfo.Invasion || spawnInfo.Player.ZoneMeteor || spawnInfo.Player.ZoneDungeon || spawnInfo.Water || spawnInfo.Sky || Main.eclipse)
 				{
 					return 0f; //no spawn rate
 				}
-				else if (spawnInfo.Player.ZoneSnow)
-				{
-					return 0f; //no spawn rate
-				}
-				else if (spawnInfo.Player.ZoneBeach) //don't spawn on beach
-				{
-					return 0f; //no spawn rate
-				}
-				else if (spawnInfo.Player.ZoneDesert) //don't spawn on beach
-				{
-					return 0f; //no spawn rate
-				}
-				else if (spawnInfo.Player.ZoneCorrupt) //don't spawn on beach
-				{
-					return 0f; //no spawn rate
-				}
-				else if (spawnInfo.Player.ZoneCrimson) //don't spawn on beach
-				{
-					return 0f; //no spawn rate
-				}
-				else if (spawnInfo.Invasion) //don't spawn during invasions
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneMeteor) //don't spawn on meteor
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneDungeon) //don't spawn in dungeon
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Water) //don't spawn in water
-				{
-					return 0f;
-				}
-                else if (spawnInfo.Sky) //don't spawn in space
-                {
-                    return 0f;
-                }
-                else if (Main.eclipse) //don't spawn during eclipse
-                {
-                    return 0f;
-                }
                 else //only forest
 				{
 					return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? .5f : 0f; //functions like a mini if else statement
@@ -114,22 +69,30 @@ namespace KirboMod.NPCs
 				new FlavorTextBestiaryInfoElement("This shy creature keeps itself concealed with a mushroom like hat. Uncovering it reveals a face that doesn't look as cheery as they move.")
             });
         }
-
+		//todo: test confusion functionality
         public override void AI() //constantly cycles each time
         {
+			if(NPC.confused)
+			{
+				NPC.direction = MathF.Sign(NPC.Center.X - Main.player[NPC.target].Center.X);
+
+			}
+
 			NPC.spriteDirection = NPC.direction;
 			jump--;
 
 			//movement
-			if (ranan > 5)
-            {
-				NPC.direction = 1;
-            }
-            else
-            {
-				NPC.direction = -1;
+			if (!NPC.confused)
+			{
+				if (ranan > 5)
+				{
+					NPC.direction = 1;
+				}
+				else
+				{
+					NPC.direction = -1;
+				}
 			}
-
 			//switch directions
 			++NPC.ai[0];
 			if (NPC.ai[0] >= 300)
@@ -139,13 +102,20 @@ namespace KirboMod.NPCs
 			}
 
 			//movement
+			
 			float speed = 0.7f;
+			if (Main.expertMode) 
+			{
+				speed = 1.4f;
+			}
+
 			float inertia = 20f;
 
 			Vector2 moveTo = NPC.Center + new Vector2(NPC.direction * 200, 0);
 			Vector2 direction = moveTo - NPC.Center; //start - end
 			direction.Normalize();
 			direction *= speed;
+
 			NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
 																					   //Cap or no Cap
 

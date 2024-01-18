@@ -11,14 +11,14 @@ namespace KirboMod.NPCs
 {
 	public class BroomHatter : ModNPC
 	{
-		public ref float attackTimer => ref NPC.ai[0]; //Use NPC.ai[] as it makes your life easier with multiplayer
-        public ref float ranan => ref NPC.ai[1]; 
-
+        public ref float AttackTimer => ref NPC.ai[0]; //Use NPC.ai[] as it makes your life easier with multiplayer
+        public ref float Ranan => ref NPC.ai[1]; 
+        public static float MoveSpeed { get => Main.expertMode ? 11 : 6; } 
         public override void SetStaticDefaults() {
 			// DisplayName.SetDefault("Broom Hatter");
 			Main.npcFrameCount[NPC.type] = 9;
 
-            NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
+            NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers()
             {
                 Direction = -1,
             };
@@ -29,17 +29,16 @@ namespace KirboMod.NPCs
 			NPC.width = 28;
 		    NPC.height = 28;
 			NPC.damage = 1;
-			NPC.defense = 3; 
-			NPC.lifeMax = 20;
+			NPC.defense = 6; 
+			NPC.lifeMax = 40;
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
 			NPC.value = 0f;
-			NPC.knockBackResist = 1f;
+			NPC.knockBackResist = .5f;
 			Banner = NPC.type;
 			BannerItem = ModContent.ItemType<Items.Banners.BroomHatterBanner>();
 			NPC.aiStyle = -1;
 			NPC.noGravity = false;
-            NPC.direction = Main.rand.Next(0, 1 + 1) == 1 ? 1 : -1; //determines whether to go left or right initally
         }
 
 		public override float SpawnChance(NPCSpawnInfo spawnInfo) 
@@ -118,16 +117,21 @@ namespace KirboMod.NPCs
 
         public override void AI() //constantly cycles each time
         {
+            if (NPC.localAI[0] == 0)
+            {
+                NPC.direction = MathF.Sign(Main.player[NPC.target].Center.X - NPC.Center.X);
+                NPC.localAI[0] = 1;
+            }
 			NPC.spriteDirection = NPC.direction;
 			//movement
 
-			if (attackTimer == 0) //switch directions
+			if (AttackTimer == 0) //switch directions
 			{
-                ranan = Main.rand.Next(0, 10);
+                Ranan = Main.rand.Next(0, 10);
 				NPC.netUpdate = true;
             }
 
-			if (ranan > 5)
+			if (Ranan > 5)
             {
 				NPC.direction = 1;
 			}
@@ -136,22 +140,22 @@ namespace KirboMod.NPCs
 				NPC.direction = -1;
 			}
             
-			++attackTimer;
+			++AttackTimer;
 
-			if (attackTimer >= 54) //end of animation
+			if (AttackTimer >= 54) //end of animation
             {
-				attackTimer = 0f;
+				AttackTimer = 0f;
             }
 
 			//movement
-			if (attackTimer == 24) //swing frames
+			if (AttackTimer == 24) //swing frames
 			{
-				NPC.velocity.X = 6 * NPC.direction; //use .X so it only effects horizontal movement
+				NPC.velocity.X = MoveSpeed * NPC.direction; //use .X so it only effects horizontal movement
 
                 if (Main.netMode != NetmodeID.MultiplayerClient) 
                 {
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + (NPC.direction * 25), NPC.Center.Y - 20, NPC.velocity.X, 0,
-                        ModContent.ProjectileType<Projectiles.BroomHatterDustCloud>(), 6 / 2, 4, Main.myPlayer);
+                        ModContent.ProjectileType<Projectiles.BroomHatterDustCloud>(), 20, 4, Main.myPlayer);
                 }
             }
 			else

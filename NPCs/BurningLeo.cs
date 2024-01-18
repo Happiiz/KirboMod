@@ -7,44 +7,49 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
+using KirboMod.Projectiles.Flames;
 
 namespace KirboMod.NPCs
 {
-	public class BurningLeo : ModNPC
+    public class BurningLeo : ModNPC
 	{
-		private double counting;
-
 		private int attacktype = 0;
 		private int attack = -60; //0 is attack point
 		private bool attacking = false;
-
         private bool jumped = false;
-
+		float RangeMultiplier { get => Main.expertMode ? 1.45f : 1; }
+		float ConfusedMultiplier { get => NPC.confused ? -1 : 1; }
+		float MoveSpeedMultiplier { get 
+			{ float result = Main.expertMode ? 1.35f : 1;
+				return NPC.confused ? -result : result; } }
         public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Burning Leo");
 			Main.npcFrameCount[NPC.type] = 8;
-		}
+            NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.OnFire] = true;
+            NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.OnFire3] = true;
+        }
 
 		public override void SetDefaults()
 		{
 			NPC.width = 50;
 			NPC.height = 46;
 			NPC.damage = 15;
-			NPC.defense = 0;
+			NPC.defense = 10;
 			NPC.lifeMax = 70;
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
-			NPC.value = Item.buyPrice(0, 0, 0, 10);
-			NPC.knockBackResist = 1f;
+			NPC.value = Item.buyPrice(0, 0, 1, 50);
+			NPC.knockBackResist = .5f;
 			Banner = NPC.type;
 			BannerItem = ModContent.ItemType<Items.Banners.BurningLeoBanner>();
 			NPC.aiStyle = -1;
 			NPC.friendly = false;
 			NPC.noGravity = false;
-		}
 
-		public override float SpawnChance(NPCSpawnInfo spawnInfo)
+        }
+
+        public override float SpawnChance(NPCSpawnInfo spawnInfo)
 		{
 			//if player is in jungle biome and daytime or underground and not in water
 			if (spawnInfo.Player.ZoneTowerVortex)
@@ -95,15 +100,17 @@ namespace KirboMod.NPCs
 			Vector2 distance = player.Center - NPC.Center;
 
 			bool lineOfSight = Collision.CanHitLine(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height);
-
-            bool inPlayerRangeX = distance.X <= 240f && distance.X >= 0f; //in range of the right
-
+			float range = 160 * ConfusedMultiplier * RangeMultiplier;
+            bool inPlayerRangeX = distance.X <= range && distance.X >= 0f; //in range of the right
+			Dust d = Dust.NewDustDirect(NPC.position - new Vector2(0, 8), NPC.width, NPC.height / 2, DustID.Torch, 0, 0, 200, Scale: 2);
+			d.noGravity = true;
+			d.velocity.Y -= 1;
             if (NPC.direction == -1) //facing left
             {
-                inPlayerRangeX = distance.X >= -240f && distance.X <= 0f; //in range of the left
+                inPlayerRangeX = distance.X >= -range && distance.X <= 0f; //in range of the left
             }
 
-            if (inPlayerRangeX && distance.Y > -240 && distance.Y < 50 && lineOfSight && !player.dead) //checks if the leo is in range
+            if (inPlayerRangeX && distance.Y > -range && distance.Y < 50 && lineOfSight && !player.dead) //checks if the leo is in range
 			{
 				attacking = true; //now attack
 			}
@@ -197,10 +204,10 @@ namespace KirboMod.NPCs
 			Player player = Main.player[NPC.target];
 			NPC.TargetClosest(true);
 
-			float speed = 1f; //top speed
+			float speed = MoveSpeedMultiplier * 1.5f * ConfusedMultiplier; //top speed
 			float inertia = 10f; //acceleration and decceleration speed
 
-			Vector2 direction = NPC.Center + new Vector2(NPC.direction * 50, 0) - NPC.Center; //start - end 
+			Vector2 direction = NPC.Center + new Vector2(NPC.direction *  50, 0) - NPC.Center; //start - end 
 			//we put this instead of player.Center so it will always be moving top speed instead of slowing down when player is near
 
 			direction.Normalize();
@@ -224,10 +231,31 @@ namespace KirboMod.NPCs
 		private void Burn()
         {
 			Player player = Main.player[NPC.target];
-			Vector2 projshoot = NPC.Center + new Vector2(NPC.direction * 10, 0) - NPC.Center; //straight ahead
-			projshoot.Normalize();
-			projshoot *= 10f;
+			Vector2 shotOrigin = NPC.Center + new Vector2(0, 10);
+			float shootSpeed = 10 * RangeMultiplier;
+            float shootAngle = NPC.spriteDirection == 1 ? 0 : MathF.PI;
+            if (Main.expertMode)
+			{
+				shootAngle = Utils.GetChaseResults(shotOrigin, shootSpeed, player.Center, player.velocity).ChaserVelocity.ToRotation();
 
+                if (NPC.spriteDirection >= 0)
+				{
+					if (shootAngle < -MathF.PI / 4f)	
+						shootAngle = -MathF.PI / 4;
+					if (shootAngle > MathF.PI / 4)
+						shootAngle = MathF.PI / 4;
+				}
+				else
+				{
+					float maxAngle = 3f * MathF.PI / 4;
+                    if (shootAngle > -maxAngle && shootAngle < 0)
+						shootAngle = -maxAngle;
+					if (shootAngle < maxAngle && shootAngle > 0)
+						shootAngle = maxAngle;
+				}
+			}
+			Vector2 projshoot = shootAngle.ToRotationVector2() * shootSpeed * ConfusedMultiplier; //  NPC.Center + new Vector2(NPC.direction * 10, 0) - NPC.Center; //straight ahead
+	
 			NPC.velocity.X *= 0.9f; //slow
 
 			if (attack == -60) //point of where attack begins (for some reason)
@@ -243,14 +271,19 @@ namespace KirboMod.NPCs
 				{
 					if (Main.netMode != NetmodeID.MultiplayerClient)
 					{
-						Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projshoot.RotatedByRandom(MathHelper.ToRadians(50)),
-						Mod.Find<ModProjectile>("BadFire").Type, 30 / 2, 1, Main.myPlayer, 0, 0);
+						float spread = .4f;
+						if(Main.expertMode)
+						{
+							spread = .25f;
+						}
+						Projectile.NewProjectile(NPC.GetSource_FromAI(), shotOrigin, projshoot.RotatedByRandom(spread),
+						ModContent.ProjectileType<BadFire>(), 30 / 2, 1, Main.myPlayer, 0, 0);
 					}
 				}
 
-				if (attack % 30 == 0) //every 30th tick
+				if (attack % 26 == 0) //every 26th tick
 				{
-                    SoundEngine.PlaySound(SoundID.Item34, NPC.Center); //flamethrower
+                    SoundEngine.PlaySound(SoundID.Item34 with { MaxInstances = 0 }, NPC.Center); //flamethrower
                 }
 			}
 			if (attack >= 120) //pause for 60 ticks

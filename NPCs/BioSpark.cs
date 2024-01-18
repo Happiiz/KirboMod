@@ -1,94 +1,91 @@
 using KirboMod.Items;
+using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
-using Terraria.Audio;
+using Terraria.GameContent.Bestiary;
+using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.ModLoader;
 using SoundEngine = Terraria.Audio.SoundEngine;
-using Terraria.GameContent.Bestiary;
-using Terraria.GameContent.ItemDropRules;
-using System.IO;
-using Microsoft.Xna.Framework.Graphics;
-using KirboMod.Projectiles;
 
 namespace KirboMod.NPCs
 {
-	public class BioSpark : ModNPC
-	{
-		int AttackTimer { get => (int)NPC.ai[0]; set => NPC.ai[0] = value; }
+    public class BioSpark : ModNPC
+    {
+        int AttackTimer { get => (int)NPC.ai[0]; set => NPC.ai[0] = value; }
         int WalkTimer { get => (int)NPC.ai[1]; set => NPC.ai[1] = value; }
         int WalkDirection { get => (int)NPC.ai[2]; set => NPC.ai[2] = value; } //determines whether the enemy will walk forward or backward
         private int Attacktype { get => (int)NPC.ai[3]; set => NPC.ai[3] = value; }
         public override void SetStaticDefaults()
-		{
-			// DisplayName.SetDefault("Bio Spark");
-			Main.npcFrameCount[NPC.type] = 16;
-		}
-		public override void SetDefaults()
-		{
-			NPC.width = 54;
-			NPC.height = 40;
-			DrawOffsetY = 4; //make sprite line up with hitbox
-			NPC.damage = 70;
-			NPC.defense = 30;
-			NPC.lifeMax = 400;
-			NPC.HitSound = SoundID.NPCHit1;
-			NPC.DeathSound = SoundID.NPCDeath1;
-			NPC.value = Item.buyPrice(0, 0, 2, 50); // money it drops
-			NPC.knockBackResist = 0f; //how much knockback applies
-			Banner = NPC.type;
-			BannerItem = ModContent.ItemType<Items.Banners.BioSparkBanner>();
-			NPC.aiStyle = -1; 
-			NPC.friendly = false;
-			NPC.noGravity = false;
-		}
-		public override float SpawnChance(NPCSpawnInfo spawnInfo)
-		{
-			if (spawnInfo.Player.ZoneRockLayerHeight & Main.hardMode) //if player is within cave height and world is in hardmode
-			{
-				if (spawnInfo.Player.ZoneJungle)
+        {
+            // DisplayName.SetDefault("Bio Spark");
+            Main.npcFrameCount[NPC.type] = 16;
+        }
+        public override void SetDefaults()
+        {
+            NPC.width = 54;
+            NPC.height = 40;
+            DrawOffsetY = 4; //make sprite line up with hitbox
+            NPC.damage = 70;
+            NPC.defense = 30;
+            NPC.lifeMax = 400;
+            NPC.HitSound = SoundID.NPCHit1;
+            NPC.DeathSound = SoundID.NPCDeath1;
+            NPC.value = Item.buyPrice(0, 0, 2, 50); // money it drops
+            NPC.knockBackResist = 0f; //how much knockback applies
+            Banner = NPC.type;
+            BannerItem = ModContent.ItemType<Items.Banners.BioSparkBanner>();
+            NPC.aiStyle = -1;
+            NPC.friendly = false;
+            NPC.noGravity = false;
+        }
+        public override float SpawnChance(NPCSpawnInfo spawnInfo)
+        {
+            if (spawnInfo.Player.ZoneRockLayerHeight & Main.hardMode) //if player is within cave height and world is in hardmode
+            {
+                if (spawnInfo.Player.ZoneJungle)
                 {
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneSnow)
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneBeach) //don't spawn on beach
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneDesert) //don't spawn on beach
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneCorrupt) //don't spawn on beach
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneCrimson) //don't spawn on beach
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneDungeon) //don't spawn in dungeon
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Water) //don't spawn in water
-				{
-					return 0f;
-				}
-				else //only forest
+                    return 0f;
+                }
+                else if (spawnInfo.Player.ZoneSnow)
                 {
-					return spawnInfo.SpawnTileType == TileID.Stone || spawnInfo.SpawnTileType == TileID.Dirt ? .06f : 0f; //functions like a mini if else statement
-				}
-			}
-			else
-			{
-				return 0f; //no spawn rate
-			}
-		}
+                    return 0f;
+                }
+                else if (spawnInfo.Player.ZoneBeach) //don't spawn on beach
+                {
+                    return 0f;
+                }
+                else if (spawnInfo.Player.ZoneDesert) //don't spawn on beach
+                {
+                    return 0f;
+                }
+                else if (spawnInfo.Player.ZoneCorrupt) //don't spawn on beach
+                {
+                    return 0f;
+                }
+                else if (spawnInfo.Player.ZoneCrimson) //don't spawn on beach
+                {
+                    return 0f;
+                }
+                else if (spawnInfo.Player.ZoneDungeon) //don't spawn in dungeon
+                {
+                    return 0f;
+                }
+                else if (spawnInfo.Water) //don't spawn in water
+                {
+                    return 0f;
+                }
+                else //only forest
+                {
+                    return spawnInfo.SpawnTileType == TileID.Stone || spawnInfo.SpawnTileType == TileID.Dirt ? .06f : 0f; //functions like a mini if else statement
+                }
+            }
+            else
+            {
+                return 0f; //no spawn rate
+            }
+        }
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
             // We can use AddRange instead of calling Add multiple times in order to add multiple items at once
@@ -102,15 +99,15 @@ namespace KirboMod.NPCs
             });
         }
         public override void AI() //constantly cycles each time
-		{
-            if(NPC.localAI[0] == 0)
+        {
+            if (NPC.localAI[0] == 0)
             {
                 WalkDirection = 1;
                 NPC.localAI[0] = 1;
             }
-			NPC.spriteDirection = NPC.direction;
-			Player player = Main.player[NPC.target];
-			Vector2 distance = player.Center - NPC.Center;
+            NPC.spriteDirection = NPC.direction;
+            Player player = Main.player[NPC.target];
+            Vector2 distance = player.Center - NPC.Center;
             bool inRange = Math.Abs(distance.X) < 500 && Math.Abs(distance.Y) < 400 && !player.dead;
 
             if (Attacktype > 1 || inRange) //attacking or in range
@@ -169,9 +166,9 @@ namespace KirboMod.NPCs
 
             //for stepping up tiles
             Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
-		}
-		private void Walk() //walk towards player
-		{
+        }
+        private void Walk() //walk towards player
+        {
             Player player = Main.player[NPC.target];
             Vector2 distance = player.Center - NPC.Center;
 
@@ -194,7 +191,7 @@ namespace KirboMod.NPCs
 
             Jump();
         }
-		private void Sidestep()
+        private void Sidestep()
         {
             NPC.TargetClosest(true);
 
@@ -252,7 +249,7 @@ namespace KirboMod.NPCs
                 Player player = Main.player[NPC.target];
                 if (AttackTimer == 120 + 30) //unleash slash
                 {
-                    if (Main.netMode != NetmodeID.MultiplayerClient) 
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
                         //hitbox
                         Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<BioSparkSlashHitbox>(), 70 / 2, 8, Main.myPlayer, NPC.whoAmI, 0);
@@ -264,11 +261,11 @@ namespace KirboMod.NPCs
                 }
                 if (AttackTimer > 120 + 30 & AttackTimer < 120 + 60)
                 {
-                    if(NPC.velocity.Y < -2)
+                    if (NPC.velocity.Y < -2)
                     {
                         for (int i = 0; i < 3; i++)
                         {
-                            Dust dust = Dust.NewDustPerfect(NPC.Bottom + Main.rand.NextVector2Circular(32,32), DustID.RainbowTorch, Vector2.Zero);
+                            Dust dust = Dust.NewDustPerfect(NPC.Bottom + Main.rand.NextVector2Circular(32, 32), DustID.RainbowTorch, Vector2.Zero);
                             dust.noGravity = true;
                             dust.color = Color.Yellow;
                         }
@@ -282,10 +279,10 @@ namespace KirboMod.NPCs
                 }
             }
         }
-		private void Daggers() //slashes
-		{
-			Player player = Main.player[NPC.target];
-			Vector2 projshoot = player.Center - NPC.Center;
+        private void Daggers() //slashes
+        {
+            Player player = Main.player[NPC.target];
+            Vector2 projshoot = player.Center - NPC.Center;
             float shootSpeed = 20;
             if (Main.getGoodWorld)
             {
@@ -294,7 +291,7 @@ namespace KirboMod.NPCs
                 {
                     projshoot = results.ChaserVelocity;
                 }
-                else 
+                else
                 {
                     projshoot = projshoot.Normalized(shootSpeed);
                 }
@@ -306,7 +303,7 @@ namespace KirboMod.NPCs
             }
             NPC.TargetClosest(true);
 
-			NPC.velocity.X *= 0.5f; //slow
+            NPC.velocity.X *= 0.5f; //slow
 
             if (AttackTimer % 5 == 0 && AttackTimer > 120 + 30 && AttackTimer <= 120 + 45) //unleash daggers every 5 ticks within 15 ticks
             {
@@ -314,7 +311,7 @@ namespace KirboMod.NPCs
                 {
                     float velocity = Utils.Remap(i, 0, 3, 2, 7);
                     float scale = Utils.Remap(i, 0, 3, 2.5f, .5f);
-                    Dust.NewDustPerfect(NPC.Center + Main.rand.NextVector2Circular(16,16), DustID.SilverCoin, projshoot.Normalized(velocity), Scale: scale);
+                    Dust.NewDustPerfect(NPC.Center + Main.rand.NextVector2Circular(16, 16), DustID.SilverCoin, projshoot.Normalized(velocity), Scale: scale);
                 }
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
@@ -419,9 +416,9 @@ namespace KirboMod.NPCs
             npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<DreamEssence>(), 1, 2, 4));
         }
         public override void HitEffect(NPC.HitInfo hit)
-		{
-			if (NPC.life <= 0)
-			{
+        {
+            if (NPC.life <= 0)
+            {
                 for (int i = 0; i < 10; i++)
                 {
                     Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle edge
@@ -433,7 +430,7 @@ namespace KirboMod.NPCs
                     Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center, speed, Main.rand.Next(11, 13), Scale: 1f); //double jump smoke
                 }
             }
-		}
+        }
         public override void ModifyHoverBoundingBox(ref Rectangle boundingBox) => boundingBox = NPC.Hitbox;
     }
 }

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -191,7 +192,6 @@ namespace KirboMod.NPCs
                 if (NPC.GetLifePercent() < (Main.expertMode ? 0.75f : 0.4f))
                     possibleAttacks.Add(KrackoAttackType.Lightning);
                 possibleAttacks.Remove(lastattacktype);
-                possibleAttacks.TrimExcess();
                 attacktype = possibleAttacks[Main.rand.Next(possibleAttacks.Count)];
                 lastattacktype = attacktype;
                 NPC.ai[0] = 0;
@@ -459,34 +459,43 @@ namespace KirboMod.NPCs
             distanceDiagonalRightOfPlayer.Normalize();
             return distanceDiagonalRightOfPlayer * speed;
         }
-        // This npc uses an additional texture for drawing
-        public static Asset<Texture2D> EyeTexture;
-        public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+        static Asset<Texture2D> eyeBase;
+        static Asset<Texture2D> pupil;
+        static Asset<Texture2D> eyelid;
+        static Asset<Texture2D> spikes;
+        public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            EyeTexture = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoEyeBase");
-            Texture2D pupil = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoEyePupil").Value;
-            Texture2D eyelid = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoEyeAngryEyelid").Value;
-            //Texture2D spikes = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoEyeAngryEyelid").Value;
-
             Player player = Main.player[NPC.target];
             bool drawEyelid = (transitioning && NPC.ai[2] > 0 && NPC.ai[2] <= 180) || frenzy;
             float offsetLength = 6.5f;
             Vector2 pupilOffset = Vector2.Normalize(player.Center - NPC.Center) * offsetLength;//the multipier is just what looks good
-            //snap the offset to grid of 2. this will make the pupil allign with the grid of the base
-            pupilOffset.X = MathF.Round(pupilOffset.X / 2) * 2;
-            pupilOffset.X = MathF.Round(pupilOffset.X / 2) * 2;
-
-
+            Texture2D texture = TextureAssets.Npc[Type].Value;
+            spriteBatch.Draw(texture, NPC.Center - screenPos, NPC.frame, GetAlpha(Color.White).Value, NPC.rotation, NPC.frame.Size() / 2, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(spikes.Value, NPC.Center - screenPos, NPC.frame, new Color(255, 255, 255), NPC.rotation, NPC.frame.Size() / 2, 1f, SpriteEffects.None, 0f);
             if ((transitioning == true && NPC.ai[2] > 0 && NPC.ai[2] <= 180))
             {
                 pupilOffset = Vector2.Zero;
             }
-            Texture2D eye = EyeTexture.Value;
-            spriteBatch.Draw(eye, NPC.Center - Main.screenPosition, null, new Color(255, 255, 255), 0, new Vector2(29, 29), 1f, SpriteEffects.None, 0f);
-            spriteBatch.Draw(pupil, NPC.Center - Main.screenPosition + pupilOffset, null, Color.White, 0, pupil.Size() / 2, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(eyeBase.Value, NPC.Center - screenPos, null, new Color(255, 255, 255), 0, eyeBase.Size() / 2, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(pupil.Value, NPC.Center - screenPos + pupilOffset, null, Color.White, 0, pupil.Size() / 2, 1, SpriteEffects.None, 0);
             if (drawEyelid)
-                spriteBatch.Draw(eyelid, NPC.Center - Main.screenPosition, null, Color.White, 0, eyelid.Size() / 2, 1, SpriteEffects.None, 0);
+                spriteBatch.Draw(eyelid.Value, NPC.Center - screenPos, null, Color.White, 0, eyelid.Size() / 2, 1, SpriteEffects.None, 0);
+            return false;
         }
-       
+
+        public override void Load()
+        {
+            eyeBase = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoEyeBase");
+            pupil = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoEyePupil");
+            eyelid = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoEyeAngryEyelid");
+            spikes = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoSpikes");
+        }
+        public override void Unload()
+        {
+            eyeBase = null;
+            pupil = null;
+            eyelid = null;
+            spikes = null;
+        }
     }
 }

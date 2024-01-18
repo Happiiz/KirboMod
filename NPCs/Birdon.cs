@@ -1,52 +1,53 @@
 using KirboMod.Items;
+using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
-using System;
 using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
-using KirboMod.Projectiles;
+using Terraria.ID;
+using Terraria.ModLoader;
 
 namespace KirboMod.NPCs
 {
-	public class Birdon : ModNPC
-	{
-		private int frame = 0;
-		private double counting;
-		public override void SetStaticDefaults() {
-			// DisplayName.SetDefault("Birdon");
-			Main.npcFrameCount[NPC.type] = 3;
-		}
+    public class Birdon : ModNPC
+    {
+        private int frame = 0;
+        private double counting;
+        public override void SetStaticDefaults()
+        {
+            // DisplayName.SetDefault("Birdon");
+            Main.npcFrameCount[NPC.type] = 3;
+        }
 
-		public override void SetDefaults() {
-			NPC.width = 36;
-			NPC.height = 36;
-			//drawOffsetY = -18; //make sprite line up with hitbox
-			NPC.damage = 40;
-			NPC.lifeMax = 300;
-			NPC.defense = 18;
-			NPC.HitSound = SoundID.NPCHit1;
-			NPC.DeathSound = SoundID.NPCDeath1;
-			NPC.value = Item.buyPrice(0, 0, 2, 50); // money it drops
-			NPC.knockBackResist = 0.5f; //How much of the knockback it receives will actually apply
-			Banner = NPC.type;
-			BannerItem = ModContent.ItemType<Items.Banners.BirdonBanner>();
-			NPC.aiStyle = 14; //flying ai
-			NPC.noGravity = true;
-		}
+        public override void SetDefaults()
+        {
+            NPC.width = 36;
+            NPC.height = 36;
+            //drawOffsetY = -18; //make sprite line up with hitbox
+            NPC.damage = 40;
+            NPC.lifeMax = 300;
+            NPC.defense = 18;
+            NPC.HitSound = SoundID.NPCHit1;
+            NPC.DeathSound = SoundID.NPCDeath1;
+            NPC.value = Item.buyPrice(0, 0, 2, 50); // money it drops
+            NPC.knockBackResist = 0.5f; //How much of the knockback it receives will actually apply
+            Banner = NPC.type;
+            BannerItem = ModContent.ItemType<Items.Banners.BirdonBanner>();
+            NPC.noGravity = true;
+            NPC.aiStyle = 14;
+        }
 
-		public override float SpawnChance(NPCSpawnInfo spawnInfo) 
-		{
-			if (spawnInfo.Player.ZoneSkyHeight & Main.hardMode) //if player is within space height and world is in hardmode
-			{	
-				return 0.5f; //return spawn rate
-			}
-			else
-			{
-				return 0f; //no spawn rate
-			}
-		}
+        public override float SpawnChance(NPCSpawnInfo spawnInfo)
+        {
+            if (spawnInfo.Player.ZoneSkyHeight & Main.hardMode) //if player is within space height and world is in hardmode
+            {
+                return 0.5f; //return spawn rate
+            }
+            else
+            {
+                return 0f; //no spawn rate
+            }
+        }
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
@@ -62,26 +63,30 @@ namespace KirboMod.NPCs
         }
         public override void AI() //constantly cycles each time
         {
-			NPC.spriteDirection = NPC.direction;
-			Player player = Main.player[NPC.target];
+            NPC.spriteDirection = NPC.direction;
+            Player player = Main.player[NPC.target];
             NPC.TargetClosest(true); //face target
 
             NPC.rotation = NPC.velocity.X * 0.1f;
 
             NPC.ai[0]++;
-			int fireRate = Main.getGoodWorld ? 90 : Main.expertMode ? 120 : 180; 
-			if (NPC.ai[0] % fireRate == 0)
+            if (NPC.confused)
             {
-				Vector2 shootVel = Vector2.Normalize(player.Center - NPC.Center);
-				shootVel *= 5;
-				if (Main.expertMode)
-				{
-					shootVel *= 1.33f;
-					Utils.ChaseResults results = Utils.GetChaseResults(NPC.Center, shootVel.Length(), player.Center, player.velocity);
-					shootVel = results.InterceptionHappens ? results.ChaserVelocity : (Vector2.Normalize(player.velocity) * shootVel.Length());
-				}
-				int featherAmount = 3;
-				if (Main.expertMode)
+                return; //don't shoot feathers if confused
+            }
+            int fireRate = Main.getGoodWorld ? 90 : Main.expertMode ? 120 : 180;
+            if (NPC.ai[0] % fireRate == 0)
+            {
+                Vector2 shootVel = Vector2.Normalize(player.Center - NPC.Center);
+                shootVel *= 5;
+                if (Main.expertMode)
+                {
+                    shootVel *= 1.33f;
+                    Utils.ChaseResults results = Utils.GetChaseResults(NPC.Center, shootVel.Length(), player.Center, player.velocity);
+                    shootVel = results.InterceptionHappens ? results.ChaserVelocity : (Vector2.Normalize(player.velocity) * shootVel.Length());
+                }
+                int featherAmount = 3;
+                if (Main.expertMode)
                 {
                     featherAmount = 4;
                 }
@@ -91,37 +96,37 @@ namespace KirboMod.NPCs
                 }
 
                 float spread = .6f;
-				if (Main.expertMode)
-					spread = 1;
-				if (Main.getGoodWorld)
+                if (Main.expertMode)
+                    spread = 1;
+                if (Main.getGoodWorld)
                 {
                     spread = 1.5f;
                 }
 
                 for (int i = -featherAmount / 2; i <= featherAmount / 2; i++)
                 {
-					ShootFeather(shootVel.RotatedBy(Utils.Remap(i, -featherAmount / 2, featherAmount / 2, -spread / 2, spread / 2)));
-				}
-			}
-		}
-		void ShootFeather(Vector2 velocity)
-		{
-			if(Main.netMode != NetmodeID.MultiplayerClient)
-			Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, velocity, ModContent.ProjectileType<BirdonFeatherBad>(), 60 / 2, 1, Main.myPlayer, 0, 0);
-		}
-		public override void FindFrame(int frameHeight) // animation
+                    ShootFeather(shootVel.RotatedBy(Utils.Remap(i, -featherAmount / 2, featherAmount / 2, -spread / 2, spread / 2)));
+                }
+            }
+        }
+        void ShootFeather(Vector2 velocity)
         {
-			if (frame == 0)
-			{
-				counting += 1.0;
-				if (counting < 10.0)
-				{
-					NPC.frame.Y = 0;
-				}
-				else if (counting < 20.0)
-				{
-					NPC.frame.Y = frameHeight;
-				}
+            if (Main.netMode != NetmodeID.MultiplayerClient)
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, velocity, ModContent.ProjectileType<BirdonFeatherBad>(), 60 / 2, 1, Main.myPlayer, 0, 0);
+        }
+        public override void FindFrame(int frameHeight) // animation
+        {
+            if (frame == 0)
+            {
+                counting += 1.0;
+                if (counting < 10.0)
+                {
+                    NPC.frame.Y = 0;
+                }
+                else if (counting < 20.0)
+                {
+                    NPC.frame.Y = frameHeight;
+                }
                 else if (counting < 30.0)
                 {
                     NPC.frame.Y = frameHeight * 2;
@@ -131,13 +136,13 @@ namespace KirboMod.NPCs
                     NPC.frame.Y = frameHeight;
                 }
                 else
-				{
-					counting = 0.0;
-				}
-			}
-		}
+                {
+                    counting = 0.0;
+                }
+            }
+        }
 
-		public override void HitEffect(NPC.HitInfo hit)
+        public override void HitEffect(NPC.HitInfo hit)
         {
             if (NPC.life <= 0)
             {
@@ -163,9 +168,9 @@ namespace KirboMod.NPCs
 
             npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<DreamEssence>(), 1, 2, 4));
 
-			//more common in normal mode
-			new DropBasedOnExpertMode(ItemDropRule.ByCondition(new Conditions.IsCrimsonAndNotExpert(), ModContent.ItemType<SkyBlanket>(), 100, 1, 1), 
-				ItemDropRule.ByCondition(new Conditions.IsCrimsonAndNotExpert(), ModContent.ItemType<SkyBlanket>(), 50, 1, 1));
+            //more common in normal mode
+            new DropBasedOnExpertMode(ItemDropRule.ByCondition(new Conditions.IsCrimsonAndNotExpert(), ModContent.ItemType<SkyBlanket>(), 100, 1, 1),
+                ItemDropRule.ByCondition(new Conditions.IsCrimsonAndNotExpert(), ModContent.ItemType<SkyBlanket>(), 50, 1, 1));
         }
     }
 }

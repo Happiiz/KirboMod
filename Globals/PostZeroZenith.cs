@@ -126,7 +126,7 @@ namespace KirboMod.Globals
 	},
 	{
 		ModContent.ItemType<Items.RainbowSword.RainbowSword>(),
-		new FinalFractalProfile(50, Main.DiscoColor)
+		new FinalFractalProfile(91, Main.DiscoColor)
 	},
 	{
 		ModContent.ItemType<DarkSword>(),

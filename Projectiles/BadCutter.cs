@@ -24,17 +24,6 @@ namespace KirboMod.Projectiles
 			Projectile.tileCollide = false;
 			Projectile.penetrate = 1;
 		}
-        
-
-        
-		static float MUV(float initialSpace, float velocity, float time)
-        {
-			return initialSpace + velocity * time;
-        }
-		static float MRUV(float initialSpace, float initialVel, float time, float acceleration)
-        {
-			return initialSpace + initialVel * time + acceleration * time * time * .5f;
-        }
 		static bool TimeFromMRUV(float targetSpace ,float initialSpace, float initialVel, float acceleration, out float t1, out float t2)
         {
 			float delta = initialVel * initialVel + 2 * acceleration * (initialSpace - targetSpace);
