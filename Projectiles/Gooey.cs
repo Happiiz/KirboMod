@@ -51,21 +51,16 @@ namespace KirboMod.Projectiles
 		{
 			Projectile.width = 32;
 			Projectile.height = 32;
-			DrawOriginOffsetY = -59; //plus 1 to touch the ground
+            DrawOriginOffsetY = -59; //plus 1 to touch the ground
             DrawOffsetX = -44;
-			// Makes the minion go through tiles freely
 			Projectile.tileCollide = true;
+            Projectile.netImportant = true;
 
-			// These below are needed for a minion weapon
-			// Only controls if it deals damage to enemies on contact (more on that later)
-			Projectile.friendly = true;
-			// Only determines the damage type
+            Projectile.friendly = true;
 			Projectile.minion = true;
-			// Amount of slots this minion occupies from the total minion slots available to the player (more on that later)
-			Projectile.minionSlots = 1f;
-			// Needed so the minion doesn't despawn on collision with enemies or tiles
+            Projectile.DamageType = DamageClass.Summon;
+            Projectile.minionSlots = 1f;
 			Projectile.penetrate = -1;
-			// local immunity makes it wait for it's own cooldown
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = 10;
 		}
@@ -222,15 +217,22 @@ namespace KirboMod.Projectiles
 
                 bool canSeeEnemy = Collision.CanHitLine(aggroTarget.position, aggroTarget.width, aggroTarget.height, Projectile.position, Projectile.width, Projectile.height);
 
-				bool inEnemyRangeX = direction.X <= 60f && direction.X >= 0f; //in range of the right
+				bool inEnemyRangeX = direction.X <= 80f && direction.X >= 0f; //in range of the right
 
 				if (Projectile.direction == -1) //facing left
 				{
-                    inEnemyRangeX = direction.X >= -60f && direction.X <= 0f; //in range of the left
+                    inEnemyRangeX = direction.X >= -80f && direction.X <= 0f; //in range of the left
+                }
+
+                bool inEnemyRangeFireX = direction.X <= 250f && direction.X >= 0f; //in range of the right (fire)
+
+                if (Projectile.direction == -1) //facing left
+                {
+                    inEnemyRangeFireX = direction.X >= -250f && direction.X <= 0f; //in range of the left (fire)
                 }
 
                 //attack (if close enough to target center, touching target hitbox or already attacking)
-                if (inEnemyRangeX && absDirection.Y <= 10f & spaceJumping == false && flying == false) //in close range of enemy
+                if (inEnemyRangeX && absDirection.Y <= 20f & spaceJumping == false && flying == false) //in close range of enemy
 				{
 					if (attack == 0)
 					{
@@ -240,7 +242,7 @@ namespace KirboMod.Projectiles
 				}
 
                 //if npc is above and attack cycle is over
-                else if (absDirection.X < 50 && direction.Y <= -20 && direction.Y > -100 && spaceJumping == false && flying == false) 
+                else if (absDirection.X < 50 && direction.Y <= -20 && direction.Y > -80 && spaceJumping == false && flying == false) 
 				{
 					if (attack == 0)
 					{
@@ -249,8 +251,8 @@ namespace KirboMod.Projectiles
                     attacking = true;
                 }
 
-                //if dash cooldown is up, in range while flying, and can see enemy
-                else if (absDirection.X <= 500 && absDirection.Y <= 20 && flying == true && spaceJumping == false && dashcooldown <= 0 && canSeeEnemy) 
+                //if dash cooldown is up, in fire range while flying, and can see enemy
+                else if (inEnemyRangeFireX && absDirection.Y <= 20 && flying == true && spaceJumping == false && dashcooldown <= 0 && canSeeEnemy) 
                 {
                     if (attack == 0) //if attack cycle restarted
 					{
@@ -268,7 +270,7 @@ namespace KirboMod.Projectiles
 					}
 
                     //stop flying when close, can see the target, and the target is on the ground
-                    if (flying == true && absDirection.X < 200f && absDirection.Y < 200f && canSeeEnemy && aggroTarget.velocity.Y == 0) 
+                    if (flying == true && absDirection.X < 200f && absDirection.Y < 50f && canSeeEnemy && aggroTarget.velocity.Y == 0) 
 					{
 						flying = false;
 					}
@@ -505,9 +507,9 @@ namespace KirboMod.Projectiles
                 Projectile.alpha = 255; //hide projectile
 
                 float speed = direction2.Length() / 30;
-                if (speed < 40) //don't go below 40
+                if (speed < 100) //don't go below 100
                 {
-                    speed = 40;
+                    speed = 100;
                 }
                 float inertia = 6f;
 
@@ -526,10 +528,15 @@ namespace KirboMod.Projectiles
             //space jump end
             if (direction2.Length() <= 20f && spaceJumping == true)
             {
+                for (int i = 0; i < 20; i++)
+                {
+                    Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
+                    Dust.NewDustPerfect(Projectile.Center + Projectile.velocity, DustID.Enchanted_Gold, speed, Scale: 1f); //Makes dust in a messy circle
+                }
                 for (int i = 0; i < 10; i++)
                 {
-                    Vector2 speed = Main.rand.NextVector2Circular(1f, 1f); //circle
-                    Dust d = Dust.NewDustPerfect(Projectile.Center + Projectile.velocity, ModContent.DustType<Dusts.LilStar>(), speed * 6, Scale: 1f); //Makes dust in a messy circle
+                    Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
+                    Gore.NewGorePerfect(Projectile.GetSource_FromAI(), Projectile.Center, speed, Main.rand.Next(16, 18));
                 }
                 Projectile.velocity *= 0;
                 SoundEngine.PlaySound(SoundID.Item10, Projectile.position); //impact
@@ -695,42 +702,47 @@ namespace KirboMod.Projectiles
 
         public static Asset<Texture2D> JumpStar;
 
-        public override void PostDraw(Color lightColor)
-        {
-            if (spaceJumping == true)
-            {
-                JumpStar = ModContent.Request<Texture2D>("KirboMod/Projectiles/Star");
-                Texture2D texture = JumpStar.Value;
-
-                spaceJumpRotation--;
-
-                Vector2 drawOrigin = new Vector2(texture.Width / 2, texture.Height / 2);
-                Vector2 drawPos = (Projectile.position - Main.screenPosition) + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
-
-                Main.EntitySpriteDraw(texture, drawPos, null,
-                    Color.White, spaceJumpRotation, drawOrigin, 1, SpriteEffects.None, 1);
-            }
-        }
-
         public override bool PreDraw(ref Color lightColor)
         {
             if (spaceJumping == true)
             {
                 Main.instance.LoadProjectile(Projectile.type);
-                JumpStar = ModContent.Request<Texture2D>("KirboMod/Projectiles/Star");
+                JumpStar = ModContent.Request<Texture2D>("KirboMod/Projectiles/TripleStarStar");
                 Texture2D texture = JumpStar.Value;
 
-                for (int k = 1; k < Projectile.oldPos.Length; k++) //rotation already going down btw (also start at 1 so no ontop of actual star)
+                if (!Main.gamePaused)
                 {
-                    Vector2 drawOrigin = new Vector2(texture.Width / 2, texture.Height / 2);
-                    Vector2 drawPos = (Projectile.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
-
-                    //no projectile.getalpha(lightcolor) cause it goes completely alpha during space jump so it would be invisible
-                    Color color = Color.White * ((Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);
-                    Main.EntitySpriteDraw(texture, drawPos, null, color, spaceJumpRotation, drawOrigin, 1, SpriteEffects.None, 0);
+                    spaceJumpRotation--;
                 }
+
+                Vector2 drawOrigin = new Vector2(texture.Width / 2, texture.Height / 2);
+                Vector2 drawPos = Projectile.position - Main.screenPosition + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
+
+                Main.EntitySpriteDraw(texture, drawPos, null, Color.White, spaceJumpRotation, drawOrigin, 1, SpriteEffects.None, 0);
+
+                int dustIndex = Dust.NewDust(Projectile.position, 50, 50, DustID.BlueTorch, Scale: 2f); //dust
+                Main.dust[dustIndex].velocity *= 0.2f;
+                Main.dust[dustIndex].noGravity = true;
+
+                //change texture for afterimages
+                JumpStar = ModContent.Request<Texture2D>("KirboMod/Projectiles/TripleStarStarAfterimage");
+                texture = JumpStar.Value;
+
+                for (int k = 1; k < Projectile.oldPos.Length; k++) //start at 1 so no ontop of actual star
+                {
+                    Vector2 drawOrigin2 = new Vector2(texture.Width / 2, texture.Height / 2);
+                    Vector2 drawPos2 = (Projectile.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
+
+                    Color color = Color.DodgerBlue * ((Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);
+                    Main.EntitySpriteDraw(texture, drawPos2, null, color, spaceJumpRotation, drawOrigin2, 1, SpriteEffects.None, 0);
+                }
+
+                return false;
             }
-            return true;
+            else
+            {
+                return true;
+            }
         }
     }
 }

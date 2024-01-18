@@ -1,5 +1,10 @@
 Mods: {
 	KirboMod: {
+		CommonItemTooltip: {
+			DefenseVariesDamage: Damage varies with the amount of defense you have
+			DefensePenetration: Ignores {0} points of enemy defense
+		}
+
 		Buffs: {
 			DarkFeeling: {
 				DisplayName: Dark Feeling
@@ -13,7 +18,7 @@ Mods: {
 
 			FlyingNimbusMount: {
 				DisplayName: Flying Nimbus
-				Description: "'How is this a Kirby reference!?'"
+				Description: "'How is this a Kirby reference?'"
 			}
 
 			HopesAndDreams: {
@@ -68,7 +73,7 @@ Mods: {
 
 			KingDededePetBuff: {
 				DisplayName: Dee
-				Description: '''"The one to rule them all... one day...."'''
+				Description: '''"The one to rule them all... one day..."'''
 			}
 
 			KrackoPetBuff: {
@@ -83,17 +88,17 @@ Mods: {
 
 			WhispyPetBuff: {
 				DisplayName: Murmuring Woods
-				Description: '''"I think it's trying to whisper something into your ear..."'''
+				Description: '''"Pspspsps..."'''
 			}
 
 			ZeroEyePetBuff: {
 				DisplayName: Zero's Eye
-				Description: '''"Is it in constant pain of not being able to blink...?"'''
+				Description: '''"Is it in constant pain of not being able to blink?"'''
 			}
 
 			ZeroPetBuff: {
 				DisplayName: Light Wanderer
-				Description: '''"Attracts darkness towards its hallowed core."'''
+				Description: '''"Attracts darkness towards its hallow shell."'''
 			}
 		}
 
@@ -393,7 +398,11 @@ Mods: {
 
 			PersonalCloud: {
 				DisplayName: Personal Cloud
-				Tooltip: Summons a personal cloud to shock your enemies
+				Tooltip:
+					'''
+					Summons a personal cloud to shock your enemies
+					{$CommonItemTooltip.DefenseVariesDamage}
+					'''
 			}
 
 			MiracleMatter: {
@@ -631,7 +640,11 @@ Mods: {
 
 			CrownOfIce: {
 				DisplayName: Crown Of Ice
-				Tooltip: Summons a chilly to fight for you
+				Tooltip:
+					'''
+					Summons a chilly to fight for you
+					{$CommonItemTooltip.DefensePenetration}
+					'''
 			}
 
 			CrystalGun: {
@@ -689,8 +702,9 @@ Mods: {
 				DisplayName: Dragon Pot
 				Tooltip:
 					'''
-					Unleashes a flurry of shadow fire
-					Enemies hit by one will be set on strong shadow flames
+					Unleashes a flurry of shadow flames
+					Enemies hit by one will be set on shadow fire
+					{$CommonItemTooltip.DefensePenetration}
 					'''
 			}
 
@@ -857,13 +871,13 @@ Mods: {
 					'''
 					While airborne, right-click a direction to do a powerful and invincible dash in that direction
 					You can only dash in the air once before having to land
-					'Is this the sword that seals the darkness?'
+					'Not the sword that seals the darkness'
 					'''
 			}
 
 			MetaKnightSword: {
 				DisplayName: Galaxia
-				Tooltip: "'Well of course not the actual thing...'"
+				Tooltip: A powerful recreation of a legendary swordsman's signature weapon
 			}
 
 			MetalFighter: {
@@ -872,7 +886,7 @@ Mods: {
 					'''
 					Right click and hold up to combo uppercuts!
 					Spike in on the ground and air by just holding right click!
-					'Fly like a ballistic missile and sting like a ballistic missile'
+					'Fly like a ballistic missile, sting like a ballistic missile'
 					'''
 			}
 
@@ -1071,7 +1085,11 @@ Mods: {
 
 			WhispyBush: {
 				DisplayName: Whispy Shrub
-				Tooltip: When you're hit you spew apples from your body
+				Tooltip:
+					'''
+					When you're hit you spew apples from your body
+					{$CommonItemTooltip.DefenseVariesDamage}
+					'''
 			}
 
 			WhispyMask: {
@@ -1084,7 +1102,7 @@ Mods: {
 				Tooltip:
 					'''
 					Summons a murmuring woods
-					'Sometimes you can hear it go 'pspspspsps'...'
+					'Did you say something?'
 					'''
 			}
 
@@ -1097,8 +1115,9 @@ Mods: {
 				DisplayName: Badge Of Gloom
 				Tooltip:
 					'''
+					Awakens the darkness within you
 					While attacking, dark matter will shoot out from your body that follow your mouse
-					'No, this won't let you into the dark matter family'
+					{$CommonItemTooltip.DefenseVariesDamage}
 					'''
 			}
 
@@ -1346,6 +1365,9 @@ Mods: {
 			DarkMatterLaser.DisplayName: Dark Matter Laser
 			DarkMatterLaserTelegraph.DisplayName: Dark Matter Laser Telegraph
 			MatterOrbVertical.DisplayName: Matter Orb
+			MinionFireSpread.DisplayName: Minion Fire Spread
+			MinionBeamSpread.DisplayName: Minion Beam Spread
+			DuoMinionFireSpread.DisplayName: Duo Minion Fire Spread
 		}
 
 		NPCs: {

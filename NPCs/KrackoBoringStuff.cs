@@ -109,19 +109,21 @@ namespace KirboMod.NPCs
 		public override void HitEffect(NPC.HitInfo hit)
 		{
 			if (NPC.life <= 0)
-			{
-				for (int i = 0; i < 20; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-				{
-					Vector2 speed = Main.rand.NextVector2Circular(20f, 20f); //circle
-					Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.LilStar>(), speed, Scale: 2f); //Makes dust in a messy circle
-					d.noGravity = true;
-				}
-				for (int i = 0; i < 15; i++)
-				{
-					Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
-					Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center, speed, Main.rand.Next(11, 13), Scale: 2f); //double jump smoke
-				}
-			}
+            {
+                for (int i = 0; i < 8; i++) 
+                {
+                    // go around in a octogonal pattern
+                    Vector2 speed = new Vector2((float)Math.Cos(MathHelper.ToRadians(i * 45)) * 25, (float)Math.Sin(MathHelper.ToRadians(i * 45)) * 25);
+
+                    Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.BoldStar>(), speed, Scale: 3f); //Makes dust in a messy circle
+                    d.noGravity = true;
+                }
+                for (int i = 0; i < 20; i++)
+                {
+                    Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
+                    Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center, speed, Main.rand.Next(11, 13), Scale: 2f); //double jump smoke
+                }
+            }
 			else
 			{
 				for (int i = 0; i < 2; i++)

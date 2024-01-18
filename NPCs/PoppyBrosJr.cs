@@ -218,7 +218,7 @@ namespace KirboMod.NPCs
         {
 			Player player = Main.player[NPC.target];
 			float Xprojshoot = player.Center.X - NPC.Center.X;
-			Xprojshoot /= 50; 
+			Xprojshoot /= 55; 
 			if (Xprojshoot >= 10) //limit speed
             {
 				Xprojshoot = 10;

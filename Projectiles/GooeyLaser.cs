@@ -11,7 +11,8 @@ namespace KirboMod.Projectiles
 		public override void SetStaticDefaults()
 		{
 			Main.projFrames[Projectile.type] = 5;
-		}
+            ProjectileID.Sets.MinionShot[Type] = true;
+        }
 		public override void SetDefaults()
 		{
 			Projectile.width = 24;
@@ -24,15 +25,15 @@ namespace KirboMod.Projectiles
 			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
 			Projectile.alpha = 128;
-			Projectile.minion = true;
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = 120;
-		}
+            Projectile.DamageType = DamageClass.Summon;
+        }
 		public override void AI()
 		{
 			Projectile.rotation = Projectile.velocity.ToRotation();
 
-			if (Main.rand.Next(5) == 1) // happens 1/5 times
+			if (Main.rand.NextBool(5)) // happens 1/5 times
 			{
 				int dustnumber = Dust.NewDust(Projectile.position, 124, 24, ModContent.DustType<Dusts.DarkResidue>(), 0f, 0f, 200, default, 0.8f); //dust
 				Main.dust[dustnumber].velocity *= 0.3f;

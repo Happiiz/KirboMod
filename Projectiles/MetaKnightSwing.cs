@@ -11,7 +11,7 @@ namespace KirboMod.Projectiles
 		public override void SetStaticDefaults()
 		{
 			Main.projFrames[Projectile.type] = 5;
-		}
+        }
 
 		public override void SetDefaults()
 		{
@@ -29,7 +29,7 @@ namespace KirboMod.Projectiles
 		public override void AI()
 		{
 			Player player = Main.player[Projectile.owner];
-			Projectile.spriteDirection = -Projectile.direction; //negative direction because I made it face the other way(oops)
+			Projectile.spriteDirection = Projectile.direction; 
 
             Projectile.Center = player.RotatedRelativePoint(player.MountedCenter) - new Vector2(0, 66f);
 
@@ -67,5 +67,14 @@ namespace KirboMod.Projectiles
 		{
 			return Color.White; // Makes it uneffected by light
 		}
+
+        /*public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+        {
+            Player player = Main.player[Projectile.owner];
+
+            float rotation = (player.itemTime * (MathF.Tau / player.itemTimeMax)) * player.direction;
+
+            return Utils.IntersectsConeFastInaccurate(targetHitbox, Projectile.Center, 150, rotation, MathF.PI); 
+        }*/
     }
 }

@@ -23,7 +23,9 @@ namespace KirboMod.Projectiles
 			Projectile.timeLeft = 300;
 			Projectile.tileCollide = true;
 			Projectile.penetrate = 1;
-		}
+            Projectile.usesIDStaticNPCImmunity = true;
+            Projectile.idStaticNPCHitCooldown = 10;
+        }
 		public override void AI()
 		{
 			Projectile.rotation += Projectile.velocity.X * 0.02f;
@@ -35,7 +37,7 @@ namespace KirboMod.Projectiles
 
 			if (Main.rand.NextBool(2)) // happens 1/2 times
 			{
-				int dustnumber = Dust.NewDust(Projectile.position, 50, 50, DustID.Torch, 0f, 0f, 200, default, 3f); //dust
+				int dustnumber = Dust.NewDust(Projectile.position, 50, 50, DustID.Torch, 0f, 0f, 200, default, 1.5f); //dust
 				Main.dust[dustnumber].velocity *= 0.3f;
 				Main.dust[dustnumber].noGravity = true;
 			}

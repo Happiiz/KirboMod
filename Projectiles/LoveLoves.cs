@@ -1,4 +1,6 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -13,7 +15,9 @@ namespace KirboMod.Projectiles
 		public override void SetStaticDefaults()
 		{
 			Main.projFrames[Projectile.type] = 6;
-		}
+            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 10; // The length of old position to be recorded
+            ProjectileID.Sets.TrailingMode[Projectile.type] = 0; // The recording mode
+        }
 		public override void SetDefaults()
 		{
 			Projectile.width = 58;
@@ -84,5 +88,28 @@ namespace KirboMod.Projectiles
 		{
 			return Color.White; // Makes it uneffected by light
 		}
-	}
+
+        public static Asset<Texture2D> afterimage;
+
+        public override bool PreDraw(ref Color lightColor)
+        {
+            Main.instance.LoadProjectile(Projectile.type);
+            afterimage = ModContent.Request<Texture2D>(Texture);
+            Texture2D texture = afterimage.Value;
+
+            // Redraw the projectile with the color not influenced by light
+            for (int k = 1; k < Projectile.oldPos.Length; k++) //start at 1 so not ontop of actual projectile
+            {
+                Vector2 drawOrigin = new Vector2(29, 26);
+                Vector2 drawPos = (Projectile.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
+				float scale = 1 - (0.05f * k);
+
+				Rectangle frame = new Rectangle(0, (texture.Height / 6) * Projectile.frame, Projectile.width, (texture.Height / 6));
+                Color color = Projectile.GetAlpha(lightColor) * ((Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);
+
+                Main.EntitySpriteDraw(texture, drawPos, frame, color, Projectile.rotation, drawOrigin, scale, SpriteEffects.None, 0);
+            }
+            return true; //draw og
+        }
+    }
 }

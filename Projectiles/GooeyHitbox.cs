@@ -12,21 +12,22 @@ namespace KirboMod.Projectiles
 		public override void SetStaticDefaults()
 		{
 			Main.projFrames[Projectile.type] = 1;
-		}
+            ProjectileID.Sets.MinionShot[Type] = true;
+        }
 
 		public override void SetDefaults()
 		{
 			Projectile.width = 72;
 			Projectile.height = 36;
 			Projectile.friendly = true;
-			Projectile.minion = true;
 			Projectile.timeLeft = 3;
 			Projectile.tileCollide = false;
-			Projectile.penetrate = 999;
+			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = 4;
-		}
+            Projectile.DamageType = DamageClass.Summon;
+        }
 		public override void AI()
 		{
 		    if (Projectile.ai[0] == 1) //umbrella hold 

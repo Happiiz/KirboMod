@@ -49,7 +49,7 @@ namespace KirboMod.Projectiles
         }
          public override void OnKill(int timeLeft) //when the projectile dies
          {
-			Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity *= 0, ModContent.ProjectileType<Projectiles.PoppyBombExplode>(), Projectile.damage / 2, 12, Main.myPlayer);
+			Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity *= 0.01f, ModContent.ProjectileType<PoppyBombExplode>(), Projectile.damage / 2, 12, Main.myPlayer);
          }
 
         public override bool OnTileCollide(Vector2 oldVelocity)

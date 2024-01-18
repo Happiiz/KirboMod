@@ -36,7 +36,7 @@ namespace KirboMod.Projectiles
 
 			if (Main.rand.NextBool(3)) // happens 1/3 times
 			{
-				Sparkle.NewSparkle(Projectile.Center + Main.rand.NextVector2Circular(20,20) - Projectile.velocity, Main.rand.NextBool(3, 5) ? Color.Yellow : Color.Blue, new Vector2(1, 1.5f), Projectile.velocity * 0.1f + Main.rand.NextVector2Circular(30, 30) / 10, 40, new Vector2(2, 2), null, 1, 0, 0.98f);
+				//Sparkle.NewSparkle(Projectile.Center + Main.rand.NextVector2Circular(20,20) - Projectile.velocity, Main.rand.NextBool(3, 5) ? Color.Yellow : Color.Blue, new Vector2(1, 1.5f), Projectile.velocity * 0.1f + Main.rand.NextVector2Circular(30, 30) / 10, 40, new Vector2(2, 2), null, 1, 0, 0.98f);
 			}
 
 			if (Projectile.soundDelay == 0)
@@ -71,8 +71,8 @@ namespace KirboMod.Projectiles
 			for (int i = 0; i < 10; i++)
             {
                 Vector2 velocity = Main.rand.NextVector2Circular(10, 10); //burst of sparkles
-                Sparkle.NewSparkle(Projectile.Center + Projectile.velocity, Main.rand.NextBool(3, 5) ? Color.Yellow : Color.Blue, 
-					new Vector2(1, 1f), velocity, 40, new Vector2(2, 2), null, 1, 0, 0.98f);
+                //Sparkle.NewSparkle(Projectile.Center + Projectile.velocity, Main.rand.NextBool(3, 5) ? Color.Yellow : Color.Blue, 
+					//new Vector2(1, 1f), velocity, 40, new Vector2(2, 2), null, 1, 0, 0.98f);
             }
 		}
         public override bool PreDraw(ref Color lightColor)

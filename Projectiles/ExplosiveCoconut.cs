@@ -45,7 +45,7 @@ namespace KirboMod.Projectiles
          {
 			SoundEngine.PlaySound(SoundID.Item14, Projectile.position); //bomb sound
 
-			for (int i = 0; i < 18; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+			for (int i = 0; i < 18; i++) 
 			{
 				Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
 				Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.Smoke, speed, Scale: 2f); //Makes dust in a messy circle

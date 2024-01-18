@@ -35,22 +35,18 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item24; //spectre boots
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.IceIce>();
-			Item.shootSpeed = 8f;
+			Item.shootSpeed = 10f;
 			Item.mana = 3;
 		}
 
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {
-            Vector2 perturbedSpeed2 = new Vector2(velocity.X, velocity.Y).RotatedByRandom(MathHelper.ToRadians(50)); //50 degree spread for dusts
+            Vector2 rotationoffset = new Vector2(velocity.X, velocity.Y).RotatedByRandom(MathHelper.ToRadians(50)); //50 degree spread for dusts
 
-            Vector2 perturbedSpeed = new Vector2(velocity.X, velocity.Y).RotatedByRandom(MathHelper.ToRadians(50)); // 50 degree spread.
+            velocity = velocity.RotatedByRandom(MathHelper.ToRadians(50)); //50 degree spread for proj too
 
             //do it before setting velocity to perturbed speed
-            Dust.NewDustPerfect(player.Center, ModContent.DustType<Dusts.Flake>(), perturbedSpeed2);
-
-            velocity = perturbedSpeed;
-
-            position += velocity * 4; //move a bit away from the player
+            Dust.NewDustPerfect(player.Center, ModContent.DustType<Dusts.Flake>(), rotationoffset);
 
         }
     }

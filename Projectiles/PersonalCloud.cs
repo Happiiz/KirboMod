@@ -27,7 +27,6 @@ namespace KirboMod.Projectiles
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
-			Projectile.minion = true; //deals minion damage
 		}
 
         public override bool? CanCutTiles() //can cut foliage?
@@ -113,10 +112,12 @@ namespace KirboMod.Projectiles
 
 				if (Projectile.ai[0] >= 60) //shoot
                 {
-					Vector2 distance = aggroTarget.Center - Projectile.Center;
+                    int damage = 12 + player.statDefense / 2;
+
+                    Vector2 distance = aggroTarget.Center - Projectile.Center;
 					distance.Normalize();
 					distance *= 5;
-					Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, distance, ModContent.ProjectileType<PersonalCloudBeam>(), 12, 4, Projectile.owner);
+					Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, distance, ModContent.ProjectileType<PersonalCloudBeam>(), damage, 4, Projectile.owner);
 
 					Projectile.ai[0] = 0;
 				}

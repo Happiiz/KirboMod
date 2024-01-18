@@ -898,7 +898,7 @@ namespace KirboMod.NPCs
                     animation = 11; //woooaaaahhh!
                     NPC.velocity *= 0.95f;
 
-                    NPC.defense = 200; //increase defense for transformation
+					NPC.dontTakeDamage = true; //make immune during transformation
                     NPC.rotation += MathHelper.ToRadians(5); //degrees to radians
 
                     //dust
@@ -931,8 +931,8 @@ namespace KirboMod.NPCs
 				else if (attack >= 300) //START FROM HERE
 				{
 					if (attack == 301)
-					{
-						NPC.defense = NPC.defDefense; //original defense
+                    {
+                        NPC.dontTakeDamage = false; //make vunerable again
 
                         animation = 12; //possessed fly
                     }
@@ -1322,19 +1322,21 @@ namespace KirboMod.NPCs
         {
             if (NPC.life <= 0)
             {
-				for (int i = 0; i < 20; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-				{
-					Vector2 speed = Main.rand.NextVector2Circular(20f, 20f); //circle
-					Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.BoldStar>(), speed, Scale: 2f); //Makes dust in a messy circle
-					d.noGravity = true;
-				}
-				for (int i = 0; i < 20; i++)
-				{
-					Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
+                for (int i = 0; i < 8; i++)
+                {
+                    // go around in a octogonal pattern
+                    Vector2 speed = new Vector2((float)Math.Cos(MathHelper.ToRadians(i * 45)) * 25, (float)Math.Sin(MathHelper.ToRadians(i * 45)) * 25);
+
+                    Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.BoldStar>(), speed, Scale: 3f); //Makes dust in a messy circle
+                    d.noGravity = true;
+                }
+                for (int i = 0; i < 20; i++)
+                {
+                    Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
                     Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center, speed, Main.rand.Next(11, 13), Scale: 2f); //double jump smoke
                 }
 
-				if (NPC.direction == -1) //die left
+                if (NPC.direction == -1) //die left
 				{
 					Dust.NewDustPerfect(NPC.position, ModContent.DustType<Dusts.KingDededead>(), new Vector2(NPC.direction * -8, -8), 1);
 				}

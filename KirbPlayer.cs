@@ -3,6 +3,7 @@ using KirboMod.Items.Weapons;
 using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -432,14 +433,17 @@ namespace KirboMod
                 //using item
                 if (player.controlUseItem && player.HeldItem.damage > 0 && player.itemTime != 0)
                 {
-                    if (gloombadgeattackcount >= 20) //reset and shoot projectile
+                    if (gloombadgeattackcount >= 10) //reset and shoot projectile
                     {
                         for (int i = 0; i < 5; i++)
                         {
                             Dust d = Dust.NewDustPerfect(player.Center, Mod.Find<ModDust>("DarkResidue").Type, Main.rand.NextVector2Circular(5f, 5f), Scale: 1f); //Makes dust in a messy circle
                             d.noGravity = true;
                         }
-                        Projectile.NewProjectile(player.GetSource_FromThis(), player.Center + new Vector2( Main.rand.Next(-100, 100), Main.rand.Next(-100, 100)), new Vector2(player.direction * 0.05f, 0), Mod.Find<ModProjectile>("SmallDarkMatterShot").Type, 80, 8f, Main.myPlayer, 0, player.whoAmI);
+
+                        int damage = 40 + player.statDefense / 2;
+                        Projectile.NewProjectile(player.GetSource_FromThis(), player.Center,
+                            Main.rand.NextVector2Circular(20, 20), ModContent.ProjectileType<SmallDarkMatterShot>(), damage, 8f, Main.myPlayer, 0, player.whoAmI);
 
                         gloombadgeattackcount = 0;
                     }
@@ -619,39 +623,17 @@ namespace KirboMod
 
             initialdash = false;
             dir = 1;
-            if (darkDashTimeWindow > 0)
+            darkDashTimeWindow--;
+
+            if (player.controlRight && player.releaseRight && player.doubleTapCardinalTimer[2] < 15) //right
             {
-                darkDashTimeWindow--;
+                initialdash = true;
+                dir = 1;
             }
-            if (darkDashTimeWindow < 0)
+            else if (player.controlLeft && player.releaseLeft && player.doubleTapCardinalTimer[3] < 15) //left
             {
-                darkDashTimeWindow++;
-            }
-            if (player.controlRight && player.releaseRight) //right
-            {
-                if (darkDashTimeWindow > 0)
-                {
-                    initialdash = true;
-                    dir = 1;
-                    darkDashTimeWindow = 0;
-                }
-                else
-                {
-                    darkDashTimeWindow = 15;
-                }
-            }
-            else if (player.controlLeft && player.releaseLeft) //left
-            {
-                if (darkDashTimeWindow < 0)
-                {
-                    initialdash = true;
-                    dir = -1;
-                    darkDashTimeWindow = 0;
-                }
-                else
-                {
-                    darkDashTimeWindow = -15;
-                }
+                initialdash = true;
+                dir = -1;
             }
         }
 
@@ -661,8 +643,9 @@ namespace KirboMod
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    Vector2 speed = Main.rand.NextVector2Circular(3f, 3f); //oval
-                    Projectile.NewProjectile(null, Player.Center, speed, ModContent.ProjectileType<SmallApple>(), 10, 6, Player.whoAmI);
+                    int damage = 10 + Player.statDefense / 2;
+                    Vector2 speed = Main.rand.NextVector2CircularEdge(5f, 5f); //circular spread with constant speed
+                    Projectile.NewProjectile(null, Player.Center, speed, ModContent.ProjectileType<SmallApple>(), damage, 6, Player.whoAmI);
                 }
             }
 

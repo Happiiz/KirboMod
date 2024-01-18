@@ -1,3 +1,4 @@
+using KirboMod.Particles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -55,6 +56,8 @@ namespace KirboMod.Projectiles
             {
                 Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
                 Dust.NewDustPerfect(Projectile.Center + Projectile.velocity, DustID.IcyMerman, speed, Scale: 1f); //Makes dust in a messy circle
+
+                Sparkle b = new(Projectile.Center, Color.Blue, Projectile.velocity.RotatedByRandom(Math.PI * 0.75f), new Vector2(0.2f, 0.2f));
             }
         }
 
@@ -64,16 +67,16 @@ namespace KirboMod.Projectiles
             return true; //collision
         }
 
-        public static Asset<Texture2D> afterimagae;
+        public static Asset<Texture2D> afterimage;
 
         public override bool PreDraw(ref Color lightColor)
         {
             Main.instance.LoadProjectile(Projectile.type);
-            afterimagae = ModContent.Request<Texture2D>(Texture);
-            Texture2D texture = afterimagae.Value;
+            afterimage = ModContent.Request<Texture2D>(Texture);
+            Texture2D texture = afterimage.Value;
 
             // Redraw the projectile with the color not influenced by light
-            for (int k = 1; k < Projectile.oldPos.Length; k++) //start at 1 so not ontop of actual ring
+            for (int k = 1; k < Projectile.oldPos.Length; k++) //start at 1 so not ontop of actual projectile
             {
                 Vector2 drawOrigin = new Vector2(8, 8);
                 Vector2 drawPos = (Projectile.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
@@ -81,8 +84,13 @@ namespace KirboMod.Projectiles
                 Color color = Color.CornflowerBlue * ((Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);
                 Main.EntitySpriteDraw(texture, drawPos, null, color, Projectile.rotation, drawOrigin, 1, SpriteEffects.None, 0);
             }
-
             return true; //draw og
+        }
+
+        public override void PostDraw(Color lightColor)
+        {
+            //add glow ball at tip of arrow
+            VFX.DrawGlowBallAdditive(Projectile.Center + Projectile.velocity * 0.5f, 1.2f, Color.Blue, Color.White);
         }
     }
 }

@@ -33,20 +33,20 @@ namespace KirboMod.Projectiles
 		{
 			Projectile.rotation = Projectile.velocity.ToRotation();
 
-			if (Main.rand.NextBool(5)) // happens 1/5 times
-			{
-				int dustnumber = Dust.NewDust(Projectile.position, 10, 10, ModContent.DustType<Dusts.LilStar>(), Projectile.velocity.X, Projectile.velocity.Y, 0, default, 0.5f); //dust
-				Main.dust[dustnumber].velocity *= 0.2f;
-				Main.dust[dustnumber].noGravity = true;
-			}
-		}
+            if (Main.rand.NextBool(2)) // happens 1/2 times
+            {
+                int dustnumber = Dust.NewDust(Projectile.position, 10, 10, DustID.Enchanted_Gold, 0f, 0f, 200, default, 1.5f); //dust
+                Main.dust[dustnumber].velocity *= 0.2f;
+                Main.dust[dustnumber].noGravity = true;
+            }
+        }
 
         public override void OnKill(int timeLeft) //when the projectile dies
         {
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 5; i++)
             {
-                Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-                Dust.NewDustPerfect(Projectile.Center + Projectile.velocity, ModContent.DustType<Dusts.LilStar>(), speed, Scale: 1f); //Makes dust in a messy circle
+                Vector2 velocity = Projectile.velocity.RotatedByRandom(MathF.PI / 4) / Main.rand.Next(2, 4); //spread
+                Dust.NewDustPerfect(Projectile.Center + Projectile.velocity, DustID.Enchanted_Gold, velocity, Scale: 1.5f); //Makes dust in a messy circle
             }
         }
 
