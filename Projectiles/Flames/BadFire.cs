@@ -1,6 +1,8 @@
+using KirboMod.Projectiles.Lightnings;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
+using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles.Flames
 {

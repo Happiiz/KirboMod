@@ -1348,6 +1348,7 @@ Mods: {
 			MatterOrbVertical.DisplayName: Matter Orb
 			KrackoJrCannonball.DisplayName: Kracko Jr Cannonball
 			KrackoJrBomb.DisplayName: Kracko Jr Bomb
+			LightningProj.DisplayName: Lightning Proj
 		}
 
 		NPCs: {

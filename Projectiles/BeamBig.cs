@@ -91,5 +91,9 @@ namespace KirboMod.Projectiles
 			VFX.DrawPrettyStarSparkle(Projectile.Opacity, Projectile.Center - Main.screenPosition + randomOffset, new Color(255, 255, 255, 0), possibleColors[Main.rand.Next(possibleColors.Length)], 1, 0, 1, 1, 2, Projectile.rotation, sparkleScale, fatness);
 			return false;
         }
+        public override void OnHitPlayer(Player target, Player.HurtInfo info)
+        {
+			target.AddBuff(BuffID.Electrified, 60);
+        }
     }
 }

@@ -1,4 +1,5 @@
 using KirboMod.Projectiles;
+using KirboMod.Projectiles.Lightnings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -426,10 +427,17 @@ namespace KirboMod.NPCs
                 int fireRate = frenzy ? 2 : 4;
                 NPC.velocity.Y = 0;
                 NPC.velocity.X = -attackDirection * thunderSlideSpeed * easingMultiplier;
-                if (NPC.ai[0] % fireRate == 0 && Main.netMode != NetmodeID.MultiplayerClient && easingMultiplier == 1)
+                if (NPC.ai[0] % fireRate == 0)
                 {//												offset down a bit so it lookslike it's coming out below kracko
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y + 100, 0, 5.5f, ModContent.ProjectileType<KrackoLightning>(), 25 / 2, 2f, Main.myPlayer, 0, 0);
-                    SoundEngine.PlaySound(SoundID.Thunder with { MaxInstances = 0 }, NPC.Center);
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        Vector2 spawnVel = new Vector2(0, 20);
+                        LightningProj.GetSpawningStats(spawnVel, out float ai0, out float ai1);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.velocity.X, NPC.Center.Y + 30, spawnVel.X, spawnVel.Y, ModContent.ProjectileType<KrackoLightning>(), 25 / 2, 2f, Main.myPlayer, ai0, ai1);
+                    }
+                    SoundStyle sound = new SoundStyle("Terraria/Sounds/Thunder_" + Main.rand.Next(4));
+                    SoundEngine.PlaySound(sound with { MaxInstances = 0, Volume = .2f}, NPC.Center);
+
                 }
             }
 
