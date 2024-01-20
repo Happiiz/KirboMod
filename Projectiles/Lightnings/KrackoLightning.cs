@@ -17,14 +17,12 @@ namespace KirboMod.Projectiles.Lightnings
         }
         public override void SetDefaults()
         {
-            base.SetStaticDefaults();
-
             base.SetDefaults();
             Projectile.hostile = true;
             innerColor = Color.White;
             outerColor = Color.Lerp(Color.White, VFX.RndElectricCol, 0.4f);
             width = 10;
-            maxDeviation = 200;
+            maxDeviation = 150;
             Projectile.tileCollide = true;
             Projectile.penetrate = -1;
         }

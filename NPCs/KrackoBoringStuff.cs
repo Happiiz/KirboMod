@@ -132,12 +132,13 @@ namespace KirboMod.NPCs
 				}
 			}
 		}
-
-		public override Color? GetAlpha(Color lightColor)
+        float DarknessProgressForThunder => Utils.GetLerpValue(15, 40, NPC.ai[0], true);
+        public override Color? GetAlpha(Color lightColor)
 		{
-			 if (attacktype == KrackoAttackType.Lightning) //frenzy
+			
+			if (attacktype == KrackoAttackType.Lightning)
 			{
-				int darkness = (int)Utils.Remap(NPC.ai[0], 30, 60, 255, 60);
+				int darkness = (int)MathHelper.Lerp(255, 60, DarknessProgressForThunder);
 				return new Color(darkness, darkness, darkness); //darken for thunder
 			}
 			else

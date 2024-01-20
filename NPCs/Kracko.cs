@@ -26,6 +26,7 @@ namespace KirboMod.NPCs
         float beamCurvingAngleMultiplier = 0.05f;
         int numberOfBeamsPerSpiral = 70;
         private sbyte attackDirection = 1;
+        //todo: rename to next attack type and rework algorithm
         private KrackoAttackType lastattacktype = KrackoAttackType.DecideNext; //sets last attack type
         private bool transitioning = false; //checks if going through expert mode exclusive phase
         private bool frenzy = false; //checks if going in frenzy mode in expert mode
@@ -385,9 +386,13 @@ namespace KirboMod.NPCs
             float attackStart = 80;
             float attackEnd = 180;
             float attackDuration = attackEnd - attackStart;
+            float thunderYHeightOffset = -400;
+            float thunderXOffset = 650;
             if (frenzy)
             {
-                thunderSlideSpeed *= 1.6f;
+                thunderYHeightOffset -= 60;
+                thunderSlideSpeed *= 1.5f;
+                thunderXOffset += 60;
                 speed *= 2;
                 attackDuration = MathF.Round(attackDuration * 0.65f);
                 attackEnd = attackStart + attackDuration;
@@ -409,7 +414,7 @@ namespace KirboMod.NPCs
                 }
                 else //move
                 {
-                    Vector2 targetPos = Main.player[NPC.target].Center + new Vector2(650 * attackDirection, -400);
+                    Vector2 targetPos = Main.player[NPC.target].Center + new Vector2(thunderXOffset * attackDirection, thunderYHeightOffset);
                     Vector2 distanceDiagonalRightOfPlayer = targetPos - NPC.Center;
                     distanceDiagonalRightOfPlayer.Normalize();
                     distanceDiagonalRightOfPlayer *= speed;
@@ -431,12 +436,12 @@ namespace KirboMod.NPCs
                 {//												offset down a bit so it lookslike it's coming out below kracko
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        Vector2 spawnVel = new Vector2(0, 20);
+                        Vector2 spawnVel = new Vector2(0, 16);
                         LightningProj.GetSpawningStats(spawnVel, out float ai0, out float ai1);
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.velocity.X, NPC.Center.Y + 30, spawnVel.X, spawnVel.Y, ModContent.ProjectileType<KrackoLightning>(), 25 / 2, 2f, Main.myPlayer, ai0, ai1);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + Main.rand.Next(-20,21) + NPC.velocity.X * 2, NPC.Center.Y + 84 + Main.rand.Next(-20, 21), spawnVel.X, spawnVel.Y, ModContent.ProjectileType<KrackoLightning>(), 25 / 2, 2f, Main.myPlayer, ai0, ai1);
                     }
                     SoundStyle sound = new SoundStyle("Terraria/Sounds/Thunder_" + Main.rand.Next(4));
-                    SoundEngine.PlaySound(sound with { MaxInstances = 0, Volume = .2f}, NPC.Center);
+                    SoundEngine.PlaySound(sound with { MaxInstances = 0, Volume = .4f}, NPC.Center);
 
                 }
             }
@@ -473,6 +478,11 @@ namespace KirboMod.NPCs
         static Asset<Texture2D> spikes;
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            float darkness = DarknessProgressForThunder;
+            if (attacktype == KrackoAttackType.Lightning)
+            {
+                VFX.DrawGlowBallDiffuse(NPC.Center + new Vector2(0, 84), 4f, VFX.RndElectricCol * darkness, Color.White);
+            }
             Player player = Main.player[NPC.target];
             bool drawEyelid = (transitioning && NPC.ai[2] > 0 && NPC.ai[2] <= 180) || frenzy;
             float offsetLength = 6.5f;
@@ -488,6 +498,7 @@ namespace KirboMod.NPCs
             spriteBatch.Draw(pupil.Value, NPC.Center - screenPos + pupilOffset, null, Color.White, 0, pupil.Size() / 2, 1, SpriteEffects.None, 0);
             if (drawEyelid)
                 spriteBatch.Draw(eyelid.Value, NPC.Center - screenPos, null, Color.White, 0, eyelid.Size() / 2, 1, SpriteEffects.None, 0);
+           
             return false;
         }
 

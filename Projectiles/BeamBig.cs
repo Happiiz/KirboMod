@@ -73,7 +73,7 @@ namespace KirboMod.Projectiles
         Color RndElectricCol { get => (Main.rand.NextBool(2, 5) ? Color.Yellow : Color.Cyan) * Projectile.Opacity; }
         public override bool PreDraw(ref Color lightColor)
         {
-			Color[] possibleColors = [Color.Yellow, Color.Cyan, Color.Cyan];
+			Color[] possibleColors = new Color[] { Color.Yellow, Color.Cyan, Color.Cyan };
 			Vector2 randomOffset = Main.rand.NextVector2Circular(4, 4);
 			Vector2 fatness = Vector2.One;//feel free to mess around with
 			Vector2 sparkleScale = Vector2.One;//these values to see what thet change
