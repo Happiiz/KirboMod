@@ -223,27 +223,19 @@ namespace KirboMod.NPCs
 		public override void SendExtraAI(BinaryWriter writer)
 		{
 			writer.Write((byte)attacktype); //send non NPC.ai array info to servers
-			writer.Write(doodelay); //send non NPC.ai array info to servers
-			writer.Write(attackDirection); //send non NPC.ai array info to servers
-			writer.Write((byte)lastattacktype); //send non NPC.ai array info to servers
-			writer.Write(sweepheight); //send non NPC.ai array info to servers
-			writer.Write(sweepX); //send non NPC.ai array info to servers
-			writer.Write(sweepY); //send non NPC.ai array info to servers
-			writer.Write(transitioning); //send non NPC.ai array info to servers
-			writer.Write(frenzy); //send non NPC.ai array info to servers
+			writer.Write((byte)doodelay); //send non NPC.ai array info to servers
+			writer.Write((byte)nextAttackType); //send non NPC.ai array info to servers
+			BitsByte b = new BitsByte(transitioning, frenzy, attackDirection);
+			writer.Write(b); //send non NPC.ai array info to servers
 		}
 
 		public override void ReceiveExtraAI(BinaryReader reader)
 		{
 			attacktype = (KrackoAttackType)reader.ReadByte(); //sync in multiplayer
-			doodelay = reader.ReadInt32(); //sync in multiplayer
-			attackDirection = reader.ReadSByte(); //sync in multiplayer
-			lastattacktype = (KrackoAttackType)reader.ReadByte(); //sync in multiplayer
-			sweepheight = reader.ReadSingle(); //sync in multiplayer
-			sweepX = reader.ReadSingle(); //sync in multiplayer
-			sweepY = reader.ReadSingle(); //sync in multiplayer
-			transitioning = reader.ReadBoolean(); //sync in multiplayer
-			frenzy = reader.ReadBoolean(); //sync in multiplayer
+			doodelay = reader.ReadByte(); //sync in multiplayer
+			nextAttackType = (KrackoAttackType)reader.ReadByte(); //sync in multiplayer
+			BitsByte b = reader.ReadByte(); //sync in multiplayer
+			b.Retrieve(ref transitioning, ref frenzy, ref attackDirection);
 		}
 	}
 }
