@@ -40,10 +40,11 @@ namespace KirboMod.Items.Weapons
 
 		public override void AddRecipes()
 		{
-			Recipe recipe = CreateRecipe();//the result is staff
-			recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20); //20 starbits
-			recipe.AddTile(TileID.Anvils); //crafted at anvil
-			recipe.Register(); //adds this recipe to the game
+			Recipe beamstaff = CreateRecipe();//the result is staff
+            beamstaff.AddIngredient(ModContent.ItemType<Starbit>(), 20); //20 starbits
+            beamstaff.AddRecipeGroup(RecipeGroupID.IronBar, 10); //10 iron/lead bars
+            beamstaff.AddTile(TileID.Anvils); //crafted at anvil
+            beamstaff.Register(); //adds this recipe to the game
 		}
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {

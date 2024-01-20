@@ -87,67 +87,53 @@ namespace KirboMod.NPCs.MidBosses
 			NPC.spriteDirection = NPC.direction;
 			Player player = Main.player[NPC.target];
 
-			if (attacktype == -1)
-			{
-				Spawned();
+            NPC.ai[0]++; //attack delay timer
 
-				if (NPC.velocity.Y == 0 && NPC.collideY) //touching tile and not falling
-				{
-					NPC.dontTakeDamage = false; //hittable
-					NPC.damage = NPC.defDamage; //regular damage
-					attacktype = 0; //start attack cycle
-				}
-			}
-			else
-			{
-				NPC.ai[0]++; //attack delay timer
+            if (NPC.ai[0] < 120) //not attacking
+            {
+                attacktype = 0; //walking
+            }
+            else
+            {
+                if (NPC.ai[0] == 120)
+                {
+                    NPC.noTileCollide = false; //don't phase through tiles
 
-				if (NPC.ai[0] < 120) //not attacking
-				{
-					attacktype = 0; //walking
-				}
-				else
-				{
-					if (NPC.ai[0] == 120)
-					{
-						NPC.noTileCollide = false; //don't phase through tiles
+                    if (lastattack == 2) //coconut was last
+                    {
+                        attacktype = 1; //hammer
+                        lastattack = 1; //next is coconut
+                    }
+                    else
+                    {
+                        attacktype = 2; //coconut
+                        lastattack = 2; //next is hammer
+                    }
+                }
 
-						if (lastattack == 2) //coconut was last
-						{
-							attacktype = 1; //hammer
-							lastattack = 1; //next is coconut
-						}
-						else
-						{
-							attacktype = 2; //coconut
-							lastattack = 2; //next is hammer
-						}
-					}
+                NPC.ai[1]++; //attack timer
+            }
 
-					NPC.ai[1]++; //attack timer
-				}
+            if (player.dead) //player has died
+            {
+                attacktype = 0; //walk
+                NPC.ai[0] = 0;
+                NPC.ai[1] = 0;
+            }
 
-				if (player.dead) //player has died
-				{
-					attacktype = 0; //walk
-					NPC.ai[0] = 0;
-					NPC.ai[1] = 0;
-				}
-
-				//declaring attacktype values
-				if (attacktype == 0)
-				{
-					Walk();
-				}
-				if (attacktype == 1)
-				{
-					Hammer();
-				}
-				if (attacktype == 2)
-				{
-					ExplosiveCoconut();
-				}
-			}
+            //declaring attacktype values
+            if (attacktype == 0)
+            {
+                Walk();
+            }
+            if (attacktype == 1)
+            {
+                Hammer();
+            }
+            if (attacktype == 2)
+            {
+                ExplosiveCoconut();
+            }
 
             //for stepping up tiles
             Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
@@ -202,13 +188,6 @@ namespace KirboMod.NPCs.MidBosses
 				}
 			}
 		}
-
-        private void Spawned() //do nothing
-        {
-            NPC.velocity.X *= 0.8f; //slow
-			NPC.dontTakeDamage = true; //immune
-			NPC.damage = 0; //dont deal damage
-        }
 
         private void Walk() //walk towards player
 		{

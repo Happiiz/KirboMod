@@ -193,36 +193,6 @@ namespace KirboMod
                     }
                 }
             }
-            //holding Triple Star Rod
-            //if (player.HeldItem.type == tripleStar && !player.dead && player.active) //holding Triple Star Rod
-            //{
-            //    for (int i = 0; i < HasTripleStars.Length; i++)
-            //    {
-            //        tripleStarIndexes[i] = -1;
-            //    }
-            //    //for (int i = 0; i < player.ownedProjectileCounts[tripleStarStar]; i++)
-            //    //{
-            //    //    HasTripleStars[i] = false;
-            //    //}
-            //    for (int i = 0; i < 3; i++) //to 3
-            //    {
-            //        float finalDamage = player.GetTotalDamage(Player.HeldItem.DamageType).ApplyTo(Player.HeldItem.damage); //final damage calculated
-
-            //        if (tripleStarIndexes[i] == -1) //checks each one to see if it has the triple stars
-            //        {
-
-            //            tripleStarIndexes[i] = Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, Vector2.Zero,
-            //                ModContent.ProjectileType<CyclingStar>(), (int)finalDamage, 0, player.whoAmI, 0, i);
-            //        }
-            //    }
-            //}
-            //else //not holding
-            //{
-            //    //no stars circle
-            //    HasTripleStars[0] = false;
-            //    HasTripleStars[0] = false;
-            //    HasTripleStars[0] = false;
-            //}
 
             //Plasma
 
@@ -354,7 +324,7 @@ namespace KirboMod
                         && (Main.tile[mouselocation.X, mouselocation.Y].LiquidType == LiquidID.Lava) == false)
                     {
                         //before effect
-                        Projectile.NewProjectile(null, player.Center, Vector2.Zero, ModContent.ProjectileType<NightCrownEffect>(), 0, 0, player.whoAmI);
+                        Projectile.NewProjectile(Player.GetSource_FromThis(), player.Center, Vector2.Zero, ModContent.ProjectileType<NightCrownEffect>(), 0, 0, player.whoAmI);
 
                         player.Teleport(Main.MouseWorld, -1);
                         
@@ -501,16 +471,8 @@ namespace KirboMod
                     if (rectangle.Intersects(rect) && (npc.noTileCollide || player.CanHit(npc)))
                     {
                         float damage = player.GetTotalDamage(DamageClass.Melee).ApplyTo(35f);
-                        float knockback = player.GetTotalKnockback(DamageClass.Melee).ApplyTo(9f);
                         bool crit = false;
-                        if (player.kbGlove)
-                        {
-                            knockback *= 2f;
-                        }
-                        if (player.kbBuff)
-                        {
-                            knockback *= 1.5f;
-                        }
+
                         if (Main.rand.Next(100) < player.GetTotalCritChance(DamageClass.Melee))
                         {
                             crit = true;
@@ -527,7 +489,7 @@ namespace KirboMod
                         }
                         if (player.whoAmI == Main.myPlayer) //deal contact damage
                         {
-                            player.ApplyDamageToNPC(npc, (int)damage, knockback, player.direction, crit);
+                            player.ApplyDamageToNPC(npc, (int)damage, 0f, player.direction, crit);
                         }
                     }
                 }
@@ -539,7 +501,6 @@ namespace KirboMod
             }
             else if (darkDashDelay < 0) //dash delay less than zero 
             {
-
                 player.StopVanityActions();
 
                 //dusts
@@ -551,7 +512,6 @@ namespace KirboMod
                     Main.dust[d].velocity *= 0.2f;
                 }
 
-                player.statDefense += 60; //increase defense by 60 for dash duration
                 player.noKnockback = true; //disable knockback
                 player.vortexStealthActive = false; //turn off vortex stealth
 
@@ -569,7 +529,7 @@ namespace KirboMod
                     return;
                 }
 
-                darkDashDelay = 20; //set delay cooldown I guess
+                darkDashDelay = 20; //set delay cooldown 
 
                 //idk what this solves
                 if (player.velocity.X < 0f)
@@ -645,7 +605,7 @@ namespace KirboMod
                 {
                     int damage = 10 + Player.statDefense / 2;
                     Vector2 speed = Main.rand.NextVector2CircularEdge(5f, 5f); //circular spread with constant speed
-                    Projectile.NewProjectile(null, Player.Center, speed, ModContent.ProjectileType<SmallApple>(), damage, 6, Player.whoAmI);
+                    Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, speed, ModContent.ProjectileType<SmallApple>(), damage, 6, Player.whoAmI);
                 }
             }
 
@@ -653,28 +613,24 @@ namespace KirboMod
             if (nightcloak == true)
             {
                 //Pretty self explanatory
-                int damage = Player.HeldItem.damage;
-                if (damage < 50)
-                {
-                    damage = 50;
-                }
+                int damage = 10 + Player.statDefense / 2;
 
                 //down right
-                Projectile.NewProjectile(null, Player.Center.X, Player.Center.Y, 7, 7, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
+                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, 7, 7, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
                 //right
-                Projectile.NewProjectile(null, Player.Center.X, Player.Center.Y, 10, 0, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
+                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, 10, 0, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
                 //up right
-                Projectile.NewProjectile(null, Player.Center.X, Player.Center.Y, 7, -7, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
+                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, 7, -7, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
                 //up
-                Projectile.NewProjectile(null, Player.Center.X, Player.Center.Y, 0, -10, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
+                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, 0, -10, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
                 //up left
-                Projectile.NewProjectile(null, Player.Center.X, Player.Center.Y, -7, -7, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
+                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, -7, -7, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
                 //left
-                Projectile.NewProjectile(null, Player.Center.X, Player.Center.Y, -10, 0, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
+                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, -10, 0, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
                 //down left
-                Projectile.NewProjectile(null, Player.Center.X, Player.Center.Y, -7, 7, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
+                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, -7, 7, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
                 //down
-                Projectile.NewProjectile(null, Player.Center.X, Player.Center.Y, 0, 10, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
+                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, 0, 10, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
 
                 SoundEngine.PlaySound(SoundID.Item4, Player.Center); //life crystal
             }

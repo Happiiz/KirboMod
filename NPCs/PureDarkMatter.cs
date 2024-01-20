@@ -668,7 +668,7 @@ namespace KirboMod.NPCs
             float speed = 30f;
             float inertia = 10f;
 
-            Vector2 move = player.Center + new Vector2(0, -500) - NPC.Center; //move above
+            Vector2 move = player.Center + new Vector2(0, -200) - NPC.Center; //move above
 
 
             NPC.direction = -1;
@@ -681,18 +681,18 @@ namespace KirboMod.NPCs
                 move *= speed;
                 NPC.velocity = (NPC.velocity * (inertia - 1) + move) / inertia;
             }
-            else if (NPC.ai[0] < 210)
+            else if (NPC.ai[0] < 240)
             {
-                if (NPC.ai[0] < 150) //full rotation once
+                if (NPC.ai[0] < 180) //full rotation once
                 {
                     NPC.rotation -= MathHelper.ToRadians(12f);
                 }
 
                 NPC.velocity *= 0.01f;
             }
-            else if (NPC.ai[0] < 498)
+            else if (NPC.ai[0] < 480)
             {
-                NPC.rotation -= MathHelper.ToRadians(6.25f);
+                NPC.rotation -= MathHelper.ToRadians(3f);
 
                 Vector2 velocity = NPC.rotation.ToRotationVector2() * 30;
 
@@ -700,7 +700,7 @@ namespace KirboMod.NPCs
 
                 SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
             }
-            else if (NPC.ai[0] > 528) //reset
+            else if (NPC.ai[0] > 510) //reset
             {
                 NPC.rotation = 0;
                 NPC.ai[0] = 29;

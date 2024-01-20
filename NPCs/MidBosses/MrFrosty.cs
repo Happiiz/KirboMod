@@ -87,76 +87,62 @@ namespace KirboMod.NPCs.MidBosses
 			Player player = Main.player[NPC.target];
 			Vector2 distance = player.Center - NPC.Center;
 
-			if (attacktype == -1)
-			{
-				Spawned();
+            if (NPC.ai[0] == 0) //not attacking
+            {
+                attacktype = 0; //standing
+                NPC.ai[3]++; //attack timer
+            }
+            else
+            {
+                NPC.ai[3] = 0; //restart attack timer
+            }
 
-				if (NPC.velocity.Y == 0 && NPC.collideY) //touching tile and not falling
-				{
-					NPC.dontTakeDamage = false; //hittable
-					NPC.damage = NPC.defDamage; //regular damage
-					attacktype = 0; //start attack cycle
-				}
-			}
-			else
-			{
-				if (NPC.ai[0] == 0) //not attacking
-				{
-					attacktype = 0; //standing
-					NPC.ai[3]++; //attack timer
-				}
-				else
-				{
-					NPC.ai[3] = 0; //restart attack timer
-				}
+            if (NPC.ai[3] >= (Main.expertMode ? 50 : 100)) //times up! (50 if in expertmode)
+            {
+                if (attacktype == 0)
+                {
+                    NPC.ai[0] += 1; //attack!
+                    NPC.ai[3] = 0;
+                }
+            }
 
-				if (NPC.ai[3] >= (Main.expertMode ? 50 : 100)) //times up! (50 if in expertmode)
-				{
-					if (attacktype == 0)
-					{
-						NPC.ai[0] += 1; //attack!
-						NPC.ai[3] = 0;
-					}
-				}
+            if (NPC.ai[0] == 1) //stancing or 
+            {
+                if (lastattack == 2) //ice
+                {
+                    attacktype = 1; //dash
+                    lastattack = 1; //also ddash
+                }
+                else
+                {
+                    attacktype = 2; //ice
+                    lastattack = 2; //also ice
+                }
 
-				if (NPC.ai[0] == 1) //stancing or 
-				{
-					if (lastattack == 2) //ice
-					{
-						attacktype = 1; //dash
-						lastattack = 1; //also ddash
-					}
-					else
-					{
-						attacktype = 2; //ice
-						lastattack = 2; //also ice
-					}
+            }
 
-				}
+            if (player.dead) //player has died
+            {
+                attacktype = 1; //dive dash
+            }
 
-				if (player.dead) //player has died
-				{
-					attacktype = 1; //dive dash
-				}
+            //declaring attacktype values
+            if (attacktype == 0)
+            {
+                Stance();
+            }
+            if (attacktype == 1)
+            {
+                DiveDash();
+            }
+            if (attacktype == 2)
+            {
+                IceToss();
+            }
 
-				//declaring attacktype values
-				if (attacktype == 0)
-				{
-					Stance();
-				}
-				if (attacktype == 1)
-				{
-					DiveDash();
-				}
-				if (attacktype == 2)
-				{
-					IceToss();
-				}
-
-				//for stepping up tiles
-				Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
-			}
-		}
+            //for stepping up tiles
+            Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
+        }
 
 		public override void FindFrame(int frameHeight) // animation
 		{
@@ -215,12 +201,6 @@ namespace KirboMod.NPCs.MidBosses
 				}
 			}
 		}
-        private void Spawned() //do nothing
-        {
-            NPC.velocity.X *= 0.8f; //slow
-            NPC.dontTakeDamage = true; //immune
-            NPC.damage = 0; //dont deal damage
-        }
 
         private void Stance() //stand up straight
 		{

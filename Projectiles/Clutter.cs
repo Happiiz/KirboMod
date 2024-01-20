@@ -55,5 +55,11 @@ namespace KirboMod.Projectiles
 			}
 			return false;
 		}
+
+        public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
+        {
+            fallThrough = false; //don't fall through platforms
+            return true;
+        }
     }
 }

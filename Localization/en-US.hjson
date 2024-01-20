@@ -110,11 +110,7 @@ Mods: {
 
 			NightCloak: {
 				DisplayName: Night Cloak
-				Tooltip:
-					'''
-					Shoots stars in eight directions upon being hit
-					Stars deal as much damage as the item you're holding, minimum being 50 damage
-					'''
+				Tooltip: Shoots stars in eight directions upon being hit
 			}
 
 			PeeWeePole: {
@@ -300,7 +296,7 @@ Mods: {
 				Tooltip:
 					'''
 					Allows the player to dash through enemies, dealing damage
-					Defense is increased while dashing
+					Damage is reduced by 30% while dashing
 					Double tap a direction
 					'''
 			}
@@ -1075,7 +1071,11 @@ Mods: {
 
 			WhispySeed: {
 				DisplayName: Suspicious Looking Seed
-				Tooltip: Summons Whispy Woods
+				Tooltip:
+					'''
+					Summons Whispy Woods
+					'Plant on wide flat ground for better results!' 
+					'''
 			}
 
 			WhispyBag: {

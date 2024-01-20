@@ -38,10 +38,11 @@ namespace KirboMod.Items.Weapons
 		}
 		public override void AddRecipes()
 		{
-			Recipe recipe1 = CreateRecipe();//the result is cutter
-			recipe1.AddIngredient(ModContent.ItemType<Starbit>(), 20); //20 starbits
-			recipe1.AddTile(TileID.Anvils); //crafted at anvil
-			recipe1.Register(); //adds this recipe to the game
+			Recipe cutter = CreateRecipe();//the result is cutter
+            cutter.AddIngredient(ModContent.ItemType<Starbit>(), 20); //20 starbits
+            cutter.AddIngredient(ItemID.WoodenBoomerang);
+            cutter.AddTile(TileID.Anvils); //crafted at anvil
+            cutter.Register(); //adds this recipe to the game
 		}
 	}
 }

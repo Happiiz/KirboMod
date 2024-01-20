@@ -57,9 +57,19 @@ namespace KirboMod.Projectiles
              }
         }
 
-        public override bool OnTileCollide(Vector2 oldVelocity) 
+        public override bool OnTileCollide(Vector2 oldVelocity)
         {
-			return false; //dont die
-		}
+            if (Projectile.velocity.X != oldVelocity.X) //bounce
+            {
+                Projectile.velocity.X = -oldVelocity.X;
+            }
+            return false; //dont die
+        }
+
+        public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
+        {
+            fallThrough = false; //don't fall through platforms
+            return true;
+        }
     }
 }
