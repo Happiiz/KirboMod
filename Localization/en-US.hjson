@@ -397,7 +397,6 @@ Mods: {
 				Tooltip:
 					'''
 					Summons a personal cloud to shock your enemies
-					{$CommonItemTooltip.DefenseVariesDamage}
 					'''
 			}
 
