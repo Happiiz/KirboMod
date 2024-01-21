@@ -21,7 +21,7 @@ namespace KirboMod.Projectiles
 			Projectile.DamageType = DamageClass.Magic;
 			Projectile.timeLeft = 15;
 			Projectile.tileCollide = false;
-			Projectile.penetrate = 99;
+			Projectile.penetrate = -1;
 			
 		}
 		public override void AI()
@@ -38,7 +38,7 @@ namespace KirboMod.Projectiles
 		}
         public override bool PreDraw(ref Color lightColor)
         {
-			VFX.DrawElectricOrb(Projectile.Center, new Vector2(1.6f), Projectile.Opacity, Projectile.rotation);
+			VFX.DrawElectricOrb(Projectile.Center, new Vector2(1.2f), Projectile.Opacity, Projectile.rotation);
 			return false;
         }
         public override Color? GetAlpha(Color lightColor)

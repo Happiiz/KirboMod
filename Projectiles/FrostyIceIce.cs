@@ -20,21 +20,38 @@ namespace KirboMod.Projectiles
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Magic;
 			Projectile.timeLeft = 20;
-			Projectile.tileCollide = false;
-			Projectile.penetrate = 99;
+			Projectile.tileCollide = true;
+			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
-			Projectile.usesLocalNPCImmunity = true;
-			Projectile.localNPCHitCooldown = 10;
-		}
+            Projectile.usesIDStaticNPCImmunity = true;
+            Projectile.idStaticNPCHitCooldown = 10;
+        }
 		public override void AI()
-		{
-			Projectile.scale = Projectile.scale + 0.025f;
-			if (Main.rand.NextBool(75)) // happens 1/75 times
+        {
+            //scale with timeLeft
+            Projectile.scale = 1 + 0.05f * (10 - Projectile.timeLeft) < 1.5f ? 1 + 0.05f * (10 - Projectile.timeLeft) : 1.5f;
+
+            if (Main.rand.NextBool(100)) // happens 1/100 times
 			{
 				//swap X vel and Y vel(also make them negative)
-				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity.RotatedByRandom(MathHelper.ToDegrees(5)) / 2, ModContent.ProjectileType<Projectiles.FrostySculpture>(), Projectile.damage, 0.1f, Projectile.owner);
+				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity / 2, ModContent.ProjectileType<Projectiles.FrostySculpture>(), Projectile.damage, 0f, Projectile.owner);
 			}
-		}
+
+            if (Projectile.timeLeft <= 5) //fade when close to death
+            {
+                Projectile.alpha += 51;
+            }
+        }
+
+        public override bool OnTileCollide(Vector2 oldVelocity)
+        {
+            //stop projectile
+            Projectile.velocity *= 0.1f;
+
+            Projectile.timeLeft = 5;
+
+            return false;
+        }
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {

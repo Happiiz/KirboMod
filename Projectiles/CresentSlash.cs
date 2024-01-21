@@ -1,4 +1,8 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
+using System;
+using System.Security.Policy;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -9,9 +13,10 @@ namespace KirboMod.Projectiles
 	public class CresentSlash : ModProjectile
 	{
 		public override void SetStaticDefaults()
-		{ 
-
-		}
+		{
+            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 4; // The length of old position to be recorded
+            ProjectileID.Sets.TrailingMode[Projectile.type] = 0; // The recording mode
+        }
 
 		public override void SetDefaults()
 		{
@@ -74,5 +79,25 @@ namespace KirboMod.Projectiles
 		{
 			return Color.White; // Makes it uneffected by light
 		}
+
+		public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+		{
+			Projectile.damage = (int)(Projectile.damage * 0.75f); //reduce
+		}
+
+        public override bool? CanHitNPC(NPC target) //can hit only if there's a line of sight
+        {
+            return Collision.CanHit(Projectile, target);
+        }
+        public override bool CanHitPvp(Player target) //can hit only if there's a line of sight
+        {
+            return Collision.CanHit(Projectile, target);
+        }
+
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+        {
+            //make collision into a half circle
+            return Utils.IntersectsConeFastInaccurate(targetHitbox, projHitbox.Center(), 100, Projectile.rotation, MathF.PI / 2);
+        } 
     }
 }

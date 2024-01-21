@@ -17,13 +17,17 @@ namespace KirboMod.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 70;
-			Projectile.height = 70;
+			Projectile.width = 10;
+			Projectile.height = 10;
+			DrawOffsetX = -30;
+			DrawOriginOffsetY = -30;
 			Projectile.friendly = true;
 			Projectile.timeLeft = 500;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
-		}
+            Projectile.usesIDStaticNPCImmunity = true;
+            Projectile.idStaticNPCHitCooldown = 10;
+        }
 
 		public override void AI()
 		{
@@ -52,5 +56,21 @@ namespace KirboMod.Projectiles
 				d.noGravity = true;
 			}
 		}
+
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) //make hitbox into a centered rectangle
+        {
+            Rectangle hitbox = Utils.CenteredRectangle(Projectile.Center, new Vector2(70, 70));
+
+            return hitbox.Intersects(targetHitbox);
+        }
+
+        public override bool? CanHitNPC(NPC target) //can hit only if there's a line of sight
+        {
+            return Collision.CanHit(Projectile, target);
+        }
+        public override bool CanHitPvp(Player target) //can hit only if there's a line of sight
+        {
+            return Collision.CanHit(Projectile, target);
+        }
     }
 }

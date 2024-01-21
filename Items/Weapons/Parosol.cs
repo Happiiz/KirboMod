@@ -30,7 +30,7 @@ namespace KirboMod.Items.Weapons
 			Item.useAnimation = 36;
 			Item.useStyle = ItemUseStyleID.Swing;
 			Item.value = Item.buyPrice(0, 0, 0, 20);
-			Item.rare = ItemRarityID.White;
+			Item.rare = ItemRarityID.Blue;
 			Item.UseSound = SoundID.Item44;
 
 			// These below are needed for a minion weapon
@@ -56,10 +56,11 @@ namespace KirboMod.Items.Weapons
 
 		public override void AddRecipes()
 		{
-			Recipe recipe = CreateRecipe();
-			recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
-			recipe.AddTile(TileID.Anvils);
-			recipe.Register();
+			Recipe parasol = CreateRecipe();
+            parasol.AddIngredient(ModContent.ItemType<Starbit>(), 20);
+            parasol.AddIngredient(ItemID.Umbrella);
+            parasol.AddTile(TileID.Anvils);
+            parasol.Register();
 		}
 	}
 }

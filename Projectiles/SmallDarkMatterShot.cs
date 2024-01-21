@@ -29,8 +29,6 @@ namespace KirboMod.Projectiles
 
 		public override void AI()
 		{
-			Projectile.spriteDirection = Projectile.direction;
-
 			if (Main.rand.NextBool(5)) // happens 1/5 times
 			{
 				int dustnumber = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, Mod.Find<ModDust>("DarkResidue").Type, 0f, 0f, 0, Color.White, 0.5f); //dust
@@ -48,32 +46,36 @@ namespace KirboMod.Projectiles
 				}
 			}
 
-			Projectile.velocity.X *= 1.08f; //speed up
-
 			Player player = Main.player[Projectile.owner];
 
-			//go up or down if going fast enough
-			if (Math.Abs(Projectile.velocity.X) > 10 && player.whoAmI == Main.myPlayer)
+			Projectile.ai[0]++;
+
+			if (Main.myPlayer == player.whoAmI) //uses mouse location so yea
 			{
-				if (Main.MouseWorld.Y < Projectile.Center.Y)
+				if (Projectile.ai[0] < 30)
 				{
-					Projectile.velocity.Y -= 0.6f;
+					Projectile.velocity *= 0.9f;
+
+					Vector2 direction = Main.MouseWorld - player.Center;
+
+					Projectile.rotation = direction.ToRotation();
 				}
-				else
+				else if (Projectile.ai[0] == 30)
 				{
-					Projectile.velocity.Y += 0.6f;
+					Vector2 direction = Main.MouseWorld - player.Center;
+					direction.Normalize();
+					direction *= 1;
+
+					Projectile.velocity = direction;
+
+					Projectile.rotation = Projectile.velocity.ToRotation();
+				}
+				else if (Projectile.ai[0] < 90) //speed up for a second
+				{
+					Projectile.velocity *= 1.1f;
 				}
 			}
 
-			//cap
-			if (Projectile.velocity.X > 40f)
-			{
-				Projectile.velocity.X = 40f;
-			}
-			if (Projectile.velocity.X < -40f)
-			{
-				Projectile.velocity.X = -40f;
-			}
 		}
 		public override Color? GetAlpha(Color lightColor)
 		{

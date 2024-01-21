@@ -11,7 +11,8 @@ namespace KirboMod.Projectiles
 		public override void SetStaticDefaults()
 		{
 			Main.projFrames[Projectile.type] = 2;
-		}
+            ProjectileID.Sets.MinionShot[Type] = true;
+        }
 
 		public override void SetDefaults()
 		{

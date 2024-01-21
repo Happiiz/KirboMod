@@ -37,7 +37,11 @@ namespace KirboMod.Items.DarkMatter
 		public override void UpdateAccessory(Player player, bool hideVisual) 
 		{
 			player.GetModPlayer<KirbPlayer>().darkShield = true;
-			hideVisual = true;
+
+			if (player.GetModPlayer<KirbPlayer>().darkDashDelay < 0)
+			{
+				player.endurance += 0.3f; ; //give 30% damage reduction for dash duration
+            }
 		}
 
 		public override int ChoosePrefix(UnifiedRandom rand) {

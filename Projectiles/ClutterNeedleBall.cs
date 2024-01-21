@@ -68,23 +68,24 @@ namespace KirboMod.Projectiles
 			//nail projectiles
 			for (int i = 0; i < 5; i++)
 			{
-				Vector2 speed = Main.rand.NextVector2Circular(8f, 8f); //circle
+				Vector2 speed = Main.rand.NextVector2CircularEdge(8f, 8f); //circle
 				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, speed, ModContent.ProjectileType<Projectiles.Clutter>(), Projectile.damage, 4, Projectile.owner, 0, 0); 
 			}
 		}
 
-        public override bool OnTileCollide(Vector2 oldVelocity) 
+        public override bool OnTileCollide(Vector2 oldVelocity)
         {
-			Player player = Main.player[0];
-			/*if (projectile.velocity.X != oldVelocity.X) //bounce
-			{
-				projectile.velocity.X = -oldVelocity.X;
-			}
-			if (projectile.velocity.Y != oldVelocity.Y) //bounce
-			{
-				projectile.velocity.Y = -oldVelocity.Y;
-			}*/
-			return false; //dont die
-		}
+            if (Projectile.velocity.X != oldVelocity.X) //bounce
+            {
+                Projectile.velocity.X = -oldVelocity.X;
+            }
+            return false; //dont die
+        }
+
+        public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
+        {
+            fallThrough = false; //don't fall through platforms
+            return true;
+        }
     }
 }

@@ -11,10 +11,11 @@ namespace KirboMod.Projectiles
 		public override void SetStaticDefaults()
 		{
 			Main.projFrames[Projectile.type] = 2;
+			ProjectileID.Sets.MinionShot[Type] = true;
 		}
         public override bool PreDraw(ref Color lightColor)
         {
-            VFX.DrawElectricOrb(Projectile.Center, Vector2.One * 1.5f, Projectile.Opacity, Projectile.rotation);
+            VFX.DrawElectricOrb(Projectile.Center, new Vector2(1.2f), Projectile.Opacity, Projectile.rotation);
 			return false;
         }
         public override void SetDefaults()
@@ -22,12 +23,12 @@ namespace KirboMod.Projectiles
 			Projectile.width = 30;
 			Projectile.height = 30;
 			Projectile.friendly = true;
-			Projectile.minion = true;
 			Projectile.timeLeft = 15;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = 15; //hit each npc once
+            Projectile.DamageType = DamageClass.Summon;
         }
 
 		public override void AI()
@@ -41,9 +42,9 @@ namespace KirboMod.Projectiles
 					Projectile.frame = 0;
 				}
 			}
-		}
+        }
 
-		public override Color? GetAlpha(Color lightColor)
+        public override Color? GetAlpha(Color lightColor)
 		{
 			return Color.White; // Makes it uneffected by light
 		}

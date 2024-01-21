@@ -39,18 +39,10 @@ namespace KirboMod.Items.Weapons
 			Item.mana = 6;
 		}
 
-        public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+        public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {
-			Vector2 perturbedSpeed = new Vector2(velocity.X, velocity.Y).RotatedByRandom(MathHelper.ToRadians(15)); // 15 degree spread.
-
-			Vector2 shootdir = Main.MouseWorld - player.Center; //distance 
-			shootdir.Normalize();//reduce to 1
-			shootdir *= 8f;//speed
-			position = player.Center + shootdir * 4;//move from player apon spawning
-
-			Projectile.NewProjectile(source, position.X, position.Y, perturbedSpeed.X, perturbedSpeed.Y - 6, ModContent.ProjectileType<Projectiles.VolcanoFireFire>(), Item.damage, 0f, player.whoAmI);
-			return false;
-		}
+            velocity = new Vector2(velocity.X, velocity.Y - 6).RotatedByRandom(MathHelper.ToRadians(15)); // 15 degree spread
+        }
 
 		public override void AddRecipes()
 		{

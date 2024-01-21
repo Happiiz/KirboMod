@@ -36,35 +36,6 @@ namespace KirboMod.Projectiles
 		}
 		public override void AI()
         {
-            /*for (int i = -3; i < 5; i++) //count up when less than 25
-			{
-				Point projectileBottomFront = new Vector2(Projectile.Center.X + Projectile.direction * 25, 
-					Projectile.position.Y + Projectile.height).ToTileCoordinates();
-
-				Tile bottomFrontTile = Main.tile[new Point(projectileBottomFront.X, projectileBottomFront.Y + i)];
-
-                Tile tileAboveBottomFrontTile = Main.tile[new Point(projectileBottomFront.X, projectileBottomFront.Y + i - 1)];
-
-                if (WorldGen.SolidOrSlopedTile(bottomFrontTile) == false 
-                    && bottomFrontTile.IsHalfBlock == false)
-				{
-					if (i >= 4) //checks if run out
-					{
-						Projectile.Kill();
-					}
-                }
-				else if (tileAboveBottomFrontTile.HasTile == false)
-				{
-                    Projectile.position.Y += i * 16;
-                    break; //stop loop
-                }
-            }
-
-			if (Projectile.ai[0] % 3 == 0)
-			{
-				int dust = Dust.NewDust(Projectile.position + new Vector2(Projectile.direction == -1 ? 0 : 46, Projectile.height - 16), 1, 1, DustID.Electric, Projectile.direction * -0.4f, 0f, 0, default, 0.75f); //dust
-				Main.dust[dust].noGravity = true;
-			}*/
 
             // scanning if every tile on it exists, and if not kills the projectile
 
@@ -72,18 +43,13 @@ namespace KirboMod.Projectiles
             {
                 int missedTiles = 0;
 
-                if (Projectile.ai[0] > 120)
-                {
-                    break; //stop if already past death point
-                }
-
                 for (int j = 0; j < Projectile.height / 16; j++) //tile height
                 {
                     Point tileLocation = Projectile.position.ToTileCoordinates() + new Point(i, j);
 
                     Tile tile = Main.tile[tileLocation];
 
-                    if (!WorldGen.SolidOrSlopedTile(tile)) //no tile
+                    if (!tile.HasTile) //no tile
                     {
                         missedTiles += 1;
                         
@@ -95,7 +61,11 @@ namespace KirboMod.Projectiles
                 if (missedTiles > 10)
                 {
                     Projectile.velocity *= 0.001f;
-                    Projectile.ai[0] = 120; //jump to disappear
+
+                    if (Projectile.ai[0] <= 120) //not past dissipate point
+                    {
+                        Projectile.ai[0] = 120; //jump to disappear
+                    }
                     break;
                 }
             }
@@ -129,15 +99,6 @@ namespace KirboMod.Projectiles
                 }
             }
         }
-
-        /*public override void Kill(int timeLeft) //when the projectile dies
-         {
-             for (int i = 0; i < 15; i++)
-             {
-                 Vector2 speed = Main.rand.NextVector2Circular(1f, 1f); //circle
-                 Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.Electric, speed * 3, Scale: 0.75f); //Makes dust in a messy circle
-             }
-        }*/
 
         public override bool OnTileCollide(Vector2 oldVelocity)
         {

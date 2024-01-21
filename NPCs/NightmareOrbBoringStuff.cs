@@ -28,7 +28,7 @@ namespace KirboMod.NPCs
         }
         public override void SetStaticDefaults() {
 			// DisplayName.SetDefault("Power Orb");
-			Main.npcFrameCount[NPC.type] = 2;
+			Main.npcFrameCount[NPC.type] = 4;
 
 			//Needed for multiplayer spawning to work
 			NPCID.Sets.MPAllowedEnemies[Type] = true;
@@ -94,13 +94,21 @@ namespace KirboMod.NPCs
 		public override void FindFrame(int frameHeight) // animation
         {
             NPC.frameCounter += 1.0;
-            if (NPC.frameCounter < 7.0)
+            if (NPC.frameCounter < 4.0)
             {
                 NPC.frame.Y = 0;
             }
-            else if (NPC.frameCounter < 14.0)
+            else if (NPC.frameCounter < 8.0)
             {
                 NPC.frame.Y = frameHeight;
+            }
+            else if (NPC.frameCounter < 12.0)
+            {
+                NPC.frame.Y = frameHeight * 2;
+            }
+            else if (NPC.frameCounter < 16.0)
+            {
+                NPC.frame.Y = frameHeight * 3;
             }
             else
             {

@@ -120,7 +120,7 @@ namespace KirboMod.NPCs
 			}
 
 			Player player = Main.player[NPC.target];
-			Vector2 distance = player.Center - NPC.position;
+			Vector2 distance = player.Center - NPC.Center;
             
 			AttackPattern();
 
@@ -136,7 +136,7 @@ namespace KirboMod.NPCs
 			//checks if whispy can "see" the player
 			int tilesInFrontOfWhispy = 0;
 
-            for (int j = 0; j < 10; j++) //10 tiles ahead
+            for (int j = 0; j < 63; j++) //63 tiles ahead
 			{
 				for (int i = 0; i < 28; i++) //28 tiles across
 				{
@@ -168,7 +168,9 @@ namespace KirboMod.NPCs
                 CheckPlatform(player);
             }
 
-            if ((distance.Y >= 250 || distance.Y <= -100 || distance.X >= 1000 || distance.X <= -1000 || tilesInFrontOfWhispy > 10)
+			Vector2 distance2 = player.Center - NPC.Bottom;
+
+            if ((distance2.Y >= 100 || distance.Y <= -100 || distance.X >= 1000 || distance.X <= -1000 || tilesInFrontOfWhispy > 10)
 				&& gravityTimer <= 0) //teleporting to player when out of range or view
 			{
 				if (player.dead == false) //checking if player is not dead

@@ -37,10 +37,17 @@ namespace KirboMod.Items.Weapons
 
         public override void AddRecipes()
 		{
-			Recipe recipe1 = CreateRecipe();//the result is herosword
-			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 20); //20 starbits
-			recipe1.AddTile(TileID.Anvils); //crafted at anvil
-			recipe1.Register(); //adds this recipe to the game
-		}
+            Recipe herosword = CreateRecipe();//the result is herosword
+            herosword.AddIngredient(ModContent.ItemType<Items.Starbit>(), 20); //20 starbits
+            herosword.AddIngredient(ItemID.IronBroadsword);
+            herosword.AddTile(TileID.Anvils); //crafted at anvil
+            herosword.Register(); //adds this recipe to the game
+
+            Recipe herosword2 = CreateRecipe();//the result is herosword
+            herosword2.AddIngredient(ModContent.ItemType<Items.Starbit>(), 20); //20 starbits
+            herosword2.AddIngredient(ItemID.LeadBroadsword);
+            herosword2.AddTile(TileID.Anvils); //crafted at anvil
+            herosword2.Register(); //adds this recipe to the game
+        }
 	}
 }

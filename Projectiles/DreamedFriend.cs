@@ -16,8 +16,9 @@ namespace KirboMod.Projectiles
 		{
 			Main.projFrames[Projectile.type] = 6;
 
-            // Don't mistake this with "if this is true, then it will automatically home". It is just for damage reduction for certain NPCs
+            //Cultist takes 75% damage from homing projectiles
             ProjectileID.Sets.CultistIsResistantTo[Projectile.type] = true;
+            ProjectileID.Sets.MinionShot[Type] = true;
         }
 		public override void SetDefaults()
 		{
@@ -26,13 +27,13 @@ namespace KirboMod.Projectiles
 			DrawOffsetX = -40;
 			DrawOriginOffsetY = -40;
 			Projectile.friendly = true;
-			Projectile.minion = true;
 			Projectile.timeLeft = 120;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = 1;
 			Projectile.scale = 1f;
 			Projectile.ignoreWater = true;
-			Projectile.usesLocalNPCImmunity = true;
+            Projectile.DamageType = DamageClass.Summon;
+            Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = 3;
 		}
 		public override void AI()
@@ -70,7 +71,7 @@ namespace KirboMod.Projectiles
 					distanceFromTarget = 2000; //cap
                 }
 
-				if (player.HasMinionAttackTargetNPC) //Right click targeting
+				if (player.HasMinionAttackTargetNPC) 
 				{
 					NPC npc = Main.npc[player.MinionAttackTargetNPC];
 					float distance = Vector2.Distance(npc.Center, Projectile.Center);
@@ -162,6 +163,13 @@ namespace KirboMod.Projectiles
                 Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.PurpleCrystalShard, speed, Scale: 1.5f, Alpha: 200); //Makes dust in a messy circle
                 d.noGravity = true;
             }
+        }
+
+        public override bool PreDraw(ref Color lightColor)
+        {
+            VFX.DrawGlowBallAdditive(Projectile.Center, 1.4f, Color.Violet, Color.Pink);
+
+            return true;
         }
 
         public override Color? GetAlpha(Color lightColor)

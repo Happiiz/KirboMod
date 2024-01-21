@@ -20,7 +20,7 @@ namespace KirboMod.Projectiles
 			Projectile.friendly = true;
 			Projectile.timeLeft = 240;
 			Projectile.tileCollide = true; 
-			Projectile.penetrate = 1;
+			Projectile.penetrate = -1;
 		}
 		public override void AI()
 		{
@@ -30,14 +30,6 @@ namespace KirboMod.Projectiles
 				Projectile.velocity.Y = 6f;
             }
 			Projectile.rotation += 0.1f; // rotates projectile
-			/*if (++projectile.frameCounter >= 15) //changes frames every 15 ticks 
-			{
-				projectile.frameCounter = 0;
-				if (++projectile.frame >= Main.projFrames[projectile.type])
-				{
-					projectile.frame = 0;
-				}
-			}*/
 		}
         public override void OnKill(int timeLeft) //when the projectile dies
          {
@@ -48,6 +40,13 @@ namespace KirboMod.Projectiles
 				d.noGravity = true;
              }
          }
+
+        public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
+        {
+			fallThrough = false; //doesn't fall through platforms
+
+			return true;
+        }
 
         public override bool OnTileCollide(Vector2 oldVelocity)
         {

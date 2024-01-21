@@ -19,7 +19,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 10;
+			Item.damage = 15;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 40;
@@ -34,16 +34,17 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item93; //electro zap
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.BeamBall>();
-			Item.shootSpeed = 8f;
+			Item.shootSpeed = 12f;
 			Item.mana = 8;
 		}
 
 		public override void AddRecipes()
 		{
-			Recipe recipe = CreateRecipe();//the result is staff
-			recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20); //20 starbits
-			recipe.AddTile(TileID.Anvils); //crafted at anvil
-			recipe.Register(); //adds this recipe to the game
+			Recipe beamstaff = CreateRecipe();//the result is staff
+            beamstaff.AddIngredient(ModContent.ItemType<Starbit>(), 20); //20 starbits
+            beamstaff.AddRecipeGroup(RecipeGroupID.IronBar, 10); //10 iron/lead bars
+            beamstaff.AddTile(TileID.Anvils); //crafted at anvil
+            beamstaff.Register(); //adds this recipe to the game
 		}
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
@@ -52,7 +53,7 @@ namespace KirboMod.Items.Weapons
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
 		{
             Vector2 shootdir = Main.MouseWorld - player.Center;
-            position = player.Center + (velocity * 8);
+            position = player.Center + (velocity * 4);
         }
     }
 }

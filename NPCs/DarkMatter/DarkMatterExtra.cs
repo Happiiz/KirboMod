@@ -136,15 +136,6 @@ namespace KirboMod.NPCs.DarkMatter
                     d.noGravity = true;
                 }
             }
-            if (phase == 3)
-            {
-                for (int i = 0; i < 5; i++)
-                {
-                    Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-                    Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed * 2, 2); //Makes dust in a messy circle
-                    d.noGravity = false;
-                }
-            }
             if (NPC.life <= 0)
             {
                 for (int i = 0; i < 40; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop

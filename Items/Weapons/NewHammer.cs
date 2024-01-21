@@ -117,7 +117,7 @@ namespace KirboMod.Items.Weapons
 				SoundEngine.PlaySound(SoundID.Item94, player.Center); // electrosphere stop
 
                 Projectile.NewProjectile(new EntitySource_ItemUse(Main.player[player.whoAmI], player.HeldItem), player.Center.X + player.direction * 40, player.Center.Y,
-                        player.direction * 8, 0, ModContent.ProjectileType<Projectiles.NewHammerShockwave>(), Item.damage / 2, 0, player.whoAmI);
+                        player.direction * 8, 0, ModContent.ProjectileType<Projectiles.NewHammerShockwave>(), player.GetWeaponDamage(Item) / 2, 0, player.whoAmI);
 
                 for (int i = 0; i < 30; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 				{

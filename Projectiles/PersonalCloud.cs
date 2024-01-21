@@ -27,7 +27,6 @@ namespace KirboMod.Projectiles
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
-			Projectile.minion = true; //deals minion damage
 		}
 
         public override bool? CanCutTiles() //can cut foliage?
