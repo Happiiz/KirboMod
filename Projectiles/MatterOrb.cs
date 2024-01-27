@@ -33,6 +33,8 @@ namespace KirboMod.Projectiles
 		}
 		public override void AI()
 		{
+			Projectile.ai[2] += 1 / 60f;
+			Projectile.ai[2] %= 3600;
 			Player player = Main.player[(int)Projectile.ai[1]]; //chooses player that was already being targeted by npc
 
 			if (Main.netMode == NetmodeID.SinglePlayer)
@@ -54,16 +56,16 @@ namespace KirboMod.Projectiles
 
 				if (move.X > 0) //going right
 				{
-					Projectile.velocity.X = 30 + MathF.Cos(Main.GlobalTimeWrappedHourly * 2) * 25;
+					Projectile.velocity.X = 30 + MathF.Cos(Projectile.ai[2] * 2) * 25;
 				}
                 else //going left
                 {
-                    Projectile.velocity.X = -30 + MathF.Cos(Main.GlobalTimeWrappedHourly * 2) * 25;
+                    Projectile.velocity.X = -30 + MathF.Cos(Projectile.ai[2] * 2) * 25;
                 }
 
                 if (Projectile.velocity.Y < 0)
 				{
-					Projectile.ai[2] = 1;
+					Projectile.localAI[2] = 1;
 					Projectile.velocity.Y = -50; //start up
 				}
 				else
@@ -73,7 +75,7 @@ namespace KirboMod.Projectiles
             }
 			else if (Projectile.ai[0] > 20) 
             {
-				if (Projectile.ai[2] == 1) //go down
+				if (Projectile.localAI[2] == 1) //go down
 				{
 					Projectile.velocity.Y += 4f;
 

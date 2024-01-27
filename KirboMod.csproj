@@ -8,6 +8,8 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Buffs\DragonFireDebuff.png" />
+    <None Remove="Dusts\DragonFireDust.png" />
     <None Remove="ExtraTextures\RingShinePremultiplied.png" />
     <None Remove="Items\DarkSword\DarkSwordBeam.png" />
     <None Remove="Items\RainbowSword\RainbowSword.png" />

@@ -10,7 +10,7 @@ using Terraria.ModLoader;
 
 namespace KirboMod.Items.Weapons
 {
-	public class DragonFire : ModItem
+    public class DragonFire : ModItem
 	{
 		public override void SetStaticDefaults()
 		{
@@ -36,8 +36,8 @@ namespace KirboMod.Items.Weapons
 			Item.rare = ItemRarityID.Yellow;
 			Item.UseSound = SoundID.Item34;
 			Item.autoReuse = true;
-			Item.shoot = ModContent.ProjectileType<Projectiles.DragonFireFire>();
-			Item.shootSpeed = 25f; 
+			Item.shoot = ModContent.ProjectileType<Projectiles.Flames.DragonFireFire>();
+			Item.shootSpeed = 7; //proj has 3 extraupdates
 			Item.mana = 12;
 			Item.ArmorPenetration = ArmPen;
 		}

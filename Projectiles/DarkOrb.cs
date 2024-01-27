@@ -42,7 +42,7 @@ namespace KirboMod.Projectiles
             Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, ModContent.DustType<Dusts.DarkResidue>(), Projectile.velocity.X * 0.25f, Projectile.velocity.Y * 0.25f, 200, default, 0.8f); //dust
 
             Projectile.ai[0]++;
-			Projectile.scale = Scale;
+			Projectile.scale = Easings.EaseInOutSine(Scale);
 			if (Projectile.ai[0] == 30) //Start hurtin'
             {
 				SoundEngine.PlaySound(SoundID.Item117, Projectile.Center); //conjure arcanum sfx

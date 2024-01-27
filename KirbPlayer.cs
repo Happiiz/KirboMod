@@ -476,7 +476,7 @@ namespace KirboMod
             {
                 if (Main.netMode == NetmodeID.SinglePlayer)
                 {
-                    StartFinalCutter();
+                    //StartFinalCutter();
                     return true;
                 }
                 //packet = Mod.GetPacket(3);
@@ -488,7 +488,7 @@ namespace KirboMod
             }
             if (Main.netMode == NetmodeID.SinglePlayer)
             {
-                StartFinalCutter();
+                //StartFinalCutter();
                 return true;
             }
             //packet = Mod.GetPacket();
@@ -502,16 +502,16 @@ namespace KirboMod
             //packet.Send(-1, Main.myPlayer);
             return false;
         }
-        public void StartFinalCutter()
-        {
-            finalCutterAnimationCounter = 80;
-            for (int i = 0; i < currentFinalCutterTargets.Count; i++)
-            {
-                //cursed line of code
-                Main.npc[currentFinalCutterTargets[i]].GetGlobalNPC<KirbNPC>().StartFinalCutter(finalCutterAnimationCounter + 10);
-            }
+        //public void StartFinalCutter()
+        //{
+        //    finalCutterAnimationCounter = 80;
+        //    for (int i = 0; i < currentFinalCutterTargets.Count; i++)
+        //    {
+        //        //cursed line of code
+        //        Main.npc[currentFinalCutterTargets[i]].GetGlobalNPC<KirbNPC>().StartFinalCutter(finalCutterAnimationCounter + 10);
+        //    }
 
-        }
+        //}
         void UpdateFinalCutter()
         {
 

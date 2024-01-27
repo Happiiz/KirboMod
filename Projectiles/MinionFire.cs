@@ -1,3 +1,4 @@
+using KirboMod.Projectiles.Flames;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
@@ -6,7 +7,7 @@ using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles
 {
-	public class MinionFire : FireFire
+    public class MinionFire : FireFire
 	{
 		public override void SetStaticDefaults()
 		{

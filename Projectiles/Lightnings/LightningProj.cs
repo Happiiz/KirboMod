@@ -21,6 +21,8 @@ namespace KirboMod.Projectiles.Lightnings
         }
         public override void SetDefaults()
         {
+            maxDeviation = 40;
+            width = 1;
             Projectile.extraUpdates = 2;
             Projectile.timeLeft = 2 * 60 * Projectile.MaxUpdates;
             Projectile.tileCollide = false;
@@ -189,11 +191,11 @@ namespace KirboMod.Projectiles.Lightnings
             }
             if (Projectile.velocity == Vector2.Zero)
             {
-                VFX.DrawGlowBallAdditive(Projectile.Center, 1, VFX.RndElectricCol, Color.Transparent, true);
+                VFX.DrawGlowBallAdditive(Projectile.Center, 1, outerColor, Color.Transparent, true);
             }
             if (Projectile.localAI[2] <= Projectile.oldPos.Length - 1)
             {
-                VFX.DrawGlowBallAdditive(Projectile.oldPos[(int)Projectile.localAI[2]], 1, VFX.RndElectricCol, Color.Transparent, true);
+                VFX.DrawGlowBallAdditive(Projectile.oldPos[(int)Projectile.localAI[2]], 1, outerColor, Color.Transparent, true);
             }
             return false;
         }

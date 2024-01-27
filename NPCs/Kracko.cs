@@ -15,15 +15,13 @@ namespace KirboMod.NPCs
 {
     public partial class Kracko : ModNPC
     {
-
         private int animation = 0;
         private KrackoAttackType attacktype = KrackoAttackType.DecideNext; //decides the attack
         private int doodelay = 0;
-        float beamCurvingAngleMultiplier = 0.05f;
-        int numberOfBeamsPerSpiral = 70;
+        const float beamCurvingAngleMultiplier = 0.05f;
+        const int numberOfBeamsPerSpiral = 70;
         bool attackDirection = false;
         private int AttackDirection { get => attackDirection ? 1 : -1; set => attackDirection = value <= 1; }
-        //todo: rename to next attack type and rework algorithm
         private KrackoAttackType nextAttackType = KrackoAttackType.Dash; //sets last attack type
         private bool transitioning = false; //checks if going through expert mode exclusive phase
         private bool frenzy = false; //checks if going in frenzy mode in expert mode
@@ -133,7 +131,6 @@ namespace KirboMod.NPCs
             if (NPC.ai[0] >= attackEnd) //end          
                 ResetVarsForNextAttack();
         }
-
         private void AttackSpawnDoo()
         {
             if (NPC.ai[0] == (!frenzy ? 15 : 60)) //changes depending or not in frenzy
@@ -180,7 +177,6 @@ namespace KirboMod.NPCs
                 }
             }
         }
-
         void AttackDecideNext()
         {
             //choose attack randomly
@@ -203,7 +199,6 @@ namespace KirboMod.NPCs
                 NPC.ai[0] = 0;
             }
         }
-
         private float AttackSweep(Player player)
         {
             float speed = 20f;
@@ -265,7 +260,6 @@ namespace KirboMod.NPCs
 
             return sweepEnd;
         }
-
         float AttackBeam()
         {
             Vector2 distanceOverPlayer = Main.player[NPC.target].Center + new Vector2(0, -200) - NPC.Center;
@@ -451,7 +445,6 @@ namespace KirboMod.NPCs
 
             return attackEnd;
         }
-
         void SpawnBeam(int numberOfBeams, float timeToCheck)
         {
             float numberOfSpirals = frenzy ? 4 : 2;
@@ -467,13 +460,6 @@ namespace KirboMod.NPCs
                     }
                 }
             }
-        }
-
-        Vector2 GetDistanceDiagonalUpOfPlayerNormalizedMulipliedBySpeed(float speed)
-        {
-            Vector2 distanceDiagonalRightOfPlayer = Main.player[NPC.target].Center + new Vector2(400 * AttackDirection, -400) - NPC.Center;
-            distanceDiagonalRightOfPlayer.Normalize();
-            return distanceDiagonalRightOfPlayer * speed;
         }
         static Asset<Texture2D> eyeBase;
         static Asset<Texture2D> pupil;
@@ -504,7 +490,6 @@ namespace KirboMod.NPCs
            
             return false;
         }
-
         public override void Load()
         {
             eyeBase = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoEyeBase");
