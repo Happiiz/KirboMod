@@ -645,7 +645,7 @@ Mods: {
 			}
 
 			CrystalGun: {
-				DisplayName: Crystal Gun
+				DisplayName: Ribbon's Crystal
 				Tooltip:
 					'''
 					Consumes magic crystal shards

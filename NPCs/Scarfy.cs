@@ -167,7 +167,7 @@ namespace KirboMod.NPCs
                         Boom();
                     }
 
-                    float speed = Helper.RemapEasing(NPC.ai[0], 30, 70, 0, 15, Easings.EaseInOutSine);
+                    float speed = Helper.RemapEased(NPC.ai[0], 30, 70, 0, 15, Easings.EaseInOutSine);
                     float inertia = 20f;
 
                     Vector2 moveTo = player.Center;

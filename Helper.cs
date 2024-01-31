@@ -52,7 +52,7 @@ namespace KirboMod
                 Dust.NewDustDirect(entity.position, entity.width, entity.height, type).noGravity = noGravity;
             }
         }
-        public static float RemapEasing(float fromValue, float fromMin, float fromMax, float toMin, float toMax, Func<float, float> easingFunction, bool clamp = true)
+        public static float RemapEased(float fromValue, float fromMin, float fromMax, float toMin, float toMax, Func<float, float> easingFunction, bool clamp = true)
         {
             return MathHelper.Lerp(toMin, toMax, easingFunction(Utils.GetLerpValue(fromMin, fromMax, fromValue, clamp)));
         }
@@ -76,11 +76,19 @@ namespace KirboMod
             float maxRangeSQ = maxRange * maxRange;
             for (int i = 0; i < Main.maxNPCs; i++)
             {
-                if (!ValidHomingTarget(Main.npc[i], proj, includeNPCsImmuneToThis) || Main.npc[i].DistanceSQ(proj.Center) > maxRangeSQ || i == -1 || (Main.npc[i].DistanceSQ(proj.Center) > Main.npc[target].DistanceSQ(proj.Center)))
+                NPC potentialTarget = Main.npc[i];
+                if (!ValidHomingTarget(potentialTarget, proj, includeNPCsImmuneToThis) || potentialTarget.DistanceSQ(proj.Center) > maxRangeSQ || i == -1 || (potentialTarget.DistanceSQ(proj.Center) > Main.npc[target].DistanceSQ(proj.Center)))
                     continue;
                 target = i;
             }
             return target;
+        }
+        public static bool ValidIndexedTarget(int targetIndex, Projectile proj, out NPC target, bool includeImmuneNPCs = true)
+        {
+            bool invalid = !Main.npc.IndexInRange(targetIndex) || !ValidHomingTarget(Main.npc[targetIndex], proj);
+            target = invalid ? null : Main.npc[targetIndex];
+            return !invalid;
+
         }
         public static bool ValidHomingTarget(NPC npc, Projectile proj, bool includeImmuneNPCs = true)
         {
@@ -101,7 +109,7 @@ namespace KirboMod
                 }
             }//eol becomes invincible during dash, phasde transition and spawn animation, so ignore donttake damage if EoL to avoid some weirdness
             //      ai0 as 8 or 9 is if she's dashng, so that she doesn't get targeted during the phase transition or spawn animation
-            return npc.CanBeChasedBy(null, npc.type == NPCID.HallowBoss && (npc.ai[0] == 8 || npc.ai[0] == 9)) && !npcImmuneToProj;
+            return npc.CanBeChasedBy(null, npc.type == NPCID.HallowBoss && (npc.ai[0] == 8 || npc.ai[0] == 9)) && (includeImmuneNPCs || !npcImmuneToProj);
         }
         /// <summary>
         /// used by the nightglow. very aggressive

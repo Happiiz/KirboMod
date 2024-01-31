@@ -40,7 +40,7 @@ namespace KirboMod.Projectiles
 				Projectile.Opacity -= .2f;
 
             }
-			Vector2 offset = Helper.RemapEasing(Projectile.timeLeft, 30, 10, MathF.PI / 1.5f, -MathF.PI / 1.5f, Easing, false).ToRotationVector2() * 80;
+			Vector2 offset = Helper.RemapEased(Projectile.timeLeft, 30, 10, MathF.PI / 1.5f, -MathF.PI / 1.5f, Easing, false).ToRotationVector2() * 80;
 			offset.Y *= .6f;
 			offset.X *= originNPC.direction;
 			Projectile.rotation = offset.ToRotation() + MathF.PI / 2;
@@ -71,13 +71,13 @@ namespace KirboMod.Projectiles
 
 			for (int i = 0; i < Projectile.oldPos.Length; i++)
 			{
-				offset = Helper.RemapEasing(Projectile.timeLeft + (i * .25f + .25f), 30, 10, MathF.PI / 1.5f, -MathF.PI / 1.1f, Easing, false).ToRotationVector2() * 80;
+				offset = Helper.RemapEased(Projectile.timeLeft + (i * .25f + .25f), 30, 10, MathF.PI / 1.5f, -MathF.PI / 1.1f, Easing, false).ToRotationVector2() * 80;
 				offset.Y *= .6f;
 				offset.X *= originNPC.direction;
 				Projectile.oldRot[i] = offset.ToRotation() + MathF.PI / 2;
 				Projectile.oldPos[i] = Projectile.position + offset;
 			}
-			offset = Helper.RemapEasing(Projectile.timeLeft, 30, 10, MathF.PI / 1.5f, -MathF.PI / 1.1f, Easing, false).ToRotationVector2() * 80;
+			offset = Helper.RemapEased(Projectile.timeLeft, 30, 10, MathF.PI / 1.5f, -MathF.PI / 1.1f, Easing, false).ToRotationVector2() * 80;
 			offset.Y *= .6f;
 			offset.X *= originNPC.direction;
 			Projectile.rotation = offset.ToRotation() + MathF.PI / 2;
