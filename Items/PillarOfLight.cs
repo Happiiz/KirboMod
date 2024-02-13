@@ -1,3 +1,4 @@
+using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
@@ -30,17 +31,16 @@ namespace KirboMod.Items
 			Item.value = Item.buyPrice(0, 0, 0, 5);
 			Item.rare = ItemRarityID.Red;
 			Item.UseSound = SoundID.Item1;
-			Item.consumable = true;
+			Item.consumable = false;
 			Item.maxStack = 9999;
 			Item.noUseGraphic = true;
-			Item.shoot = Mod.Find<ModProjectile>("FlyingPillarOfLight").Type;
+			Item.shoot = ModContent.ProjectileType<FlyingPillarOfLight>();
 		}
 
         public override bool CanUseItem(Player player)
         {
 			//can use item if no Pure Dark Matter, Zero, Eye of Zero or Totem proj
-			if (!NPC.AnyNPCs(Mod.Find<ModNPC>("PureDarkMatter").Type) && !NPC.AnyNPCs(Mod.Find<ModNPC>("Zero").Type) 
-				&&!NPC.AnyNPCs(Mod.Find<ModNPC>("Zero").Type) && !NPC.AnyNPCs(Mod.Find<ModNPC>("ZeroEye").Type))
+			if (!NPC.AnyNPCs(Mod.Find<ModNPC>("Zero").Type) && !NPC.AnyNPCs(Mod.Find<ModNPC>("ZeroEye").Type))
 			{
 				return player.ownedProjectileCounts[ModContent.ProjectileType<Projectiles.FlyingPillarOfLight>()] < 1; //can use if no pillars
 			}
@@ -56,7 +56,7 @@ namespace KirboMod.Items
             position.X = player.Center.X + player.direction * 50;
 
             velocity.X = 0;
-            velocity.Y = 0; //moves up in code
+            velocity.Y = -10;
         }
 
 		public override Color? GetAlpha(Color lightColor)
@@ -68,7 +68,7 @@ namespace KirboMod.Items
         {
 			Recipe recipe = CreateRecipe();//the result is totem
 			recipe.AddIngredient(ModContent.ItemType<Items.PurifiedMaterial>()); //1 purified matter
-			recipe.AddIngredient(ItemID.HallowedBar, 5); //5 hallowed bars
+			recipe.AddIngredient(ItemID.LunarBar, 5); //5 luminite bars
 			recipe.AddTile(TileID.LunarCraftingStation); //crafted at ancient manipulator
 			recipe.Register(); //adds this recipe to the game
 		}

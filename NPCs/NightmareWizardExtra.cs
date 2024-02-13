@@ -46,7 +46,7 @@ namespace KirboMod.NPCs
             NPC.width = 114;
             NPC.height = 114;
             DrawOffsetY = 20;
-            NPC.damage = 70; 
+            NPC.damage = 70;
             NPC.noTileCollide = true;
             NPC.defense = 6;
             NPC.lifeMax = 10000;

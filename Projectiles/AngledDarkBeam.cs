@@ -31,16 +31,7 @@ namespace KirboMod.Projectiles
 			Projectile.rotation = Projectile.velocity.ToRotation();
 			Projectile.spriteDirection = Projectile.direction;
 
-		   /*if (++projectile.frameCounter >= 10) //changes frames every 10 ticks 
-			{
-				projectile.frameCounter = 0;
-				if (++projectile.frame >= Main.projFrames[projectile.type])
-				{
-					projectile.frame = 0;
-				}
-			}*/
-
-			if (Main.rand.Next(5) == 1) // happens 1/5 times
+			if (Main.rand.NextBool(5)) // happens 1/5 times
 			{
 				int dustnumber = Dust.NewDust(Projectile.position, 76, 18, ModContent.DustType<Dusts.DarkResidue>(), 0f, 0f, 200, default, 0.8f); //dust
 				Main.dust[dustnumber].velocity *= 0.3f;

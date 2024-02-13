@@ -42,9 +42,9 @@ namespace KirboMod.Projectiles
 
         public override void OnKill(int timeLeft)
         {
-			for (int i = 0; i < 5; i++)
+			for (int i = 0; i < 20; i++)
 			{
-				Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
+				Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
 				Dust d = Dust.NewDustPerfect(Projectile.Center, Mod.Find<ModDust>("Redsidue").Type, -speed); //Makes dust in a circle
 				d.noGravity = true; 
 			}
@@ -63,7 +63,7 @@ namespace KirboMod.Projectiles
                     int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), projX, projY, Vector2.Zero.X, Vector2.Zero.Y, ModContent.ProjectileType<ZeroBloodPellet>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
                     Vector2 direction = Main.projectile[proj].Center - Projectile.Center;
                     direction.Normalize(); //unit of 1
-                    direction *= 20; //speed of 20
+                    direction *= 35; //speed of 35
 					Main.projectile[proj].velocity = direction;
                 }
             }
@@ -79,7 +79,7 @@ namespace KirboMod.Projectiles
                     int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), projX, projY, Vector2.Zero.X, Vector2.Zero.Y, ModContent.ProjectileType<ZeroBloodPellet>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
                     Vector2 direction = Main.projectile[proj].Center - Projectile.Center;
                     direction.Normalize(); //unit of 1
-                    direction *= 20; //speed of 20
+                    direction *= 35; //speed of 35
                     Main.projectile[proj].velocity = direction;
                 }
             }

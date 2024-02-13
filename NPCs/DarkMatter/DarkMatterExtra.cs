@@ -8,6 +8,7 @@ using Terraria.GameContent.ItemDropRules;
 using KirboMod.Bestiary;
 using KirboMod.Systems;
 using System.IO;
+using Terraria.DataStructures;
 
 namespace KirboMod.NPCs.DarkMatter
 {
@@ -34,7 +35,10 @@ namespace KirboMod.NPCs.DarkMatter
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
 
-            NPCID.Sets.ImmuneToRegularBuffs[Type] = true; //immune to all buffs that aren't whips
+            NPCDebuffImmunityData debuffData = new NPCDebuffImmunityData
+            {
+                ImmuneToAllBuffsThatAreNotWhips = true,
+            };
 
             //for drawing afterimages and stuff alike
             ProjectileID.Sets.TrailCacheLength[NPC.type] = 5; // The length of old position to be recorded
@@ -64,13 +68,7 @@ namespace KirboMod.NPCs.DarkMatter
             NPC.boss = true;
             NPC.noGravity = true;
             NPC.lavaImmune = true;
-            NPC.buffImmune[BuffID.Poisoned] = true;
-            NPC.buffImmune[BuffID.Venom] = true;
-            NPC.buffImmune[BuffID.OnFire] = true;
-            NPC.buffImmune[BuffID.CursedInferno] = true;
-            NPC.buffImmune[BuffID.ShadowFlame] = true;
             Music = MusicID.Boss4;
-            NPC.buffImmune[BuffID.Confused] = true;
         }
         public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */
         {

@@ -52,12 +52,19 @@ namespace KirboMod.Projectiles
 
         public override void OnKill(int timeLeft) //when the projectile dies
         {
+            for (int i = 0; i < 10; i++)
+            {
+                Vector2 velocity = Main.rand.NextVector2Circular(Projectile.velocity.Length() / 2, Projectile.velocity.Length() / 2); //circle
+                Dust.NewDustPerfect(Projectile.Center, DustID.IceTorch,
+                    velocity, Scale: 1f);
+            }
+
+
             for (int i = 0; i < 5; i++)
             {
-                Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-                Dust.NewDustPerfect(Projectile.Center + Projectile.velocity, DustID.IcyMerman, speed, Scale: 1f); //Makes dust in a messy circle
-
-                Sparkle b = new(Projectile.Center, Color.Blue, Projectile.velocity.RotatedByRandom(Math.PI * 0.75f), new Vector2(0.2f, 0.2f));
+                Vector2 velocity = Main.rand.NextVector2Circular(Projectile.velocity.Length() / 2, Projectile.velocity.Length() / 2); //circle
+                Sparkle.NewSparkle(Projectile.Center, Color.Blue, new Vector2(1, 1f),
+                velocity, 40, new Vector2(1f, 1f));
             }
         }
 

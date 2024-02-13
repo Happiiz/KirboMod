@@ -77,7 +77,7 @@ namespace KirboMod.Projectiles
 
 		public override Color? GetAlpha(Color lightColor)
 		{
-			return Color.White; // Makes it uneffected by light
+			return Color.White * Projectile.Opacity; // Makes it uneffected by light
 		}
 
 		public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)

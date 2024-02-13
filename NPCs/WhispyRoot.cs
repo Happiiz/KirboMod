@@ -40,7 +40,7 @@ namespace KirboMod.NPCs
 			NPC.damage = 0; //won't last
 			NPC.HitSound = SoundID.Dig;
 			NPC.DeathSound = SoundID.Dig;
-            NPC.dontCountMe = true; //I guess don't count towards npc total
+            NPC.dontCountMe = true; //Don't count towards npc total
         }
 
 		private int TileDetection(int missedTiles)

@@ -22,11 +22,12 @@ namespace KirboMod.Projectiles
 			Projectile.timeLeft = 180;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
-			Projectile.scale = 1f;
 		}
 		public override void AI()
 		{
+			Projectile.ai[0] += MathF.PI / 60;
 
+			Projectile.scale = 1 + MathF.Sin(Projectile.ai[0]) * 0.1f;
 		}
 
         public override void OnKill(int timeLeft)

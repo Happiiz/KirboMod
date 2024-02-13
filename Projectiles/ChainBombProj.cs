@@ -191,5 +191,11 @@ namespace KirboMod.Projectiles
                             ChainBombKnobs.Value.Bounds, Color.White, Projectile.rotation,
                             ChainBombKnobs.Size() * 0.5f, 1f, SpriteEffects.None, 0);
         }
+
+        public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
+        {
+            fallThrough = false; //don't fall through platforms
+            return true;
+        }
     }
 }

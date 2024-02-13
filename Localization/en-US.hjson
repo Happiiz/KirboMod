@@ -362,9 +362,9 @@ Mods: {
 				DisplayName: Royal Slippers
 				Tooltip:
 					'''
-					Hold DOWN in the air and fall for a bit to ground pound
-					Hold UP or JUMP to stop your descent
-					'Wait he doesn't wear shoes... Who's are these?'
+					press DOWN in the air and fall for a bit to ground pound
+					press UP or JUMP to cancel your descent
+					'The King doesn't wear shoes... Whose are these?'
 					'''
 			}
 
@@ -394,10 +394,7 @@ Mods: {
 
 			PersonalCloud: {
 				DisplayName: Personal Cloud
-				Tooltip:
-					'''
-					Summons a personal cloud to shock your enemies
-					'''
+				Tooltip: Summons a personal cloud to shock your enemies
 			}
 
 			MiracleMatter: {
@@ -1003,7 +1000,7 @@ Mods: {
 				Tooltip:
 					'''
 					Lashes three apples out from the leaves
-					'Swishy Swishy'
+					'Swishy swishy'
 					'''
 			}
 
@@ -1161,6 +1158,16 @@ Mods: {
 					Cycles through stages of progression
 					'''
 				DisplayName: Changaroonie
+			}
+
+			DimensionalDestabilizer: {
+				DisplayName: Dimensional Destabilizer
+				Tooltip:
+					'''
+					Summons a dimensional rift containing a powerful enemy at the cursor's position
+					Enemy summoned depends on the biome you're in
+					Consumes 50 starbits per use
+					'''
 			}
 		}
 
@@ -1370,6 +1377,7 @@ Mods: {
 			MinionFireSpread.DisplayName: Minion Fire Spread
 			MinionBeamSpread.DisplayName: Minion Beam Spread
 			DuoMinionFireSpread.DisplayName: Duo Minion Fire Spread
+			BadIceChunkMist.DisplayName: Bad Ice Chunk Mist
 		}
 
 		NPCs: {
@@ -1466,7 +1474,7 @@ Mods: {
 		Tiles: {
 			BossTrophy.MapEntry: Trophy
 			EnemyBanner.MapEntry: Banner
-			FountainOfDreams.MapEntry: Fountain Of Dreams
+			FountainOfDreams.MapEntry: Fountain of Dreams
 			RareStone.MapEntry: Rare Stone
 		}
 

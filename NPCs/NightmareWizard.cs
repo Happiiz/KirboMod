@@ -337,7 +337,7 @@ namespace KirboMod.NPCs
                     Vector2 playerDistance = player.Center - NPC.Center;
 
                     float speed = 18f;
-                    float inertia = 20f;
+                    float inertia = 36f;
 
                     playerDistance.Normalize();
                     playerDistance *= speed;
@@ -360,7 +360,7 @@ namespace KirboMod.NPCs
             {
                 NPC.ai[1] = timer; //time to start teleport
             }
-            Teleport(timer - NPC.ai[1], player, new Vector2(0, -400));
+            Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
 
 			if (timer >= 12)
 			{
@@ -464,17 +464,11 @@ namespace KirboMod.NPCs
 
         private void EnrageRingStars(float timer, Player player)
         {
-            //teleport 
-            if (timer == 1)
-            {
-                NPC.ai[1] = timer; //time to start teleport
-            }
-            Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
-
+            //teleport
             if (timer < 240)
             {
                 //teleport throughout attack
-                if (timer % 40 == 0)
+                if (timer % 40 == 0 || timer == 1)
                 {
                     NPC.ai[1] = timer; //time to start teleport
                 }
@@ -512,24 +506,26 @@ namespace KirboMod.NPCs
             {
                 NPC.ai[1] = timer; //time to start teleport
             }
-            Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
-
+            if (timer < 60)
+            {
+                Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
+            }
             float side = Main.rand.NextBool() == true ? 1 : -1;
 
             //teleport again
-            if (timer == 30)
+            if (timer == 60)
             {
                 NPC.ai[1] = timer; //time to start teleport
             }
             Teleport(timer - NPC.ai[1], player, new Vector2(side * 600, 0));
 
-            if (timer > 30)
+            if (timer > 60)
             {
                 Vector2 playerDistance = player.Center - NPC.Center;
 
                 animation = 4; //swoop
 
-                if (timer == 31)
+                if (timer == 61)
                 {
                     if (playerDistance.X <= 0) //if player is right of enemy
                     {
@@ -567,7 +563,7 @@ namespace KirboMod.NPCs
                 }
             }
 
-            if (timer > 150)
+            if (timer > 180)
             {
                 NPC.velocity *= 0.01f;
 
@@ -582,9 +578,11 @@ namespace KirboMod.NPCs
 			{
 				NPC.ai[1] = timer; //time to start teleport
             }
-			Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
-
-			if (timer >= 30) //initiate animation
+            if (timer < 30)
+            {
+                Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
+            }
+			else if (timer >= 30) //initiate animation
 			{
 				animation = 6;
 
@@ -593,7 +591,7 @@ namespace KirboMod.NPCs
                     Vector2 playerDistance = player.Center - NPC.Center;
 
                     float speed = 18f;
-                    float inertia = 20f;
+                    float inertia = 36f;
 
                     playerDistance.Normalize();
                     playerDistance *= speed;
@@ -608,7 +606,7 @@ namespace KirboMod.NPCs
                 }
             }
 
-			if (timer >= 420)
+			if (timer >= 480)
 			{
                 NPC.velocity *= 0.01f;
 
@@ -623,9 +621,11 @@ namespace KirboMod.NPCs
             {
                 NPC.ai[1] = timer; //time to start teleport
             }
-            Teleport(timer - NPC.ai[1], player, new Vector2(0, -400));
-
-            if (timer >= 12)
+            if (timer < 12)
+            {
+                Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
+            }
+            else if (timer >= 12)
             {
                 animation = 7;
 
@@ -672,7 +672,7 @@ namespace KirboMod.NPCs
                 {
                     NPC.ai[1] = timer; //time to start teleport
                 }
-                Teleport(timer - NPC.ai[1], player, new Vector2(-400, 0));
+                Teleport(timer - NPC.ai[1], player, new Vector2(-300, 0));
 
                 if (timer >= 132)
                 {
@@ -680,7 +680,7 @@ namespace KirboMod.NPCs
 
                     if (timer < 180) //follow but with slightly more time to escape
                     {
-                        //hover over player
+                        //hover beside player
                         Vector2 playerDistance = player.Center + new Vector2(-400, 0) - NPC.Center;
                         NPC.rotation = -MathF.PI / 2; //facing right
 
@@ -728,7 +728,11 @@ namespace KirboMod.NPCs
 		{
             if (timer == 1)
             {
-                tpEffectPos = NPC.Center;
+                if (Main.netMode != NetmodeID.MultiplayerClient) //have this here because teleport is random sometimes
+                {
+                    tpEffectPos = NPC.Center;
+                }
+
                 tpEffectCounter = 4;//animSpeed
 
                 NPC.Center = player.Center + location;

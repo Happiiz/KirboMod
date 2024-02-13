@@ -18,8 +18,10 @@ namespace KirboMod.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 114;
-			Projectile.height = 200;
+			Projectile.width = 150;
+			Projectile.height = 150;
+			DrawOffsetX = 10;
+			DrawOriginOffsetY = -20;
 			Projectile.friendly = true;
 			Projectile.penetrate = -1;
 			Projectile.tileCollide = false;
@@ -31,14 +33,19 @@ namespace KirboMod.Projectiles
 
 		public override void AI()
 		{
-			Projectile.spriteDirection = Projectile.direction; //face direction
+            Projectile.rotation = Projectile.velocity.ToRotation();
 
-			Projectile.velocity.X *= 0.9f; //slow
+            Projectile.velocity *= 0.9f; //slow
 
-			if (Math.Abs(Projectile.velocity.X) < 0.5f)
+			if (Math.Abs(Projectile.velocity.X) < 0.5f || Math.Abs(Projectile.velocity.Y) < 0.5f)
 			{
 				Projectile.alpha += 10; //become more transparent
 			}
+			else //make dust
+			{
+                int dustnumber = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Smoke, 0f, 0f, 0, Color.White, 1f); //dust
+                Main.dust[dustnumber].noGravity = true;
+            }
 
 			if (Projectile.alpha >= 255) //transparent
 			{
@@ -47,22 +54,14 @@ namespace KirboMod.Projectiles
 
 			Projectile.ai[0]++; //goes up for gore smoke
 
-			// all for dust btw
+            // all for dust btw
 
-			if (Math.Abs(Projectile.velocity.X) > 5) //moving fast enough
+            if (Math.Abs(Projectile.velocity.X) > 5) //moving fast enough
 			{
 				for (int i = 0; i < Projectile.width / 16; i++) //tile width
 				{
 					for (int j = 0; j < Projectile.height / 16; j++) //tile height
 					{
-						/*Point tileLocation = Projectile.position.ToTileCoordinates() + new Point(i, j);
-
-						Point aboveTileLocation = Projectile.position.ToTileCoordinates() + new Point(i, j - 1);
-
-						Tile tile = Main.tile[tileLocation];
-
-						Tile aboveTile = Main.tile[aboveTileLocation];*/
-
 						int projTileX = Projectile.position.ToTileCoordinates().X;
 						int projTileY = Projectile.position.ToTileCoordinates().Y;
 
@@ -84,6 +83,11 @@ namespace KirboMod.Projectiles
 					}
 				}
 			}
+        }
+
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            Projectile.damage = (int)(Projectile.damage * 0.75f); //reduce
         }
     }
 }

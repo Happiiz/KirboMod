@@ -31,35 +31,27 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item1.WithPitchOffset(-0.5f); //lower pitch to emphasis power
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.GigantSlash>();
-			Item.shootSpeed = 40; //overridden in ModifyShootStats()
+			Item.shootSpeed = 60; //overridden in ModifyShootStats()
 		}
 
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {
 			if (player.velocity.Y == 0)
 			{
-                velocity.X = player.direction * 60; //go 60 units per tick in player direction
+				velocity *= 1.5f ; //go 60 units per tick in shoot direction
 				damage = (int)(damage * 1.2);
             }
-			else
-			{
-                velocity.X = player.direction * 40; //go 40 units per tick in player direction
-            }
-
-			velocity.Y = 0; //don't move on Y axis
-
-			knockback = 0;
         }
 
         public override void AddRecipes()
 		{
-			Recipe recipe1 = CreateRecipe();//the result is gigantsword
-			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.HeroSword>()); //Hero Sword
-			recipe1.AddIngredient(ItemID.BreakerBlade); //Breaker Blade
-			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 50); //50 starbits
-			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 2); //2 rare stones
-			recipe1.AddTile(TileID.Anvils); //crafted at anvil
-			recipe1.Register(); //adds this recipe to the game
+			Recipe gigantsword = CreateRecipe();//the result is gigantsword
+            gigantsword.AddIngredient(ModContent.ItemType<HeroSword>()); //Hero Sword
+            gigantsword.AddIngredient(ItemID.BreakerBlade); //Breaker Blade
+            gigantsword.AddIngredient(ModContent.ItemType<Starbit>(), 50); //50 starbits
+			gigantsword.AddIngredient(ModContent.ItemType<RareStone>(), 2); //2 rare stones
+			gigantsword.AddTile(TileID.Anvils); //crafted at anvil
+			gigantsword.Register(); //adds this recipe to the game
 		}
     }
 }

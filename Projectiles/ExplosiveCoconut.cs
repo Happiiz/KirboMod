@@ -21,7 +21,7 @@ namespace KirboMod.Projectiles
 			Projectile.friendly = false;
 			Projectile.hostile = true;
 			Projectile.timeLeft = 300;
-			Projectile.tileCollide = true;
+			Projectile.tileCollide = false;
 			Projectile.penetrate = 1;
 		}
 		public override void AI()
@@ -45,13 +45,19 @@ namespace KirboMod.Projectiles
          {
 			SoundEngine.PlaySound(SoundID.Item14, Projectile.position); //bomb sound
 
-			for (int i = 0; i < 18; i++) 
+			for (int i = 0; i < 30; i++) 
 			{
-				Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
+				Vector2 speed = Main.rand.NextVector2Circular(6f, 6f); //circle spread
 				Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.Smoke, speed, Scale: 2f); //Makes dust in a messy circle
 				d.noGravity = true;
 			}
-		}
+
+            for (int k = 0; k < 10; k++)
+            {
+                Vector2 speed = Main.rand.NextVector2Circular(6f, 6f); //circle spread
+                Gore.NewGorePerfect(Projectile.GetSource_FromThis(), Projectile.Center, speed, Main.rand.Next(61, 63), Scale: 1f); //smoke
+            }
+        }
 
         public override void OnHitPlayer(Player target, Player.HurtInfo info)
         {

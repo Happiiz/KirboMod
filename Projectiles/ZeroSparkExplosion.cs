@@ -30,12 +30,6 @@ namespace KirboMod.Projectiles
 		}
 		public override void AI()
 		{
-			Projectile.ai[0]++;
-			if (Projectile.ai[0] == 1)
-			{
-				SoundEngine.PlaySound(SoundID.Item14, Projectile.position); //bomb sound
-			}
-
 		    if (Projectile.ai[0] >= 10)
             {
 				Projectile.alpha += 10;
@@ -44,5 +38,10 @@ namespace KirboMod.Projectiles
 			Projectile.scale += 0.05f;
 			Lighting.AddLight(Projectile.Center, 1f, 0.9f, 0);
 		}
+
+        public override Color? GetAlpha(Color lightColor)
+        {
+			return Color.White * Projectile.Opacity;
+        }
     }
 }
