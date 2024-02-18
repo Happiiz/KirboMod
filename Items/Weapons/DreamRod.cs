@@ -13,8 +13,6 @@ namespace KirboMod.Items.Weapons
 	{
 		public override void SetStaticDefaults()
 		{
-			// DisplayName.SetDefault("Dream Rod"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
-			// Tooltip.SetDefault("Use the power of your friends to defeat evil doers!");
 			ItemID.Sets.GamepadWholeScreenUseRange[Item.type] = true; // This lets the player target anywhere on the whole screen while using a controller.
 			ItemID.Sets.LockOnIgnoresCollision[Item.type] = true;
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research 
@@ -22,14 +20,14 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 165;
+			Item.damage = 183;
 			Item.noMelee = true;
 			Item.DamageType = DamageClass.Summon;
-			Item.mana = 12;
+			Item.mana = 6;
 			Item.width = 22; //make small for better world hitbox
 			Item.height = 22;
-			Item.useTime = 10;
-			Item.useAnimation = 10;
+			Item.useTime = 8;
+			Item.useAnimation = 8;
 			Item.useStyle = ItemUseStyleID.HoldUp;
 			Item.knockBack = 6;
             Item.value = Item.buyPrice(0, 25, 0, 0);
@@ -37,7 +35,7 @@ namespace KirboMod.Items.Weapons
 			Item.autoReuse = true;
 			Item.UseSound = SoundID.Item9; //fallen star
 			Item.scale = 1f;
-			Item.shoot = ModContent.ProjectileType<Projectiles.DreamedFriend>(); //redundant as it's overrided in Shoot()
+			Item.shoot = ModContent.ProjectileType<Projectiles.DreamedFriend>();
 			Item.shootSpeed = 25f;
 			Item.crit += 24;
 			Item.buffType = ModContent.BuffType<Buffs.HopesAndDreams>();
@@ -53,6 +51,11 @@ namespace KirboMod.Items.Weapons
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {
             float spreadAngle = (120 - player.maxMinions * 20) < 20 ? 20 : 120 - player.maxMinions * 20f; //can't be lower than 20
+
+			int damageMultiplier = 20 * player.maxMinions;
+
+            damage += player.maxMinions < 8 ? 20 * player.maxMinions:
+                20 * 8; //can only increase by 160 damage max
 
             velocity = velocity.RotatedByRandom(MathHelper.ToRadians(spreadAngle)); // 120 degree spread max and 20 degree min 
 

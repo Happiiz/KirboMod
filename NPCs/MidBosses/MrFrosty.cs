@@ -41,7 +41,7 @@ namespace KirboMod.NPCs.MidBosses
 			NPC.height = 136;
 			NPC.damage = Main.hardMode ? 80 : 40;
 			NPC.defense = 20;
-            NPC.lifeMax = Main.hardMode ? 2500 : 500;
+            NPC.lifeMax = Main.hardMode ? 2500 : 400;
             NPC.HitSound = SoundID.NPCHit14; //fishron squeal
 			NPC.DeathSound = SoundID.NPCDeath8; //grunt
 			NPC.value = Item.buyPrice(0, 0, 50, 0); // money it drops
@@ -246,16 +246,16 @@ namespace KirboMod.NPCs.MidBosses
                         pastPlayer = distance.X > -5; //check for if facing left
                     }
 
-                    bool inRangeY = distance.Y > -300 &&  distance.Y < 100;
+                    bool inRangeY = distance.Y > -200 &&  distance.Y < 100;
 
-                    if (pastPlayer && inRangeY && player.dead == false) //past the player, near player and player not dead
+                    if (MathF.Abs(distance.X) < 10 && inRangeY && player.dead == false) //past the player, near player and player not dead
                     {
 						NPC.ai[0] = 180; //dive
                     }
 
                     if (player.dead) //player is no longer with us unfortunately
 					{
-						NPC.ai[0] = 1;
+						NPC.ai[0] = 31;
 					}
 				}
 				else //dive
@@ -294,21 +294,9 @@ namespace KirboMod.NPCs.MidBosses
             }
             Player player = Main.player[NPC.target];
 
-            float Xoffset = -26;
-
-            if (NPC.direction == -1) //so it matches projectile starting position
-            {
-                Xoffset = 26;
-            }
-
             float projshootX = (Main.expertMode ? 6 : 3) * NPC.direction;
 
-            Vector2 offset = new Vector2(-26, -80);
-
-            if (NPC.direction == -1) //when facing left
-            {
-                offset = new Vector2(26, -80);
-            }
+            Vector2 offset = new Vector2(NPC.direction * -26, -80);
 
             NPC.ai[0]++;
 
@@ -359,9 +347,9 @@ namespace KirboMod.NPCs.MidBosses
                 {
                     NPC.noTileCollide = true;
 
-                    if (player.Center.Y < NPC.Center.Y) //higher than NPC
+                    if (player.Center.Y < NPC.Center.Y || !player.dead) //higher than NPC or dead
                     {
-                        NPC.velocity.Y = -4f;
+                        NPC.velocity.Y = -8f;
                     }
 
                     break;

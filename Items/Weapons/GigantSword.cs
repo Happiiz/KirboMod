@@ -39,7 +39,7 @@ namespace KirboMod.Items.Weapons
 			if (player.velocity.Y == 0)
 			{
 				velocity *= 1.5f ; //go 60 units per tick in shoot direction
-				damage = (int)(damage * 1.2);
+				damage = (int)(damage * 1.5);
             }
         }
 

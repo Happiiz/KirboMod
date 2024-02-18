@@ -715,7 +715,7 @@ namespace KirboMod.NPCs
 
 				if (Main.expertMode)
 				{
-					for (int i = 0; i < 40; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+					for (int i = 0; i < 40; i++)
 				    {
 						Vector2 speed = Main.rand.NextVector2Unit(); //circle edge
 						Dust d = Dust.NewDustPerfect(NPC.Center + new Vector2(0, -200), ModContent.DustType<Dusts.Redsidue>(), speed * 20, Scale: 4); //Makes dust in a messy circle

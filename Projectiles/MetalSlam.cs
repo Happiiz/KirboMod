@@ -92,7 +92,7 @@ namespace KirboMod.Projectiles
 						peturbedspeed.Y = Main.rand.Next( -10, -4);
                     }
 
-                    SlamSpikes();
+                    SlamSpikes(player);
 
                     for (int i = 0; i < 16; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 					{
@@ -122,7 +122,7 @@ namespace KirboMod.Projectiles
 					player.immune = true;
 					player.immuneNoBlink = true;
 
-					SlamSpikes();
+					SlamSpikes(player);
                 }
 			}
 		}
@@ -130,23 +130,23 @@ namespace KirboMod.Projectiles
          /// Custom method used for the spikes that shoot out if a slam hits the ground or an NPC.
          /// </summary>
 
-        private void SlamSpikes() //custom method for 
+        private void SlamSpikes(Player player) //custom method for 
 		{
             //spikes
-            for (int i = 0; i < 8; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+            for (int i = 0; i < 16; i++)
             {
-                float rotationalOffset = MathHelper.ToRadians(i * 45f); //convert degrees to radians
+                float rotationalOffset = MathHelper.ToRadians(i * 22.5f); //convert degrees to radians
 
                 //use sine and cosine for circular formation
-                float projX = Projectile.Center.X + (float)Math.Cos(rotationalOffset) * 5; //angle = rotation offset
-                float projY = Projectile.Center.Y + (float)Math.Sin(rotationalOffset) * 5; //multiplier = spread
+                float projX = Projectile.Center.X + MathF.Cos(rotationalOffset) * 5; //angle = rotation offset
+                float projY = Projectile.Center.Y + MathF.Sin(rotationalOffset) * 5; //multiplier = spread
 
-                int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), projX, projY, Vector2.Zero.X, Vector2.Zero.Y,
+                int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), projX + player.direction * 45, projY + 45, Vector2.Zero.X, Vector2.Zero.Y,
                     ModContent.ProjectileType<MetalFighterSpike>(), Projectile.damage / 2, 6, Projectile.owner, 0, 0);
 
-                Vector2 direction = Main.projectile[proj].Center - Projectile.Center;
+                Vector2 direction = Main.projectile[proj].Center - (Projectile.Center + new Vector2(player.direction * 45, 45));
                 direction.Normalize();
-                direction *= 15;
+                direction *= 25;
                 Main.projectile[proj].velocity = direction;
             }
         }

@@ -44,7 +44,7 @@ namespace KirboMod.NPCs.MidBosses
 			DrawOffsetY = 70;
 			NPC.damage = Main.hardMode ? 100 : 50;
 			NPC.defense = 15;
-			NPC.lifeMax = Main.hardMode ? 2500 : 500;
+			NPC.lifeMax = Main.hardMode ? 2500 : 400;
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
 			NPC.value = Item.buyPrice(0, 0, 50, 0); // money it drops
@@ -333,7 +333,7 @@ namespace KirboMod.NPCs.MidBosses
                 {
                     NPC.noTileCollide = true;
 
-                    if (player.Center.Y < NPC.Center.Y) //higher than NPC
+                    if (player.Center.Y < NPC.Center.Y || !player.dead) //higher than NPC or dead
                     {
                         NPC.velocity.Y = -4f;
                     }

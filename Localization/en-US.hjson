@@ -783,7 +783,7 @@ Mods: {
 				DisplayName: Hardened Fighter Glove
 				Tooltip:
 					'''
-					Right click to slam the ground and shoot rocks!
+					Right click to slam the ground and shoot rocks
 					Slam onto enemies to boost yourself
 					'''
 			}
@@ -847,7 +847,7 @@ Mods: {
 			}
 
 			MaskedHammer: {
-				DisplayName: Wild Fire Hammer
+				DisplayName: Wildfire Hammer
 				Tooltip:
 					'''
 					Hold left on the ground to swing fire tornados in the direction you're facing
@@ -876,8 +876,9 @@ Mods: {
 				DisplayName: Metal Fighter Glove
 				Tooltip:
 					'''
-					Right click and hold up to combo uppercuts!
-					Spike in on the ground and air by just holding right click!
+					Right click and hold up to uppercut!
+					Combo punches to make uppercuts stronger!
+					Spike on the ground and in the air by just holding right click!
 					'Fly like a ballistic missile, sting like a ballistic missile'
 					'''
 			}
@@ -1045,7 +1046,7 @@ Mods: {
 				DisplayName: Tasty Fish
 				Tooltip:
 					'''
-					Summons a friendly face to help you uncover the mysteries of life
+					Summons a friendly face to help you unravel the mysteries of life
 					'Who...Me?'
 					'''
 			}
