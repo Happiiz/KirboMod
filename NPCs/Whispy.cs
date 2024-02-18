@@ -136,7 +136,7 @@ namespace KirboMod.NPCs
 			//checks if whispy can "see" the player
 			int tilesInFrontOfWhispy = 0;
 
-            for (int j = 0; j < 63; j++) //63 tiles ahead
+            for (int j = 0; j < 10; j++) //10 tiles ahead
 			{
 				for (int i = 0; i < 28; i++) //28 tiles across
 				{

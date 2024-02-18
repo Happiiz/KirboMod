@@ -81,7 +81,6 @@ namespace KirboMod.NPCs
             NPCDebuffImmunityData debuffData = new NPCDebuffImmunityData
             {
                 ImmuneToAllBuffsThatAreNotWhips = true,
-                ImmuneToWhips = true
             };
         }
 
@@ -90,10 +89,10 @@ namespace KirboMod.NPCs
 			NPC.width = 398; 
 			NPC.height = 398;
 			DrawOffsetY = 193;
-			NPC.damage = 120; //initally
+			NPC.damage = 150; 
 			NPC.noTileCollide = true;
-			NPC.defense = 70;
-			NPC.lifeMax = 160000;
+			NPC.defense = 150;
+			NPC.lifeMax = 280000;
 			NPC.HitSound = SoundID.NPCHit1; //slime
 			NPC.DeathSound = SoundID.NPCDeath1;
 			NPC.value = Item.buyPrice( 0, 38, 18, 10); // money it drops
@@ -103,16 +102,13 @@ namespace KirboMod.NPCs
 			NPC.boss = true;
 			NPC.noGravity = true;
 			NPC.lavaImmune = true;
-			NPC.buffImmune[BuffID.Poisoned] = true;
-			NPC.buffImmune[BuffID.Venom] = true;
-			NPC.buffImmune[BuffID.OnFire] = true;
-			NPC.buffImmune[BuffID.CursedInferno] = true;
-			NPC.buffImmune[BuffID.ShadowFlame] = true;
+            NPC.dontTakeDamage = true; //only initally
 
             /*Music = MusicID.Boss2;*/
             if (!Main.dedServ)
             {
-                Music = MusicLoader.GetMusicSlot(Mod, "Sounds/Music/Zero");
+				//Music = MusicLoader.GetMusicSlot(Mod, "Sounds/Music/Zero");
+				Music = MusicID.Boss2;
             }
 
             SceneEffectPriority = SceneEffectPriority.BossHigh; // By default, musicPriority is BossLow
@@ -121,8 +117,8 @@ namespace KirboMod.NPCs
 
 		public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */ //damage is automatically doubled in expert, use this to reduce it
 		{
-			NPC.lifeMax = (int)(NPC.lifeMax * 0.75 * balance); //240,000 health in expert
-			NPC.damage = (int)(NPC.damage * 1); //it scales by x2 automatically
+			NPC.lifeMax = (int)(NPC.lifeMax * 0.75 * balance); //360,000 health in expert
+			NPC.damage = (int)(NPC.damage * 1); //2x damage
 		}
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
@@ -222,7 +218,7 @@ namespace KirboMod.NPCs
 					NPC.velocity *= 0;
 				}
 
-				if (NPC.ai[1] == 389) //regular stats
+				if (NPC.ai[1] == 389) //fight start effect
                 {
 					for (int i = 0; i < 40; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 					{
@@ -230,14 +226,7 @@ namespace KirboMod.NPCs
 						Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed * 20, Scale: 2); //Makes dust in a messy circle
 						d.noGravity = true;
 					}
-
-					NPC.dontTakeDamage = false;
                 }
-				else //invinicble
-                {
-					NPC.dontTakeDamage = true;
-					NPC.damage = 0;
-				}
             }
 			else //regular attack
             {
@@ -248,26 +237,37 @@ namespace KirboMod.NPCs
 		{
 			Player player = Main.player[NPC.target];
 			Vector2 playerDistance = player.Center - NPC.Center;
-			Vector2 playerRightDistance = player.Center + new Vector2(500 + backupoffset, 0) - NPC.Center;
-			Vector2 playerLeftDistance = player.Center + new Vector2(-500 - backupoffset, 0) - NPC.Center;
-			Vector2 playerAboveDistance = player.Center + new Vector2(0, -500) - NPC.Center;
+            float playerSineDistanceExtra = attacktype == ZeroAttackType.BloodShots && NPC.ai[0] > 120 ?
+				MathF.Sin((NPC.ai[0] / 60 % 3600) * 2) * 300 : 0;
 
-			if (NPC.ai[0] == 0) //restart stats
+            Vector2 playerRightDistance = player.Center + new Vector2(500 + backupoffset, playerSineDistanceExtra) - NPC.Center;
+			Vector2 playerLeftDistance = player.Center + new Vector2(-500 - backupoffset, playerSineDistanceExtra) - NPC.Center;
+			Vector2 playerAboveDistance = player.Center + new Vector2(0, -1000) - NPC.Center;
+
+            if (NPC.ai[0] == 0) //restart stats
             {
 				animation = 0;
 				NPC.frameCounter = 0; //reset animation
 
 				NPC.dontTakeDamage = false;
 
-				NPC.damage = NPC.defDamage;
-			}
+                backupoffset = 0;
+            }
 
 			NPC.ai[0]++;
 
-			float speed = 16; 
-			float inertia = 15;
+			float timer = NPC.GetLifePercent() > 0.5 ? NPC.ai[0] : NPC.ai[0] + 60;
 
-			if (NPC.ai[0] <= 120)
+			float speed = 16; 
+			float inertia = 20;
+
+            //far away
+            if (playerDistance.Length() > 5000)
+            {
+                speed += 10 + playerDistance.Length() - 5000; //make Zero move faster 
+            }
+
+            if (NPC.ai[0] <= 120)
 			{
 				NPC.TargetClosest(true); //face player before attacking
 
@@ -275,7 +275,7 @@ namespace KirboMod.NPCs
 
                 if (NPC.ai[0] == 120)  
 				{
-					if (NPC.life <= NPC.lifeMax * 0.10) //10%
+					if (NPC.GetLifePercent() <= 0.25) //25%
 					{
 						//background attack is done every 3 attacks when zero's health gets low enough
 						//(does it the next cycle upon initally dropping low enough)
@@ -304,99 +304,26 @@ namespace KirboMod.NPCs
                 {
                     NPC.TargetClosest(true); //face player during attack
 
-					//blood effect for attack
-					if (NPC.ai[0] % 5 == 0) //every 5
+                    speed += 8;
+
+                    //blood effect for attack
+                    if (NPC.ai[0] % 5 == 0) //every 5
 					{
 						int d = Dust.NewDust(NPC.position + new Vector2(NPC.direction == 1 ? NPC.width - 200 : 0, NPC.height / 4), 200, 200, ModContent.DustType<Dusts.Redsidue>());
 						Main.dust[d].velocity *= 0;
 					}
 
-                    //1st shot of round
-
-                    if (NPC.ai[0] == 140 || NPC.ai[0] == 180 || NPC.ai[0] == 220 || NPC.ai[0] == 260 || NPC.ai[0] == 300 || NPC.ai[0] == 340)
+                    if (NPC.ai[0] % 10 == 0) //every 10 ticks
                     {
-                        if (Main.netMode != NetmodeID.MultiplayerClient)
+                        for (int i = 0; i < 5; i++)
                         {
-                            bloodlocationx = Main.rand.Next(0, 50);
-                            bloodlocationy = Main.rand.Next(0, 199);
-                            NPC.netUpdate = true;
-
-                            if (NPC.direction == -1) //left
-                            {
-                                bloodlocation = new Vector2(NPC.position.X + bloodlocationx, NPC.position.Y + (NPC.height / 4) + bloodlocationy);
-                            }
-                            else //right
-                            {
-                                bloodlocation = new Vector2(NPC.position.X + NPC.width - bloodlocationx, NPC.position.Y + (NPC.height / 4) + bloodlocationy);
-                            }
-
-                            for (int i = 0; i < 5; i++)
-                            {
-                                Vector2 spread = Main.rand.NextVector2Circular(10f, 10f); //circle
-                                Dust.NewDustPerfect(bloodlocation, ModContent.DustType<Dusts.Redsidue>(), spread, Scale: 1f); //Makes dust in a messy circle
-                            }
-
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), bloodlocation, new Vector2(NPC.direction * 25, 0), ModContent.ProjectileType<ZeroBloodShot>(), 60 / 2, 6f, Main.myPlayer, NPC.whoAmI, 0);
+                            Vector2 spread = Main.rand.NextVector2Circular(10f, 10f); //circle
+                            Dust.NewDustPerfect(bloodlocation, ModContent.DustType<Dusts.Redsidue>(), spread, Scale: 1f); //Makes dust in a messy circle
                         }
-                        SoundStyle SkinTear = new SoundStyle("KirboMod/Sounds/Item/SkinTear");
-                        SoundEngine.PlaySound(SkinTear, NPC.Center);
-                    }
 
-                    //2nd shot of round
-
-                    if (NPC.ai[0] == 150 || NPC.ai[0] == 190 || NPC.ai[0] == 230 || NPC.ai[0] == 270 || NPC.ai[0] == 310 || NPC.ai[0] == 350)
-                    {
                         if (Main.netMode != NetmodeID.MultiplayerClient)
                         {
-                            bloodlocationx = Main.rand.Next(0, 50);
-                            bloodlocationy = Main.rand.Next(0, 199);
-                            NPC.netUpdate = true;
-
-                            if (NPC.direction == -1) //left
-                            {
-                                bloodlocation = new Vector2(NPC.position.X + bloodlocationx, NPC.position.Y + (NPC.height / 4) + bloodlocationy);
-                            }
-                            else //right
-                            {
-                                bloodlocation = new Vector2(NPC.position.X + NPC.width - bloodlocationx, NPC.position.Y + (NPC.height / 4) + bloodlocationy);
-                            }
-
-                            for (int i = 0; i < 5; i++)
-                            {
-                                Vector2 spread = Main.rand.NextVector2Circular(10f, 10f); //circle
-                                Dust.NewDustPerfect(bloodlocation, ModContent.DustType<Dusts.Redsidue>(), spread, Scale: 1f); //Makes dust in a messy circle
-                            }
-
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), bloodlocation, new Vector2(NPC.direction * 25, 0), ModContent.ProjectileType<ZeroBloodShot>(), 60 / 2, 6f, Main.myPlayer, NPC.whoAmI, 0);
-                        }
-                        SoundStyle SkinTear = new SoundStyle("KirboMod/Sounds/Item/SkinTear");
-                        SoundEngine.PlaySound(SkinTear, NPC.Center);
-                    }
-
-                    //3rd shot of round
-
-                    if (NPC.ai[0] == 160 || NPC.ai[0] == 200 || NPC.ai[0] == 240 || NPC.ai[0] == 280 || NPC.ai[0] == 320 || NPC.ai[0] == 360)
-                    {
-                        if (Main.netMode != NetmodeID.MultiplayerClient)
-                        {
-                            bloodlocationx = Main.rand.Next(0, 50);
-                            bloodlocationy = Main.rand.Next(0, 199);
-                            NPC.netUpdate = true;
-
-                            if (NPC.direction == -1) //left
-                            {
-                                bloodlocation = new Vector2(NPC.position.X + bloodlocationx, NPC.position.Y + (NPC.height / 4) + bloodlocationy);
-                            }
-                            else //right
-                            {
-                                bloodlocation = new Vector2(NPC.position.X + NPC.width - bloodlocationx, NPC.position.Y + (NPC.height / 4) + bloodlocationy);
-                            }
-
-                            for (int i = 0; i < 5; i++)
-                            {
-                                Vector2 spread = Main.rand.NextVector2Circular(10f, 10f); //circle
-                                Dust.NewDustPerfect(bloodlocation, ModContent.DustType<Dusts.Redsidue>(), spread, Scale: 1f); //Makes dust in a messy circle
-                            }
+                            Vector2 bloodlocation = new Vector2(NPC.Center.X + NPC.width / 2 * NPC.direction, NPC.Center.Y);
 
                             Projectile.NewProjectile(NPC.GetSource_FromAI(), bloodlocation, new Vector2(NPC.direction * 25, 0), ModContent.ProjectileType<ZeroBloodShot>(), 60 / 2, 6f, Main.myPlayer, NPC.whoAmI, 0);
                         }
@@ -407,10 +334,10 @@ namespace KirboMod.NPCs
                     DefaultMovement(playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
 
                     if (NPC.ai[0] >= 440)
-					{
-						NPC.ai[0] = 0;
-					}
-				}
+                    {
+                        NPC.ai[0] = 0;
+                    }
+                }
 
 
 				if (attacktype == ZeroAttackType.Dash) //dash
@@ -425,12 +352,12 @@ namespace KirboMod.NPCs
 						}
 						else
 						{
-							NPC.velocity.X -= NPC.direction * 0.2f; //back up
+							NPC.velocity.X -= NPC.direction * 0.5f; //back up
 						}
 					}
 					else if (NPC.ai[0] <= 270) //dash
 					{
-						NPC.velocity.X += NPC.direction * 0.4f;
+						NPC.velocity.X += NPC.direction * 0.6f;
 					}
 					else //reset
 					{
@@ -441,21 +368,21 @@ namespace KirboMod.NPCs
 					//go up or down
 					if (player.Center.Y < NPC.Center.Y)
 					{
-						NPC.velocity.Y -= 0.4f;
+						NPC.velocity.Y -= 0.65f;
 					}
 					else
 					{
-						NPC.velocity.Y += 0.4f;
+						NPC.velocity.Y += 0.65f;
 					}
 
 					//cap
-					if (NPC.velocity.Y > 5f)
+					if (NPC.velocity.Y > 9f)
 					{
-						NPC.velocity.Y = 5f;
+						NPC.velocity.Y = 9f;
 					}
-					if (NPC.velocity.Y < -5f)
+					if (NPC.velocity.Y < -9f)
 					{
-						NPC.velocity.Y = -5f;
+						NPC.velocity.Y = -9f;
 					}
 				}
 
@@ -463,26 +390,16 @@ namespace KirboMod.NPCs
 				{
                     NPC.TargetClosest(true); //face player during attack
 
-                    if (NPC.ai[0] % 40 == 0)
-					{
-                        Vector2 randomlocation = new Vector2(NPC.position.X + Main.rand.Next(0, NPC.width), NPC.position.Y + Main.rand.Next(20, NPC.height - 20));
+					if (NPC.ai[0] % 80 == 0) //on multiples of 80
+                    {
+                        CreateDarkMatterFloorAndCeiling();
 
-                        for (int i = 0; i < 5; i++)
-                        {
-                            Dust d = Dust.NewDustPerfect(randomlocation, ModContent.DustType<DarkResidue>(), Main.rand.NextVector2Circular(10f, 10f), Scale: 1f); //Makes dust in a messy circle
-                            d.noGravity = true;
-                        }
-
-						if (Main.netMode != NetmodeID.MultiplayerClient)
-						{
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), randomlocation, new Vector2(NPC.direction * 0.05f, 0), ModContent.ProjectileType<DarkMatterShot>(), 80 / 2, 8f, Main.myPlayer, 0, player.whoAmI);
-						}
-                        SoundEngine.PlaySound(SoundID.Item81, NPC.Center); //spawn slime mount
-					}
+                        SoundEngine.PlaySound(SoundID.Item104, NPC.Center);
+                    }
 
                     DefaultMovement(playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
 
-                    if (NPC.ai[0] >= 360)
+                    if (NPC.ai[0] >= 520)
 					{
 						NPC.ai[0] = 0;
 					}
@@ -492,23 +409,27 @@ namespace KirboMod.NPCs
                 {
                     NPC.TargetClosest(true); //face player during attack
 
-                    //shoot every 60 ticks
-                    if (NPC.ai[0] % 60 == 0)
-					{
-						for (int i = 0; i < 10; i++)
-						{
-							//shoot all at once
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 150, 0), new Vector2(NPC.direction * Main.rand.Next(1, 50), Main.rand.Next(-30, 30)), Mod.Find<ModProjectile>("ZeroSpark").Type, 0, 0, Main.myPlayer, 0, 0);
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 150, 0), new Vector2(NPC.direction * Main.rand.Next(1, 25), Main.rand.Next(-15, 15)), Mod.Find<ModProjectile>("ZeroSpark").Type, 0, 0, Main.myPlayer, 0, 0);
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 150, 0), new Vector2(NPC.direction * Main.rand.Next(1, 100), Main.rand.Next(-60, 60)), Mod.Find<ModProjectile>("ZeroSpark").Type, 0, 0, Main.myPlayer, 0, 0);
-							}
-						}
-                        SoundEngine.PlaySound(SoundID.Item5.WithVolumeScale(1.6f).WithPitchOffset(0.1f), NPC.Center); //bow shot
-					}
+                    float attackRange = MathF.Sin((NPC.ai[0] / 60 % 3600) * 3) * 50;
 
-					DefaultMovement(playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
+                    for (int i = 0; i < 2; i++)
+                    {
+                        //rapid fire in a spread
+                        if (Main.netMode != NetmodeID.MultiplayerClient)
+                        {
+                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 150, 0),
+                                Main.rand.NextVector2Unit(MathF.PI / 2 * -NPC.direction, MathF.PI * 0.85f) * (60 + attackRange),
+                                ModContent.ProjectileType<ZeroSpark>(), 0, 0, Main.myPlayer, 0, 0);
+                        }
+                    }
+
+                    if (NPC.ai[0] % 5 == 0)
+                    {
+                        SoundEngine.PlaySound(SoundID.Item39.WithVolumeScale(1.4f), NPC.Center);
+                    }
+
+					backupoffset = 500;
+
+                    DefaultMovement(playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
 
                     if (NPC.ai[0] >= 360)
 					{
@@ -525,24 +446,27 @@ namespace KirboMod.NPCs
 
 						if (NPC.ai[0] == 130)
                         {
-							SoundEngine.PlaySound(SoundID.Item56.WithVolumeScale(1.6f).WithPitchOffset(-0.1f), NPC.Center); //grass
+							SoundEngine.PlaySound(SoundID.Item56.WithVolumeScale(1.6f).WithPitchOffset(-0.1f), NPC.Center); 
 						}
 					}
 					else if (NPC.ai[0] < 480)
 					{
 						animation = 3;
 
-						playerAboveDistance.Normalize();
+                        speed += 8; //go slightly faster
+
+                        playerAboveDistance.Normalize();
 						playerAboveDistance *= speed;
 						NPC.velocity = (NPC.velocity * (inertia - 1) + playerAboveDistance) / inertia; //fly towards player
 
-						if (NPC.ai[0] % 5 == 0 && Main.netMode != NetmodeID.MultiplayerClient)
+						if (NPC.ai[0] % 3 == 0 && Main.netMode != NetmodeID.MultiplayerClient)
 						{ 
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(0, 300), new Vector2(Main.rand.Next(-10, 10), -5), Mod.Find<ModProjectile>("ZeroThornJuice").Type, 60 / 2, 1f, Main.myPlayer, 0);
+							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(0, 290), 
+								new Vector2(Main.rand.Next(-20, 20), 15), ModContent.ProjectileType<ZeroThornJuice>(), 60 / 2, 1f, Main.myPlayer, 0);
 					    }
-						if (NPC.ai[0] % 20 == 0)
+						if (NPC.ai[0] % 10 == 0)
 						{
-							SoundEngine.PlaySound(SoundID.Grass.WithVolumeScale(1.2f).WithPitchOffset(-0.1f), NPC.Center); //grass
+							SoundEngine.PlaySound(SoundID.Item17.WithVolumeScale(1.2f), NPC.Center); //stinger
 						}
 					}
 					else if (NPC.ai[0] < 510)
@@ -567,7 +491,8 @@ namespace KirboMod.NPCs
 					{
 						NPC.TargetClosest(false); //don't face player during attack
 
-						NPC.scale -= 0.01f; //get smaller
+						NPC.scale = 1 - ((float)Utils.GetLerpValue(120, 180, NPC.ai[0]) * 0.6f); //get smaller
+
 						NPC.behindTiles = true;
 						NPC.damage = 0;
 						NPC.dontTakeDamage = true;
@@ -589,11 +514,11 @@ namespace KirboMod.NPCs
 
 						if (NPC.ai[0] % 9 == 0 && NPC.ai[0] < 420) //shoot projectiles before getting big again
                         {
-							Vector2 BackgroundplayerDistance = player.Center - NPC.Center;
+							Vector2 BackgroundplayerDistance = player.Center + (player.velocity * 5) - NPC.Center;
 
 							if (Main.netMode != NetmodeID.MultiplayerClient) 
 							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, BackgroundplayerDistance / 60, Mod.Find<ModProjectile>("ZeroScreenBlood").Type, 80 / 2, 1f, Main.myPlayer, 0, NPC.ai[0] % 2 == 0 ? 0 : 1);
+								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, BackgroundplayerDistance / 60, ModContent.ProjectileType<ZeroScreenBlood>(), 80 / 2, 1f, Main.myPlayer, 0, NPC.ai[0] % 2 == 0 ? 0 : 1);
 							}
 							SoundEngine.PlaySound(SoundID.NPCHit9.WithVolumeScale(0.8f), NPC.Center); //leech hit
 
@@ -626,31 +551,37 @@ namespace KirboMod.NPCs
 				}
 			}
 		}
+        //call this on the frame you want to create the setup
+        //probably snaps to the position too quickly, but idk how to calculate the numbers to fix it so it gets there in fewer frames
+        void CreateDarkMatterFloorAndCeiling()
+        {
+            Player player = Main.player[NPC.target];
+            //tweak these parameters to your liking for balancing
+            float ySpacing = 1000;
+            float xSpacing = 130;
+            int mattersInWall = 20;
+
+            for (int i = 0; i < mattersInWall; i++)
+            {
+                //if i is even, mod will result in 0, multiplied by 2 becomes 0, then subtract one to become -1
+                //if i is odd, mod will result in 1, multiplied by 2 becomes 2, then subtract one to become 1
+                int directionY = i % 2 * 2 - 1;
+                Vector2 offset = default;
+                offset.Y = directionY * ySpacing / 2;
+                offset.X = Utils.Remap(i, 0, mattersInWall - 1, -xSpacing * mattersInWall / 2, xSpacing * mattersInWall / 2);
+                DarkMatterShot.AccountForSpeed(ref offset, player);
+                Vector2 from = NPC.Center + Main.rand.NextVector2Circular(NPC.width, NPC.height);
+                DarkMatterShot.NewDarkMatterShot(NPC, offset + player.Center, from, 80 / 2, directionY, .3f);
+            }
+        }
 
         void AttackDecideNext()
         {
-            List<ZeroAttackType> possibleAttacks = new() { ZeroAttackType.BloodShots };
-            if (NPC.GetLifePercent() < 0.90f)
-            {
-                possibleAttacks.Add(ZeroAttackType.Dash);
-            }
-            if (NPC.GetLifePercent() < 0.75f)
-            {
-                possibleAttacks.Add(ZeroAttackType.DarkMatterShots);
-            }
-            if (NPC.GetLifePercent() < 0.50f)
-            {
-                possibleAttacks.Add(ZeroAttackType.Sparks);
-            }
-            if (NPC.GetLifePercent() < 0.35f)
-            {
-                possibleAttacks.Add(ZeroAttackType.ThornTail);
-            }
-
+            List<ZeroAttackType> possibleAttacks = new() { ZeroAttackType.BloodShots, ZeroAttackType.Dash, ZeroAttackType.DarkMatterShots, ZeroAttackType.Sparks, ZeroAttackType.ThornTail };
+            
             possibleAttacks.Remove(lastattacktype);
-            possibleAttacks.TrimExcess();
 
-            if (NPC.GetLifePercent() >= 0.90f)
+            if (NPC.GetLifePercent() >= 0.95f)
             {
                 attacktype = ZeroAttackType.BloodShots;
             }
@@ -784,11 +715,11 @@ namespace KirboMod.NPCs
 
 				if (Main.expertMode)
 				{
-					for (int i = 0; i < 40; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+					for (int i = 0; i < 40; i++)
 				    {
-					Vector2 speed = Main.rand.NextVector2Unit(); //circle edge
-					Dust d = Dust.NewDustPerfect(NPC.Center + new Vector2(0, -200), ModContent.DustType<Dusts.Redsidue>(), speed * 20, Scale: 4); //Makes dust in a messy circle
-					d.noGravity = true;
+						Vector2 speed = Main.rand.NextVector2Unit(); //circle edge
+						Dust d = Dust.NewDustPerfect(NPC.Center + new Vector2(0, -200), ModContent.DustType<Dusts.Redsidue>(), speed * 20, Scale: 4); //Makes dust in a messy circle
+						d.noGravity = true;
 				    }
 
 					Dust.NewDustPerfect(NPC.position + new Vector2(-200, -200), ModContent.DustType<Dusts.ZeroEyeless>(), new Vector2(0, 5), 0);
@@ -838,10 +769,8 @@ namespace KirboMod.NPCs
 			{
 				for (int i = 0; i < 2; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 				{
-					Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
-					Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.Redsidue>(), speed, 1); //Makes dust in a messy circle
-					d.noGravity = true;
-				}
+                    Dust.NewDust(NPC.position, NPC.width, NPC.height, ModContent.DustType<Dusts.Redsidue>());
+                }
 			}
 		}
 

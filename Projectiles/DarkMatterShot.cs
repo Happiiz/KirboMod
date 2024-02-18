@@ -12,32 +12,72 @@ namespace KirboMod.Projectiles
 		int initalDir = 1;
 		public override void SetStaticDefaults()
 		{
-			// DisplayName.SetDefault("Dark Matter");
-			Main.projFrames[Projectile.type] = 2;
+			Main.projFrames[Projectile.type] = 4;
 		}
 
 		public override void SetDefaults()
 		{
 			Projectile.width = 120; //not actual size just hitbox
 			Projectile.height = 120;
-			DrawOriginOffsetY = -4;
+			DrawOriginOffsetY = -3;
+			DrawOffsetX = -23;
 			Projectile.friendly = false;
 			Projectile.hostile = true;
 			Projectile.timeLeft = 500;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
+			Projectile.alpha = 255;
 
         }
 
-		public override void AI()
+        public override string Texture => "KirboMod/NPCs/PureDarkMatter";
+
+        public static float TimeSpentDecelerating => 20f;
+        //call this
+        public static void AccountForSpeed(ref Vector2 offset, Player target)
+        {
+            offset += target.velocity * TimeSpentDecelerating;
+        }
+        public static void NewDarkMatterShot(NPC zero, Vector2 target, Vector2 from, int damage, float directionY, float acceleration = 1.3f)
+        {
+            Projectile.NewProjectile(zero.GetSource_FromAI(), from, target - from, ModContent.ProjectileType<DarkMatterShot>(), damage, 0, -1, 0, acceleration * directionY, directionY);
+        }
+        public override void AI()
+        {
+            if (Projectile.ai[0] < TimeSpentDecelerating)
+            {
+                Projectile.velocity *= .5f;
+
+				Projectile.damage = 0;
+
+				if (Projectile.ai[0] > 5)
+				{
+                    Projectile.Opacity += .1f;//make it have 255 alpha on SetDefaults
+                }
+            }
+            else
+            {
+                Projectile.velocity.Y -= Projectile.ai[1];
+                Projectile.damage = Projectile.originalDamage;
+            }
+            Projectile.spriteDirection = (int)Projectile.ai[2];
+            Projectile.rotation = MathF.PI / 2 * Projectile.ai[2];
+            if (Projectile.spriteDirection < 0)
+            {
+                Projectile.rotation += MathF.PI;
+            }
+            Projectile.ai[0]++;
+        }
+
+        /*public override void AI()
 		{
             Player player = Main.player[(int)Projectile.ai[1]];
-            float playerXDir = player.Center.X - Projectile.Center.X;
+            Vector2 playerDir = player.Center - Projectile.Center;
 
             //set inital direction manually
             if (Projectile.ai[0] == 0) 
 			{
-				if (playerXDir > 0) 
+				if (playerDir.X > 0) 
 				{
 					initalDir = 1;
 
@@ -48,7 +88,7 @@ namespace KirboMod.Projectiles
                 }
 			}
 
-            Projectile.spriteDirection = initalDir; //face same direction
+            Projectile.spriteDirection = -initalDir; //face same direction (negative 'cause sprite is flipped)
 
 			if (Main.rand.NextBool(5)) // happens 1/5 times
 			{
@@ -58,8 +98,8 @@ namespace KirboMod.Projectiles
 			}
 
 			//animation
-			if (++Projectile.frameCounter >= 20) //changes frames every 20 ticks 
-			{
+			if (++Projectile.frameCounter >= 10) //changes frames every 10 ticks 
+            {
 				Projectile.frameCounter = 0;
 				if (++Projectile.frame >= 2)
 				{
@@ -67,35 +107,17 @@ namespace KirboMod.Projectiles
 				}
 			}
 
-			//backing up and speeding up
-			Projectile.ai[0]++; 
+			//slowing down, backing up and speeding up
+			Projectile.ai[0]++;
 
 			if (Projectile.ai[0] < 30)
 			{
-				if (playerXDir < 250 || playerXDir > -250) //player is close
-				{
-                    Projectile.velocity.X -= 0.5f * initalDir; //back up faster
-                }
-				else //regular speed
-				{
-					Projectile.velocity.X -= 0.25f * initalDir; //back up
-				}
+                Projectile.velocity *= 0.9f;
             }
 			else
 			{
-                Projectile.velocity.X += 0.5f * initalDir; //speed up
+                Projectile.velocity.X += 1.2f * initalDir; //speed up
             }
-
-			//move up or down
-			if (!player.dead) //check this so it doesn't flatline when player dies
-			{
-				float speed = 16f;
-				float inertia = 8f;
-				Vector2 direction = player.Center - Projectile.Center; //start - end
-				direction.Normalize();
-				direction *= speed;
-				Projectile.velocity.Y = (Projectile.velocity.Y * (inertia - 1) + direction.Y) / inertia; //use .Y so it only effects vertical movement    
-			}
 
             //cap
             if (Projectile.velocity.X > 60f)
@@ -106,10 +128,10 @@ namespace KirboMod.Projectiles
 			{
 				Projectile.velocity.X = -60f;
 			}
-		}
-		public override Color? GetAlpha(Color lightColor)
+		}*/
+        public override Color? GetAlpha(Color lightColor)
 		{
-			return Color.White; // Makes it uneffected by light
+			return Color.White * Projectile.Opacity; // Makes it uneffected by light
 		}
     }
 }

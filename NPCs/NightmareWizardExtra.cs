@@ -29,7 +29,7 @@ namespace KirboMod.NPCs
         public override void SetStaticDefaults()
         {
             // DisplayName.SetDefault("Nightmare");
-            Main.npcFrameCount[NPC.type] = 19;
+            Main.npcFrameCount[NPC.type] = 25;
 
             NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
             {
@@ -46,7 +46,7 @@ namespace KirboMod.NPCs
             NPC.width = 114;
             NPC.height = 114;
             DrawOffsetY = 20;
-            NPC.damage = 70; 
+            NPC.damage = 70;
             NPC.noTileCollide = true;
             NPC.defense = 6;
             NPC.lifeMax = 10000;
@@ -146,14 +146,14 @@ namespace KirboMod.NPCs
 
         public override void HitEffect(NPC.HitInfo hit)
         {
-            if (NPC.life <= 0)
+            if (deathCounter >= 360 && NPC.life <= 0)
             {
                 for (int i = 0; i < 8; i++) 
                 {
                     // go around in a octogonal pattern
                     Vector2 speed = new Vector2((float)Math.Cos(MathHelper.ToRadians(i * 45)) * 20, (float)Math.Sin(MathHelper.ToRadians(i * 45)) * 20);
 
-                    Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.NightStar>(), speed, Scale: 3f); //Makes dust in a messy circle
+                    Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.NightStar>(), speed, Scale: 3f); //Makes dust in an octogonal formation
                     d.noGravity = true;
                 }
 

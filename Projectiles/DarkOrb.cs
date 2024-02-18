@@ -27,7 +27,6 @@ namespace KirboMod.Projectiles
 			Projectile.timeLeft = 120;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = 1;
-			Projectile.scale = .05f;
 		}
 		float Scale { get => Utils.GetLerpValue(0, 20, Projectile.ai[0], true); }
 		public override void AI()

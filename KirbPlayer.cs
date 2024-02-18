@@ -54,6 +54,7 @@ namespace KirboMod
 
         public bool royalslippers;
         public int falltime = 0;
+        public bool dededeSlam = false; //determines if Player is stomping from mid-air
 
         public bool hyperzone;
 
@@ -168,10 +169,16 @@ namespace KirboMod
             }
 
             //ground pounding with royal slippers
-            if (royalslippers == true && player.controlDown && player.velocity.Y != 0 && player.controlUp == false && player.controlJump == false)
+            if (dededeSlam == true)
             {
                 player.armorEffectDrawShadow = true; //afterimages
             }
+
+            if (player.velocity.Y == 0) //reset
+            {
+                dededeSlam = false;
+            }
+
 
             //TRIPLE STAR STARS
             tripleStarRotationCounter += 1;
@@ -298,30 +305,7 @@ namespace KirboMod
                         && (Main.tile[mouselocation.X, mouselocation.Y].LiquidType == LiquidID.Lava) == false
                         && (Main.tile[mouselocation.X, mouselocation.Y].WallType != WallID.LihzahrdBrickUnsafe))
                     {
-                        //before effect
-                        Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, Vector2.Zero, ModContent.ProjectileType<NightCrownEffect>(), 0, 0, player.whoAmI);
-
-                        player.Teleport(Main.MouseWorld, -1);
-
-                        //after effect
-                        for (int i = 0; i < 10; i++)
-                        {
-                            Vector2 speed = Main.rand.NextVector2Circular(5f, 10f); //circle
-                            Dust.NewDustPerfect(player.Center, ModContent.DustType<Dusts.NightStar>(), speed, Scale: 1f); //Makes dust in a messy circle
-                        }
-
-                        player.AddBuff(ModContent.BuffType<Buffs.Nightmare>(), 720); //gives player nightmare effect for 12 seconds
-
-                        if (nightmareeffect) //has nightmare effect
-                        {
-                            player.statLife -= player.statLifeMax2 / 10; //subtract life
-                            if (player.statLife <= 0) //if dead
-                            {
-                                PlayerDeathReason deathmessage = PlayerDeathReason.ByCustomReason($"{player.name} couldn't handle the bad thoughts"); //custom death message
-
-                                player.KillMe(deathmessage, 1.0, 0); //kill player with death message
-                            }
-                        }
+                        NightCrownTeleport();
                     }
                 }
                 else //everything else but now you can teleport through lihizhard walls
@@ -330,46 +314,28 @@ namespace KirboMod
                         && player.mount.Active == false
                         && (Main.tile[mouselocation.X, mouselocation.Y].LiquidType == LiquidID.Lava) == false)
                     {
-                        //before effect
-                        Projectile.NewProjectile(Player.GetSource_FromThis(), player.Center, Vector2.Zero, ModContent.ProjectileType<NightCrownEffect>(), 0, 0, player.whoAmI);
-
-                        player.Teleport(Main.MouseWorld, -1);
-
-                        player.AddBuff(ModContent.BuffType<Buffs.Nightmare>(), 720); //gives player nightmare effect for 12 seconds
-
-                        //after effect
-                        for (int i = 0; i < 10; i++)
-                        {
-                            Vector2 speed = Main.rand.NextVector2Circular(5f, 10f); //circle
-                            Dust.NewDustPerfect(player.Center, ModContent.DustType<Dusts.NightStar>(), speed, Scale: 1f); //Makes dust in a messy circle
-                        }
-
-                        if (nightmareeffect) //has nightmare effect
-                        {
-                            player.statLife -= player.statLifeMax2 / 10; //subtract life
-                            if (player.statLife <= 0) //if dead
-                            {
-                                PlayerDeathReason deathmessage = PlayerDeathReason.ByCustomReason($"{player.name} couldn't handle the bad thoughts"); //custom death message
-
-                                player.KillMe(deathmessage, 1.0, 0); //kill player with death message
-                            }
-                        }
+                        NightCrownTeleport();
                     }
                 }
             }
+
+
 
             //ROYAL SLIPPERS
 
             if (royalslippers == true)
             {
-                //holding down ,not holding up and jump, in the air, and not grappling
-                if (player.controlDown && player.velocity.Y != 0 && player.controlUp == false && player.controlJump == false)
+                //pressed down, not holding up or jump, and in the air
+                if (Player.controlDown && Player.releaseDown && player.velocity.Y != 0 && player.controlUp == false && player.controlJump == false)
+                {
+                    dededeSlam = true;
+                }
+
+                if (dededeSlam)
                 {
                     player.velocity.Y = 20;
+                    Player.maxFallSpeed = 20;
                     player.noFallDmg = true; //disable fall damage
-
-                    player.DryCollision(true, true); //fall through platforms
-                    player.SlopingCollision(true, true); //fall through slopes(?)
 
                     //stop grappling
                     for (int k = 0; k < 1000; k++)
@@ -382,24 +348,19 @@ namespace KirboMod
 
                     falltime++; //go up
 
-                    for (float i = 0; i < player.width; i++) //counter for stuck
+                    for (float i = 0; i < player.width; i++)
                     {
                         Point belowplayer = new Vector2(player.position.X + i, player.position.Y + player.height).ToTileCoordinates(); //all tiles below npc
 
                         //touching ground while groundpounding
-                        if (WorldGen.SolidOrSlopedTile(Main.tile[belowplayer.X, belowplayer.Y]) && falltime >= 5)
+                        if (Main.tile[belowplayer.X, belowplayer.Y].HasTile && falltime >= 5)
                         {
-                            Projectile.NewProjectile(null, player.Center.X, player.position.Y + player.height, 0, 0, Mod.Find<ModProjectile>("PlayerSlam").Type, 100, 8f, Main.myPlayer, 0, 0);
+                            Projectile.NewProjectile(player.GetSource_FromThis(), player.Center.X, player.position.Y + player.height, player.direction * 0.01f, 0, ModContent.ProjectileType<PlayerSlam>(), 100 + (falltime - 5), 8f, Main.myPlayer, 0, 0);
                             SoundEngine.PlaySound(SoundID.Item14, player.Center); //bomb
 
-                            falltime = 0; //reset
+                            falltime = 0; //reset damage
                         }
                     }
-                }
-
-                if (player.velocity.Y == 0)
-                {
-                    falltime = 0; //reset
                 }
             }
 
@@ -445,6 +406,35 @@ namespace KirboMod
                 }
             }
         }
+
+        private void NightCrownTeleport()
+        {
+            //before effect
+            Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, Vector2.Zero, ModContent.ProjectileType<NightCrownEffect>(), 0, 0, Player.whoAmI);
+
+            Player.Teleport(Main.MouseWorld, -1);
+
+            Player.AddBuff(ModContent.BuffType<Buffs.Nightmare>(), 720); //gives player nightmare effect for 12 seconds
+
+            //after effect
+            for (int i = 0; i < 10; i++)
+            {
+                Vector2 speed = Main.rand.NextVector2Circular(5f, 10f); //circle
+                Dust.NewDustPerfect(Player.Center, ModContent.DustType<Dusts.NightStar>(), speed, Scale: 1f); //Makes dust in a messy circle
+            }
+
+            if (nightmareeffect) //has nightmare effect
+            {
+                Player.statLife -= Player.statLifeMax2 / 10; //subtract life
+                if (Player.statLife <= 0) //if dead
+                {
+                    PlayerDeathReason deathmessage = PlayerDeathReason.ByCustomReason($"{Player.name} couldn't handle the bad thoughts"); //custom death message
+
+                    Player.KillMe(deathmessage, 1.0, 0); //kill player with death message
+                }
+            }
+        }
+
         public void GetDarkSwordSwingStats(out int direction, out Items.DarkSword.DarkSword.ProjectileShootType projToShoot)
         {
             projToShoot = (Items.DarkSword.DarkSword.ProjectileShootType)(customSwordSwingCounter % 3);
@@ -748,17 +738,41 @@ namespace KirboMod
 
             initialdash = false;
             dir = 1;
-            darkDashTimeWindow--;
 
-            if (player.controlRight && player.releaseRight && player.doubleTapCardinalTimer[2] < 15) //right
+            if (darkDashTimeWindow > 0)
             {
-                initialdash = true;
-                dir = 1;
+                darkDashTimeWindow--;
             }
-            else if (player.controlLeft && player.releaseLeft && player.doubleTapCardinalTimer[3] < 15) //left
+            if (darkDashTimeWindow < 0)
             {
-                initialdash = true;
-                dir = -1;
+                darkDashTimeWindow++;
+            }
+
+            if (player.controlRight && player.releaseRight) //right
+            {
+                if (darkDashTimeWindow > 0)
+                {
+                    initialdash = true;
+                    dir = 1;
+                    darkDashTimeWindow = 0;
+                }
+                else
+                {
+                    darkDashTimeWindow = 15;
+                }
+            }
+            else if (player.controlLeft && player.releaseLeft) //left
+            {
+                if (darkDashTimeWindow < 0)
+                {
+                    initialdash = true;
+                    dir = -1;
+                    darkDashTimeWindow = 0;
+                }
+                else
+                {
+                    darkDashTimeWindow = -15;
+                }
             }
         }
         public override void OnHurt(Player.HurtInfo info)

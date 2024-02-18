@@ -18,11 +18,13 @@ namespace KirboMod.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 114;
-			Projectile.height = 200;
+			Projectile.width = 11;
+			Projectile.height = 11;
+			DrawOffsetX = -52;
+			DrawOriginOffsetY = -95;
 			Projectile.friendly = true;
 			Projectile.penetrate = -1;
-			Projectile.tileCollide = false;
+			Projectile.tileCollide = true;
 			Projectile.ignoreWater = true;
 			Projectile.alpha = 50;
 			Projectile.usesLocalNPCImmunity = true;
@@ -31,11 +33,11 @@ namespace KirboMod.Projectiles
 
 		public override void AI()
 		{
-			Projectile.spriteDirection = Projectile.direction; //face direction
+            Projectile.rotation = Projectile.velocity.ToRotation();
 
-			Projectile.velocity.X *= 0.9f; //slow
+            Projectile.velocity *= 0.9f; //slow
 
-			if (Math.Abs(Projectile.velocity.X) < 0.5f)
+			if (Math.Abs(Projectile.velocity.X) < 0.5f || Math.Abs(Projectile.velocity.Y) < 0.5f)
 			{
 				Projectile.alpha += 10; //become more transparent
 			}
@@ -47,43 +49,58 @@ namespace KirboMod.Projectiles
 
 			Projectile.ai[0]++; //goes up for gore smoke
 
-			// all for dust btw
+            // all for dust btw
+            for (int i = 0; i < 208 / 16; i++) //tile width
+            {
+                for (int j = 0; j < 208 / 16; j++) //tile height
+                {
+                    Vector2 positionOffset = new Vector2(Projectile.position.X - 104, Projectile.position.Y - 104);
 
-			if (Math.Abs(Projectile.velocity.X) > 5) //moving fast enough
-			{
-				for (int i = 0; i < Projectile.width / 16; i++) //tile width
-				{
-					for (int j = 0; j < Projectile.height / 16; j++) //tile height
-					{
-						/*Point tileLocation = Projectile.position.ToTileCoordinates() + new Point(i, j);
+                    int projTileX = positionOffset.ToTileCoordinates().X;
+                    int projTileY = positionOffset.ToTileCoordinates().Y;
 
-						Point aboveTileLocation = Projectile.position.ToTileCoordinates() + new Point(i, j - 1);
+                    Tile tile = Framing.GetTileSafely(projTileX + i, projTileY + j);
 
-						Tile tile = Main.tile[tileLocation];
+                    Tile aboveTile = Framing.GetTileSafely(projTileX + i, projTileY + j - 1);
 
-						Tile aboveTile = Main.tile[aboveTileLocation];*/
+                    Point dustArea = new Point(projTileX + i, projTileY + j);
 
-						int projTileX = Projectile.position.ToTileCoordinates().X;
-						int projTileY = Projectile.position.ToTileCoordinates().Y;
+                    //no tile above tile and moving fast enough
+                    if (WorldGen.SolidOrSlopedTile(tile) && !WorldGen.SolidOrSlopedTile(aboveTile) && Math.Abs(Projectile.velocity.X) > 5) 
+                    {
+                        SoundEngine.PlaySound(SoundID.Dig.WithVolumeScale(0.25f), Projectile.Center); // Dig
+                        Dust d = Main.dust[WorldGen.KillTile_MakeTileDust(projTileX + i, projTileY + j, tile)];
 
-						Tile tile = Framing.GetTileSafely(projTileX + i, projTileY + j);
+                        if (Projectile.ai[0] % 5 == 0) //every multiple of 5 (spawn yellow smoke)
+                        {
+                            Gore.NewGoreDirect(Projectile.GetSource_FromThis(), dustArea.ToWorldCoordinates(), new Vector2(0, -0.5f),
+                                61 + Main.rand.Next(3), 0.75f);
+                        }
+                    }
+                }
+            }
+        }
 
-						Tile aboveTile = Framing.GetTileSafely(projTileX + i, projTileY + j - 1);
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            Projectile.damage = (int)(Projectile.damage * 0.75f); //reduce
+        }
 
-						if (WorldGen.SolidOrSlopedTile(tile) && !WorldGen.SolidOrSlopedTile(aboveTile)) //no tile above tile
-						{
-                            SoundEngine.PlaySound(SoundID.Dig.WithVolumeScale(0.25f), Projectile.Center); // Dig
-                            Dust d = Main.dust[WorldGen.KillTile_MakeTileDust(projTileX + i, projTileY + j, tile)];
+        public override bool OnTileCollide(Vector2 oldVelocity) //if touching a tile (will kill it)
+        {
+            for (int i = 0; i < 20; i++)
+            {
+                Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
+                Gore.NewGorePerfect(Projectile.GetSource_FromAI(), Projectile.Center, speed,
+                                61 + Main.rand.Next(3));
+            }
 
-							if (Projectile.ai[0] % 5 == 0) //every multiple of 5 (spawn yellow smoke)
-							{
-								Gore.NewGoreDirect(Projectile.GetSource_FromThis(), new Point(projTileX + i, projTileY + j).ToWorldCoordinates(), new Vector2(0, -0.5f),
-									61 + Main.rand.Next(3), 0.75f);
-							}
-						}
-					}
-				}
-			}
+            return true;
+        }
+
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+        {
+            return targetHitbox.IntersectsConeSlowMoreAccurate(Projectile.Center, 100, Projectile.rotation, MathF.PI / 2f);
         }
     }
 }

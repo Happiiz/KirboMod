@@ -367,9 +367,9 @@ Mods: {
 				DisplayName: Royal Slippers
 				Tooltip:
 					'''
-					Hold DOWN in the air and fall for a bit to ground pound
-					Hold UP or JUMP to stop your descent
-					'Wait he doesn't wear shoes... Who's are these?'
+					press DOWN in the air and fall for a bit to ground pound
+					press UP or JUMP to cancel your descent
+					'The King doesn't wear shoes... Whose are these?'
 					'''
 			}
 
@@ -788,7 +788,7 @@ Mods: {
 				DisplayName: Hardened Fighter Glove
 				Tooltip:
 					'''
-					Right click to slam the ground and shoot rocks!
+					Right click to slam the ground and shoot rocks
 					Slam onto enemies to boost yourself
 					'''
 			}
@@ -852,7 +852,7 @@ Mods: {
 			}
 
 			MaskedHammer: {
-				DisplayName: Wild Fire Hammer
+				DisplayName: Wildfire Hammer
 				Tooltip:
 					'''
 					Hold left on the ground to swing fire tornados in the direction you're facing
@@ -881,8 +881,9 @@ Mods: {
 				DisplayName: Metal Fighter Glove
 				Tooltip:
 					'''
-					Right click and hold up to combo uppercuts!
-					Spike in on the ground and air by just holding right click!
+					Right click and hold up to uppercut!
+					Combo punches to make uppercuts stronger!
+					Spike on the ground and in the air by just holding right click!
 					'Fly like a ballistic missile, sting like a ballistic missile'
 					'''
 			}
@@ -1005,7 +1006,7 @@ Mods: {
 				Tooltip:
 					'''
 					Lashes three apples out from the leaves
-					'Swishy Swishy'
+					'Swishy swishy'
 					'''
 			}
 
@@ -1050,7 +1051,7 @@ Mods: {
 				DisplayName: Tasty Fish
 				Tooltip:
 					'''
-					Summons a friendly face to help you uncover the mysteries of life
+					Summons a friendly face to help you unravel the mysteries of life
 					'Who...Me?'
 					'''
 			}
@@ -1163,6 +1164,16 @@ Mods: {
 					Cycles through stages of progression
 					'''
 				DisplayName: Changaroonie
+			}
+
+			DimensionalDestabilizer: {
+				DisplayName: Dimensional Destabilizer
+				Tooltip:
+					'''
+					Summons a dimensional rift containing a powerful enemy at the cursor's position
+					Enemy summoned depends on the biome you're in
+					Consumes 50 starbits per use
+					'''
 			}
 		}
 
@@ -1372,6 +1383,7 @@ Mods: {
 			MinionFireSpread.DisplayName: Minion Fire Spread
 			MinionBeamSpread.DisplayName: Minion Beam Spread
 			DuoMinionFireSpread.DisplayName: Duo Minion Fire Spread
+			BadIceChunkMist.DisplayName: Bad Ice Chunk Mist
 		}
 
 		NPCs: {
@@ -1468,7 +1480,7 @@ Mods: {
 		Tiles: {
 			BossTrophy.MapEntry: Trophy
 			EnemyBanner.MapEntry: Banner
-			FountainOfDreams.MapEntry: Fountain Of Dreams
+			FountainOfDreams.MapEntry: Fountain of Dreams
 			RareStone.MapEntry: Rare Stone
 		}
 

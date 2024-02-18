@@ -31,14 +31,32 @@ namespace KirboMod.Projectiles
 		{
             Projectile.ai[0]++;
 
-            //spawning dust on bottom
-            if (Projectile.velocity.Y == 0) //make dust on floor
+			//spawning dust on bottom
+			if (Projectile.velocity.Y == 0)
+			{
+				if (Projectile.ai[0] % 5 == 0) //make dust every 5 ticks
+				{
+					Dust.NewDustPerfect(new Vector2(Projectile.Center.X + Projectile.direction * -20, Projectile.position.Y + 50), DustID.GemDiamond,
+						new Vector2(Projectile.velocity.X * -1, Main.rand.Next(-3, -1)), Scale: 0.5f); //Makes dust
+				}
+            }
+
+            if (Projectile.ai[0] % 10 == 0) //spawn mist every 10 ticks
             {
-                if (Projectile.ai[0] % 5 == 0)
-                {
-                    Dust.NewDustPerfect(new Vector2(Projectile.Center.X + Projectile.direction * -20, Projectile.position.Y + 50), DustID.GemDiamond,
-                        new Vector2(Projectile.velocity.X * -1, Main.rand.Next(-3, -1)), Scale: 0.5f); //Makes dust
-                }
+                Vector2 position = Projectile.Center + new Vector2(0, 20);
+
+                Projectile.NewProjectile(Projectile.GetSource_FromAI(), position, Projectile.velocity * 0.01f, ModContent.ProjectileType<BadIceChunkMist>(),
+                    Projectile.damage / 2, 2f);
+            }
+
+            //keep it from stopping
+            if (Projectile.velocity.X > 0)
+            {
+                Projectile.velocity.X = Main.expertMode ? 6 : 3;
+            }
+            else
+            {
+                Projectile.velocity.X = Main.expertMode ? -6 : -3;
             }
 
             //Gravity
@@ -48,19 +66,51 @@ namespace KirboMod.Projectiles
             {
 				Projectile.velocity.Y = 12f;
             }
+
+            ClimbTiles();
         }
 
 		public override bool OnTileCollide(Vector2 oldVelocity) 
 		{
-			if (oldVelocity.X != Projectile.velocity.X)
-			{
-				return true; //kill
-			}
-			else
-			{
-				return false; //don't die 
-			}
-		}
+            return false; //don't die 
+        }
+
+        private void ClimbTiles()
+        {
+            bool climableTiles = false;
+
+            for (int i = 0; i < 48; i++)
+            {
+                if (Projectile.direction == 1)
+                {
+                    //checks for tiles on right side of NPC
+                    Tile tile = Main.tile[(new Vector2(Projectile.Right.X + 16, Projectile.position.Y + i)).ToTileCoordinates()];
+                    climableTiles = WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType] || tile.IsHalfBlock;
+                }
+                else
+                {
+                    //checks for tiles on left side of NPC
+                    Tile tile = Main.tile[(new Vector2(Projectile.Left.X - 16, Projectile.position.Y + i)).ToTileCoordinates()];
+                    climableTiles = WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType] || tile.IsHalfBlock;
+                }
+
+                if (climableTiles || Projectile.velocity.X == 0)
+                {
+                    Projectile.tileCollide = false;
+
+                    Projectile.velocity.Y = -2f;
+
+                    break;
+                }
+            }
+        }
+
+        public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
+        {
+			fallThrough = false; //don't pass through platforms
+
+            return true;
+        }
 
         public override void OnKill(int timeLeft)
         {

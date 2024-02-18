@@ -31,7 +31,7 @@ namespace KirboMod.Items.Weapons
 			Item.useStyle = ItemUseStyleID.Swing;
 			Item.knockBack = 6;
 			Item.value = Item.buyPrice(0, 0, 0, 20);
-			Item.rare = ItemRarityID.White;
+			Item.rare = ItemRarityID.Blue;
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.CutterBlade>();
@@ -47,9 +47,9 @@ namespace KirboMod.Items.Weapons
    //         {
 			//	return false;
    //         }
-			float maxSpeed = Item.shootSpeed;
 			float acceleration = .15f;
-			Projectile.NewProjectile(source,position,velocity,type,damage,knockback, player.whoAmI, 0 , maxSpeed, acceleration);
+            int direction = player.direction;
+            Projectile.NewProjectile(source,position,velocity,type,damage,knockback, player.whoAmI, direction, acceleration, 20);
 			return false;
         }
         public override void AddRecipes()

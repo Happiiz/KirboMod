@@ -38,7 +38,6 @@ namespace KirboMod.Projectiles
 				return;
 			}
 
-			Projectile.velocity = Vector2.Zero;
 			Projectile.position = Projectile.Center;
 			Projectile.Size = new Vector2(8f, 4f) * MathHelper.Lerp(5f, 40f, Utils.GetLerpValue(0f, 9f, Projectile.ai[0]));
 			Projectile.Center = Projectile.position;
@@ -50,8 +49,6 @@ namespace KirboMod.Projectiles
 			{
 				return;
 			}
-
-			int num3 = (int)Projectile.ai[0] / 3;
 
 			for (int i = topleft.X; i <= topright.X; i++)
 			{

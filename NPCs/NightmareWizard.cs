@@ -31,6 +31,8 @@ namespace KirboMod.NPCs
 
 		private int phase = 1; //decides what kind of attack cycle
 
+        ref float deathCounter { get => ref NPC.ai[2]; }
+
         int tpEffectCounter = 12;
         Vector2 tpEffectPos;
 
@@ -43,7 +45,12 @@ namespace KirboMod.NPCs
             tpEffectCounter++;
 
             //Despawn
-            if (NPC.target < 0 || NPC.target == 255 || player.dead || !player.active || Main.dayTime) //Despawn
+
+            if (deathCounter > 0)
+            {
+                DoDeathAnimation();
+            }
+            else if (NPC.target < 0 || NPC.target == 255 || player.dead || !player.active || Main.dayTime) //Despawn
 			{
 				NPC.TargetClosest(false);
 				animation = 8; //despawn
@@ -67,7 +74,7 @@ namespace KirboMod.NPCs
 					return;
 				}
 			}
-			else //regular attack
+            else //regular attack
 			{
 				AttackCycle();
 				despawntimer = 0;
@@ -125,7 +132,7 @@ namespace KirboMod.NPCs
                         AttackSpreadStars(NPC.ai[0] - 120, player);
                     }
                     else
-                    { 
+                    {
                         EnrageSpreadStars(NPC.ai[0] - 120, player);
                     }
                 }
@@ -207,22 +214,34 @@ namespace KirboMod.NPCs
 			if (timer >= 120)
 			{
                 animation = 3; //damageable
-                NPC.velocity *= 0.975f;
+                NPC.velocity *= 0.9f;
 
-                if (timer % 10 == 0)
-				{
-                    Vector2 direction = player.Center - NPC.Center;
+                //spawn on top of hand
+                Vector2 startpos = NPC.Center + new Vector2(NPC.direction * -50, -100);
 
-                    direction.Normalize();
-                    direction *= 15;
+                Vector2 direction = player.Center - startpos;
 
+                direction.Normalize();
+                direction *= 25;
+
+
+                if (timer % 10 == 0 && timer % 20 != 0)
+                {
                     SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
 
-                    //spawn on top of hand
-                    Vector2 startpos = NPC.Center + new Vector2(NPC.direction * -50, -100);
-
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction.RotatedByRandom(MathHelper.ToRadians(30)),
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction,
                         ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
+                }
+
+                if (timer % 20 == 0)
+                {
+                    SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
+
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction.RotatedBy(-(MathF.PI / 9)),
+                            ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
+
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction.RotatedBy(MathF.PI / 9),
+                            ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
                 }
             }
 
@@ -337,7 +356,7 @@ namespace KirboMod.NPCs
                     Vector2 playerDistance = player.Center - NPC.Center;
 
                     float speed = 18f;
-                    float inertia = 20f;
+                    float inertia = 36f;
 
                     playerDistance.Normalize();
                     playerDistance *= speed;
@@ -360,7 +379,7 @@ namespace KirboMod.NPCs
             {
                 NPC.ai[1] = timer; //time to start teleport
             }
-            Teleport(timer - NPC.ai[1], player, new Vector2(0, -400));
+            Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
 
 			if (timer >= 12)
 			{
@@ -437,22 +456,34 @@ namespace KirboMod.NPCs
             if (timer >= 90)
             {
                 animation = 3; //damageable
-                NPC.velocity *= 0.95f;
+                NPC.velocity *= 0.9f;
 
-                if (timer % 8 == 0)
+                //spawn on top of hand
+                Vector2 startpos = NPC.Center + new Vector2(NPC.direction * -50, -100);
+
+                Vector2 direction = player.Center - startpos;
+
+                direction.Normalize();
+                direction *= 25;
+
+
+                if (timer % 8 == 0 && timer % 16 != 0)
                 {
-                    Vector2 direction = player.Center - NPC.Center;
-
-                    direction.Normalize();
-                    direction *= 15;
-
                     SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
 
-                    //spawn on top of hand
-                    Vector2 startpos = NPC.Center + new Vector2(NPC.direction * -50, -100);
-
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction.RotatedByRandom(MathHelper.ToRadians(30)),
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction,
                         ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
+                }
+
+                if (timer % 16 == 0)
+                {
+                    SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
+
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction.RotatedBy(-(MathF.PI / 9)),
+                            ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
+
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction.RotatedBy(MathF.PI / 9),
+                            ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
                 }
             }
 
@@ -464,17 +495,11 @@ namespace KirboMod.NPCs
 
         private void EnrageRingStars(float timer, Player player)
         {
-            //teleport 
-            if (timer == 1)
-            {
-                NPC.ai[1] = timer; //time to start teleport
-            }
-            Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
-
+            //teleport
             if (timer < 240)
             {
                 //teleport throughout attack
-                if (timer % 40 == 0)
+                if (timer % 40 == 0 || timer == 1)
                 {
                     NPC.ai[1] = timer; //time to start teleport
                 }
@@ -512,24 +537,26 @@ namespace KirboMod.NPCs
             {
                 NPC.ai[1] = timer; //time to start teleport
             }
-            Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
-
+            if (timer < 60)
+            {
+                Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
+            }
             float side = Main.rand.NextBool() == true ? 1 : -1;
 
             //teleport again
-            if (timer == 30)
+            if (timer == 60)
             {
                 NPC.ai[1] = timer; //time to start teleport
             }
             Teleport(timer - NPC.ai[1], player, new Vector2(side * 600, 0));
 
-            if (timer > 30)
+            if (timer > 60)
             {
                 Vector2 playerDistance = player.Center - NPC.Center;
 
                 animation = 4; //swoop
 
-                if (timer == 31)
+                if (timer == 61)
                 {
                     if (playerDistance.X <= 0) //if player is right of enemy
                     {
@@ -567,7 +594,7 @@ namespace KirboMod.NPCs
                 }
             }
 
-            if (timer > 150)
+            if (timer > 180)
             {
                 NPC.velocity *= 0.01f;
 
@@ -582,9 +609,11 @@ namespace KirboMod.NPCs
 			{
 				NPC.ai[1] = timer; //time to start teleport
             }
-			Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
-
-			if (timer >= 30) //initiate animation
+            if (timer < 30)
+            {
+                Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
+            }
+			else if (timer >= 30) //initiate animation
 			{
 				animation = 6;
 
@@ -593,7 +622,7 @@ namespace KirboMod.NPCs
                     Vector2 playerDistance = player.Center - NPC.Center;
 
                     float speed = 18f;
-                    float inertia = 20f;
+                    float inertia = 36f;
 
                     playerDistance.Normalize();
                     playerDistance *= speed;
@@ -608,7 +637,7 @@ namespace KirboMod.NPCs
                 }
             }
 
-			if (timer >= 420)
+			if (timer >= 480)
 			{
                 NPC.velocity *= 0.01f;
 
@@ -623,9 +652,11 @@ namespace KirboMod.NPCs
             {
                 NPC.ai[1] = timer; //time to start teleport
             }
-            Teleport(timer - NPC.ai[1], player, new Vector2(0, -400));
-
-            if (timer >= 12)
+            if (timer < 12)
+            {
+                Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
+            }
+            else if (timer >= 12)
             {
                 animation = 7;
 
@@ -672,7 +703,7 @@ namespace KirboMod.NPCs
                 {
                     NPC.ai[1] = timer; //time to start teleport
                 }
-                Teleport(timer - NPC.ai[1], player, new Vector2(-400, 0));
+                Teleport(timer - NPC.ai[1], player, new Vector2(-300, 0));
 
                 if (timer >= 132)
                 {
@@ -680,7 +711,7 @@ namespace KirboMod.NPCs
 
                     if (timer < 180) //follow but with slightly more time to escape
                     {
-                        //hover over player
+                        //hover beside player
                         Vector2 playerDistance = player.Center + new Vector2(-400, 0) - NPC.Center;
                         NPC.rotation = -MathF.PI / 2; //facing right
 
@@ -728,7 +759,11 @@ namespace KirboMod.NPCs
 		{
             if (timer == 1)
             {
-                tpEffectPos = NPC.Center;
+                if (Main.netMode != NetmodeID.MultiplayerClient) //have this here because teleport is random sometimes
+                {
+                    tpEffectPos = NPC.Center;
+                }
+
                 tpEffectCounter = 4;//animSpeed
 
                 NPC.Center = player.Center + location;
@@ -755,9 +790,57 @@ namespace KirboMod.NPCs
             Texture2D sheet = TextureAssets.Npc[Type].Value;
             //3 frames on the tp anim
             int frameY = (int)Utils.Remap(tpEffectCounter, animSpeed, animSpeed * 3, 10, 12, true); 
-            Rectangle frame = sheet.Frame(1, 19, 0, frameY);
+            Rectangle frame = sheet.Frame(1, Main.npcFrameCount[NPC.type], 0, frameY);
             Vector2 origin = new Vector2(frame.Width / 2, frame.Height / 2);
             Main.EntitySpriteDraw(sheet, tpEffectPos - Main.screenPosition, frame, Color.White, 0, origin, 1f, SpriteEffects.None);
+        }
+        public override bool CheckDead()
+        {
+            if (deathCounter < 360)
+            {
+                NPC.active = true;
+                NPC.life = 1;
+                deathCounter += 1; //go up
+                return false;
+            }
+            return true;
+        }
+
+        private void DoDeathAnimation()
+        {
+            NPC.ai[0] = 0; //don't attack
+            NPC.dontTakeDamage = true;
+            NPC.damage = 0;
+            NPC.active = true;
+            NPC.velocity *= 0.01f;
+
+            if (deathCounter % 10 == 0)
+            {
+                SoundEngine.PlaySound(SoundID.NPCHit2, NPC.Center);
+            }
+
+            deathCounter++; //go up
+
+            Vector2 speed = Main.rand.NextVector2Circular(40f, 40f); //circle
+            Dust d = Dust.NewDustPerfect(NPC.Center, DustID.DemonTorch, speed, Scale: 2f); //Makes dust in a messy circle
+            d.noGravity = true;
+
+            if (deathCounter < 120)
+            {
+                animation = 9;
+            }
+            else if (deathCounter < 240)
+            {
+                animation = 10;
+            }
+            else if (deathCounter < 360)
+            {
+                animation = 11;
+            }
+            else
+            {
+                NPC.SimpleStrikeNPC(999999, 1, false, 0, null, false, 0, false);
+            }
         }
 
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
@@ -964,6 +1047,55 @@ namespace KirboMod.NPCs
                 }
 
                 NPC.dontTakeDamage = true;
+            }
+
+            if (animation == 9) // death 1
+            {
+                NPC.frameCounter++;
+                if (NPC.frameCounter < 5)
+                {
+                    NPC.frame.Y = frameHeight * 19;
+                }
+                else
+                {
+                    NPC.frame.Y = frameHeight * 20;
+                }
+                if (NPC.frameCounter >= 10)
+                {
+                    NPC.frameCounter = 0;
+                }
+            }
+            if (animation == 10) // death 2
+            {
+                NPC.frameCounter++;
+                if (NPC.frameCounter < 5)
+                {
+                    NPC.frame.Y = frameHeight * 21;
+                }
+                else
+                {
+                    NPC.frame.Y = frameHeight * 22;
+                }
+                if (NPC.frameCounter >= 10)
+                {
+                    NPC.frameCounter = 0;
+                }
+            }
+            if (animation == 11) // death 3
+            {
+                NPC.frameCounter++;
+                if (NPC.frameCounter < 5)
+                {
+                    NPC.frame.Y = frameHeight * 23;
+                }
+                else
+                {
+                    NPC.frame.Y = frameHeight * 24;
+                }
+                if (NPC.frameCounter >= 10)
+                {
+                    NPC.frameCounter = 0;
+                }
             }
         }
 	}

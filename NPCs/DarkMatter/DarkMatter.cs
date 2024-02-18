@@ -171,7 +171,7 @@ namespace KirboMod.NPCs.DarkMatter
                 //restart if high enough (and not expert mode)
                 NPC.ai[0] = 0; //restart         
             }
-            for (int i = 0; i < 7; i++)
+            for (int i = 0; i < 8; i++)
             {
                 TripleShot(40 + i * 30);
             }

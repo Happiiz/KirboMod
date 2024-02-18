@@ -40,24 +40,16 @@ namespace KirboMod.Projectiles
             {
 				Projectile.damage = 15;
             }
-			/*if (++projectile.frameCounter >= 15) //changes frames every 15 ticks 
-			{
-				projectile.frameCounter = 0;
-				if (++projectile.frame >= Main.projFrames[projectile.type])
-				{
-					projectile.frame = 0;
-				}
-			}*/
 		}
         public override void OnKill(int timeLeft) //when the projectile dies
-         {
-             for (int i = 0; i < 10; i++)
-             {
-                 Vector2 speed = Main.rand.NextVector2Circular(2f, 2f); //circle
-                 Dust d = Dust.NewDustPerfect(Projectile.position, 115, speed * 2, Scale: 0.9f); //Makes dust in a messy circle
-				d.noGravity = true;
-             }
-         }
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                Vector2 speed = Main.rand.NextVector2Circular(3f, 3f); //circle
+                Dust d = Dust.NewDustPerfect(Projectile.position, 115, speed * 2, Scale: 1f); //Makes dust in a messy circle
+                d.noGravity = true;
+            }
+        }
 
         public override bool OnTileCollide(Vector2 oldVelocity)
         {

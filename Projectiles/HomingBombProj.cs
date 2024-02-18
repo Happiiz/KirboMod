@@ -113,7 +113,7 @@ namespace KirboMod.Projectiles
                 Projectile.spriteDirection = Projectile.direction;
 
                 //Targeting
-				float distanceFromTarget = 500f;
+				float distanceFromTarget = 2000f;
 
                 if (aggroTarget == null || !aggroTarget.active || aggroTarget.dontTakeDamage) //search target
                 {
@@ -174,15 +174,15 @@ namespace KirboMod.Projectiles
                 else if (aggroTarget != null && aggroTarget.active && !aggroTarget.dontTakeDamage) //ATTACK
                 {
                     Vector2 direction = aggroTarget.Center - Projectile.Center; //start - end
-					float speed = 10f;
+					float speed = 15f;
 					float inertia = 15f;
 
 					//Jumping
 					Vector2 jumprange = aggroTarget.Center - Projectile.Center;
 					float distance = Math.Abs(direction.X); //get absolute
-					if (jumprange.Y <= -20 && groundcollide == true && Math.Abs(jumprange.X) < 200 || (Projectile.velocity.X == 0 && groundcollide == true)) //jump when a little close and no attack cycle and when touching ground
+					if (jumprange.Y <= -20 && groundcollide == true && Math.Abs(jumprange.X) < 1000 || (Projectile.velocity.X == 0 && groundcollide == true)) //jump when a little close and no attack cycle and when touching ground
 					{
-						Projectile.velocity.Y = -10; //jump
+						Projectile.velocity.Y = direction.Y / 20; //jump
 						groundcollide = false; //wait to touch floor again
 					}
 
@@ -269,7 +269,7 @@ namespace KirboMod.Projectiles
             {
                 Projectile proj = Main.projectile[i];
 
-                if (Vector2.Distance(Projectile.Center, proj.Center) < 200 && proj.type == ModContent.ProjectileType<HomingBombProj>()
+                if (Vector2.Distance(Projectile.Center, proj.Center) < 500 && proj.type == ModContent.ProjectileType<HomingBombProj>()
                     && Projectile.whoAmI != proj.whoAmI && proj.active)
                 {
                     Power += 1; //add 1 to power
@@ -295,6 +295,12 @@ namespace KirboMod.Projectiles
                 }
             }
 
+            return true;
+        }
+
+        public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
+        {
+            fallThrough = false; //don't fall through platforms
             return true;
         }
     }
