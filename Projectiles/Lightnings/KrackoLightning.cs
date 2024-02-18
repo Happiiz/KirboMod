@@ -26,9 +26,23 @@ namespace KirboMod.Projectiles.Lightnings
             Projectile.tileCollide = true;
             Projectile.penetrate = -1;
         }
+        public override bool PreDraw(ref Color lightColor)
+        {
+            outerColor = Color.Lerp(Color.White, VFX.RndElectricCol, 0.4f);
+            return base.PreDraw(ref lightColor);
+        }
         public override void OnHitPlayer(Player target, Player.HurtInfo info)
         {
-            target.AddBuff(BuffID.Electrified, 90);
+            int duration = 120;
+            if (Main.masterMode)
+            {
+                duration *= 3;
+            }
+            else if (Main.expertMode)
+            {
+                duration *= 2;
+            }
+            target.AddBuff(BuffID.Electrified, duration);
         }
     }
 }

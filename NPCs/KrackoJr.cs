@@ -25,7 +25,7 @@ namespace KirboMod.NPCs
             CannonBall,
             Dash
         }
-        private struct KrackoJrCloud
+        private class KrackoJrCloud
         {
             public int timeLeft;
             public Vector2 position;
@@ -69,7 +69,7 @@ namespace KirboMod.NPCs
         {
             NPC.width = 58;
             NPC.height = 58;
-            NPC.damage = 15;
+            NPC.damage = 60;
             NPC.defense = 6;
             NPC.noTileCollide = true;
             NPC.lifeMax = 800;
@@ -210,7 +210,6 @@ namespace KirboMod.NPCs
                         SoundEngine.PlaySound(SoundID.Item66 with { Volume = 2, MaxInstances = 0, Pitch = 1f }, NPC.Center);
                         ShootCannonBalls();
                     }
-
                     if (Timer > spinStart + spinDuration + decelerationDuration + GetExtraAttackWaitTime())//change 14 to a higher number to increase how much cooldown between attacks
                     {
                         Timer = 0;
@@ -244,7 +243,7 @@ namespace KirboMod.NPCs
 
         private void MakeClouds()
         {
-            if ((NPC.position - NPC.oldPosition).LengthSquared() > 1 && Main.timeForVisualEffects % 4 == 0)
+            if ((NPC.position - NPC.oldPosition).LengthSquared() > 2 && Main.timeForVisualEffects % 4 == 0)
             {
                 KrackoJrCloud.SpawnCloud(this);
             }
@@ -258,7 +257,6 @@ namespace KirboMod.NPCs
                     i--;
                     continue;
                 }
-                trail[i] = cld;
             }
         }
 
@@ -322,12 +320,6 @@ namespace KirboMod.NPCs
             spriteBatch.Draw(pupil, NPC.Center - Main.screenPosition + pupilOffset, null, Color.White, 0, pupil.Size() / 2, 1, SpriteEffects.None, 0);
             return false;
         }
-
-        bool CheckShouldShoot(int fireRate, int numberOfShots, int start, float shootVelMagnitude, Vector2 shotOrigin, Vector2 shootTarget, out Vector2 projVelocity)
-        {
-            projVelocity = Vector2.Normalize(shootTarget - shotOrigin) * shootVelMagnitude;
-            return (NPC.ai[0] - start) % fireRate == 0 && NPC.ai[0] < (start + fireRate * numberOfShots) && NPC.ai[0] >= start && Main.netMode != NetmodeID.MultiplayerClient;
-        }
         bool CheckShouldShoot(int fireRate, int numberOfShots, int start)
         {
             return (NPC.ai[0] - start) % fireRate == 0 && NPC.ai[0] < (start + fireRate * numberOfShots) && NPC.ai[0] >= start;
@@ -358,7 +350,7 @@ namespace KirboMod.NPCs
                     dust.velocity *= Main.rand.NextFloat() * .2f + .2f;
                 }
                 if (Main.netMode != NetmodeID.MultiplayerClient)
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, velocity, ModContent.ProjectileType<KrackoJrCannonball>(), 40, 0);
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, velocity, ModContent.ProjectileType<KrackoJrCannonball>(), 30, 0);
             }
         }
         int GetExtraAttackWaitTime()
@@ -378,21 +370,41 @@ namespace KirboMod.NPCs
                 sparkle.fatness.Y *= 3;
                 sparkle.fadeOutTime = 4;
             }
+            for (int i = 0; i < Main.maxPlayers; i++)
+            {
+                Player plr = Main.player[i];
+                if (plr.dead || !plr.active)
+                {
+                    continue;
+                }
+
+                if (Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<KrackoJrBomb>(), 30, 0, Main.myPlayer, plr.whoAmI);
+                }
+            }
+        }
+
+        private void BombToNearestPlayer()
+        {
             if (Main.netMode != NetmodeID.MultiplayerClient)
             {
                 Vector2 center = NPC.Center;
                 Player plr = Main.player[0];
+                Main.NewText($"myplayer: {Main.myPlayer}");
                 for (int i = 1; i < Main.maxPlayers; i++)
                 {
                     Player possibleTarget = Main.player[i];
-                    if(possibleTarget.dead || !possibleTarget.active)
+                    if (possibleTarget.dead || !possibleTarget.active)
                     {
                         continue;
                     }
-                    if(plr.DistanceSQ(center) > possibleTarget.DistanceSQ(center))
+                    Main.NewText($"targeted: {i}");
+                    if (plr.DistanceSQ(center) > possibleTarget.DistanceSQ(center))
                     {
                         plr = possibleTarget;
                     }
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<KrackoJrBomb>(), 40, 0, Main.myPlayer, plr.whoAmI);
                 }
                 if (plr.active && !plr.dead && plr.Distance(NPC.Center) < 5000)
                 {

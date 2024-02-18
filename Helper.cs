@@ -52,6 +52,10 @@ namespace KirboMod
                 Dust.NewDustDirect(entity.position, entity.width, entity.height, type).noGravity = noGravity;
             }
         }
+        public static Color Remap(float fromValue, float fromMin, float fromMax, Color toMin, Color toMax, bool clamped = true)
+        {
+            return Color.Lerp(toMin, toMax, Utils.GetLerpValue(fromMin, fromMax, fromValue, clamped));
+        }
         public static float RemapEased(float fromValue, float fromMin, float fromMax, float toMin, float toMax, Func<float, float> easingFunction, bool clamp = true)
         {
             return MathHelper.Lerp(toMin, toMax, easingFunction(Utils.GetLerpValue(fromMin, fromMax, fromValue, clamp)));
