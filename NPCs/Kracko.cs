@@ -455,8 +455,7 @@ namespace KirboMod.NPCs
                 {                 
                     for (float j = 0; j < numberOfSpirals; j++)
                     {
-                        Projectile spawnedProj = Projectile.NewProjectileDirect(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<BeamBig>(), 20 / 2, 8f, Main.myPlayer, NPC.whoAmI, j * (MathF.Tau / numberOfSpirals) - i * beamCurvingAngleMultiplier, i * 70 + 100);
-                        spawnedProj.direction = Main.rand.NextBool() ? 1 : -1;
+                       Projectile.NewProjectileDirect(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<BeamBig>(), 40, 8f, Main.myPlayer, NPC.whoAmI, j * (MathF.Tau / numberOfSpirals) - i * beamCurvingAngleMultiplier, i * 70 + 100);
                     }
                 }
             }

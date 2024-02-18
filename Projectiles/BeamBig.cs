@@ -32,7 +32,13 @@ namespace KirboMod.Projectiles
 		public float DistanceFromCenter { get => Projectile.ai[2]; set => Projectile.ai[2] = value; }
 		public override void AI()
 		{
-			if (Kracko.type != ModContent.NPCType<Kracko>() || !Kracko.active)
+			if (Projectile.localAI[0] == 0)
+			{
+				Projectile.localAI[0] = 1;
+                Projectile.direction = Main.rand.NextBool() ? 1 : -1;
+
+            }
+            if (Kracko.type != ModContent.NPCType<Kracko>() || !Kracko.active)
 			{
 				for (int i = 0; i < 20; i++)
 				{
@@ -93,7 +99,15 @@ namespace KirboMod.Projectiles
         }
         public override void OnHitPlayer(Player target, Player.HurtInfo info)
         {
-			target.AddBuff(BuffID.Electrified, 60);
+			int duration = 120;
+			if (Main.masterMode)
+			{
+				duration *= 3;
+			}else if (Main.expertMode)
+			{
+				duration *= 2;
+			}
+			target.AddBuff(BuffID.Electrified, duration);
         }
     }
 }
