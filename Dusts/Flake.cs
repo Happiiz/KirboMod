@@ -21,7 +21,10 @@ namespace KirboMod.Dusts
 		{
 			dust.position += dust.velocity *= 0.95f; //slows down
 			dust.alpha += 4;
-
+			if(dust.alpha > 240)
+			{
+				dust.active = false;
+			}
             return false;
 		}
     }
