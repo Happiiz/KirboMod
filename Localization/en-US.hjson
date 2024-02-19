@@ -678,11 +678,7 @@ Mods: {
 
 			DarknessRay: {
 				DisplayName: Darkness Ray
-				Tooltip:
-					'''
-					Fires a dark laser that darts through the sky
-					Right click to fire a orb a darkness for more mana
-					'''
+				Tooltip: Fires a dark laser that zips through the sky
 			}
 
 			DarkSword: {
@@ -1384,6 +1380,8 @@ Mods: {
 			MinionBeamSpread.DisplayName: Minion Beam Spread
 			DuoMinionFireSpread.DisplayName: Duo Minion Fire Spread
 			BadIceChunkMist.DisplayName: Bad Ice Chunk Mist
+			GoodDarkMatterLaser.DisplayName: Good Dark Matter Laser
+			GooeyDarkMatterLaser.DisplayName: Gooey Dark Matter Laser
 		}
 
 		NPCs: {

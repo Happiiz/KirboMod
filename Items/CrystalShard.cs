@@ -12,8 +12,6 @@ namespace KirboMod.Items
 	{
 		public override void SetStaticDefaults() 
 		{
-			// DisplayName.SetDefault("Crystal Shard");
-			// Tooltip.SetDefault("A makeshift version of special otherworldy crystals");
 			ItemID.Sets.SortingPriorityMaterials[Item.type] = 1008; //go to *this* spot in material group
 
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 3; // Configure the amount of this item that's needed to research it in Journey mode.

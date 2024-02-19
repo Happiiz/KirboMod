@@ -1,4 +1,5 @@
 using Humanizer;
+using KirboMod.Projectiles.Lightnings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -190,30 +191,7 @@ namespace KirboMod.Projectiles
             else if (aggroTarget != null && aggroTarget.active && !aggroTarget.dontTakeDamage) //ATTACK
             {
 				Vector2 direction = aggroTarget.Center - Projectile.Center; //start - end
-				Vector2 flydirection = (aggroTarget.Center + new Vector2(0, -50)) - Projectile.Center;
 				Vector2 absDirection = new Vector2(Math.Abs(direction.X), Math.Abs(direction.Y));
-
-                /*//shoving gooeys if on top of each other
-				for (int i = 0; i < Main.maxProjectiles; i++)
-				{
-					Projectile proj = Main.projectile[i];
-
-					if (Projectile.Hitbox.Intersects(proj.Hitbox) && proj.type == Projectile.type && proj.whoAmI != Projectile.whoAmI)
-					{
-						Vector2 shoveDir = proj.Center - Projectile.Center;
-						
-						if (shoveDir.X > 0) 
-						{
-							shoveDir = new Vector2(1, 0); //to the right
-						}
-                        else //0 or less
-                        {
-                            shoveDir = new Vector2(-1, 0); //to the left
-                        }
-
-                        proj.position += shoveDir;
-					}
-				}*/
 
                 bool canSeeEnemy = Collision.CanHitLine(aggroTarget.position, aggroTarget.width, aggroTarget.height, Projectile.position, Projectile.width, Projectile.height);
 
@@ -308,9 +286,11 @@ namespace KirboMod.Projectiles
 							Projectile.ai[1]++; //timer
 							if (Projectile.ai[1] % 20 == 0)
 							{
-                                direction.Normalize(); //use direction because it's distance from proj to target already
+                                direction.Normalize();
                                 direction *= 32; //speed
-                                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, direction, ModContent.ProjectileType<GooeyLaser>(), Projectile.damage, 3, Projectile.owner); //fire good laser
+                                LightningProj.GetSpawningStats(direction, out float ai0, out float ai1);
+                                Projectile.NewProjectile(Projectile.GetSource_FromAI(), Projectile.Center, direction, 
+                                    ModContent.ProjectileType<GooeyDarkMatterLaser>(), Projectile.damage * 2, 3, Projectile.owner, ai0, ai1); //fire good laser
                             }
 						}
 					}
@@ -329,7 +309,7 @@ namespace KirboMod.Projectiles
                             //we put this instead of player.Center so it will always be moving top speed instead of slowing down when enemy is near but unreachable
                             //A "carrot on a stick" if you will
 
-                            Vector2 carrotDirection = Projectile.Center + new Vector2(pseudoDirection * 50, 0) - Projectile.Center; //start - end 
+                            Vector2 carrotDirection = new Vector2(pseudoDirection, 0); //start - end 
                             carrotDirection.Normalize();
                             carrotDirection *= speed;
 
@@ -454,14 +434,14 @@ namespace KirboMod.Projectiles
                             Vector2 direction = IdlePosition - Projectile.Center; //start - end
 
                             int pseudoDirection = 1;
-                            if (direction.X < 0) //enemy is behind
+                            if (direction.X < 0) //player is behind
                             {
                                 pseudoDirection = -1; //change direction so it will go towards enemy
                             }
                             //we put this instead of player.Center so it will always be moving top speed instead of slowing down when enemy is near but unreachable
                             //A "carrot on a stick" if you will
 
-                            Vector2 carrotDirection = Projectile.Center + new Vector2(pseudoDirection * 50, 0) - Projectile.Center; //start - end 
+                            Vector2 carrotDirection = new Vector2(pseudoDirection, 0); //start - end 
                             carrotDirection.Normalize();
                             carrotDirection *= speed;
 
