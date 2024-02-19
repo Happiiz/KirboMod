@@ -48,7 +48,7 @@ namespace KirboMod.Projectiles
             dust.scale *= 2;
             dust.velocity += Projectile.velocity;
         }
-        void Explode()
+        public override void OnKill(int timeLeft)
         {
             Projectile.Hitbox = Utils.CenteredRectangle(Projectile.Center, Projectile.Size * 2);
             Projectile.Damage();
@@ -57,23 +57,14 @@ namespace KirboMod.Projectiles
             {
                 Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
                 Gore.NewGorePerfect(Projectile.GetSource_FromAI(), Projectile.Center, speed, Main.rand.Next(16, 18), 1);
-                Vector2 speed2 = Main.rand.NextVector2Circular(5f, 5f); //circle
-                Gore.NewGorePerfect(Projectile.GetSource_FromThis(), Projectile.Center, speed2, Main.rand.Next(11, 13), Scale: 1f); //double jump smoke
+                speed = Main.rand.NextVector2Circular(5f, 5f); //circle
+                Gore.NewGorePerfect(Projectile.GetSource_FromThis(), Projectile.Center, speed, Main.rand.Next(11, 13), Scale: 1f); //double jump smoke
             }
             for (int i = 0; i < 35; i++)
             {
                 Dust d = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.Torch, 0, 0, 0, default, 2);
                 d.velocity.Y -= 1;
             }
-        }
-        public override bool OnTileCollide(Vector2 oldVelocity)
-        {
-            Explode();
-            return true;
-        }
-        public override void OnHitPlayer(Player target, Player.HurtInfo info)
-        {
-            Explode();
         }
     }
 }

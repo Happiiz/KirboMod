@@ -145,8 +145,6 @@ namespace KirboMod.NPCs
 			NPC.spriteDirection = NPC.direction;
 			Player player = Main.player[NPC.target];
 			Vector2 distance = player.Center - NPC.Center;
-			Main.hardMode = false;
-			NPC.downedPlantBoss = false;
 			bool lineOfSight = Collision.CanHitLine(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height);
 			float range = 265;
 			if (Main.expertMode)

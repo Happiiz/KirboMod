@@ -24,7 +24,12 @@ namespace KirboMod.Items
         {
             Vector2 drawPos = Item.Center - Main.screenPosition;
             Texture2D tex = TextureAssets.Item[Type].Value;
-            Rectangle frame = tex.Frame(1, 8, 0, (int)Main.timeForVisualEffects / 7 % 8);
+
+            float frameIndex = (int)Main.timeForVisualEffects / 7;
+            //probably not a good idea but should be fine hopefully probably maybe
+            frameIndex = MathF.Acos(MathF.Cos((MathF.PI * frameIndex) / 7f)) * (7 / MathF.PI);
+            frameIndex = MathF.Round(frameIndex);
+            Rectangle frame = tex.Frame(1, 8, 0, (int)frameIndex);
             //copied from fallen star code
             float rotationTimeOffset = Item.timeSinceItemSpawned / 240f + Main.GlobalTimeWrappedHourly * 0.04f;
             float timer = Main.GlobalTimeWrappedHourly;

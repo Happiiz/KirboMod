@@ -13,7 +13,8 @@ namespace KirboMod.Projectiles
 		{
 			Main.projFrames[Projectile.type] = 1;
 		}
-
+		public const float yAcceleration = .13f;
+		ref float YVel { get => ref Projectile.ai[2]; }
 		public override void SetDefaults()
 		{
 			Projectile.width = 24;
@@ -26,13 +27,11 @@ namespace KirboMod.Projectiles
 		}
 		public override void AI()
 		{
-			Projectile.velocity.Y = Projectile.velocity.Y + 0.3f;
-			if (Projectile.velocity.Y >= 10f)
-			{
-				Projectile.velocity.Y = 10f;
-			}
-
-			if (Projectile.velocity.X >= 0)
+            Projectile.position.X += Projectile.velocity.X;
+			Projectile.position.Y += YVel / 2;
+			YVel += yAcceleration;
+            Projectile.position.Y += YVel / 2;
+            if (Projectile.velocity.X >= 0)
 			{
 				Projectile.rotation += MathHelper.ToRadians(18);
 			}
@@ -58,7 +57,10 @@ namespace KirboMod.Projectiles
                 Gore.NewGorePerfect(Projectile.GetSource_FromThis(), Projectile.Center, speed, Main.rand.Next(61, 63), Scale: 1f); //smoke
             }
         }
-
+        public override bool ShouldUpdatePosition()
+        {
+			return false;
+        }
         public override void OnHitPlayer(Player target, Player.HurtInfo info)
         {
 			Projectile.Kill(); 

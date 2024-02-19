@@ -59,12 +59,11 @@ namespace KirboMod.Projectiles
 
                     float projX = Projectile.Center.X + (float)Math.Cos(rotationalOffset) * 2;
                     float projY = Projectile.Center.Y + (float)Math.Sin(rotationalOffset) * 2;
-
-                    int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), projX, projY, Vector2.Zero.X, Vector2.Zero.Y, ModContent.ProjectileType<ZeroBloodPellet>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
-                    Vector2 direction = Main.projectile[proj].Center - Projectile.Center;
+                    Vector2 direction = new Vector2(projX, projY) - Projectile.Center;
                     direction.Normalize(); //unit of 1
                     direction *= 35; //speed of 35
-					Main.projectile[proj].velocity = direction;
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), projX, projY, direction.X, direction.Y, ModContent.ProjectileType<ZeroBloodPellet>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+
                 }
             }
 			else //offset circle
@@ -76,11 +75,12 @@ namespace KirboMod.Projectiles
                     float projX = Projectile.Center.X + (float)Math.Cos(rotationalOffset) * 2;
                     float projY = Projectile.Center.Y + (float)Math.Sin(rotationalOffset) * 2;
 
-                    int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), projX, projY, Vector2.Zero.X, Vector2.Zero.Y, ModContent.ProjectileType<ZeroBloodPellet>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
-                    Vector2 direction = Main.projectile[proj].Center - Projectile.Center;
+                    Vector2 direction = new Vector2(projX, projY) - Projectile.Center;
                     direction.Normalize(); //unit of 1
                     direction *= 35; //speed of 35
-                    Main.projectile[proj].velocity = direction;
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), projX, projY, direction.X, direction.Y, ModContent.ProjectileType<ZeroBloodPellet>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+
+
                 }
             }
 		}

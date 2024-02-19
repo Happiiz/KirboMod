@@ -25,7 +25,7 @@ namespace KirboMod.NPCs.MidBosses
 			// DisplayName.SetDefault("Mr. Frosty");
 			Main.npcFrameCount[NPC.type] = 8;
 
-            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
+            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers()
             {
                 PortraitScale = 1f, // Portrait refers to the full picture when clicking on the icon in the bestiary
                 PortraitPositionYOverride = 20f,
@@ -78,7 +78,7 @@ namespace KirboMod.NPCs.MidBosses
 				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.UndergroundSnow,
 
 				// Sets the description of this NPC that is listed in the bestiary.
-				new FlavorTextBestiaryInfoElement("An icy beast that appeared in the tuntra from a strange star shaped rift. Does it's best to stamp out any threats with it's grace and style, or lack thereof.")
+				new FlavorTextBestiaryInfoElement("An icy beast that appeared in the tuntra from a strange star shaped rift. Does its best to stamp out any threats with its grace and style, or lack thereof.")
             });
         }
         public override void AI() //constantly cycles each time
@@ -292,11 +292,7 @@ namespace KirboMod.NPCs.MidBosses
             {
                 NPC.velocity.X *= 0.7f; //slow
             }
-            Player player = Main.player[NPC.target];
 
-            float projshootX = (Main.expertMode ? 6 : 3) * NPC.direction;
-
-            Vector2 offset = new Vector2(NPC.direction * -26, -80);
 
             NPC.ai[0]++;
 
@@ -311,10 +307,19 @@ namespace KirboMod.NPCs.MidBosses
             {
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + offset.X, NPC.Center.Y + offset.Y, projshootX, -5, 
+                    float velX = BadIceChunk.GetIceChunkXVelocity(NPC.direction);
+                    Vector2 offset = new Vector2(NPC.direction * -26, -80);
+                    float velY = Main.hardMode ? -8 : -5;
+
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + offset.X, NPC.Center.Y + offset.Y, velX, velY, 
                         ModContent.ProjectileType<BadIceChunk>(), (Main.hardMode ? 80 : 40) / 2, 5f, Main.myPlayer, 0, 0);
+                    if (Main.hardMode)
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + offset.X, NPC.Center.Y + offset.Y, -velX, velY,
+                        ModContent.ProjectileType<BadIceChunk>(), (Main.hardMode ? 80 : 40) / 2, 5f, Main.myPlayer, 0, 0);
+                    }
                 }
-                SoundEngine.PlaySound(SoundID.Item1, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item1 with { Volume = 2 }, NPC.Center);
             }
             if (NPC.ai[0] >= 150) //restart
             {
