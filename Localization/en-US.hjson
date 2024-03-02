@@ -5,6 +5,24 @@ Mods: {
 			DefensePenetration: Ignores {0} points of enemy defense
 		}
 
+		ProgressionDescription: {
+			Whispy: Use a [i:{0}].
+			Kracko: Kill a naturally spawning Kracko Jr. or use a [i:{0}] to summon one.
+			Dedede: Use a [i:{0}].
+			Nightmare: Use a [i:{0}] at a Fountain of Dreams during night.
+			DarkMatter: Use a [i:{0}].
+			Zero: Use a [i:{0}] and prepare for what comes next.
+		}
+
+		DespawnMessage: {
+			Whispy: Whispy Woods retreats back into the ground...
+			Kracko: Kracko floats back up into the heavens...
+			Dedede: The King gives up the chase...
+			Nightmare: The nightmare has passed...
+			DarkMatter: It slips back into the shadows...
+			Zero: The darkness clears...
+		}
+
 		Buffs: {
 			DarkFeeling: {
 				DisplayName: Dark Feeling
@@ -83,7 +101,7 @@ Mods: {
 
 			NightmarePetBuff: {
 				DisplayName: Shade Mage
-				Description: '''"What could it be hiding under those shades?"'''
+				Description: '''"What could it be hiding?"'''
 			}
 
 			WhispyPetBuff: {
@@ -97,8 +115,8 @@ Mods: {
 			}
 
 			ZeroPetBuff: {
-				DisplayName: Light Wanderer
-				Description: '''"Attracts darkness towards its hallow shell."'''
+				DisplayName: Hollow Wanderer
+				Description: '''"Attracts darkness towards its empty shell."'''
 			}
 
 			DragonFireDebuff: {
@@ -283,11 +301,11 @@ Mods: {
 			}
 
 			DarkMatterPetItem: {
-				DisplayName: Quivering Goop
+				DisplayName: Black Goop
 				Tooltip:
 					'''
 					Summons a dark wanderer
-					'I don't think you can use this as clay.'
+					'It's staring back at you.'
 					'''
 			}
 
@@ -534,7 +552,7 @@ Mods: {
 				Tooltip:
 					'''
 					Calls on a Kracko Jr.
-					'I need my blankey!
+					'I need my blankey!'
 					'''
 			}
 
@@ -862,9 +880,9 @@ Mods: {
 				DisplayName: Master Sword
 				Tooltip:
 					'''
-					While airborne, right-click a direction to do a powerful and invincible dash in that direction
-					You can only dash in the air once before having to land
-					'Not the sword that seals the darkness'
+					While airborne, right-click a direction to do a powerful dash
+					Dashing reduces damage by 50%
+					'The sword that seals a different kind of darkness'
 					'''
 			}
 
@@ -1099,8 +1117,8 @@ Mods: {
 				DisplayName: Murmuring Sapling
 				Tooltip:
 					'''
-					Summons a murmuring woods
-					'Did you say something?'
+					Summons a murmury woods
+					'Did you hear something?'
 					'''
 			}
 
@@ -1121,7 +1139,7 @@ Mods: {
 
 			BloodyTendrils: {
 				DisplayName: Bloody Tendrils
-				Tooltip: "'Feels and looks bad'"
+				Tooltip: "'Feels bad'"
 			}
 
 			ZeroBag: {
@@ -1144,7 +1162,7 @@ Mods: {
 				Tooltip:
 					'''
 					Summons a light wanderer
-					'Feels almost weightless'
+					'Feels almost weightless.'
 					'''
 			}
 
@@ -1382,6 +1400,7 @@ Mods: {
 			BadIceChunkMist.DisplayName: Bad Ice Chunk Mist
 			GoodDarkMatterLaser.DisplayName: Good Dark Matter Laser
 			GooeyDarkMatterLaser.DisplayName: Gooey Dark Matter Laser
+			NightmareShockOrb.DisplayName: Nightmare Shock Orb
 		}
 
 		NPCs: {

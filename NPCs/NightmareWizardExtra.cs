@@ -48,8 +48,8 @@ namespace KirboMod.NPCs
             DrawOffsetY = 20;
             NPC.damage = 70;
             NPC.noTileCollide = true;
-            NPC.defense = 6;
-            NPC.lifeMax = 10000;
+            NPC.defense = 15;
+            NPC.lifeMax = 18000;
             NPC.HitSound = SoundID.NPCHit2; //bone
             NPC.DeathSound = SoundID.NPCDeath2; //undead
             NPC.value = Item.buyPrice(0, 5, 0, 0); // money it drops

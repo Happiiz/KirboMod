@@ -33,8 +33,8 @@ namespace KirboMod.Projectiles
 			Vector2 rotato = Main.player[Projectile.owner].RotatedRelativePoint(Main.player[Projectile.owner].MountedCenter);
 			Projectile.direction = Main.player[Projectile.owner].direction;
 
-			Projectile.position.X = rotato.X - (float)(Projectile.width / 2);
-			Projectile.position.Y = rotato.Y - (float)(Projectile.height / 2);
+			Projectile.position.X = rotato.X - (Projectile.width / 2);
+			Projectile.position.Y = rotato.Y - (Projectile.height / 2);
 
 			// Apply proper rotation, with an offset of 135 degrees due to the sprite's rotation, notice the usage of MathHelper, use this class!
 			// MathHelper.ToRadians(xx degrees here)
@@ -46,8 +46,8 @@ namespace KirboMod.Projectiles
 			}
 
 			Player player = Main.player[Projectile.owner];
-			                                                      //if max 60, then this 30
-			if (player.itemAnimation < player.itemAnimationMax - (player.itemAnimationMax / 2)) //done dashing
+			                                                      
+			if (player.itemAnimation < player.itemAnimationMax / 2) //done dashing
             {
 				Projectile.Kill();
             }

@@ -34,7 +34,8 @@ namespace KirboMod.Projectiles
         }
          public override void OnKill(int timeLeft) //when the projectile dies
          {
-			Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity *= 0.01f, ModContent.ProjectileType<ZeroSparkExplosion>(), 100 / 2, 12f, Main.myPlayer);
+            SoundEngine.PlaySound(SoundID.Item11.WithVolumeScale(0.8f), Projectile.Center);
+            Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity *= 0.01f, ModContent.ProjectileType<ZeroSparkExplosion>(), 100 / 2, 12f, Main.myPlayer);
 		 }
 
         public override bool OnTileCollide(Vector2 oldVelocity)

@@ -117,7 +117,7 @@ namespace KirboMod.NPCs
 
 		public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */ //damage is automatically doubled in expert, use this to reduce it
 		{
-			NPC.lifeMax = (int)(NPC.lifeMax * 0.75 * balance); //360,000 health in expert
+			NPC.lifeMax = (int)(NPC.lifeMax * 0.75 * balance); //420,000 health in expert
 			NPC.damage = (int)(NPC.damage * 1); //2x damage
 		}
 
@@ -368,21 +368,21 @@ namespace KirboMod.NPCs
 					//go up or down
 					if (player.Center.Y < NPC.Center.Y)
 					{
-						NPC.velocity.Y -= 0.65f;
+						NPC.velocity.Y -= 0.5f;
 					}
 					else
 					{
-						NPC.velocity.Y += 0.65f;
+						NPC.velocity.Y += 0.5f;
 					}
 
 					//cap
-					if (NPC.velocity.Y > 9f)
+					if (NPC.velocity.Y > 7.5f)
 					{
-						NPC.velocity.Y = 9f;
+						NPC.velocity.Y = 7.5f;
 					}
-					if (NPC.velocity.Y < -9f)
+					if (NPC.velocity.Y < -7.5f)
 					{
-						NPC.velocity.Y = -9f;
+						NPC.velocity.Y = -7.5f;
 					}
 				}
 
@@ -836,7 +836,7 @@ namespace KirboMod.NPCs
 
 			Texture2D Zero = ZeroSprite.Value; //get the texture but actually
 
-			//fade in stuff
+			//fade in stuff (fades in from black but it looks cool so I'm keeping it)
             int r;
             int g;
             int b;

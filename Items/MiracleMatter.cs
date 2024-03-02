@@ -26,7 +26,7 @@ namespace KirboMod.Items
 			Item.width = 66;
 			Item.height = 70;
 			Item.value = Item.buyPrice(0, 0, 25, 0);
-			Item.rare = ItemRarityID.Red; //moon lord tier
+			Item.rare = ItemRarityID.Purple; //post moon lord tier
 			Item.maxStack = 9999;
 		}
 

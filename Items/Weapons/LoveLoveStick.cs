@@ -29,7 +29,7 @@ namespace KirboMod.Items.Weapons
 			Item.useStyle = ItemUseStyleID.Swing;
 			Item.knockBack = 8;
             Item.value = Item.buyPrice(0, 25, 0, 0);
-            Item.rare = ItemRarityID.Red;
+            Item.rare = ItemRarityID.Purple;
 			Item.UseSound = SoundID.Item8; //magic cast
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.LoveLoves>();

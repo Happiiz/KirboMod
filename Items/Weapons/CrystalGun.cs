@@ -33,7 +33,7 @@ namespace KirboMod.Items.Weapons
 			Item.useStyle = ItemUseStyleID.Shoot;
 			Item.knockBack = 2;
             Item.value = Item.buyPrice(0, 25, 0, 0);
-            Item.rare = ItemRarityID.Red;
+            Item.rare = ItemRarityID.Purple; //post moon lord tier
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.CrystalShardProj>();
 			Item.shootSpeed = 20;

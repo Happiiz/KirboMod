@@ -82,7 +82,6 @@ namespace KirboMod.Projectiles
             afterimage = ModContent.Request<Texture2D>(Texture);
             Texture2D texture = afterimage.Value;
 
-            // Redraw the projectile with the color not influenced by light
             for (int k = 1; k < Projectile.oldPos.Length; k++) //start at 1 so not ontop of actual projectile
             {
                 Vector2 drawOrigin = texture.Size() / 2;

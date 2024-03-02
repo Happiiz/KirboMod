@@ -10,8 +10,6 @@ namespace KirboMod.Items.Accesories
 	public class KirbyBalloon : ModItem
 	{
 		public override void SetStaticDefaults() {
-			// DisplayName.SetDefault("Pink Balloon");
-			// Tooltip.SetDefault("You can jump infinitely!");
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research
         }
 
