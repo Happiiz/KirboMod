@@ -32,7 +32,13 @@ namespace KirboMod.Projectiles
 		public float DistanceFromCenter { get => Projectile.ai[2]; set => Projectile.ai[2] = value; }
 		public override void AI()
 		{
-			if (Kracko.type != ModContent.NPCType<Kracko>() || !Kracko.active)
+			if (Projectile.localAI[0] == 0)
+			{
+				Projectile.localAI[0] = 1;
+                Projectile.direction = Main.rand.NextBool() ? 1 : -1;
+
+            }
+            if (Kracko.type != ModContent.NPCType<Kracko>() || !Kracko.active)
 			{
 				for (int i = 0; i < 20; i++)
 				{
@@ -73,7 +79,7 @@ namespace KirboMod.Projectiles
         Color RndElectricCol { get => (Main.rand.NextBool(2, 5) ? Color.Yellow : Color.Cyan) * Projectile.Opacity; }
         public override bool PreDraw(ref Color lightColor)
         {
-			Color[] possibleColors = [Color.Yellow, Color.Cyan, Color.Cyan];
+			Color[] possibleColors = new Color[] { Color.Yellow, Color.Cyan, Color.Cyan };
 			Vector2 randomOffset = Main.rand.NextVector2Circular(4, 4);
 			Vector2 fatness = Vector2.One;//feel free to mess around with
 			Vector2 sparkleScale = Vector2.One;//these values to see what thet change
@@ -90,6 +96,18 @@ namespace KirboMod.Projectiles
 			Main.EntitySpriteDraw(VFX.Circle, Projectile.Center - Main.screenPosition, null, RndElectricCol with { A = 0 } * 0.25f, randRot, VFX.Circle.Size() / 2, randScale * 1.8f, SpriteEffects.None);
 			VFX.DrawPrettyStarSparkle(Projectile.Opacity, Projectile.Center - Main.screenPosition + randomOffset, new Color(255, 255, 255, 0), possibleColors[Main.rand.Next(possibleColors.Length)], 1, 0, 1, 1, 2, Projectile.rotation, sparkleScale, fatness);
 			return false;
+        }
+        public override void OnHitPlayer(Player target, Player.HurtInfo info)
+        {
+			int duration = 120;
+			if (Main.masterMode)
+			{
+				duration *= 3;
+			}else if (Main.expertMode)
+			{
+				duration *= 2;
+			}
+			target.AddBuff(BuffID.Electrified, duration);
         }
     }
 }

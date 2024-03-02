@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -26,8 +27,8 @@ namespace KirboMod.NPCs
 		{
 			NPC.width = 60;
 			NPC.height = 150;
-			NPC.life = 80; //put it high because it (initally)does 0 damage so no expert mode scale
-			NPC.lifeMax = 80; //put it high because it (initally)does 0 damage so no expert mode scale
+			NPC.life = 80; 
+			NPC.lifeMax = 80; 
 			NPC.defense = 10;
 			NPC.knockBackResist = 0.00f; //recieves 0% of knockback
 			NPC.friendly = false;
@@ -39,36 +40,61 @@ namespace KirboMod.NPCs
 			NPC.damage = 0; //won't last
 			NPC.HitSound = SoundID.Dig;
 			NPC.DeathSound = SoundID.Dig;
-            NPC.dontCountMe = true; //I guess don't count towards npc total
+            NPC.dontCountMe = true; //Don't count towards npc total
+        }
+
+		private int TileDetection(int missedTiles)
+		{
+            missedTiles = 0;
+
+            int max = NPC.width / 16;
+
+            for (int i = 0; i < max; i++) //tile width
+            {
+                Point tileposition = NPC.position.ToTileCoordinates() + new Point(i, (int)(NPC.position.Y / 16));
+
+                Tile tile = Main.tile[tileposition];
+
+                if (!tile.HasTile) //no tile on top
+                {
+                    missedTiles++;
+
+                    continue;
+                }
+            }
+
+			return missedTiles;
         }
 
 		public override void AI()
 		{
 			NPC.spriteDirection = (int)NPC.ai[1]; //ai 1 is equal to whispy direction
 
-			if (NPC.ai[0] == 59) //tile checking(vibe check)
+			if (NPC.ai[0] == 59) //tile checking
             {
-				Point tileposition = NPC.position.ToTileCoordinates();
+				int missedTiles = 0;
+                missedTiles = TileDetection(missedTiles);
 
-				if (WorldGen.SolidTile(tileposition.X, tileposition.Y) == false) //check if no tile in npc position(top left corner of npc)
-                {
+                if (missedTiles >= 3) //break if too many missing tiles
+				{
 					//bark
-					if (Main.netMode != NetmodeID.MultiplayerClient)
-					{
-						Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, 0, -10, Mod.Find<ModProjectile>("WhispyBark").Type, 20 / 2, 5, Main.myPlayer, 0, 0);
-						Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, -1, -10, Mod.Find<ModProjectile>("WhispyBark").Type, 20 / 2, 5, Main.myPlayer, 0, 0);
-						Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, 1, -10, Mod.Find<ModProjectile>("WhispyBark").Type, 20 / 2, 5, Main.myPlayer, 0, 0);
-					}
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, 0, -10, Mod.Find<ModProjectile>("WhispyBark").Type, 20 / 2, 5, Main.myPlayer, 0, 0);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, -1, -10, Mod.Find<ModProjectile>("WhispyBark").Type, 20 / 2, 5, Main.myPlayer, 0, 0);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, 1, -10, Mod.Find<ModProjectile>("WhispyBark").Type, 20 / 2, 5, Main.myPlayer, 0, 0);
+                    }
 
-					NPC.life = 0;
+                    NPC.life = 0;
                 }
+
             }
 
 			NPC.ai[0]++;
 
 			if (NPC.ai[0] < 60)
             {
-				int dusty = Dust.NewDust(NPC.position, NPC.width / 2, NPC.height, DustID.Dirt, 0, -3, 0, default, 1f); //warning
+				Dust.NewDust(NPC.position, NPC.width / 2, NPC.height, DustID.Dirt, 0, -3, 0, default, 1f); //warning
 				if (NPC.ai[0] % 5 == 0) //multiple of 5
 				{
 					SoundEngine.PlaySound(SoundID.WormDig.WithVolumeScale(1.2f), NPC.Center); //worm dig warning(style is 1 so not roar)
@@ -97,7 +123,7 @@ namespace KirboMod.NPCs
 				NPC.life = 0; //kill
 				for (int i = 0; i < 25; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 				{
-					int dusty = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Dirt, 0, 0, 0, default, 1f);
+					Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Dirt, 0, 0, 0, default, 1f);
 				}
 			}
 		}
@@ -108,14 +134,14 @@ namespace KirboMod.NPCs
 			{
 				for (int i = 0; i < 25; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 				{
-					int dusty = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Dirt, 0, 0, 0, default, 1f);
+					Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Dirt, 0, 0, 0, default, 1f);
 				}
 			}
 			else //less if above death
 			{
 				for (int i = 0; i < 3; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 				{
-					int dusty = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Dirt, 0, 0, 0, default, 1f);
+					Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Dirt, 0, 0, 0, default, 1f);
 				}
 			}
 		}
@@ -136,16 +162,17 @@ namespace KirboMod.NPCs
 
         public override Color? GetAlpha(Color drawColor)
         {
-			Point tileposition = NPC.position.ToTileCoordinates();
+            int missedTiles = 0;
+            missedTiles = TileDetection(missedTiles);
 
-			if (WorldGen.SolidTile(tileposition.X, tileposition.Y) == false & NPC.ai[0] < 59) //check if no tile in npc position(top left corner of npc)
-			{
-				return Color.Red; //will explode
-			}
+            if (missedTiles >= 3 && NPC.ai[0] < 60) //too many missing tiles
+            {
+                return Color.Red; //will explode
+            }
 			else
             {
-				return null; //will rise
+                return null; //will rise
             }
-		}
+        }
     }
 }

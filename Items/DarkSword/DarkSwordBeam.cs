@@ -74,7 +74,7 @@ namespace KirboMod.Items.DarkSword
             opacity *= projectile.Opacity;
             scale *= .5f;
             scale += .8f;
-            Main.EntitySpriteDraw(glow, projectile.Center - Main.screenPosition, null, Color.White with { A = 0 } * opacity, projectile.rotation, glow.Size() / 2, scale * projectile.scale, SpriteEffects.None);
+            Main.EntitySpriteDraw(glow, projectile.Center - Main.screenPosition, null, Color.White * opacity, projectile.rotation, glow.Size() / 2, scale * projectile.scale, SpriteEffects.None);
         }
 
         public override void Unload()

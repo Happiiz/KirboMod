@@ -35,15 +35,18 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item24; //spectre boots
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.BlizzardIcicle>(); 
-			Item.shootSpeed = 20;//give proj extraupdate and afterimage for 60 velocity
+			Item.shootSpeed = 16; //give proj extraupdate and afterimage for 60 velocity
 			Item.mana = 12;
 		}
+
+        public override Vector2? HoldoutOffset()
+        {
+            return new Vector2(-10, -6);
+        }
 
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {
             velocity = new Vector2(velocity.X, velocity.Y).RotatedByRandom(MathHelper.ToRadians(10)); // 10 degree spread.
-
-			position += velocity * 2; //move a bit away from the player
         }
 
         public override void AddRecipes()

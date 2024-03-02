@@ -1,4 +1,5 @@
 using KirboMod.Projectiles;
+using KirboMod.Projectiles.Lightnings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -14,18 +15,14 @@ namespace KirboMod.NPCs
 {
     public partial class Kracko : ModNPC
     {
-
         private int animation = 0;
-
         private KrackoAttackType attacktype = KrackoAttackType.DecideNext; //decides the attack
         private int doodelay = 0;
-        private float sweepheight = 0;
-        private float sweepX = 0;
-        private float sweepY = 0;
-        float beamCurvingAngleMultiplier = 0.05f;
-        int numberOfBeamsPerSpiral = 70;
-        private sbyte attackDirection = 1;
-        private KrackoAttackType lastattacktype = KrackoAttackType.DecideNext; //sets last attack type
+        const float beamCurvingAngleMultiplier = 0.05f;
+        const int numberOfBeamsPerSpiral = 70;
+        bool attackDirection = false;
+        private int AttackDirection { get => attackDirection ? 1 : -1; set => attackDirection = value <= 1; }
+        private KrackoAttackType nextAttackType = KrackoAttackType.Dash; //sets last attack type
         private bool transitioning = false; //checks if going through expert mode exclusive phase
         private bool frenzy = false; //checks if going in frenzy mode in expert mode
 
@@ -134,7 +131,6 @@ namespace KirboMod.NPCs
             if (NPC.ai[0] >= attackEnd) //end          
                 ResetVarsForNextAttack();
         }
-
         private void AttackSpawnDoo()
         {
             if (NPC.ai[0] == (!frenzy ? 15 : 60)) //changes depending or not in frenzy
@@ -181,24 +177,28 @@ namespace KirboMod.NPCs
                 }
             }
         }
-
         void AttackDecideNext()
         {
-            //10 attack delay during frenzy, 70 during frenzy
-            if (NPC.ai[0] >= (!frenzy ? 70 : 10)) //choose attack randomly(faster is frenzying)
+            //choose attack randomly
+            if (NPC.ai[0] == 1)
             {
-                attackDirection = (sbyte)(Main.rand.NextBool() ? 1 : -1); //right or left
+                attacktype = nextAttackType;
+                attackDirection = Main.rand.NextBool(); //right or left (true for right, false for left)
                 List<KrackoAttackType> possibleAttacks = new() { KrackoAttackType.SpinningBeamOrbs, KrackoAttackType.Sweep, KrackoAttackType.Dash };
-                if (NPC.GetLifePercent() < (Main.expertMode ? 0.75f : 0.4f))
+                if (NPC.GetLifePercent() < (Main.expertMode ? 0.75f : 0.5f))
+                {
                     possibleAttacks.Add(KrackoAttackType.Lightning);
-                possibleAttacks.Remove(lastattacktype);
-                attacktype = possibleAttacks[Main.rand.Next(possibleAttacks.Count)];
-                lastattacktype = attacktype;
-                NPC.ai[0] = 0;
+                }
+                possibleAttacks.Remove(attacktype);
+                nextAttackType = possibleAttacks[Main.rand.Next(possibleAttacks.Count)];
                 NPC.netUpdate = true;
             }
+            //10 attack delay during frenzy, 70 during frenzy
+            if (NPC.ai[0] >= (!frenzy ? 70 : 10)) 
+            {
+                NPC.ai[0] = 0;
+            }
         }
-
         private float AttackSweep(Player player)
         {
             float speed = 20f;
@@ -227,7 +227,7 @@ namespace KirboMod.NPCs
             sweepY /= sweepDuration;
             sweepX /= sweepDuration;
                                                                                                       //compensate for it losing overall distance travelled by accelerating and decelerating
-            Vector2 targetPos = player.Center + new Vector2(sweepX * sweepDuration * 0.5f * attackDirection - (attackDirection * sweepX * 5), -400);
+            Vector2 targetPos = player.Center + new Vector2(sweepX * sweepDuration * 0.5f * AttackDirection - (AttackDirection * sweepX * 5), -400);
             float sweepProgress = Utils.GetLerpValue(sweepStart, sweepEnd, NPC.ai[0]);
             if (NPC.ai[0] >= moveStart && NPC.ai[0] < moveEnd) //go to top left or right
             {
@@ -250,7 +250,7 @@ namespace KirboMod.NPCs
             }
             if (sweepProgress >= 0 && sweepProgress <= 1)
             {
-                Vector2 vel = new(-attackDirection, MathF.Cos(sweepProgress * MathF.PI));
+                Vector2 vel = new(-AttackDirection, MathF.Cos(sweepProgress * MathF.PI));
                 vel.Y *= sweepY;
                 vel.X *= sweepX;
                 float easingThing = Utils.GetLerpValue(sweepStart, sweepStart + 10, NPC.ai[0], true) * Utils.GetLerpValue(sweepEnd, sweepEnd - 10, NPC.ai[0], true);
@@ -260,7 +260,6 @@ namespace KirboMod.NPCs
 
             return sweepEnd;
         }
-
         float AttackBeam()
         {
             Vector2 distanceOverPlayer = Main.player[NPC.target].Center + new Vector2(0, -200) - NPC.Center;
@@ -355,17 +354,17 @@ namespace KirboMod.NPCs
             if (dashProgress < 0.33f)
             {
                 easingMultiplier = Utils.GetLerpValue(0, 0.5f, dashProgress * 3, true) * Utils.GetLerpValue(1, 0.5f, dashProgress * 3, true);
-                NPC.velocity = new Vector2(dashDistanceX / 2 * attackDirection, dashDistanceY) * easingMultiplier;
+                NPC.velocity = new Vector2(dashDistanceX / 2 * AttackDirection, dashDistanceY) * easingMultiplier;
             }
             else if (dashProgress < 0.66f)
             {
                 easingMultiplier = Utils.GetLerpValue(0, 0.5f, (dashProgress - 0.33f) * 3, true) * Utils.GetLerpValue(1, 0.5f, (dashProgress - 0.33f) * 3, true);
-                NPC.velocity = new Vector2(dashDistanceX * -attackDirection, 0) * easingMultiplier;
+                NPC.velocity = new Vector2(dashDistanceX * -AttackDirection, 0) * easingMultiplier;
             }
             else if (dashProgress < 1)
             {
                 easingMultiplier = Utils.GetLerpValue(0, 0.5f, (dashProgress - 0.66f) * 3, true) * Utils.GetLerpValue(1, 0.5f, (dashProgress - 0.66f) * 3, true);
-                NPC.velocity = new Vector2(dashDistanceX / 2 * attackDirection, -dashDistanceY) * easingMultiplier;
+                NPC.velocity = new Vector2(dashDistanceX / 2 * AttackDirection, -dashDistanceY) * easingMultiplier;
             }
             else
             {
@@ -384,9 +383,13 @@ namespace KirboMod.NPCs
             float attackStart = 80;
             float attackEnd = 180;
             float attackDuration = attackEnd - attackStart;
+            float thunderYHeightOffset = -400;
+            float thunderXOffset = 650;
             if (frenzy)
             {
-                thunderSlideSpeed *= 1.6f;
+                thunderYHeightOffset -= 60;
+                thunderSlideSpeed *= 1.5f;
+                thunderXOffset += 60;
                 speed *= 2;
                 attackDuration = MathF.Round(attackDuration * 0.65f);
                 attackEnd = attackStart + attackDuration;
@@ -408,7 +411,7 @@ namespace KirboMod.NPCs
                 }
                 else //move
                 {
-                    Vector2 targetPos = Main.player[NPC.target].Center + new Vector2(650 * attackDirection, -400);
+                    Vector2 targetPos = Main.player[NPC.target].Center + new Vector2(thunderXOffset * AttackDirection, thunderYHeightOffset);
                     Vector2 distanceDiagonalRightOfPlayer = targetPos - NPC.Center;
                     distanceDiagonalRightOfPlayer.Normalize();
                     distanceDiagonalRightOfPlayer *= speed;
@@ -425,17 +428,23 @@ namespace KirboMod.NPCs
                 float easingMultiplier = Utils.GetLerpValue(attackStart - 1, attackStart + 9, NPC.ai[0], true) * Utils.GetLerpValue(attackEnd + 1, attackEnd - 12, NPC.ai[0], true);
                 int fireRate = frenzy ? 2 : 4;
                 NPC.velocity.Y = 0;
-                NPC.velocity.X = -attackDirection * thunderSlideSpeed * easingMultiplier;
-                if (NPC.ai[0] % fireRate == 0 && Main.netMode != NetmodeID.MultiplayerClient && easingMultiplier == 1)
+                NPC.velocity.X = -AttackDirection * thunderSlideSpeed * easingMultiplier;
+                if (NPC.ai[0] % fireRate == 0)
                 {//												offset down a bit so it lookslike it's coming out below kracko
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y + 100, 0, 5.5f, ModContent.ProjectileType<KrackoLightning>(), 25 / 2, 2f, Main.myPlayer, 0, 0);
-                    SoundEngine.PlaySound(SoundID.Thunder with { MaxInstances = 0 }, NPC.Center);
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        Vector2 spawnVel = new Vector2(0, 16);
+                        LightningProj.GetSpawningStats(spawnVel, out float ai0, out float ai1);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + Main.rand.Next(-20,21) + NPC.velocity.X * 2, NPC.Center.Y + 84 + Main.rand.Next(-20, 21), spawnVel.X, spawnVel.Y, ModContent.ProjectileType<KrackoLightning>(), 25 / 2, 2f, Main.myPlayer, ai0, ai1);
+                    }
+                    SoundStyle sound = new SoundStyle("Terraria/Sounds/Thunder_" + Main.rand.Next(4));
+                    SoundEngine.PlaySound(sound with { MaxInstances = 0, Volume = .4f}, NPC.Center);
+
                 }
             }
 
             return attackEnd;
         }
-
         void SpawnBeam(int numberOfBeams, float timeToCheck)
         {
             float numberOfSpirals = frenzy ? 4 : 2;
@@ -446,18 +455,10 @@ namespace KirboMod.NPCs
                 {                 
                     for (float j = 0; j < numberOfSpirals; j++)
                     {
-                        Projectile spawnedProj = Projectile.NewProjectileDirect(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<BeamBig>(), 20 / 2, 8f, Main.myPlayer, NPC.whoAmI, j * (MathF.Tau / numberOfSpirals) - i * beamCurvingAngleMultiplier, i * 70 + 100);
-                        spawnedProj.direction = Main.rand.NextBool() ? 1 : -1;
+                       Projectile.NewProjectileDirect(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<BeamBig>(), 40, 8f, Main.myPlayer, NPC.whoAmI, j * (MathF.Tau / numberOfSpirals) - i * beamCurvingAngleMultiplier, i * 70 + 100);
                     }
                 }
             }
-        }
-
-        Vector2 GetDistanceDiagonalUpOfPlayerNormalizedMulipliedBySpeed(float speed)
-        {
-            Vector2 distanceDiagonalRightOfPlayer = Main.player[NPC.target].Center + new Vector2(400 * attackDirection, -400) - NPC.Center;
-            distanceDiagonalRightOfPlayer.Normalize();
-            return distanceDiagonalRightOfPlayer * speed;
         }
         static Asset<Texture2D> eyeBase;
         static Asset<Texture2D> pupil;
@@ -465,6 +466,11 @@ namespace KirboMod.NPCs
         static Asset<Texture2D> spikes;
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            float darkness = DarknessProgressForThunder;
+            if (attacktype == KrackoAttackType.Lightning)
+            {
+                VFX.DrawGlowBallDiffuse(NPC.Center + new Vector2(0, 84), 4f, VFX.RndElectricCol * darkness, Color.White);
+            }
             Player player = Main.player[NPC.target];
             bool drawEyelid = (transitioning && NPC.ai[2] > 0 && NPC.ai[2] <= 180) || frenzy;
             float offsetLength = 6.5f;
@@ -480,9 +486,9 @@ namespace KirboMod.NPCs
             spriteBatch.Draw(pupil.Value, NPC.Center - screenPos + pupilOffset, null, Color.White, 0, pupil.Size() / 2, 1, SpriteEffects.None, 0);
             if (drawEyelid)
                 spriteBatch.Draw(eyelid.Value, NPC.Center - screenPos, null, Color.White, 0, eyelid.Size() / 2, 1, SpriteEffects.None, 0);
+           
             return false;
         }
-
         public override void Load()
         {
             eyeBase = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoEyeBase");

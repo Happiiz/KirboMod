@@ -109,19 +109,21 @@ namespace KirboMod.NPCs
 		public override void HitEffect(NPC.HitInfo hit)
 		{
 			if (NPC.life <= 0)
-			{
-				for (int i = 0; i < 20; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-				{
-					Vector2 speed = Main.rand.NextVector2Circular(20f, 20f); //circle
-					Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.LilStar>(), speed, Scale: 2f); //Makes dust in a messy circle
-					d.noGravity = true;
-				}
-				for (int i = 0; i < 15; i++)
-				{
-					Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
-					Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center, speed, Main.rand.Next(11, 13), Scale: 2f); //double jump smoke
-				}
-			}
+            {
+                for (int i = 0; i < 8; i++) 
+                {
+                    // go around in a octogonal pattern
+                    Vector2 speed = new Vector2((float)Math.Cos(MathHelper.ToRadians(i * 45)) * 25, (float)Math.Sin(MathHelper.ToRadians(i * 45)) * 25);
+
+                    Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.BoldStar>(), speed, Scale: 3f); //Makes dust in a messy circle
+                    d.noGravity = true;
+                }
+                for (int i = 0; i < 20; i++)
+                {
+                    Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
+                    Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center, speed, Main.rand.Next(11, 13), Scale: 2f); //double jump smoke
+                }
+            }
 			else
 			{
 				for (int i = 0; i < 2; i++)
@@ -132,12 +134,13 @@ namespace KirboMod.NPCs
 				}
 			}
 		}
-
-		public override Color? GetAlpha(Color lightColor)
+        float DarknessProgressForThunder => Utils.GetLerpValue(15, 40, NPC.ai[0], true);
+        public override Color? GetAlpha(Color lightColor)
 		{
-			 if (attacktype == KrackoAttackType.Lightning) //frenzy
+			
+			if (attacktype == KrackoAttackType.Lightning)
 			{
-				int darkness = (int)Utils.Remap(NPC.ai[0], 30, 60, 255, 60);
+				int darkness = (int)MathHelper.Lerp(255, 60, DarknessProgressForThunder);
 				return new Color(darkness, darkness, darkness); //darken for thunder
 			}
 			else
@@ -222,27 +225,19 @@ namespace KirboMod.NPCs
 		public override void SendExtraAI(BinaryWriter writer)
 		{
 			writer.Write((byte)attacktype); //send non NPC.ai array info to servers
-			writer.Write(doodelay); //send non NPC.ai array info to servers
-			writer.Write(attackDirection); //send non NPC.ai array info to servers
-			writer.Write((byte)lastattacktype); //send non NPC.ai array info to servers
-			writer.Write(sweepheight); //send non NPC.ai array info to servers
-			writer.Write(sweepX); //send non NPC.ai array info to servers
-			writer.Write(sweepY); //send non NPC.ai array info to servers
-			writer.Write(transitioning); //send non NPC.ai array info to servers
-			writer.Write(frenzy); //send non NPC.ai array info to servers
+			writer.Write((byte)doodelay); //send non NPC.ai array info to servers
+			writer.Write((byte)nextAttackType); //send non NPC.ai array info to servers
+			BitsByte b = new BitsByte(transitioning, frenzy, attackDirection);
+			writer.Write(b); //send non NPC.ai array info to servers
 		}
 
 		public override void ReceiveExtraAI(BinaryReader reader)
 		{
 			attacktype = (KrackoAttackType)reader.ReadByte(); //sync in multiplayer
-			doodelay = reader.ReadInt32(); //sync in multiplayer
-			attackDirection = reader.ReadSByte(); //sync in multiplayer
-			lastattacktype = (KrackoAttackType)reader.ReadByte(); //sync in multiplayer
-			sweepheight = reader.ReadSingle(); //sync in multiplayer
-			sweepX = reader.ReadSingle(); //sync in multiplayer
-			sweepY = reader.ReadSingle(); //sync in multiplayer
-			transitioning = reader.ReadBoolean(); //sync in multiplayer
-			frenzy = reader.ReadBoolean(); //sync in multiplayer
+			doodelay = reader.ReadByte(); //sync in multiplayer
+			nextAttackType = (KrackoAttackType)reader.ReadByte(); //sync in multiplayer
+			BitsByte b = reader.ReadByte(); //sync in multiplayer
+			b.Retrieve(ref transitioning, ref frenzy, ref attackDirection);
 		}
 	}
 }

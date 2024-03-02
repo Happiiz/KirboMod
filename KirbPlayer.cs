@@ -54,6 +54,7 @@ namespace KirboMod
 
         public bool royalslippers;
         public int falltime = 0;
+        public bool dededeSlam = false; //determines if Player is stomping from mid-air
 
         public bool hyperzone;
 
@@ -168,10 +169,16 @@ namespace KirboMod
             }
 
             //ground pounding with royal slippers
-            if (royalslippers == true && player.controlDown && player.velocity.Y != 0 && player.controlUp == false && player.controlJump == false)
+            if (dededeSlam == true)
             {
                 player.armorEffectDrawShadow = true; //afterimages
             }
+
+            if (player.velocity.Y == 0) //reset
+            {
+                dededeSlam = false;
+            }
+
 
             //TRIPLE STAR STARS
             tripleStarRotationCounter += 1;
@@ -205,37 +212,8 @@ namespace KirboMod
                     }
                 }
             }
-            //holding Triple Star Rod
-            //if (player.HeldItem.type == tripleStar && !player.dead && player.active) //holding Triple Star Rod
-            //{
-            //    for (int i = 0; i < HasTripleStars.Length; i++)
-            //    {
-            //        tripleStarIndexes[i] = -1;
-            //    }
-            //    //for (int i = 0; i < player.ownedProjectileCounts[tripleStarStar]; i++)
-            //    //{
-            //    //    HasTripleStars[i] = false;
-            //    //}
-            //    for (int i = 0; i < 3; i++) //to 3
-            //    {
-            //        float finalDamage = player.GetTotalDamage(Player.HeldItem.DamageType).ApplyTo(Player.HeldItem.damage); //final damage calculated
 
-            //        if (tripleStarIndexes[i] == -1) //checks each one to see if it has the triple stars
-            //        {
-
-            //            tripleStarIndexes[i] = Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, Vector2.Zero,
-            //                ModContent.ProjectileType<CyclingStar>(), (int)finalDamage, 0, player.whoAmI, 0, i);
-            //        }
-            //    }
-            //}
-            //else //not holding
-            //{
-            //    //no stars circle
-            //    HasTripleStars[0] = false;
-            //    HasTripleStars[0] = false;
-            //    HasTripleStars[0] = false;
-            //}
-
+            //Plasma
 
             UpdatePlasmaCharge();
 
@@ -267,9 +245,7 @@ namespace KirboMod
             DarkDashMovement(); //dark dash
 
             //KIRBY BALLOON (checks if already used all double jumps and rockets and player doesn't have mount)
-            if (kirbyballoon == true && airborne & player.GetJumpState(ExtraJump.BlizzardInABottle).Available == false & player.GetJumpState(ExtraJump.CloudInABottle).Available == false
-                & player.GetJumpState(ExtraJump.FartInAJar).Available == false & player.GetJumpState(ExtraJump.TsunamiInABottle).Available == false & player.GetJumpState(ExtraJump.SandstormInABottle).Available == false
-                & !player.mount.CanHover())
+            if (kirbyballoon == true && airborne && player.AnyExtraJumpUsable() == false && !player.mount.CanHover())
             {
                 kirbyballoonwait -= 1; //go down
 
@@ -327,30 +303,7 @@ namespace KirboMod
                         && (Main.tile[mouselocation.X, mouselocation.Y].LiquidType == LiquidID.Lava) == false
                         && (Main.tile[mouselocation.X, mouselocation.Y].WallType != WallID.LihzahrdBrickUnsafe))
                     {
-                        //before effect
-                        Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, Vector2.Zero, ModContent.ProjectileType<NightCrownEffect>(), 0, 0, player.whoAmI);
-
-                        player.Teleport(Main.MouseWorld, -1);
-
-                        //after effect
-                        for (int i = 0; i < 10; i++)
-                        {
-                            Vector2 speed = Main.rand.NextVector2Circular(5f, 10f); //circle
-                            Dust.NewDustPerfect(player.Center, ModContent.DustType<Dusts.NightStar>(), speed, Scale: 1f); //Makes dust in a messy circle
-                        }
-
-                        player.AddBuff(ModContent.BuffType<Buffs.Nightmare>(), 720); //gives player nightmare effect for 12 seconds
-
-                        if (nightmareeffect) //has nightmare effect
-                        {
-                            player.statLife -= player.statLifeMax2 / 10; //subtract life
-                            if (player.statLife <= 0) //if dead
-                            {
-                                PlayerDeathReason deathmessage = PlayerDeathReason.ByCustomReason($"{player.name} couldn't handle the bad thoughts"); //custom death message
-
-                                player.KillMe(deathmessage, 1.0, 0); //kill player with death message
-                            }
-                        }
+                        NightCrownTeleport();
                     }
                 }
                 else //everything else but now you can teleport through lihizhard walls
@@ -359,46 +312,28 @@ namespace KirboMod
                         && player.mount.Active == false
                         && (Main.tile[mouselocation.X, mouselocation.Y].LiquidType == LiquidID.Lava) == false)
                     {
-                        //before effect
-                        Projectile.NewProjectile(null, player.Center, Vector2.Zero, ModContent.ProjectileType<NightCrownEffect>(), 0, 0, player.whoAmI);
-
-                        player.Teleport(Main.MouseWorld, -1);
-
-                        player.AddBuff(ModContent.BuffType<Buffs.Nightmare>(), 720); //gives player nightmare effect for 12 seconds
-
-                        //after effect
-                        for (int i = 0; i < 10; i++)
-                        {
-                            Vector2 speed = Main.rand.NextVector2Circular(5f, 10f); //circle
-                            Dust.NewDustPerfect(player.Center, ModContent.DustType<Dusts.NightStar>(), speed, Scale: 1f); //Makes dust in a messy circle
-                        }
-
-                        if (nightmareeffect) //has nightmare effect
-                        {
-                            player.statLife -= player.statLifeMax2 / 10; //subtract life
-                            if (player.statLife <= 0) //if dead
-                            {
-                                PlayerDeathReason deathmessage = PlayerDeathReason.ByCustomReason($"{player.name} couldn't handle the bad thoughts"); //custom death message
-
-                                player.KillMe(deathmessage, 1.0, 0); //kill player with death message
-                            }
-                        }
+                        NightCrownTeleport();
                     }
                 }
             }
+
+
 
             //ROYAL SLIPPERS
 
             if (royalslippers == true)
             {
-                //holding down ,not holding up and jump, in the air, and not grappling
-                if (player.controlDown && player.velocity.Y != 0 && player.controlUp == false && player.controlJump == false)
+                //pressed down, not holding up or jump, and in the air
+                if (Player.controlDown && Player.releaseDown && player.velocity.Y != 0 && player.controlUp == false && player.controlJump == false)
+                {
+                    dededeSlam = true;
+                }
+
+                if (dededeSlam)
                 {
                     player.velocity.Y = 20;
+                    Player.maxFallSpeed = 20;
                     player.noFallDmg = true; //disable fall damage
-
-                    player.DryCollision(true, true); //fall through platforms
-                    player.SlopingCollision(true, true); //fall through slopes(?)
 
                     //stop grappling
                     for (int k = 0; k < 1000; k++)
@@ -411,24 +346,24 @@ namespace KirboMod
 
                     falltime++; //go up
 
-                    for (float i = 0; i < player.width; i++) //counter for stuck
+                    for (float i = 0; i < player.width; i++)
                     {
                         Point belowplayer = new Vector2(player.position.X + i, player.position.Y + player.height).ToTileCoordinates(); //all tiles below npc
 
                         //touching ground while groundpounding
-                        if (WorldGen.SolidOrSlopedTile(Main.tile[belowplayer.X, belowplayer.Y]) && falltime >= 5)
+                        if (Main.tile[belowplayer.X, belowplayer.Y].HasTile && falltime >= 5)
                         {
-                            Projectile.NewProjectile(null, player.Center.X, player.position.Y + player.height, 0, 0, Mod.Find<ModProjectile>("PlayerSlam").Type, 100, 8f, Main.myPlayer, 0, 0);
+                            Projectile.NewProjectile(player.GetSource_FromThis(), player.Center.X, player.position.Y + player.height, player.direction * 0.01f, 0, ModContent.ProjectileType<PlayerSlam>(), 100 + (falltime - 5), 8f, Main.myPlayer, 0, 0);
                             SoundEngine.PlaySound(SoundID.Item14, player.Center); //bomb
 
-                            falltime = 0; //reset
+                            falltime = 0; //reset damage
                         }
                     }
-                }
 
-                if (player.velocity.Y == 0)
-                {
-                    falltime = 0; //reset
+                    if (player.controlUp || player.controlJump) //cancel slam
+                    {
+                        dededeSlam = false;
+                    }
                 }
             }
 
@@ -439,14 +374,17 @@ namespace KirboMod
                 //using item
                 if (player.controlUseItem && player.HeldItem.damage > 0 && player.itemTime != 0)
                 {
-                    if (gloombadgeattackcount >= 20) //reset and shoot projectile
+                    if (gloombadgeattackcount >= 10) //reset and shoot projectile
                     {
                         for (int i = 0; i < 5; i++)
                         {
                             Dust d = Dust.NewDustPerfect(player.Center, Mod.Find<ModDust>("DarkResidue").Type, Main.rand.NextVector2Circular(5f, 5f), Scale: 1f); //Makes dust in a messy circle
                             d.noGravity = true;
                         }
-                        Projectile.NewProjectile(player.GetSource_FromThis(), player.Center + new Vector2(Main.rand.Next(-100, 100), Main.rand.Next(-100, 100)), new Vector2(player.direction * 0.05f, 0), Mod.Find<ModProjectile>("SmallDarkMatterShot").Type, 80, 8f, Main.myPlayer, 0, player.whoAmI);
+
+                        int damage = 40 + player.statDefense / 2;
+                        Projectile.NewProjectile(player.GetSource_FromThis(), player.Center,
+                            Main.rand.NextVector2Circular(20, 20), ModContent.ProjectileType<SmallDarkMatterShot>(), damage, 8f, Main.myPlayer, 0, player.whoAmI);
 
                         gloombadgeattackcount = 0;
                     }
@@ -471,6 +409,35 @@ namespace KirboMod
                 }
             }
         }
+
+        private void NightCrownTeleport()
+        {
+            //before effect
+            Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, Vector2.Zero, ModContent.ProjectileType<NightCrownEffect>(), 0, 0, Player.whoAmI);
+
+            Player.Teleport(Main.MouseWorld, -1);
+
+            Player.AddBuff(ModContent.BuffType<Buffs.Nightmare>(), 720); //gives player nightmare effect for 12 seconds
+
+            //after effect
+            for (int i = 0; i < 10; i++)
+            {
+                Vector2 speed = Main.rand.NextVector2Circular(5f, 10f); //circle
+                Dust.NewDustPerfect(Player.Center, ModContent.DustType<Dusts.NightStar>(), speed, Scale: 1f); //Makes dust in a messy circle
+            }
+
+            if (nightmareeffect) //has nightmare effect
+            {
+                Player.statLife -= Player.statLifeMax2 / 10; //subtract life
+                if (Player.statLife <= 0) //if dead
+                {
+                    PlayerDeathReason deathmessage = PlayerDeathReason.ByCustomReason($"{Player.name} couldn't handle the bad thoughts"); //custom death message
+
+                    Player.KillMe(deathmessage, 1.0, 0); //kill player with death message
+                }
+            }
+        }
+
         public void GetDarkSwordSwingStats(out int direction, out Items.DarkSword.DarkSword.ProjectileShootType projToShoot)
         {
             projToShoot = (Items.DarkSword.DarkSword.ProjectileShootType)(customSwordSwingCounter % 3);
@@ -502,7 +469,7 @@ namespace KirboMod
             {
                 if (Main.netMode == NetmodeID.SinglePlayer)
                 {
-                    StartFinalCutter();
+                    //StartFinalCutter();
                     return true;
                 }
                 //packet = Mod.GetPacket(3);
@@ -514,7 +481,7 @@ namespace KirboMod
             }
             if (Main.netMode == NetmodeID.SinglePlayer)
             {
-                StartFinalCutter();
+                //StartFinalCutter();
                 return true;
             }
             //packet = Mod.GetPacket();
@@ -528,16 +495,16 @@ namespace KirboMod
             //packet.Send(-1, Main.myPlayer);
             return false;
         }
-        public void StartFinalCutter()
-        {
-            finalCutterAnimationCounter = 80;
-            for (int i = 0; i < currentFinalCutterTargets.Count; i++)
-            {
-                //cursed line of code
-                Main.npc[currentFinalCutterTargets[i]].GetGlobalNPC<KirbNPC>().StartFinalCutter(finalCutterAnimationCounter + 10);
-            }
+        //public void StartFinalCutter()
+        //{
+        //    finalCutterAnimationCounter = 80;
+        //    for (int i = 0; i < currentFinalCutterTargets.Count; i++)
+        //    {
+        //        //cursed line of code
+        //        Main.npc[currentFinalCutterTargets[i]].GetGlobalNPC<KirbNPC>().StartFinalCutter(finalCutterAnimationCounter + 10);
+        //    }
 
-        }
+        //}
         void UpdateFinalCutter()
         {
 
@@ -663,16 +630,8 @@ namespace KirboMod
                     if (rectangle.Intersects(rect) && (npc.noTileCollide || player.CanHit(npc)))
                     {
                         float damage = player.GetTotalDamage(DamageClass.Melee).ApplyTo(35f);
-                        float knockback = player.GetTotalKnockback(DamageClass.Melee).ApplyTo(9f);
                         bool crit = false;
-                        if (player.kbGlove)
-                        {
-                            knockback *= 2f;
-                        }
-                        if (player.kbBuff)
-                        {
-                            knockback *= 1.5f;
-                        }
+
                         if (Main.rand.Next(100) < player.GetTotalCritChance(DamageClass.Melee))
                         {
                             crit = true;
@@ -689,7 +648,7 @@ namespace KirboMod
                         }
                         if (player.whoAmI == Main.myPlayer) //deal contact damage
                         {
-                            player.ApplyDamageToNPC(npc, (int)damage, knockback, player.direction, crit);
+                            player.ApplyDamageToNPC(npc, (int)damage, 0f, player.direction, crit);
                         }
                     }
                 }
@@ -701,7 +660,6 @@ namespace KirboMod
             }
             else if (darkDashDelay < 0) //dash delay less than zero 
             {
-
                 player.StopVanityActions();
 
                 //dusts
@@ -713,7 +671,6 @@ namespace KirboMod
                     Main.dust[d].velocity *= 0.2f;
                 }
 
-                player.statDefense += 60; //increase defense by 60 for dash duration
                 player.noKnockback = true; //disable knockback
                 player.vortexStealthActive = false; //turn off vortex stealth
 
@@ -731,7 +688,7 @@ namespace KirboMod
                     return;
                 }
 
-                darkDashDelay = 20; //set delay cooldown I guess
+                darkDashDelay = 20; //set delay cooldown 
 
                 //idk what this solves
                 if (player.velocity.X < 0f)
@@ -784,6 +741,7 @@ namespace KirboMod
 
             initialdash = false;
             dir = 1;
+
             if (darkDashTimeWindow > 0)
             {
                 darkDashTimeWindow--;
@@ -792,6 +750,7 @@ namespace KirboMod
             {
                 darkDashTimeWindow++;
             }
+
             if (player.controlRight && player.releaseRight) //right
             {
                 if (darkDashTimeWindow > 0)
@@ -825,8 +784,9 @@ namespace KirboMod
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    Vector2 speed = Main.rand.NextVector2Circular(3f, 3f); //oval
-                    Projectile.NewProjectile(null, Player.Center, speed, ModContent.ProjectileType<SmallApple>(), 10, 6, Player.whoAmI);
+                    int damage = 10 + Player.statDefense / 2;
+                    Vector2 speed = Main.rand.NextVector2CircularEdge(5f, 5f); //circular spread with constant speed
+                    Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, speed, ModContent.ProjectileType<SmallApple>(), damage, 6, Player.whoAmI);
                 }
             }
 
@@ -834,28 +794,24 @@ namespace KirboMod
             if (nightcloak)
             {
                 //Pretty self explanatory
-                int damage = Player.HeldItem.damage;
-                if (damage < 50)
-                {
-                    damage = 50;
-                }
+                int damage = 10 + Player.statDefense / 2;
 
                 //down right
-                Projectile.NewProjectile(null, Player.Center.X, Player.Center.Y, 7, 7, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
+                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, 7, 7, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
                 //right
-                Projectile.NewProjectile(null, Player.Center.X, Player.Center.Y, 10, 0, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
+                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, 10, 0, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
                 //up right
-                Projectile.NewProjectile(null, Player.Center.X, Player.Center.Y, 7, -7, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
+                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, 7, -7, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
                 //up
-                Projectile.NewProjectile(null, Player.Center.X, Player.Center.Y, 0, -10, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
+                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, 0, -10, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
                 //up left
-                Projectile.NewProjectile(null, Player.Center.X, Player.Center.Y, -7, -7, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
+                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, -7, -7, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
                 //left
-                Projectile.NewProjectile(null, Player.Center.X, Player.Center.Y, -10, 0, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
+                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, -10, 0, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
                 //down left
-                Projectile.NewProjectile(null, Player.Center.X, Player.Center.Y, -7, 7, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
+                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, -7, 7, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
                 //down
-                Projectile.NewProjectile(null, Player.Center.X, Player.Center.Y, 0, 10, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
+                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, 0, 10, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
 
                 SoundEngine.PlaySound(SoundID.Item4, Player.Center); //life crystal
             }

@@ -13,7 +13,8 @@ namespace KirboMod.Projectiles
 		{
 			Main.projFrames[Projectile.type] = 1;
 		}
-
+		public const float yAcceleration = .13f;
+		ref float YVel { get => ref Projectile.ai[2]; }
 		public override void SetDefaults()
 		{
 			Projectile.width = 24;
@@ -21,18 +22,16 @@ namespace KirboMod.Projectiles
 			Projectile.friendly = false;
 			Projectile.hostile = true;
 			Projectile.timeLeft = 300;
-			Projectile.tileCollide = true;
+			Projectile.tileCollide = false;
 			Projectile.penetrate = 1;
 		}
 		public override void AI()
 		{
-			Projectile.velocity.Y = Projectile.velocity.Y + 0.3f;
-			if (Projectile.velocity.Y >= 10f)
-			{
-				Projectile.velocity.Y = 10f;
-			}
-
-			if (Projectile.velocity.X >= 0)
+            Projectile.position.X += Projectile.velocity.X;
+			Projectile.position.Y += YVel / 2;
+			YVel += yAcceleration;
+            Projectile.position.Y += YVel / 2;
+            if (Projectile.velocity.X >= 0)
 			{
 				Projectile.rotation += MathHelper.ToRadians(18);
 			}
@@ -45,14 +44,23 @@ namespace KirboMod.Projectiles
          {
 			SoundEngine.PlaySound(SoundID.Item14, Projectile.position); //bomb sound
 
-			for (int i = 0; i < 18; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+			for (int i = 0; i < 30; i++) 
 			{
-				Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
+				Vector2 speed = Main.rand.NextVector2Circular(6f, 6f); //circle spread
 				Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.Smoke, speed, Scale: 2f); //Makes dust in a messy circle
 				d.noGravity = true;
 			}
-		}
 
+            for (int k = 0; k < 10; k++)
+            {
+                Vector2 speed = Main.rand.NextVector2Circular(6f, 6f); //circle spread
+                Gore.NewGorePerfect(Projectile.GetSource_FromThis(), Projectile.Center, speed, Main.rand.Next(61, 63), Scale: 1f); //smoke
+            }
+        }
+        public override bool ShouldUpdatePosition()
+        {
+			return false;
+        }
         public override void OnHitPlayer(Player target, Player.HurtInfo info)
         {
 			Projectile.Kill(); 

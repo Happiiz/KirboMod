@@ -48,7 +48,7 @@ namespace KirboMod.Items.Weapons
 
         public override void AddRecipes()
         {
-			Recipe chainbombrecipe = CreateRecipe(100);//the result is chain bomb
+			Recipe chainbombrecipe = CreateRecipe(300);//the result is chain bomb
 			chainbombrecipe.AddIngredient(ModContent.ItemType<Items.Weapons.Bomb>()); 
 			chainbombrecipe.AddIngredient(ItemID.Wire, 10); //Wire
 			chainbombrecipe.AddIngredient(ModContent.ItemType<Items.Starbit>(), 15);

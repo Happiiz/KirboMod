@@ -10,6 +10,8 @@ using Terraria.ModLoader;
 using Terraria.ObjectData;
 using Terraria.ID;
 using Terraria.Localization;
+using ReLogic.Content;
+using Terraria.Map;
 
 namespace KirboMod.Tiles
 {
@@ -24,86 +26,31 @@ namespace KirboMod.Tiles
 			TileObjectData.newTile.Height = 3;
 			TileObjectData.newTile.CoordinateHeights = new[] { 16, 16, 16 };
 			TileObjectData.newTile.StyleHorizontal = true;
-			TileObjectData.newTile.AnchorTop = new AnchorData(AnchorType.SolidTile | AnchorType.SolidWithTop | AnchorType.SolidSide, TileObjectData.newTile.Width, 0);
+			TileObjectData.newTile.AnchorTop = new AnchorData(AnchorType.SolidTile | AnchorType.SolidWithTop | AnchorType.SolidSide | AnchorType.PlanterBox, TileObjectData.newTile.Width, 0);
 			TileObjectData.newTile.StyleWrapLimit = 111;
+            TileObjectData.newTile.DrawYOffset = -2;
+            TileObjectData.newAlternate.CopyFrom(TileObjectData.newTile);
+            TileObjectData.newAlternate.AnchorTop = new AnchorData(AnchorType.Platform, TileObjectData.newTile.Width, 0);
+            TileObjectData.newAlternate.DrawYOffset = -10;
+            TileObjectData.addAlternate(0);
             TileObjectData.addTile(Type);
 			DustType = -1;
 			LocalizedText name = CreateMapEntryName();
-			// name.SetDefault("Banner");
 			AddMapEntry(new Color(13, 88, 130), name);
         }
 
-		public override void KillMultiTile(int i, int j, int frameX, int frameY) {
-			int style = frameX / 18;
-			string item;
-			switch (style) {
-				case 0:
-					item = "BioSparkBanner";
-					break;
-				case 1:
-					item = "BirdonBanner";
-					break;
-				case 2:
-					item = "BladeKnightBanner";
-					break;
-				case 3:
-					item = "BurningLeoBanner";
-					break;
-				case 4:
-					item = "CappyBanner";
-					break;
-				case 5:
-					item = "ChillyBanner";
-					break;
-				case 6:
-					item = "KabuBanner";
-					break;
-				case 7:
-					item = "KnuckleJoeBanner";
-					break;
-				case 8:
-					item = "ParosolWaddleDeeBanner";
-					break;
-				case 9:
-					item = "PlasmaWispBanner";
-					break;
-				case 10:
-					item = "PoppyBrosJrBanner";
-					break;
-				case 11:
-					item = "ScarfyBanner";
-					break;
-				case 12:
-					item = "SirKibbleBanner";
-					break;
-				case 13:
-					item = "TwisterBanner";
-					break;
-				case 14:
-					item = "UFOBanner";
-					break;
-				case 15:
-					item = "WaddleDeeBanner";
-					break;
-				case 16:
-					item = "WaddleDooBanner";
-					break;
-				case 17:
-					item = "BrontoBurtBanner";
-					break;
-                case 18:
-                    item = "BroomHatterBanner";
-                    break;
-                case 19:
-                    item = "BonkersBanner";
-                    break;
-                case 20:
-                    item = "MrFrostyBanner";
-                    break;
-                default:
-					return;
-			}
-		}
+        public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height, ref short tileFrameX, ref short tileFrameY)
+        {
+            if (TileID.Sets.Platforms[Main.tile[i, j - 3].TileType] == true || TileID.Sets.Platforms[Main.tile[i, j - 2].TileType] == true
+                || TileID.Sets.Platforms[Main.tile[i, j - 1].TileType] == true)
+            {
+                offsetY = -10;
+            }
+            else
+            {
+                offsetY = -2;
+            }
+        }
 
 		public override void NearbyEffects(int i, int j, bool closer) 
 		{

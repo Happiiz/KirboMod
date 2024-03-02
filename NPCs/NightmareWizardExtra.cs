@@ -29,12 +29,12 @@ namespace KirboMod.NPCs
         public override void SetStaticDefaults()
         {
             // DisplayName.SetDefault("Nightmare");
-            Main.npcFrameCount[NPC.type] = 19;
+            Main.npcFrameCount[NPC.type] = 25;
 
             NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
             {
                 PortraitScale = 1f, // Portrait refers to the full picture when clicking on the icon in the bestiary
-                PortraitPositionYOverride = 90f,
+                PortraitPositionYOverride = 70f,
                 Position = new Vector2(0, 80),
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
@@ -44,12 +44,12 @@ namespace KirboMod.NPCs
         public override void SetDefaults()
         {
             NPC.width = 114;
-            NPC.height = 152;
-            DrawOffsetY = -20;
-            NPC.damage = 70; 
+            NPC.height = 114;
+            DrawOffsetY = 20;
+            NPC.damage = 70;
             NPC.noTileCollide = true;
-            NPC.defense = 6;
-            NPC.lifeMax = 10000;
+            NPC.defense = 15;
+            NPC.lifeMax = 18000;
             NPC.HitSound = SoundID.NPCHit2; //bone
             NPC.DeathSound = SoundID.NPCDeath2; //undead
             NPC.value = Item.buyPrice(0, 5, 0, 0); // money it drops
@@ -146,14 +146,14 @@ namespace KirboMod.NPCs
 
         public override void HitEffect(NPC.HitInfo hit)
         {
-            if (NPC.life <= 0)
+            if (deathCounter >= 360 && NPC.life <= 0)
             {
                 for (int i = 0; i < 8; i++) 
                 {
                     // go around in a octogonal pattern
                     Vector2 speed = new Vector2((float)Math.Cos(MathHelper.ToRadians(i * 45)) * 20, (float)Math.Sin(MathHelper.ToRadians(i * 45)) * 20);
 
-                    Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.NightStar>(), speed, Scale: 3f); //Makes dust in a messy circle
+                    Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.NightStar>(), speed, Scale: 3f); //Makes dust in an octogonal formation
                     d.noGravity = true;
                 }
 

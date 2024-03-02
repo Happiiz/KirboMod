@@ -28,7 +28,7 @@ namespace KirboMod.NPCs
         }
         public override void SetStaticDefaults() {
 			// DisplayName.SetDefault("Power Orb");
-			Main.npcFrameCount[NPC.type] = 2;
+			Main.npcFrameCount[NPC.type] = 4;
 
 			//Needed for multiplayer spawning to work
 			NPCID.Sets.MPAllowedEnemies[Type] = true;
@@ -45,10 +45,10 @@ namespace KirboMod.NPCs
 		public override void SetDefaults() {
 			NPC.width = 100;
 			NPC.height = 100;
-			NPC.damage = 0; //initally
+			NPC.damage = 70; //initally
 			NPC.noTileCollide = true;
-			NPC.defense = 20; 
-			NPC.lifeMax = 15000;
+			NPC.defense = 25; 
+			NPC.lifeMax = 24000;
 			NPC.HitSound = SoundID.NPCHit4;
 			NPC.DeathSound = SoundID.NPCDeath14; //explosive metal
 			NPC.value = 0f; // money it drops
@@ -61,7 +61,6 @@ namespace KirboMod.NPCs
 			NPC.lavaImmune = true;
 			Music = MusicID.Boss3;
 			NPC.npcSlots = 6;
-			NPC.alpha = 255; //only initally of course
 		}
 
 		public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */ 
@@ -94,13 +93,21 @@ namespace KirboMod.NPCs
 		public override void FindFrame(int frameHeight) // animation
         {
             NPC.frameCounter += 1.0;
-            if (NPC.frameCounter < 7.0)
+            if (NPC.frameCounter < 4.0)
             {
                 NPC.frame.Y = 0;
             }
-            else if (NPC.frameCounter < 14.0)
+            else if (NPC.frameCounter < 8.0)
             {
                 NPC.frame.Y = frameHeight;
+            }
+            else if (NPC.frameCounter < 12.0)
+            {
+                NPC.frame.Y = frameHeight * 2;
+            }
+            else if (NPC.frameCounter < 16.0)
+            {
+                NPC.frame.Y = frameHeight * 3;
             }
             else
             {

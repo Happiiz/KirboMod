@@ -19,7 +19,7 @@ namespace KirboMod.Projectiles
 			Projectile.height = 32;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Ranged;
-			Projectile.timeLeft = 120;
+			Projectile.timeLeft = 300;
 			Projectile.tileCollide = true;
 			Projectile.penetrate = 5;
             Projectile.usesLocalNPCImmunity = true; //wait for no one else's immunity timer
@@ -49,17 +49,16 @@ namespace KirboMod.Projectiles
 
         public override bool OnTileCollide(Vector2 oldVelocity) 
         {
-			Player player = Main.player[0];
-			if (Projectile.velocity.X != oldVelocity.X) //KILL
-			{
-				Projectile.Kill();
-			}/*
-			if (projectile.velocity.Y != oldVelocity.Y) //bounce
-			{
-				projectile.velocity.Y = -oldVelocity.Y;
-			}*/
 			return false; //dont die
 		}
+
+
+        public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
+        {
+            fallThrough = false; //don't fall through platforms
+            return true;
+        }
+
         public override Color? GetAlpha(Color lightColor)
         {
 			return Color.White; // Makes it uneffected by light

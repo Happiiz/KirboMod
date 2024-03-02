@@ -1,3 +1,5 @@
+using KirboMod.Projectiles;
+using KirboMod.Projectiles.SwordAuras;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -9,7 +11,7 @@ using Terraria.ModLoader;
 
 namespace KirboMod.Items.Weapons
 {
-	public class MetaKnightSword : ModItem
+    public class MetaKnightSword : ModItem
 	{
 		public override void SetStaticDefaults() 
 		{
@@ -21,7 +23,7 @@ namespace KirboMod.Items.Weapons
 		public override void SetDefaults() 
 		{
 			Item.damage = 102;
-			Item.DamageType = DamageClass.MeleeNoSpeed; //Don't increase attack speed
+			Item.DamageType = DamageClass.Melee;
 			Item.width = 40;
 			Item.height = 40;
 			Item.useTime = 10;
@@ -32,16 +34,20 @@ namespace KirboMod.Items.Weapons
 			Item.rare = ItemRarityID.Yellow;
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = true;
-			Item.shoot = ModContent.ProjectileType<Projectiles.CresentSlash>();
-			Item.shootSpeed = 30f;
+			Item.shoot = ModContent.ProjectileType<CresentSlash>();
+			Item.shootSpeed = 100f;
+			Item.shootsEveryUse = true;
 			Item.noMelee = true; //no melee hitbox
 		}
 
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
-			//swing
-			Projectile.NewProjectile(source, player.MountedCenter, new Vector2(player.direction, 0f), ModContent.ProjectileType<Projectiles.MetaKnightSwing>(), Item.damage, Item.knockBack);
-			return true;
+			if (Main.myPlayer == player.whoAmI)
+			{
+				SwordAura.NewAura<MetaKnightSwing>(player, source, damage, knockback, Item);
+				SwordSlash.NewSwordSlash<CresentSlash>(source, player, velocity, damage, knockback, .01f);
+			}
+			return false;
 		}
         public override void AddRecipes()
 		{

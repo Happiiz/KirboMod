@@ -76,7 +76,7 @@ namespace KirboMod.Projectiles
 
         public override Color? GetAlpha(Color lightColor)
         {
-			return Color.White; // Makes it uneffected by light
+			return Color.White with { A = 0 } * Projectile.Opacity; // Makes it uneffected by light
         }
 
         // This projectile uses additional textures for drawing
@@ -107,7 +107,9 @@ namespace KirboMod.Projectiles
 						0);
 				}
 			}
-			return true;
+            VFX.DrawProjWithStarryTrail(Projectile, new Color(173, 245, 255) * .15f, Color.White * .35f, default, Projectile.Opacity);
+
+            return true;
 		}
 	}
 }

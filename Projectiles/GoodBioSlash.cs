@@ -10,8 +10,8 @@ namespace KirboMod.Projectiles
 		public override void SetStaticDefaults()
 		{
 			Main.projFrames[Projectile.type] = 3;
-			// DisplayName.SetDefault("Purple Slash");
-		}
+            ProjectileID.Sets.MinionShot[Type] = true;
+        }
 
 		public override void SetDefaults()
 		{
@@ -25,8 +25,8 @@ namespace KirboMod.Projectiles
 			Projectile.scale = 1f;
 			Projectile.usesLocalNPCImmunity = true; //uses own immunity frames
 			Projectile.localNPCHitCooldown = 15; //time to hit the same npc again
-			Projectile.minion = true; //deal summon damage
-		}
+            Projectile.DamageType = DamageClass.Summon;
+        }
 
 		public override void AI()
 		{

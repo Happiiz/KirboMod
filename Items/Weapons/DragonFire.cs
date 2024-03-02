@@ -5,73 +5,41 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace KirboMod.Items.Weapons
 {
-	public class DragonFire : ModItem
+    public class DragonFire : ModItem
 	{
 		public override void SetStaticDefaults()
 		{
-			// DisplayName.SetDefault("Dragon Pot"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
-			/* Tooltip.SetDefault("Unleashes a flurry of shadow fire" +
-				"\nEnemies hit by one will be set on strong shadow flames"); */
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research 
         }
 
-		public override void SetDefaults()
+        static int ArmPen = 15;
+
+        public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(ArmPen);
+
+        public override void SetDefaults()
 		{
 			Item.damage = 45;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
-			Item.width = 56;
-			Item.height = 50;
+			Item.width = 25;
+			Item.height = 25;
 			Item.useTime = 4;
 			Item.useAnimation = 20;
 			Item.useStyle = ItemUseStyleID.Shoot;
-			Item.knockBack = 0f;
+			Item.knockBack = 0.2f;
 			Item.value = Item.buyPrice(0, 5, 50, 0);
 			Item.rare = ItemRarityID.Yellow;
 			Item.UseSound = SoundID.Item34;
 			Item.autoReuse = true;
-			//item.shoot = ModContent.ProjectileType<Projectiles.FireFire>();
-			Item.shootSpeed = 16f; 
+			Item.shoot = ModContent.ProjectileType<Projectiles.Flames.DragonFireFire>();
+			Item.shootSpeed = 7; //proj has 3 extraupdates
 			Item.mana = 12;
-		}
-
-		public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
-        {
-
-			Vector2 shootdir = Main.MouseWorld - player.Center; //distance 
-			shootdir.Normalize();//reduce to 1
-			shootdir *= 25f;//speed
-			position = player.Center + shootdir / 2;//move 8 units away from player apon spawning
-
-			//uses it two times for each supporting projectile
-			Vector2 shootoffset1 = new Vector2(shootdir.X, shootdir.Y).RotatedBy(MathHelper.ToRadians(2)); // 2 degree offset
-			Vector2 shootoffset2 = new Vector2(shootdir.X, shootdir.Y).RotatedBy(MathHelper.ToRadians(-2)); // -2 degree offset
-
-			Projectile.NewProjectile(source, position.X, position.Y, shootdir.X, shootdir.Y, ModContent.ProjectileType<Projectiles.DragonFireFire>(), Item.damage, 0.2f, player.whoAmI);
-			Projectile.NewProjectile(source, position.X, position.Y, shootoffset1.X, shootoffset1.Y, ModContent.ProjectileType<Projectiles.DragonFireFire>(), Item.damage, 0.2f, player.whoAmI);
-			Projectile.NewProjectile(source, position.X, position.Y, shootoffset2.X, shootoffset2.Y, ModContent.ProjectileType<Projectiles.DragonFireFire>(), Item.damage, 0.2f, player.whoAmI);
-			return false;
-		}
-
-        public override bool CanUseItem(Player player)
-        {
-			if (player.altFunctionUse == 2)
-            {
-				Item.useStyle = ItemUseStyleID.HoldUp;
-				Item.shoot = ModContent.ProjectileType<Projectiles.FireSphere>();
-				Item.shootSpeed = 0f;
-			}
-			else
-			{
-				Item.useStyle = ItemUseStyleID.Shoot;
-				Item.shoot = ModContent.ProjectileType<Projectiles.FireFire>();
-				Item.shootSpeed = 8f;
-			}
-			return player.ownedProjectileCounts[ModContent.ProjectileType<Projectiles.FireSphere>()] < 1;
+			Item.ArmorPenetration = ArmPen;
 		}
 
 		public override Vector2? HoldoutOffset()

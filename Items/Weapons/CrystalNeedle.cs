@@ -33,7 +33,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.CrystalNeedleBall>();
-			Item.shootSpeed = 12f;
+			Item.shootSpeed = 16f;
 			Item.consumable = true;
 			Item.maxStack = 9999;
 			Item.noMelee = true;
@@ -43,12 +43,12 @@ namespace KirboMod.Items.Weapons
 		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
 		{
             position.X = player.Center.X;
-            position.Y = player.Center.Y - 25f;
+            position.Y = player.Center.Y - 35f;
         }
 
 		public override void AddRecipes()
 		{
-			Recipe recipe1 = CreateRecipe(100);//the result is crystal needle ball
+			Recipe recipe1 = CreateRecipe(300);//the result is crystal needle ball
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.ClutterNeedle>(), 10); //Clutter Needle
 			recipe1.AddIngredient(ItemID.CrystalShard, 5); //5 crystals
 			recipe1.AddIngredient(ItemID.BeetleHusk); //1 Beetle Husk

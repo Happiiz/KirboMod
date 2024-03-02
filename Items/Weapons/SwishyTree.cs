@@ -33,17 +33,18 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.SmolApple>();
-			Item.shootSpeed = 8f;
+			Item.shootSpeed = 12f;
 			Item.useTurn = false; //can't turn around while using
 		}
 
 		public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
-			damage = 6;
-			//two extra projectiles that spread
-			Projectile.NewProjectile(source, position, new Vector2(velocity.X, velocity.Y).RotatedBy(MathHelper.ToRadians(-15f)), type, damage, 3f, Item.playerIndexTheItemIsReservedFor, 0, 0);
-			Projectile.NewProjectile(source, position, new Vector2(velocity.X, velocity.Y).RotatedBy(MathHelper.ToRadians(15f)), type, damage, 3f, Item.playerIndexTheItemIsReservedFor, 0, 0);
-			return true;
+			damage /= 2;
+
+			Projectile.NewProjectile(source, position, new Vector2(velocity.X, velocity.Y), type, damage, 3f);
+			Projectile.NewProjectile(source, position, new Vector2(velocity.X, velocity.Y).RotatedBy(MathHelper.ToRadians(15f)), type, damage, 3f);
+            Projectile.NewProjectile(source, position, new Vector2(velocity.X, velocity.Y).RotatedBy(MathHelper.ToRadians(-15f)), type, damage, 3f);
+            return false;
         }
     }
 }

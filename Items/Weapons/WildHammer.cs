@@ -38,11 +38,10 @@ namespace KirboMod.Items.Weapons
 
 		public override void HoldItem(Player player)
 		{
-			if (Main.mouseRight == true & attackTime < 1) //holding right & not attacking
+			if (Main.mouseRight == true && attackTime < 1) //holding right & not attacking
 			{
 				meleeCharge++; //go up
 				player.velocity.X *= 0.9f; //slow
-                player.endurance += 0.35f; //damage reduction of 35%
 
                 for (int i = 0; i % 5 == 0; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 				{
@@ -87,6 +86,14 @@ namespace KirboMod.Items.Weapons
 				meleeCharge = 0;
 			}
 		}
+
+        public override void UpdateInventory(Player player)
+        {
+            if (Main.mouseRight == true && attackTime < 1) //holding right & not attacking
+            {
+                player.endurance += 0.35f; //damage reduction of 35% (put it here since it won't work in HoldItem()
+            }
+        }
 
         public override void MeleeEffects(Player player, Rectangle hitbox)
         {

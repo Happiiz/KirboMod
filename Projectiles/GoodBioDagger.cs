@@ -10,7 +10,7 @@ namespace KirboMod.Projectiles
 	{
 		public override void SetStaticDefaults()
 		{
-            // DisplayName.SetDefault("Throwing Knife");
+            ProjectileID.Sets.MinionShot[Type] = true;
         }
 		public override void SetDefaults()
 		{
@@ -18,14 +18,14 @@ namespace KirboMod.Projectiles
 			Projectile.height = 18;
 			Projectile.friendly = true;
 			Projectile.hostile = false;
-			Projectile.timeLeft = 40;
+			Projectile.timeLeft = 120;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
-			Projectile.minion = true; //deal summon damage
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = 10;
-		}
+            Projectile.DamageType = DamageClass.Summon;
+        }
 		public override void AI()
 		{
 			Projectile.rotation = Projectile.velocity.ToRotation();

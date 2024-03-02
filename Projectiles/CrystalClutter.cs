@@ -20,11 +20,11 @@ namespace KirboMod.Projectiles
 			Projectile.height = 62;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Ranged;
-			Projectile.timeLeft = 120;
+			Projectile.timeLeft = 240;
 			Projectile.tileCollide = true;
 			Projectile.penetrate = 3;
-            Projectile.usesIDStaticNPCImmunity = true; //wait for npc to recover from other projectiles of same type
-            Projectile.idStaticNPCHitCooldown = 10;
+            Projectile.usesLocalNPCImmunity = true; 
+            Projectile.localNPCHitCooldown = 5;
         }
 		public override void AI()
 		{
@@ -60,7 +60,13 @@ namespace KirboMod.Projectiles
 			return false;
 		}
 
-		public override Color? GetAlpha(Color lightColor)
+        public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
+        {
+            fallThrough = false; //don't fall through platforms
+            return true;
+        }
+
+        public override Color? GetAlpha(Color lightColor)
 		{
 			return Color.White; // Makes it uneffected by light
 		}

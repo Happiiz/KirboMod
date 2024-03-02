@@ -44,21 +44,21 @@ namespace KirboMod.Projectiles
 
 			Projectile.ai[0]++;
 
-			if (Projectile.ai[0] < 15)
+			if (Projectile.ai[0] < 5)
 			{
 				Projectile.velocity *= 0.9f;
 			}
-			else 
-            {
+			else
+			{
 				Projectile.hostile = true;
 
 				if (Projectile.ai[1] == 1) //go up
 				{
-					Projectile.velocity.Y = -20; 
+					Projectile.velocity.Y -= .5f; 
 				}
                 else //go down
                 {
-                    Projectile.velocity.Y = 20;
+                    Projectile.velocity.Y += .5f;
                 }
             }
 

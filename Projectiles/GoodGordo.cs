@@ -34,23 +34,7 @@ namespace KirboMod.Projectiles
 				Projectile.velocity.Y = 6f;
             }
 			Projectile.rotation += 0.1f; // rotates projectile
-			/*if (++projectile.frameCounter >= 15) //changes frames every 15 ticks 
-			{
-				projectile.frameCounter = 0;
-				if (++projectile.frame >= Main.projFrames[projectile.type])
-				{
-					projectile.frame = 0;
-				}
-			}*/
 		}
-        /* public override void Kill(int timeLeft) //when the projectile dies
-         {
-             for (int i = 0; i < 10; i++)
-             {
-                 Vector2 speed = Main.rand.NextVector2Circular(1f, 1f); //circle
-                 Dust d = Dust.NewDustPerfect(projectile.position, DustID.Enchanted_Gold, speed * 3, Scale: 1f); //Makes dust in a messy circle
-             }
-         }*/
 
         public override bool OnTileCollide(Vector2 oldVelocity) 
         {

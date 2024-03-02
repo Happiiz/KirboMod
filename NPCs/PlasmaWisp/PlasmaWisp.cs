@@ -199,7 +199,7 @@ namespace KirboMod.NPCs.PlasmaWisp
 				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Caverns,
 
 				// Sets the description of this NPC that is listed in the bestiary.
-				new FlavorTextBestiaryInfoElement("A wisp sparking high amounts of electricity and light. Tries to sniff out intruders of its domain.")
+				new FlavorTextBestiaryInfoElement("A ghastly entity sparking high amounts of electricity and light. Tries to snuff out intruders of its domain.")
             });
         }
         void Particles()

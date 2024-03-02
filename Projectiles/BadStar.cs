@@ -27,9 +27,13 @@ namespace KirboMod.Projectiles
 			Projectile.tileCollide = false;
 			Projectile.penetrate = 999;
 			Projectile.scale = 1f;
+			Projectile.alpha = 255;
 		}
 		public override void AI()
 		{
+			Projectile.alpha -= 51;
+			if (Projectile.alpha <= 0)
+				Projectile.alpha = 0;
 			Lighting.AddLight(Projectile.Center, 0.255f, 0f, 0.255f);
 			
 			if (Projectile.velocity.X >= 0)
@@ -58,7 +62,7 @@ namespace KirboMod.Projectiles
 
         public override Color? GetAlpha(Color lightColor)
         {
-			return Color.White; // Makes it uneffected by light
+			return Color.White with { A = 0 } * Projectile.Opacity; // Makes it uneffected by light
         }
 
         // This projectile uses additional textures for drawing
@@ -79,13 +83,14 @@ namespace KirboMod.Projectiles
 						(Projectile.position.Y - Main.screenPosition.Y + Projectile.height - star.Height * 0.5f + 2f) - Projectile.velocity.Y * (i * 1.5f)
 				),
 					new Rectangle(0, 0, star.Width, star.Height),
-					new Color(0, 0, 100, 0),
+					new Color(0, 0, 100, 0) * Projectile.Opacity,
 					Projectile.rotation,
                     star.Size() * 0.5f,
 					1f,
 					SpriteEffects.None,
 					0);
 			}
+			VFX.DrawProjWithStarryTrail(Projectile,new Color(173, 245, 255) * .15f, Color.White * .35f, default, Projectile.Opacity);
 			return true;
 		}
 	}

@@ -1,6 +1,8 @@
+using KirboMod.Particles;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -20,7 +22,7 @@ namespace KirboMod.Projectiles
 			Projectile.height = 10;
 			Projectile.friendly = false;
 			Projectile.hostile = true;
-			Projectile.timeLeft = 60;
+			Projectile.timeLeft = 90;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 		}
@@ -29,14 +31,21 @@ namespace KirboMod.Projectiles
 			Projectile.rotation += Projectile.velocity.X * 0.02f;
 
 			Projectile.velocity *= 0.96f;
-		}
+        }
          public override void OnKill(int timeLeft) //when the projectile dies
          {
-			Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity *= 0, ModContent.ProjectileType<Projectiles.ZeroSparkExplosion>(), 100 / 2, 12f, Main.myPlayer);
-         }
+            SoundEngine.PlaySound(SoundID.Item11.WithVolumeScale(0.8f), Projectile.Center);
+            Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity *= 0.01f, ModContent.ProjectileType<ZeroSparkExplosion>(), 100 / 2, 12f, Main.myPlayer);
+		 }
 
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
+			return false;
+        }
+
+        public override bool PreDraw(ref Color lightColor)
+        {
+            VFX.DrawGlowBallAdditive(Projectile.Center, 0.5f, Color.Blue, Color.White);
 			return false;
         }
 

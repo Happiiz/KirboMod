@@ -19,15 +19,33 @@ namespace KirboMod.Projectiles
 			Projectile.height = 24;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Magic;
-			Projectile.timeLeft = 10;
-			Projectile.tileCollide = false;
+			Projectile.timeLeft = 20;
+			Projectile.tileCollide = true;
 			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
-		}
+            Projectile.usesIDStaticNPCImmunity = true;
+            Projectile.idStaticNPCHitCooldown = 10;
+        }
 		public override void AI()
 		{
-			Projectile.scale = Projectile.scale + 0.05f;
-		}
+            //scale with timeLeft
+            Projectile.scale = 1 + 0.05f * (10 - Projectile.timeLeft) < 1.5f ? 1 + 0.05f * (10 - Projectile.timeLeft) : 1.5f;
+
+            if (Projectile.timeLeft <= 5) //fade when close to death
+            {
+                Projectile.alpha += 51;
+            }
+        }
+
+        public override bool OnTileCollide(Vector2 oldVelocity)
+        {
+            //stop projectile
+            Projectile.velocity *= 0.1f;
+
+            Projectile.timeLeft = 5;
+
+            return false;
+        }
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {

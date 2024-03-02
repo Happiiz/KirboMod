@@ -23,7 +23,8 @@ namespace KirboMod.Globals
     {
         public override bool AppliesToEntity(Item entity, bool lateInstantiation)
         {
-            return entity.damage > 0 && ModLoader.TryGetMod("CalamityMod", out _) && entity.ModItem != null && entity.ModItem.Mod.Name == "KirboMod";
+            bool calam = ModLoader.TryGetMod("CalamityMod", out _);
+            return entity.damage > 0 && calam && entity.ModItem != null && entity.ModItem.Mod.Name == "KirboMod";
         }
         public override void SetDefaults(Item entity)
         {

@@ -23,16 +23,23 @@ namespace KirboMod.Projectiles
 			Projectile.timeLeft = 300;
 			Projectile.tileCollide = true;
 			Projectile.penetrate = -1;
-            Projectile.usesIDStaticNPCImmunity = true; //wait for npc to recover from other projectiles of same type
-            Projectile.idStaticNPCHitCooldown = 10;
+            Projectile.usesLocalNPCImmunity = true; //wait for no one
+            Projectile.localNPCHitCooldown = 5;
         }
 		public override void AI()
-		{
-			//Gravity
-			Projectile.velocity.Y = Projectile.velocity.Y + 0.4f;
-			if (Projectile.velocity.Y >= 12f)
+        {
+
+            Projectile.ai[0]++;
+            if (Projectile.ai[0] % 10 == 0 && Projectile.velocity.Y == 0) //every 10 ticks and on the ground
             {
-				Projectile.velocity.Y = 12f;
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Bottom.X, Projectile.Bottom.Y - 16, Projectile.velocity.X * 0.01f, Projectile.velocity.Y * 0.01f, ModContent.ProjectileType<CrystalTrap>(), Projectile.damage * 3/4, 1, Projectile.owner, 0, 0, 0);
+            }
+
+            //Gravity
+            Projectile.velocity.Y = Projectile.velocity.Y + 0.6f;
+			if (Projectile.velocity.Y >= 16f)
+            {
+				Projectile.velocity.Y = 16f;
             }
 
 			//Rotation
@@ -47,12 +54,6 @@ namespace KirboMod.Projectiles
 			{
 				int dustnumber = Dust.NewDust(Projectile.position, 102, 102, ModContent.DustType<Dusts.RainbowSparkle>(), 0f, 0f, 200, default, 1f); //dust
 				Main.dust[dustnumber].velocity *= 0.3f;
-			}
-
-			Projectile.ai[0]++;
-			if (Projectile.ai[0] % 10 == 0) //multiple of 10
-            {
-				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * 0, ModContent.ProjectileType<Projectiles.CrystalTrap>(), Projectile.damage / 2, 1, Projectile.owner, 0, 0);
 			}
 
 			//for stepping up tiles
@@ -78,17 +79,18 @@ namespace KirboMod.Projectiles
 
         public override bool OnTileCollide(Vector2 oldVelocity) 
         {
-			Player player = Main.player[0];
-			if (Projectile.velocity.X != oldVelocity.X) //KILL
-			{
-				Projectile.Kill();
-			}/*
-			if (projectile.velocity.Y != oldVelocity.Y) //bounce
-			{
-				projectile.velocity.Y = -oldVelocity.Y;
-			}*/
+			if (Projectile.velocity.X != oldVelocity.X) //bounce
+            {
+                Projectile.velocity.X = -oldVelocity.X;
+            }
 			return false; //dont die
 		}
+
+        public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
+        {
+			fallThrough = false; //don't fall through platforms
+            return true;
+        }
 
         public override Color? GetAlpha(Color lightColor)
         {

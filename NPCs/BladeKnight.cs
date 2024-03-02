@@ -268,8 +268,8 @@ namespace KirboMod.NPCs
 			Player player = Main.player[NPC.target];
 			NPC.TargetClosest(true);
 
-			float speed = 3f; //top speed
-			if (Main.expertMode)
+            float speed = 1f; //top speed
+            if (Main.expertMode)
 				speed *= 1.3334f;
 			float inertia = 10f; //acceleration and decceleration speed
 			float jumpSpeed = 7;

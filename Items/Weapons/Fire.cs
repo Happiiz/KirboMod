@@ -9,7 +9,7 @@ using Terraria.ModLoader;
 
 namespace KirboMod.Items.Weapons
 {
-	public class Fire : ModItem
+    public class Fire : ModItem
 	{
 		public override void SetStaticDefaults()
 		{
@@ -21,35 +21,27 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 16;
+			Item.damage = 14;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 32;
 			Item.height = 40;
-			Item.useTime = 5;
-			Item.useAnimation = 25;
+			Item.useTime = 9;
+			Item.useAnimation = Item.useTime * 5;
 			Item.useStyle = ItemUseStyleID.Shoot;
 			Item.knockBack = 0.1f;
             Item.value = Item.buyPrice(0, 0, 4, 0);
             Item.rare = ItemRarityID.Green;
 			Item.UseSound = SoundID.Item34;
 			Item.autoReuse = true;
-			Item.shoot = ModContent.ProjectileType<Projectiles.FireFire>();
-			Item.shootSpeed = 10f;
+			Item.shoot = ModContent.ProjectileType<Projectiles.Flames.FireFire>();
+			Item.shootSpeed = 15f;
 			Item.mana = 3;
 		}
 
 		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
 		{
-			Vector2 perturbedSpeed = new Vector2(velocity.X, velocity.Y).RotatedByRandom(MathHelper.ToRadians(50)); // 50 degree spread.
-
-			Vector2 shootdir = Main.MouseWorld - player.Center; //distance 
-			shootdir.Normalize();//reduce to 1
-			shootdir *= 8f;//speed
-			position = player.Center + shootdir * 4;//move from player apon spawning
-
-			velocity.X = perturbedSpeed.X;
-			velocity.Y = perturbedSpeed.Y;
+			velocity = new Vector2(velocity.X, velocity.Y).RotatedByRandom(MathHelper.ToRadians(20)); // 40 degree spread
 		}
 
         public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)

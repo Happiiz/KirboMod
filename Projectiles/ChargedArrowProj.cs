@@ -1,3 +1,4 @@
+using KirboMod.Particles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -51,10 +52,19 @@ namespace KirboMod.Projectiles
 
         public override void OnKill(int timeLeft) //when the projectile dies
         {
+            for (int i = 0; i < 10; i++)
+            {
+                Vector2 velocity = Main.rand.NextVector2Circular(Projectile.velocity.Length() / 2, Projectile.velocity.Length() / 2); //circle
+                Dust.NewDustPerfect(Projectile.Center, DustID.IceTorch,
+                    velocity, Scale: 1f);
+            }
+
+
             for (int i = 0; i < 5; i++)
             {
-                Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-                Dust.NewDustPerfect(Projectile.Center + Projectile.velocity, DustID.IcyMerman, speed, Scale: 1f); //Makes dust in a messy circle
+                Vector2 velocity = Main.rand.NextVector2Circular(Projectile.velocity.Length() / 2, Projectile.velocity.Length() / 2); //circle
+                Sparkle.NewSparkle(Projectile.Center, Color.Blue, new Vector2(1, 1f),
+                velocity, 40, new Vector2(1f, 1f));
             }
         }
 
@@ -64,25 +74,29 @@ namespace KirboMod.Projectiles
             return true; //collision
         }
 
-        public static Asset<Texture2D> afterimagae;
+        public static Asset<Texture2D> afterimage;
 
         public override bool PreDraw(ref Color lightColor)
         {
             Main.instance.LoadProjectile(Projectile.type);
-            afterimagae = ModContent.Request<Texture2D>(Texture);
-            Texture2D texture = afterimagae.Value;
+            afterimage = ModContent.Request<Texture2D>(Texture);
+            Texture2D texture = afterimage.Value;
 
-            // Redraw the projectile with the color not influenced by light
-            for (int k = 1; k < Projectile.oldPos.Length; k++) //start at 1 so not ontop of actual ring
+            for (int k = 1; k < Projectile.oldPos.Length; k++) //start at 1 so not ontop of actual projectile
             {
-                Vector2 drawOrigin = new Vector2(8, 8);
-                Vector2 drawPos = (Projectile.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
+                Vector2 drawOrigin = texture.Size() / 2;
+                Vector2 drawPos = (Projectile.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(-8f, Projectile.gfxOffY);
 
                 Color color = Color.CornflowerBlue * ((Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);
                 Main.EntitySpriteDraw(texture, drawPos, null, color, Projectile.rotation, drawOrigin, 1, SpriteEffects.None, 0);
             }
-
             return true; //draw og
+        }
+
+        public override void PostDraw(Color lightColor)
+        {
+            //add glow ball at tip of arrow
+            VFX.DrawGlowBallAdditive(Projectile.Center + Projectile.velocity * 0.5f, 1.2f, Color.Blue, Color.White);
         }
     }
 }

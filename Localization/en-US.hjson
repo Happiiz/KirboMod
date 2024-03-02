@@ -1,5 +1,28 @@
 Mods: {
 	KirboMod: {
+		CommonItemTooltip: {
+			DefenseVariesDamage: Damage varies with the amount of defense you have
+			DefensePenetration: Ignores {0} points of enemy defense
+		}
+
+		ProgressionDescription: {
+			Whispy: Use a [i:{0}].
+			Kracko: Kill a naturally spawning Kracko Jr. or use a [i:{0}] to summon one.
+			Dedede: Use a [i:{0}].
+			Nightmare: Use a [i:{0}] at a Fountain of Dreams during night.
+			DarkMatter: Use a [i:{0}].
+			Zero: Use a [i:{0}] and prepare for what comes next.
+		}
+
+		DespawnMessage: {
+			Whispy: Whispy Woods retreats back into the ground...
+			Kracko: Kracko floats back up into the heavens...
+			Dedede: The King gives up the chase...
+			Nightmare: The nightmare has passed...
+			DarkMatter: It slips back into the shadows...
+			Zero: The darkness clears...
+		}
+
 		Buffs: {
 			DarkFeeling: {
 				DisplayName: Dark Feeling
@@ -13,7 +36,7 @@ Mods: {
 
 			FlyingNimbusMount: {
 				DisplayName: Flying Nimbus
-				Description: "'How is this a Kirby reference!?'"
+				Description: "'How is this a Kirby reference?'"
 			}
 
 			HopesAndDreams: {
@@ -68,7 +91,7 @@ Mods: {
 
 			KingDededePetBuff: {
 				DisplayName: Dee
-				Description: '''"The one to rule them all... one day...."'''
+				Description: '''"The one to rule them all... one day..."'''
 			}
 
 			KrackoPetBuff: {
@@ -78,22 +101,27 @@ Mods: {
 
 			NightmarePetBuff: {
 				DisplayName: Shade Mage
-				Description: '''"What could it be hiding under those shades?"'''
+				Description: '''"What could it be hiding?"'''
 			}
 
 			WhispyPetBuff: {
 				DisplayName: Murmuring Woods
-				Description: '''"I think it's trying to whisper something into your ear..."'''
+				Description: '''"Pspspsps..."'''
 			}
 
 			ZeroEyePetBuff: {
 				DisplayName: Zero's Eye
-				Description: '''"Is it in constant pain of not being able to blink...?"'''
+				Description: '''"Is it in constant pain of not being able to blink?"'''
 			}
 
 			ZeroPetBuff: {
-				DisplayName: Light Wanderer
-				Description: '''"Attracts darkness towards its hallowed core."'''
+				DisplayName: Hollow Wanderer
+				Description: '''"Attracts darkness towards its empty shell."'''
+			}
+
+			DragonFireDebuff: {
+				DisplayName: Dragon Fire Debuff
+				Description: Mods.KirboMod.Buffs.DragonFireDebuff.Description
 			}
 		}
 
@@ -105,11 +133,7 @@ Mods: {
 
 			NightCloak: {
 				DisplayName: Night Cloak
-				Tooltip:
-					'''
-					Shoots stars in eight directions upon being hit
-					Stars deal as much damage as the item you're holding, minimum being 50 damage
-					'''
+				Tooltip: Shoots stars in eight directions upon being hit
 			}
 
 			PeeWeePole: {
@@ -277,11 +301,11 @@ Mods: {
 			}
 
 			DarkMatterPetItem: {
-				DisplayName: Quivering Goop
+				DisplayName: Black Goop
 				Tooltip:
 					'''
 					Summons a dark wanderer
-					'I don't think you can use this as clay.'
+					'It's staring back at you.'
 					'''
 			}
 
@@ -295,7 +319,7 @@ Mods: {
 				Tooltip:
 					'''
 					Allows the player to dash through enemies, dealing damage
-					Defense is increased while dashing
+					Damage is reduced by 30% while dashing
 					Double tap a direction
 					'''
 			}
@@ -361,9 +385,9 @@ Mods: {
 				DisplayName: Royal Slippers
 				Tooltip:
 					'''
-					Hold DOWN in the air and fall for a bit to ground pound
-					Hold UP or JUMP to stop your descent
-					'Wait he doesn't wear shoes... Who's are these?'
+					press DOWN in the air and fall for a bit to ground pound
+					press UP or JUMP to cancel your descent
+					'The King doesn't wear shoes... Whose are these?'
 					'''
 			}
 
@@ -528,7 +552,7 @@ Mods: {
 				Tooltip:
 					'''
 					Calls on a Kracko Jr.
-					'I need my blankey!
+					'I need my blankey!'
 					'''
 			}
 
@@ -631,11 +655,15 @@ Mods: {
 
 			CrownOfIce: {
 				DisplayName: Crown Of Ice
-				Tooltip: Summons a chilly to fight for you
+				Tooltip:
+					'''
+					Summons a chilly to fight for you
+					{$CommonItemTooltip.DefensePenetration}
+					'''
 			}
 
 			CrystalGun: {
-				DisplayName: Crystal Gun
+				DisplayName: Ribbon's Crystal
 				Tooltip:
 					'''
 					Consumes magic crystal shards
@@ -668,11 +696,7 @@ Mods: {
 
 			DarknessRay: {
 				DisplayName: Darkness Ray
-				Tooltip:
-					'''
-					Fires a dark laser that darts through the sky
-					Right click to fire a orb a darkness for more mana
-					'''
+				Tooltip: Fires a dark laser that zips through the sky
 			}
 
 			DarkSword: {
@@ -689,8 +713,9 @@ Mods: {
 				DisplayName: Dragon Pot
 				Tooltip:
 					'''
-					Unleashes a flurry of shadow fire
-					Enemies hit by one will be set on strong shadow flames
+					Unleashes a flurry of shadow flames
+					Enemies hit by one will be set on shadow fire
+					{$CommonItemTooltip.DefensePenetration}
 					'''
 			}
 
@@ -777,7 +802,7 @@ Mods: {
 				DisplayName: Hardened Fighter Glove
 				Tooltip:
 					'''
-					Right click to slam the ground and shoot rocks!
+					Right click to slam the ground and shoot rocks
 					Slam onto enemies to boost yourself
 					'''
 			}
@@ -841,7 +866,7 @@ Mods: {
 			}
 
 			MaskedHammer: {
-				DisplayName: Wild Fire Hammer
+				DisplayName: Wildfire Hammer
 				Tooltip:
 					'''
 					Hold left on the ground to swing fire tornados in the direction you're facing
@@ -855,24 +880,25 @@ Mods: {
 				DisplayName: Master Sword
 				Tooltip:
 					'''
-					While airborne, right-click a direction to do a powerful and invincible dash in that direction
-					You can only dash in the air once before having to land
-					'Is this the sword that seals the darkness?'
+					While airborne, right-click a direction to do a powerful dash
+					Dashing reduces damage by 50%
+					'The sword that seals a different kind of darkness'
 					'''
 			}
 
 			MetaKnightSword: {
 				DisplayName: Galaxia
-				Tooltip: "'Well of course not the actual thing...'"
+				Tooltip: A powerful recreation of a legendary swordsman's signature weapon
 			}
 
 			MetalFighter: {
 				DisplayName: Metal Fighter Glove
 				Tooltip:
 					'''
-					Right click and hold up to combo uppercuts!
-					Spike in on the ground and air by just holding right click!
-					'Fly like a ballistic missile and sting like a ballistic missile'
+					Right click and hold up to uppercut!
+					Combo punches to make uppercuts stronger!
+					Spike on the ground and in the air by just holding right click!
+					'Fly like a ballistic missile, sting like a ballistic missile'
 					'''
 			}
 
@@ -994,7 +1020,7 @@ Mods: {
 				Tooltip:
 					'''
 					Lashes three apples out from the leaves
-					'Swishy Swishy'
+					'Swishy swishy'
 					'''
 			}
 
@@ -1039,7 +1065,7 @@ Mods: {
 				DisplayName: Tasty Fish
 				Tooltip:
 					'''
-					Summons a friendly face to help you uncover the mysteries of life
+					Summons a friendly face to help you unravel the mysteries of life
 					'Who...Me?'
 					'''
 			}
@@ -1061,7 +1087,11 @@ Mods: {
 
 			WhispySeed: {
 				DisplayName: Suspicious Looking Seed
-				Tooltip: Summons Whispy Woods
+				Tooltip:
+					'''
+					Summons Whispy Woods
+					'Plant on wide flat ground for better results!' 
+					'''
 			}
 
 			WhispyBag: {
@@ -1071,7 +1101,11 @@ Mods: {
 
 			WhispyBush: {
 				DisplayName: Whispy Shrub
-				Tooltip: When you're hit you spew apples from your body
+				Tooltip:
+					'''
+					When you're hit you spew apples from your body
+					{$CommonItemTooltip.DefenseVariesDamage}
+					'''
 			}
 
 			WhispyMask: {
@@ -1083,8 +1117,8 @@ Mods: {
 				DisplayName: Murmuring Sapling
 				Tooltip:
 					'''
-					Summons a murmuring woods
-					'Sometimes you can hear it go 'pspspspsps'...'
+					Summons a murmury woods
+					'Did you hear something?'
 					'''
 			}
 
@@ -1097,14 +1131,15 @@ Mods: {
 				DisplayName: Badge Of Gloom
 				Tooltip:
 					'''
+					Awakens the darkness within you
 					While attacking, dark matter will shoot out from your body that follow your mouse
-					'No, this won't let you into the dark matter family'
+					{$CommonItemTooltip.DefenseVariesDamage}
 					'''
 			}
 
 			BloodyTendrils: {
 				DisplayName: Bloody Tendrils
-				Tooltip: "'Feels and looks bad'"
+				Tooltip: "'Feels bad'"
 			}
 
 			ZeroBag: {
@@ -1127,7 +1162,7 @@ Mods: {
 				Tooltip:
 					'''
 					Summons a light wanderer
-					'Feels almost weightless'
+					'Feels almost weightless.'
 					'''
 			}
 
@@ -1143,6 +1178,16 @@ Mods: {
 					Cycles through stages of progression
 					'''
 				DisplayName: Changaroonie
+			}
+
+			DimensionalDestabilizer: {
+				DisplayName: Dimensional Destabilizer
+				Tooltip:
+					'''
+					Summons a dimensional rift containing a powerful enemy at the cursor's position
+					Enemy summoned depends on the biome you're in
+					Consumes 50 starbits per use
+					'''
 			}
 		}
 
@@ -1348,7 +1393,16 @@ Mods: {
 			MatterOrbVertical.DisplayName: Matter Orb
 			KrackoJrCannonball.DisplayName: Kracko Jr Cannonball
 			KrackoJrBomb.DisplayName: Kracko Jr Bomb
-		}
+			LightningProj.DisplayName: Lightning Proj
+			MinionFireSpread.DisplayName: Minion Fire Spread
+			MinionBeamSpread.DisplayName: Minion Beam Spread
+			DuoMinionFireSpread.DisplayName: Duo Minion Fire Spread
+			BadIceChunkMist.DisplayName: Bad Ice Chunk Mist
+      NightmareLightningOrb.DisplayName: Nightmare Lightning Orb
+      GoodDarkMatterLaser.DisplayName: Good Dark Matter Laser
+			GooeyDarkMatterLaser.DisplayName: Gooey Dark Matter Laser
+			NightmareShockOrb.DisplayName: Nightmare Shock Orb
+      		}
 
 		NPCs: {
 			BioSpark.DisplayName: Bio Spark
@@ -1444,7 +1498,7 @@ Mods: {
 		Tiles: {
 			BossTrophy.MapEntry: Trophy
 			EnemyBanner.MapEntry: Banner
-			FountainOfDreams.MapEntry: Fountain Of Dreams
+			FountainOfDreams.MapEntry: Fountain of Dreams
 			RareStone.MapEntry: Rare Stone
 		}
 

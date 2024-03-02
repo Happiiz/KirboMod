@@ -11,8 +11,15 @@ namespace KirboMod.Projectiles.Flames
 {
     public abstract class FlameProj : ModProjectile
     {
+        protected enum HueshiftType
+        {
+            Hot,
+            Cold,
+            None,
+            DontDarken
+        }
         public override string Texture => "Terraria/Images/Projectile_" + ProjectileID.Flames;
-    
+        protected HueshiftType hueshiftType = HueshiftType.Hot;
         protected virtual void FlamethrowerStats() {}
         protected Color smokeColor;
         protected Color startColor;
@@ -25,9 +32,22 @@ namespace KirboMod.Projectiles.Flames
         protected float dustChance = .25f;
         protected int debuffID;
         protected int debuffDuration;
-        protected int duration = 60;
-        protected int fadeOutDuration = 12;
-        protected float whiteInsideOpacity = 0;
+        protected int duration = defaultDuration;
+        protected int fadeOutDuration = defaultFadeOutDuration;
+        protected float whiteInsideOpacity = 1;
+        public const int defaultDuration = 60;
+        public const int defaultFadeOutDuration = 12;
+        protected float whiteInsideSizeMultiplier = 1;
+        public int TotalDuration { get => (duration + fadeOutDuration); 
+            set
+            {
+                //basically how much percent the duration (not fadeout duration or total duration) is of the total duration
+                float durationPortion = Utils.GetLerpValue(0, duration + fadeOutDuration, duration);
+                duration = (int)(value * durationPortion);
+                fadeOutDuration = (int)(value * (1 - durationPortion));
+            }
+        }
+        public float TotalProgress => Utils.GetLerpValue(0, TotalDuration, Projectile.localAI[0], true);
         public override void SetDefaults()
         {
             Projectile.width = 20;
@@ -50,9 +70,8 @@ namespace KirboMod.Projectiles.Flames
             {
                 Projectile.velocity *= 0.95f;
             }
-            int num4 = 50;
-            int num5 = num4;
-            if (Projectile.localAI[0] < num5 && Main.rand.NextFloat() < dustChance)
+            bool smokeDust = TotalProgress >= .8f;
+            if (!smokeDust && Main.rand.NextFloat() < dustChance)
             {
                 Dust dust = Dust.NewDustDirect(Projectile.Center + Main.rand.NextVector2Circular(dustRadius, dustRadius) * Utils.Remap(Projectile.localAI[0], 0f, totalDuration, 0.5f, 1f), 4, 4, dustID, Projectile.velocity.X * 0.2f, Projectile.velocity.Y * 0.2f, 100);
                 if (Main.rand.NextBool(4))
@@ -71,14 +90,13 @@ namespace KirboMod.Projectiles.Flames
                 dust.velocity += Projectile.velocity * 1f * Utils.Remap(Projectile.localAI[0], 0f, duration * 0.75f, 1f, 0.1f) * Utils.Remap(Projectile.localAI[0], 0f, duration * 0.1f, 0.1f, 1f);
                 dust.customData = 1;
             }
-            if (num4 > 0 && Projectile.localAI[0] >= num4 && Main.rand.NextFloat() < 0.5f)
+            if (smokeDust && Main.rand.NextFloat() < dustChance)
             {
                 Vector2 center = Main.player[Projectile.owner].Center;
-                Vector2 vector = (Projectile.Center - center).SafeNormalize(Vector2.Zero).RotatedByRandom(0.19634954631328583) * 7f;
-                short num7 = 31;
-                Dust dust = Dust.NewDustDirect(Projectile.Center + Main.rand.NextVector2Circular(50f, 50f) - vector * 2f, 4, 4, num7, 0f, 0f, 150, new Color(80, 80, 80));
+                Vector2 dustoffset = (Projectile.Center - center).SafeNormalize(Vector2.Zero).RotatedByRandom(0.19634954631328583) * 7f;
+                Dust dust = Dust.NewDustDirect(Projectile.Center + Main.rand.NextVector2Circular(50f, 50f) - dustoffset * 2f, 4, 4, DustID.Smoke, 0f, 0f, 150, new Color(80, 80, 80));
                 dust.noGravity = true;
-                dust.velocity = vector;
+                dust.velocity = dustoffset;
                 dust.scale *= 1.1f + Main.rand.NextFloat() * 0.2f;
                 dust.customData = -0.3f - 0.15f * Main.rand.NextFloat();
             }
@@ -121,30 +139,42 @@ namespace KirboMod.Projectiles.Flames
                     Vector2 drawPos = Projectile.Center - Main.screenPosition + Projectile.velocity * -startOffset * j;
                     Color secondaryTrailColor = color * fadeFromTrail;
                     Color drawColor = secondaryTrailColor;
-                    drawColor.G /= 2;
-                    drawColor.B /= 2;
+                    if (hueshiftType != HueshiftType.DontDarken)
+                    {
+                        drawColor.G /= 2;
+                    }
+                    if(hueshiftType == HueshiftType.Cold || hueshiftType == HueshiftType.None)
+                    {
+                        drawColor.R /= 2;
+                    }
+                    else if(hueshiftType == HueshiftType.Hot || hueshiftType == HueshiftType.None)
+                    {
+                        drawColor.B /= 2;
+                    }
                     drawColor.A = (byte)Math.Min(secondaryTrailColor.A + 80f * fadeFromTrail, 255f);
                     float rotation = 1f / decrementStep * (j + 1f);
                     float rotationOffsetCw = Projectile.rotation + j * (MathF.PI / 2f) + Main.GlobalTimeWrappedHourly * rotation * 2f;
                     float rotationOffsetCcw = Projectile.rotation - j * (MathF.PI / 2f) - Main.GlobalTimeWrappedHourly * rotation * 2f;
                     float finalDrawScale = MathHelper.Lerp(oldDrawScale, drawScale, j);
 
-                    Color white = new Color(255, 255, 255, 0) * whiteInsideOpacity * Utils.Remap(progress, middleColorThreshold, endColorThreshold, 1, 0) * Utils.GetLerpValue(0, .1f, Projectile.localAI[0], true) * fadeFromTrail * .4f;
+                    Color white = new Color(255, 255, 255, 0) * Utils.Remap(progress, middleColorThreshold, endColorThreshold, 1, 0) * Utils.GetLerpValue(0, .1f, Projectile.localAI[0], true) * fadeFromTrail * .4f;
+                    white *= whiteInsideOpacity;
                     switch (i)
                     {
                         case 0:
                             VFX.DrawGlowBallDiffuse(drawPos + Main.screenPosition, finalDrawScale * 2, drawColor, Color.Transparent);
                             Main.EntitySpriteDraw(texture, drawPos + Projectile.velocity * (0f - startOffset) * decrementStep * 0.5f, frame, drawColor * fadeOutProgress * 0.25f, rotationOffsetCw + MathF.PI / 4f, frame.Size() / 2f, finalDrawScale, SpriteEffects.None);
                             Main.EntitySpriteDraw(texture, drawPos, frame, drawColor * fadeOutProgress, rotationOffsetCcw, frame.Size() / 2f, finalDrawScale, SpriteEffects.None);
-                            Main.EntitySpriteDraw(texture, drawPos, frame, white, rotationOffsetCcw, frame.Size() / 2f, finalDrawScale * .5f, SpriteEffects.None);
-                            Main.EntitySpriteDraw(texture, drawPos, frame, white, rotationOffsetCcw, frame.Size() / 2f, finalDrawScale * .25f, SpriteEffects.None);
+
+                            Main.EntitySpriteDraw(texture, drawPos, frame, white, rotationOffsetCcw, frame.Size() / 2f, finalDrawScale * .5f * whiteInsideSizeMultiplier, SpriteEffects.None);
+                            Main.EntitySpriteDraw(texture, drawPos, frame, white, rotationOffsetCcw, frame.Size() / 2f, finalDrawScale * .4f * whiteInsideSizeMultiplier, SpriteEffects.None);
                             break;
                         case 1:
                             Main.EntitySpriteDraw(texture, drawPos + Projectile.velocity * (0f - startOffset) * decrementStep * 0.2f, frame, secondaryTrailColor * fadeOutProgress * 0.25f, rotationOffsetCw + MathF.PI / 2f, frame.Size() / 2f, finalDrawScale * 0.75f, SpriteEffects.None);
                             Main.EntitySpriteDraw(texture, drawPos, frame, secondaryTrailColor * fadeOutProgress, rotationOffsetCcw + MathF.PI / 2f, frame.Size() / 2f, finalDrawScale * 0.75f, SpriteEffects.None);
 
-                            Main.EntitySpriteDraw(texture, drawPos, frame, white, rotationOffsetCcw + MathF.PI / 2f, frame.Size() / 2f, finalDrawScale * 0.19f, SpriteEffects.None);
-                            Main.EntitySpriteDraw(texture, drawPos, frame, white, rotationOffsetCcw + MathF.PI / 2f, frame.Size() / 2f, finalDrawScale * 0.37f, SpriteEffects.None);
+                            Main.EntitySpriteDraw(texture, drawPos, frame, white, rotationOffsetCcw + MathF.PI / 2f, frame.Size() / 2f, finalDrawScale * 0.3f * whiteInsideSizeMultiplier, SpriteEffects.None);
+                            Main.EntitySpriteDraw(texture, drawPos, frame, white, rotationOffsetCcw + MathF.PI / 2f, frame.Size() / 2f, finalDrawScale * 0.375f * whiteInsideSizeMultiplier, SpriteEffects.None);
                             break;
 
                     }
@@ -153,11 +183,11 @@ namespace KirboMod.Projectiles.Flames
             return false;
         }
         static int DebuffDurationMultiplier { get => Main.masterMode ? 3 : Main.expertMode ? 2 : 1; }
-        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone) => target.AddBuff(debuffID, debuffDuration * DebuffDurationMultiplier);
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone) => target.AddBuff(debuffID, debuffDuration);
         public override void OnHitPlayer(Player target, Player.HurtInfo info) => target.AddBuff(debuffID, debuffDuration * DebuffDurationMultiplier);
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
-            float baseHitboxSize = Projectile.friendly ? 40 : 20;
+            float baseHitboxSize = Projectile.friendly ? 100 : 50;
             float progress = Utils.Remap(Projectile.localAI[0], 0f, duration + fadeOutDuration, 0f, 1f);
             float drawScale = Utils.Remap(progress, 0.2f, 0.5f, startScale, endScale);
             projHitbox = Utils.CenteredRectangle(Projectile.Center, new Vector2(baseHitboxSize * drawScale));
@@ -166,6 +196,12 @@ namespace KirboMod.Projectiles.Flames
                 return false;
             }
             return targetHitbox.Intersects(projHitbox);
+        }
+        public override bool OnTileCollide(Vector2 oldVelocity)
+        {
+            Projectile.localAI[0]++;
+            Projectile.velocity = Vector2.Zero;
+            return false;
         }
     }
 

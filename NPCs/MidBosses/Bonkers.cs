@@ -19,12 +19,14 @@ namespace KirboMod.NPCs.MidBosses
 		private int attacktype = -1;
 		private int lastattack = 2;
 
+        private int coconutRounds = 3;
+
         public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Bonkers");
 			Main.npcFrameCount[NPC.type] = 8;
 
-            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
+            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers()
             {
                 //CustomTexturePath = "ExampleMod/Assets/Textures/Bestiary/MinionBoss_Preview",
                 PortraitScale = 1f, // Portrait refers to the full picture when clicking on the icon in the bestiary
@@ -42,7 +44,7 @@ namespace KirboMod.NPCs.MidBosses
 			DrawOffsetY = 70;
 			NPC.damage = Main.hardMode ? 100 : 50;
 			NPC.defense = 15;
-			NPC.lifeMax = Main.hardMode ? 2500 : 500;
+			NPC.lifeMax = Main.hardMode ? 2500 : 400;
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
 			NPC.value = Item.buyPrice(0, 0, 50, 0); // money it drops
@@ -87,70 +89,67 @@ namespace KirboMod.NPCs.MidBosses
 			NPC.spriteDirection = NPC.direction;
 			Player player = Main.player[NPC.target];
 
-			if (attacktype == -1)
-			{
-				Spawned();
+            NPC.ai[0]++; //attack delay timer
 
-				if (NPC.velocity.Y == 0 && NPC.collideY) //touching tile and not falling
-				{
-					NPC.dontTakeDamage = false; //hittable
-					NPC.damage = NPC.defDamage; //regular damage
-					attacktype = 0; //start attack cycle
-				}
-			}
-			else
-			{
-				NPC.ai[0]++; //attack delay timer
+            if (NPC.ai[0] < 120) //not attacking
+            {
+                attacktype = 0; //walking
+            }
+            else
+            {
+                if (NPC.ai[0] == 120)
+                {
+                    NPC.noTileCollide = false; //don't phase through tiles
 
-				if (NPC.ai[0] < 120) //not attacking
-				{
-					attacktype = 0; //walking
-				}
-				else
-				{
-					if (NPC.ai[0] == 120)
-					{
-						NPC.noTileCollide = false; //don't phase through tiles
+                    if (lastattack == 2) //coconut was last
+                    {
+                        attacktype = 1; //hammer
+                        lastattack = 1; //next is coconut
+                    }
+                    else
+                    {
+                        coconutRounds = Main.expertMode ? 6 : 3; //3 or 6 coconut throws
 
-						if (lastattack == 2) //coconut was last
-						{
-							attacktype = 1; //hammer
-							lastattack = 1; //next is coconut
-						}
-						else
-						{
-							attacktype = 2; //coconut
-							lastattack = 2; //next is hammer
-						}
-					}
+                        attacktype = 2; //coconut
+                        lastattack = 2; //next is hammer
+                        int delayBeforeFirstCoconut = (int)Utils.Remap(NPC.Distance(player.Center), 100, 600, -30, 0);
+                        NPC.ai[1] = delayBeforeFirstCoconut;
+                    }
+                }
 
-					NPC.ai[1]++; //attack timer
-				}
+                NPC.ai[1]++; //attack timer
+            }
 
-				if (player.dead) //player has died
-				{
-					attacktype = 0; //walk
-					NPC.ai[0] = 0;
-					NPC.ai[1] = 0;
-				}
-
-				//declaring attacktype values
-				if (attacktype == 0)
-				{
-					Walk();
-				}
-				if (attacktype == 1)
-				{
-					Hammer();
-				}
-				if (attacktype == 2)
-				{
-					ExplosiveCoconut();
-				}
-			}
-
-            //for stepping up tiles
-            Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
+            if (player.dead) //player has died
+            {
+                attacktype = 0; //walk
+                NPC.ai[0] = 0;
+                NPC.ai[1] = 0;
+            }
+            NPC.noGravity = attacktype == 1;
+            NPC.GravityMultiplier = MultipliableFloat.One;
+            //declaring attacktype values
+            if (attacktype == 0)
+            {
+                Walk();
+            }
+            if (attacktype == 1)
+            {
+                if (Main.hardMode)
+                {
+                    NPC.GravityMultiplier = MultipliableFloat.One * 2;
+                }
+                Hammer();
+                NPC.velocity.Y += NPC.gravity;
+                if(NPC.velocity.Y > 16)
+                {
+                    NPC.velocity.Y = 16;
+                }
+            }
+            if (attacktype == 2)
+            {
+                ExplosiveCoconut();
+            }
         }
 
 		public override void FindFrame(int frameHeight) // animation
@@ -188,11 +187,11 @@ namespace KirboMod.NPCs.MidBosses
 			}
 			else if (attacktype == 2) //cocunut
 			{
-				if (NPC.ai[1] >= 60) //attacking
+                if (NPC.ai[1] >= (Main.expertMode ? 15 : 30)) //attacking
 				{
 					NPC.frame.Y = frameHeight * 7; //toss
 				}
-                else if (NPC.ai[1] >= 30)
+                else if (NPC.ai[1] >= (Main.expertMode ? 7 : 15))
                 {
                     NPC.frame.Y = frameHeight * 6; //hand behind back
                 }
@@ -202,13 +201,6 @@ namespace KirboMod.NPCs.MidBosses
 				}
 			}
 		}
-
-        private void Spawned() //do nothing
-        {
-            NPC.velocity.X *= 0.8f; //slow
-			NPC.dontTakeDamage = true; //immune
-			NPC.damage = 0; //dont deal damage
-        }
 
         private void Walk() //walk towards player
 		{
@@ -220,37 +212,70 @@ namespace KirboMod.NPCs.MidBosses
 
 			CheckPlatform(player); //go down platforms when player is low
 
-            float speed = 4f; 
-			float inertia = 10f; //acceleration and decceleration speed
+            float speed = Main.expertMode ? 12f : 8f; 
+			float inertia = 15f; //acceleration and decceleration speed
 
-            //we put this instead of player.Center so it will always be moving top speed instead of slowing down when player is near
-            Vector2 direction = NPC.Center + new Vector2(NPC.direction * 50, 0) - NPC.Center; //start - end 
-																							  
-			direction.Normalize();
-			direction *= speed;
-			NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
+            ClimbTiles(player);
 
-            //tile in front of npc
-            if (NPC.collideX && NPC.velocity.Y == 0)
+            MoveX(player, speed, inertia);
+            Rectangle hitbox = Utils.CenteredRectangle(NPC.Center, new Vector2(NPC.width + 140, NPC.height + 500));
+            if (hitbox.Intersects(player.Hitbox))
             {
-                NPC.velocity.Y = -8; //jump over
+                NPC.ai[0] = 119;//reached player, stop chasing to avoid stunlock
             }
         }
-
-		private void Hammer() //slams hammer
+        static float TimeToReachYPoint(float fromY, float toY, float accelY, float initialVelY)
+        {
+            bool hasSolution = Utils.SolveQuadratic(accelY * .5f, initialVelY, fromY - toY, out float result1, out float result2);
+            if (!hasSolution)
+            {
+                return 99999f;
+            }
+            float time = MathF.Max(result2, result1);
+            return time;
+        }
+        private void Hammer() //slams hammer
         {
             Player player = Main.player[NPC.target];
             Vector2 distance = player.Center - NPC.Center;
-
             if (NPC.ai[1] < 60) //charge
             {
                 NPC.TargetClosest(true); //face player
-                NPC.velocity.X *= 0.8f; //slow
 
-                if (NPC.ai[1] == 30 && distance.Y <= -100) //jump if player is high
+                if (NPC.ai[1] < 30)
                 {
-                    NPC.velocity.Y = -12; //jump
+                    NPC.velocity.X *= 0.8f; //slow
+                }
+                else
+                {
+                    if (NPC.ai[1] == 30) //jump if player is high
+                    {
+                        float vel = GetYVelForParabolaPeakToBeAt(player.Center.Y - 320, NPC.gravity, NPC.Center.Y);
+                        if(vel > -14)
+                        {
+                            vel = -14;
+                        }
+                        float time = TimeToReachYPoint(NPC.Center.Y, player.Center.Y, NPC.gravity, vel);
+                        distance.X += player.velocity.X * time;
+                        NPC.velocity.X = distance.X / time;
+                        NPC.velocity.Y = vel;
+                        NPC.ai[2] = MathF.Abs(NPC.velocity.X);
+                    }
+
+                    float speed = NPC.ai[2];
+                    float inertia = 25f; //acceleration and decceleration speed
+                    MoveX(player, speed, inertia);
+
                     NPC.noTileCollide = true;
+
+                    if (NPC.Bottom.Y < player.Center.Y || NPC.velocity.Y < 0) //higher than player or going up
+                    {
+                        NPC.ai[1] = 31; //reset
+                    }
+                    else
+                    {
+                        NPC.ai[1] = 59; //skip ahead
+                    }
                 }
             }
             else //slam
@@ -263,8 +288,8 @@ namespace KirboMod.NPCs.MidBosses
                 {
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 130, -10), NPC.velocity * 0.01f, 
-							ModContent.ProjectileType<BonkersSmash>(), NPC.damage / 4, 8f, Main.myPlayer, 0, 0);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 130, -10), default, 
+							ModContent.ProjectileType<BonkersSmash>(), (Main.hardMode ? 100 : 50) / 2, 8f, Main.myPlayer, 0, NPC.whoAmI); 
                     }
 
                     SoundEngine.PlaySound(SoundID.Item1, NPC.Center); //we dont define the stuff after coordinates because legacy sound style
@@ -276,30 +301,94 @@ namespace KirboMod.NPCs.MidBosses
                 }
             }
         }
+        static float GetYVelForParabolaPeakToBeAt(float peakPosY, float gravityY, float fromY)
+        {
+            float result = MathF.Abs((peakPosY - fromY) * gravityY * 2);
 
-		private void ExplosiveCoconut() //explosive coconut throw
+            return -MathF.Sqrt(result);
+        }
+        static Vector2 PredictForAcceleratingProj(Player target, float shootSpeed, Vector2 acceleration, Vector2 targetPos, Vector2 from)
+        {
+            Utils.ChaseResults results = Utils.GetChaseResults(from, shootSpeed, targetPos, target.velocity);
+            targetPos = results.InterceptionPosition;
+            Vector2 velocity = results.ChaserVelocity;
+            float timeToReachX = (targetPos.X - from.X) / velocity.X;
+            Vector2 posWhenReachesX = from + velocity * timeToReachX + acceleration * timeToReachX * timeToReachX * .5f;
+            float heightOffset = targetPos.Y - posWhenReachesX.Y;
+            velocity.Y += heightOffset / timeToReachX;
+            return velocity;
+        }
+        private void ExplosiveCoconut() //explosive coconut throw
 		{
             Player player = Main.player[NPC.target];
-            Vector2 projshoot = player.Center - NPC.Center; //200 in the direction it's facing(doesn't have to be 200 because we normalize it)
-            projshoot.Normalize();
-            projshoot *= 10f;
             NPC.velocity.X *= 0.8f; //slow
-
             NPC.TargetClosest(true); //face player
+         
 
-            if (NPC.ai[1] == 60) //climax
+            if (NPC.ai[1] == (Main.expertMode ? 15 : 30))
             {
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, projshoot.X, projshoot.Y - 5, ModContent.ProjectileType<ExplosiveCoconut>(), NPC.damage / 4, 0f, Main.myPlayer, 0, 0); //actual damage has to be divided by 2 (4 in this case because fuck you)
+                    Vector2 shootFrom = NPC.Center;
+                    Vector2 projVel = PredictForAcceleratingProj(player, 15, new Vector2(0, Projectiles.ExplosiveCoconut.yAcceleration), player.Center, shootFrom);
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), shootFrom, projVel, 
+                        ModContent.ProjectileType<ExplosiveCoconut>(), (Main.hardMode ? 50 : 25) / 2, 0f, Main.myPlayer, 0, 0, projVel.Y); 
                 }
                 SoundEngine.PlaySound(SoundID.Item1, NPC.Center);
+
+                coconutRounds--; //go down
             }
-            if (NPC.ai[1] >= 120) //restart
+
+            if (NPC.ai[1] == (Main.expertMode ? 30 : 60) && coconutRounds > 0)
+            {
+                NPC.ai[1] = 0; //reset attack
+            }
+
+            if (NPC.ai[1] >= (Main.expertMode ? 90 : 120)) //restart
             {
                 NPC.ai[1] = 0;
                 NPC.ai[0] = 0;
             }
+        }
+
+        private void ClimbTiles(Player player)
+        {
+            bool climableTiles = false;
+
+            for (int i = 0; i < NPC.height; i++)
+            {
+                if (NPC.direction == 1)
+                {
+                    //checks for tiles on right side of NPC
+                    Tile tile = Main.tile[(new Vector2((NPC.Right.X), NPC.position.Y + i)).ToTileCoordinates()];
+                    climableTiles = WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType] || tile.IsHalfBlock;
+                }
+                else
+                {
+                    //checks for tiles on left side of NPC
+                    Tile tile = Main.tile[(new Vector2((NPC.Left.X), NPC.position.Y + i)).ToTileCoordinates()];
+                    climableTiles = WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType] || tile.IsHalfBlock;
+                }
+
+                if (climableTiles || NPC.velocity.X == 0)
+                {
+                    NPC.noTileCollide = true;
+
+                    if (player.Center.Y < NPC.Center.Y || !player.dead) //higher than NPC or dead
+                    {
+                        NPC.velocity.Y = -4f;
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        private void MoveX(Player player, float speed, float inertia) //move X position toward player
+        {
+            Vector2 direction = new Vector2(NPC.direction, 0);
+            direction *= speed;
+            NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
         }
 
         private void CheckPlatform(Player player) //trust me this is totally unique and original code and definitely not stolen from Spirit Mod's public source code(thx so much btw you don't know the hell I went through with this)

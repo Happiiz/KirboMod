@@ -23,11 +23,12 @@ namespace KirboMod.Projectiles
 			Projectile.DamageType = DamageClass.Summon;
 			Projectile.timeLeft = 12;
 			Projectile.tileCollide = false;
-			Projectile.penetrate = -1;
-			Projectile.usesLocalNPCImmunity = true;
+            Projectile.penetrate = 6;
+            Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = 12; //doesn't wait for global npc cooldown
 			Projectile.hide = true; //here so drawbehind works
-		}
+            Projectile.stopsDealingDamageAfterPenetrateHits = true; //cancels out damage without killing projectile
+        }
 
 		public override void AI()
 		{

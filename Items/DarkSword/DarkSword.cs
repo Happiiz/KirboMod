@@ -99,7 +99,7 @@ namespace KirboMod.Items.DarkSword
 		public override void AddRecipes()
 		{
 			Recipe recipe = CreateRecipe();//the result is darksword
-			recipe.AddIngredient(ItemID.Excalibur); //excalibur
+			recipe.AddIngredient(ItemID.BrokenHeroSword); //Broken Hero Sword
 			recipe.AddIngredient(ModContent.ItemType<DarkMaterial>(), 15); //15 dark material
 			recipe.AddTile(TileID.MythrilAnvil); //crafted at mythril anvil
 			recipe.Register(); //adds this recipe to the game

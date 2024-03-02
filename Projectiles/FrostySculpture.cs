@@ -17,11 +17,13 @@ namespace KirboMod.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 82;
-			Projectile.height = 82;
-			Projectile.friendly = true;
-			Projectile.timeLeft = 300;
-			Projectile.tileCollide = false;
+			Projectile.width = 24;
+			Projectile.height = 24;
+            DrawOffsetX = -29;
+            DrawOriginOffsetY = -29;
+            Projectile.friendly = true;
+			Projectile.timeLeft = 180;
+			Projectile.tileCollide = true;
 			Projectile.penetrate = -1;
 			Projectile.usesIDStaticNPCImmunity = true;
 			Projectile.idStaticNPCHitCooldown = 10;
@@ -43,7 +45,34 @@ namespace KirboMod.Projectiles
 			}
 			
 			Projectile.velocity *= 0.96f;
-		}
+        }
+
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) //make hitbox into a circle
+        {
+            return Utils.IntersectsConeFastInaccurate(targetHitbox, Projectile.Center, 38, 0, MathF.Tau);
+        }
+
+        public override bool OnTileCollide(Vector2 oldVelocity)
+        {
+            if (Projectile.velocity.X != oldVelocity.X) //bounce
+            {
+                Projectile.velocity.X = -oldVelocity.X;
+            }
+            if (Projectile.velocity.Y != oldVelocity.Y) //bounce
+            {
+                Projectile.velocity.Y = -oldVelocity.Y;
+            }
+            return false;
+        }
+
+        public override bool? CanHitNPC(NPC target) //can hit only if there's a line of sight
+        {
+            return Collision.CanHit(Projectile, target);
+        }
+        public override bool CanHitPvp(Player target) //can hit only if there's a line of sight
+        {
+            return Collision.CanHit(Projectile, target);
+        }
 
         public override void OnKill(int timeLeft)
         {

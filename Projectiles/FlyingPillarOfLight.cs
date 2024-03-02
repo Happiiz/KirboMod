@@ -1,4 +1,6 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -36,7 +38,7 @@ namespace KirboMod.Projectiles
 
 			if (Projectile.ai[0] < 180)
 			{
-				Projectile.velocity.Y = -2;
+				Projectile.velocity.Y *= 0.98f;
 
 				Vector2 speed = Main.rand.NextVector2Circular(10, 10);
 				Dust d = Dust.NewDustPerfect(Projectile.Center, ModContent.DustType<Dusts.RainbowSparkle>(), speed, 0); //Makes dust in a messy circle
@@ -50,25 +52,15 @@ namespace KirboMod.Projectiles
 				Projectile.velocity.Y = 0;
 
 				Vector2 speed = Main.rand.NextVector2Circular(20, 20);
-				Dust d = Dust.NewDustPerfect(Projectile.Center + speed * 20, ModContent.DustType<Dusts.DarkResidue>(), -speed, 0); //Makes dust in a messy circle
+				Dust d = Dust.NewDustPerfect(Projectile.Center + speed * 20, ModContent.DustType<Dusts.DarkResidue>(), -speed, Scale: 1 + (Projectile.ai[0] - 180) / 180); //Makes dust in a messy circle
 				d.noGravity = true;
 			}
 
-			if (Projectile.ai[0] == 300)
+			if (Projectile.ai[0] == 360)
             {
-				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * 0, ModContent.ProjectileType<BallOfImpendingDoom>(), 0, 0f);
-			}
-
-			if (Projectile.ai[0] == 359)
-            {
-                if (Main.netMode != NetmodeID.MultiplayerClient) // If the player is not in multiplayer, spawn directly
+                if (Main.netMode != NetmodeID.MultiplayerClient) // If not a client
                 {
-                    NPC.SpawnOnPlayer(player.whoAmI, ModContent.NPCType<NPCs.PureDarkMatter>());
-                }
-                else // If the player is in multiplayer, request a spawn
-                {
-                    //this will only work if NPCID.Sets.MPAllowedEnemies[type] is set in boss
-                    NetMessage.SendData(MessageID.SpawnBossUseLicenseStartEvent, number: player.whoAmI, number2: ModContent.NPCType<NPCs.PureDarkMatter>());
+					NPC.SpawnBoss((int)Projectile.Center.X, (int)Projectile.Center.Y, ModContent.NPCType<NPCs.Zero>(), player.whoAmI);
                 }
 
                 SoundEngine.PlaySound(SoundID.Item74, Projectile.Center); //inferno explosion
@@ -79,19 +71,21 @@ namespace KirboMod.Projectiles
 					Dust d = Dust.NewDustPerfect(Projectile.Center, ModContent.DustType<Dusts.DarkResidue>(), speed * 20, Scale: 5); //Makes dust in a messy circle
 					d.noGravity = true;
 				}
-
-				if (Main.netMode == NetmodeID.SinglePlayer)
-				{
-					Main.NewText("A great darkness has blanketed the world!", 175, 75);
-				}
-				else if (Main.netMode == NetmodeID.Server)
-				{
-					ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("A great darkness has blanketed the world!"), new Color(175, 75, 255));
-				}
 			}
 		}
+        public static Asset<Texture2D> Flash;
 
-		public override Color? GetAlpha(Color lightColor)
+        public override void PostDraw(Color lightColor)
+        {
+            Flash = ModContent.Request<Texture2D>("KirboMod/Projectiles/FlyingPillarOfLightFlash");
+
+            if (Projectile.ai[0] >= 300)
+            {
+				Main.EntitySpriteDraw(Flash.Value, Projectile.Center - Main.screenPosition, null, Color.White, 0, Flash.Size() / 2, 0.1f + (Projectile.ai[0] - 300) / 50, SpriteEffects.None);
+            }
+        }
+
+        public override Color? GetAlpha(Color lightColor)
 		{
 			return Color.White; // Makes it uneffected by light
 		}

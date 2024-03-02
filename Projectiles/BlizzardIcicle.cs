@@ -39,9 +39,9 @@ namespace KirboMod.Projectiles
             for (int i = Projectile.oldPos.Length - 1; i >= 0; i--)
             {
 				Vector2 drawPos = Projectile.oldPos[i] + Projectile.Size / 2 - Main.screenPosition;
-				Main.EntitySpriteDraw(texture, drawPos, null, lightColor * (1 - (float)i / Projectile.oldPos.Length), Projectile.rotation, texture.Size() / 2, Projectile.scale, SpriteEffects.None);
+				Main.EntitySpriteDraw(texture, drawPos, null, Color.White * (1 - (float)i / Projectile.oldPos.Length), Projectile.rotation, texture.Size() / 2, Projectile.scale, SpriteEffects.None);
             }
-			Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, null, lightColor, Projectile.rotation, texture.Size() / 2, Projectile.scale, SpriteEffects.None);
+			Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, null, Color.White, Projectile.rotation, texture.Size() / 2, Projectile.scale, SpriteEffects.None);
 			return false;
         }
         public override void AI()
@@ -107,5 +107,10 @@ namespace KirboMod.Projectiles
             }
 			return true;
         }
+		
+		public override Color? GetAlpha(Color lightColor)
+		{
+			return Color.White; // Makes it uneffected by light
+		}
     }
 }

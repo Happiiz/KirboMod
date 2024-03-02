@@ -4,6 +4,7 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace KirboMod.Items.Weapons
@@ -19,7 +20,11 @@ namespace KirboMod.Items.Weapons
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research 
         }
 
-		public override void SetDefaults()
+		static int ArmPen = 12;
+
+        public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(ArmPen);
+
+        public override void SetDefaults()
 		{
 			Item.damage = 8;
 			Item.knockBack = 1;
@@ -32,6 +37,7 @@ namespace KirboMod.Items.Weapons
 			Item.value = Item.buyPrice(0, 0, 15, 0);
 			Item.rare = ItemRarityID.Green;
 			Item.UseSound = SoundID.Item44;
+			Item.ArmorPenetration = ArmPen;
 
 			// These below are needed for a minion weapon
 			Item.noMelee = true;

@@ -110,7 +110,6 @@ namespace KirboMod.Projectiles.KrackoJrBomb
             }
             Timer++;
         }
-
         public override bool PreDraw(ref Color lightColor)
         {
             if (!Exploding)
@@ -119,10 +118,6 @@ namespace KirboMod.Projectiles.KrackoJrBomb
                 Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, null, Color.White * Projectile.Opacity, Projectile.rotation, new Vector2(41.5f, 51.5f), Projectile.scale, SpriteEffects.None);
             }
             return false;
-        }
-        public override void OnKill(int timeLeft)
-        {
-
         }
     }
 }

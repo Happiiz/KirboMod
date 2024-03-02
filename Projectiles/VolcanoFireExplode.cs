@@ -36,12 +36,14 @@ namespace KirboMod.Projectiles
 			{
 				SoundEngine.PlaySound(SoundID.Item14, Projectile.position); //bomb sound
 
-				for (int i = 0; i < 20; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+				for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 				{
-					Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-					Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.Torch, speed * 2, Scale: 2f); //Makes dust in a messy circle
-					d.noGravity = true;
-				}
+					Vector2 velocity = Main.rand.NextVector2Circular(3f, 3f); //circle
+					Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.Torch, velocity, Scale: 2f); //Makes dust in a messy circle
+
+                    Vector2 velocity2 = Main.rand.NextVector2Circular(3f, 3f); //circle
+                    Gore.NewGorePerfect(Projectile.GetSource_FromThis(), Projectile.Center, velocity2, Main.rand.Next(61, 63), Scale: 1f); //smoke
+                }
 			}
 		}
 

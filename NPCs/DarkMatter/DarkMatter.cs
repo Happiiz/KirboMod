@@ -27,7 +27,7 @@ namespace KirboMod.NPCs.DarkMatter
 
         public override void AI() //constantly cycles each time
 		{
-			Player playerstate = Main.player[NPC.target];
+			Player player = Main.player[NPC.target];
 
 			//cap life
 			if (NPC.life >= NPC.lifeMax)
@@ -39,9 +39,32 @@ namespace KirboMod.NPCs.DarkMatter
             {
                 Transition();
             }
+			//INTRO
+            else if (NPC.ai[1] < 60)
+            {
+                if (NPC.ai[1] == 30) //teleport to player
+                {
+                    NPC.Center = player.Center + new Vector2(MathF.Cos((float)Utils.Lerp(0, MathF.Tau, Main.rand.NextFloat())) * 500, 
+                        MathF.Sin((float)Utils.Lerp(0, MathF.Tau, Main.rand.NextFloat())) * 500);
 
-			//DESPAWNING
-			else if (NPC.target < 0 || NPC.target == 255 || playerstate.dead || !playerstate.active)
+                    for (int i = 0; i < 100; i++) 
+                    {
+                        Vector2 speed = Main.rand.NextVector2Circular(20f, 20f); //circle
+                        Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 3); //Makes dust in a messy circle
+                        d.noGravity = true;
+                    }
+                }
+
+                NPC.velocity *= 0.98f;
+
+                NPC.ai[1]++;
+
+                NPC.TargetClosest();
+
+                NPC.spriteDirection = NPC.direction;
+            }
+            //DESPAWNING
+            else if (NPC.target < 0 || NPC.target == 255 || player.dead || !player.active)
 			{
 				NPC.TargetClosest(false);
 
@@ -148,7 +171,7 @@ namespace KirboMod.NPCs.DarkMatter
                 //restart if high enough (and not expert mode)
                 NPC.ai[0] = 0; //restart         
             }
-            for (int i = 0; i < 7; i++)
+            for (int i = 0; i < 8; i++)
             {
                 TripleShot(40 + i * 30);
             }

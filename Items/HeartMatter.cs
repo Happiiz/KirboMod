@@ -30,18 +30,11 @@ namespace KirboMod.Items
 		public override void AddRecipes()
 		{
 			Recipe heartmatterrecipe = CreateRecipe();
-			heartmatterrecipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
-			heartmatterrecipe.AddIngredient(ModContent.ItemType<DreamEssence>(), 5);
-			heartmatterrecipe.AddIngredient(ItemID.LifeCrystal);
-			heartmatterrecipe.AddTile(TileID.MythrilAnvil);
-			heartmatterrecipe.Register();
-
-			Recipe heartmatterrecipe2 = CreateRecipe();
-			heartmatterrecipe2.AddIngredient(ModContent.ItemType<Starbit>(), 20);
-			heartmatterrecipe2.AddIngredient(ItemID.ChlorophyteBar, 2);
-			heartmatterrecipe2.AddIngredient(ItemID.LifeFruit);
-			heartmatterrecipe2.AddTile(TileID.MythrilAnvil);
-			heartmatterrecipe2.Register();
+            heartmatterrecipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
+            heartmatterrecipe.AddIngredient(ItemID.ChlorophyteBar, 2);
+            heartmatterrecipe.AddIngredient(ModContent.ItemType<DreamEssence>(), 5);
+            heartmatterrecipe.AddTile(TileID.MythrilAnvil);
+            heartmatterrecipe.Register();
 		}
 	}
 }

@@ -140,17 +140,4 @@ namespace KirboMod.Tiles.Relics
 			}
 		}
 	}
-
-	// If you want to make more relics but do not go the optional way, you can use inheritance to avoid using duplicate code:
-	// Your tile code would then inherit from the MinionBossRelic class (which you should make abstract) and should look like this:
-	
-	/*public class WhispyWoodsRelic : KingDededeRelic
-	{
-		public override string RelicTextureName => "KirboMod/Tiles/Relics/WhispyWoodsRelic";
-
-	}*/
-	
-
-	// Your item code would then just use the MyBossRelic tile type, and keep placeStyle on 0
-	// The textures for MyBossRelic item/tile have to be supplied separately
 }

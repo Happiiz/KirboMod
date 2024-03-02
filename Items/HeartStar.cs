@@ -34,7 +34,7 @@ namespace KirboMod.Items
 		{
 			Recipe heartstarrecipe = CreateRecipe();
 			heartstarrecipe.AddIngredient(ModContent.ItemType<HeartMatter>());
-			heartstarrecipe.AddIngredient(ModContent.ItemType<Starbit>(), 50);
+			heartstarrecipe.AddIngredient(ModContent.ItemType<Starbit>(), 10);
 			heartstarrecipe.AddTile(TileID.MythrilAnvil);
 			heartstarrecipe.Register();
 		}

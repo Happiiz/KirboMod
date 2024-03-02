@@ -52,7 +52,6 @@ namespace KirboMod.NPCs
 
 			NPC.TargetClosest(true);
 			{
-				NPC.damage = 70;
                 if (NPC.target < 0 || NPC.target == 255 || player.dead || !player.active || Main.dayTime == true)
 				{
 					NPC.ai[0] = 0;

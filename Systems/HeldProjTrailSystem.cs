@@ -80,7 +80,7 @@ namespace KirboMod.Systems
             {
                 if (trails == null)
                 {
-                    trails = [trail];
+                    trails = new Trail[1] { trail };
                 }
                 else
                 {

@@ -12,6 +12,7 @@ using KirboMod.Systems;
 using KirboMod.Bestiary;
 using System.Collections.Specialized;
 using System.IO;
+using KirboMod.Projectiles;
 
 namespace KirboMod.NPCs
 {
@@ -20,17 +21,6 @@ namespace KirboMod.NPCs
 	{
 		private int deathcounter = 0; //for death animation
 
-		Vector2 chargedirection = new Vector2(1, 1);
-
-		//default speed, acceleration and charge speed
-        private float speed = 40f;
-        private float inertia = 50f;
-		private float chargespeed = 30;
-
-		//shortens the time between charges and the time of charges
-		private float chargereduce = 0;
-
-		private bool spewFaster = false; //decide if to spew blood faster (whether or not eye is low)
         public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Eye of Zero");
@@ -54,7 +44,7 @@ namespace KirboMod.NPCs
 			NPC.width = 110;
 			NPC.height = 110;
             NPC.defense = 60;
-            NPC.lifeMax = 20000;
+            NPC.lifeMax = 40000;
 			NPC.damage = 200;
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
@@ -94,23 +84,11 @@ namespace KirboMod.NPCs
         public override void SendExtraAI(BinaryWriter writer) //syncing stuff
         {
 			writer.Write(deathcounter);
-			writer.WriteVector2(chargedirection);
-			writer.Write(speed);
-            writer.Write(inertia);
-            writer.Write(chargespeed);
-            writer.Write(chargereduce);
-            writer.Write(spewFaster);
         }
 
         public override void ReceiveExtraAI(BinaryReader reader)
         {
 			deathcounter = reader.ReadInt32();
-            chargedirection = reader.ReadVector2();
-            speed = reader.ReadSingle();
-            inertia = reader.ReadSingle();
-            chargespeed = reader.ReadSingle();
-            chargereduce = reader.ReadSingle();
-            spewFaster = reader.ReadBoolean();
         }
 
         public override void AI() //constantly cycles each time
@@ -150,25 +128,26 @@ namespace KirboMod.NPCs
 		private void AttackPattern()
 		{
 			Player player = Main.player[NPC.target];
+            float speed = 40f;
+			float inertia = 50f;
+			float chargespeed = 40;
+			float chargereduce = 0; //shortens the time between charges and the time of charges
+
+            bool spewFaster = false; //decide if to spew blood faster (whether or not eye is low)
 
             if (Vector2.Distance(player.Center, NPC.Center) > 2000) //player is far away
             {
-                speed = 100;
+                speed *= 2; //double speed
             }
-            else if (NPC.life <= NPC.lifeMax * 0.25 && NPC.ai[0] == 0) //low
+            else if (NPC.GetLifePercent() <= 0.3f && NPC.ai[0] == 0) //low
 			{
-				speed = 60; //25% faster speed
-				inertia = 62.5f; //25% faster acceleration
+				speed *= 1.25f; //25% faster speed
+				inertia *= 1.25f; //25% faster acceleration
 
-				chargespeed = 40; //33.3& faster charge speed
-				chargereduce = 150; //300 - 150 = 150 ticks before charge if low (150 / 3 is 30 less for charge)
+                chargespeed = 60;
+                chargereduce = 150;
 
-				spewFaster = true;
-            }
-			else
-			{
-                speed = 40f;
-                inertia = 50f;
+                spewFaster = true;
             }
 
 			Vector2 moveTo = player.Center;
@@ -176,45 +155,47 @@ namespace KirboMod.NPCs
 			direction.Normalize();
 			direction *= speed;
 
-			if (NPC.ai[0] < 300 - chargereduce)
+            NPC.ai[0]++;
+
+            if (NPC.ai[0] < 300 - chargereduce)
 			{
 				NPC.velocity = (NPC.velocity * (inertia - 1) + direction) / inertia; //follow player
 			}
 
-			NPC.ai[0]++;
-			if (NPC.ai[0] % (spewFaster ? 7 : 10) == 0 && NPC.ai[0] < 300 - chargereduce) //only do this if less than 300(or less)
+			if (NPC.ai[0] % (spewFaster ? 7 : 10) == 0 && NPC.ai[0] < 300 - chargereduce) //only do this if less than 300 (or less)
 			{
-				//divide damage by 4 because so it doesn't scale in expert mode because npc damage doesnt scale in expert mode
-				//and so it doesn't scale normally
+				//divide damage by 2 once so it doesn't double damage in expert mode
+				//and divide damage by 2 another time so it doesn't double damage by default
 				if (Main.netMode != NetmodeID.MultiplayerClient)
 				{
-					Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity * 0, Mod.Find<ModProjectile>("ZeroEyeBlood").Type, NPC.damage / 4, 2f, Main.myPlayer);
+					Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity * 0.01f, Mod.Find<ModProjectile>("ZeroEyeBlood").Type, NPC.damage / 4, 2f, Main.myPlayer);
 				}
 			}
 
 			if (NPC.ai[0] >= 300 - chargereduce)
 			{
-				if (NPC.life <= NPC.lifeMax * 0.5) //initate dash
+                Vector2 chargedirection = player.Center - NPC.Center; //start - end
+
+                if (NPC.GetLifePercent() <= 0.6f) //initate dash
 				{
-					if (NPC.ai[0] <= 360 - (chargereduce + chargereduce / 5)) //stop
+					if (NPC.ai[0] < 360 - chargereduce) //stop
 					{
-						NPC.velocity *= 0.01f; //freeze to warn player (but not too much else it might disappear)
+						NPC.velocity *= 0.01f; //freeze to warn player
                     }
-					else if (NPC.ai[0] <= 390 - (chargereduce + chargereduce / 5)) //initiate dash
+					else if (NPC.ai[0] < 390 - chargereduce) //initiate dash
 					{
-						if (NPC.ai[0] == 361 - (chargereduce + chargereduce / 5))
+						if (NPC.ai[0] == 360 - chargereduce)
 						{
-							chargedirection = player.Center - NPC.Center; //start - end
-						}
-						chargedirection.Normalize();
-						chargedirection *= chargespeed; //changes depending whether or not eye has less than 25% health
-						NPC.velocity = chargedirection; //charge
+                            chargedirection.Normalize();
+                            chargedirection *= chargespeed; //changes depending whether or not eye has less than 25% health
+                            NPC.velocity = chargedirection; //charge
+                        }
 
 						if (NPC.ai[0] % 2 == 0)
 						{
 							if (Main.netMode != NetmodeID.MultiplayerClient)
 							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity * 0, Mod.Find<ModProjectile>("ZeroEyeBlood").Type, NPC.damage / 4, 2f, Main.myPlayer);
+								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity * 0.01f, ModContent.ProjectileType<ZeroEyeBlood>(), NPC.damage / 4, 2f, Main.myPlayer);
 							}
 						}
 					}
@@ -230,10 +211,7 @@ namespace KirboMod.NPCs
 			}
 
 			//rotato
-			// First, calculate a Vector pointing towards what you want to look at
-			Vector2 distance = player.Center - NPC.Center;
-			// Second, use the ToRotation method to turn that Vector2 into a float representing a rotation in radians.
-			float desiredRotation = distance.ToRotation();
+			float desiredRotation = direction.ToRotation();
 
 			NPC.rotation = desiredRotation;
 		}
