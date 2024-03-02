@@ -24,6 +24,8 @@ namespace KirboMod.NPCs
             Swoop,//3
             Tornado,//4
             Stoop,//5
+            LightningOrbsPentagon,
+            LightningOrbsHoming
         }
 
         public override void SetStaticDefaults()
@@ -31,7 +33,7 @@ namespace KirboMod.NPCs
             // DisplayName.SetDefault("Nightmare");
             Main.npcFrameCount[NPC.type] = 25;
 
-            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
+            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers()
             {
                 PortraitScale = 1f, // Portrait refers to the full picture when clicking on the icon in the bestiary
                 PortraitPositionYOverride = 70f,
@@ -67,8 +69,7 @@ namespace KirboMod.NPCs
 
         public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */
         {
-            NPC.lifeMax = (int)(NPC.lifeMax * 0.8 * balance);
-            NPC.damage = (int)(NPC.damage * 1f);
+            Helper.BossHpScalingForHigherDifficulty(ref NPC.lifeMax, balance);
         }
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
@@ -136,7 +137,7 @@ namespace KirboMod.NPCs
         public override void BossLoot(ref string name, ref int potionType)
         {
             name = "Nightmare"; //_ has been defeated!
-            potionType = ItemID.HealingPotion; //potion it drops
+            potionType = ItemID.GreaterHealingPotion; //potion it drops
         }
         public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
         {

@@ -44,7 +44,7 @@ namespace KirboMod.NPCs.MidBosses
 			DrawOffsetY = 70;
 			NPC.damage = Main.hardMode ? 100 : 50;
 			NPC.defense = 15;
-			NPC.lifeMax = Main.hardMode ? 2500 : 400;
+			NPC.lifeMax = Main.hardMode ? 2500 : 800;
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
 			NPC.value = Item.buyPrice(0, 0, 50, 0); // money it drops
@@ -60,14 +60,18 @@ namespace KirboMod.NPCs.MidBosses
 
 		public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */
 		{
-			/*(if (Main.hardMode)
+            if (Main.hardMode)
+            {
+                Helper.BossHpScalingForHigherDifficulty(ref NPC.lifeMax, balance);
+            }
+            /*(if (Main.hardMode)
 			{
 				NPC.lifeMax = (int)(NPC.lifeMax * 0.75f * balance);
 				NPC.damage = (int)(NPC.damage * 0.75f);
 			}*/
-		}
+        }
 
-		public override float SpawnChance(NPCSpawnInfo spawnInfo)
+        public override float SpawnChance(NPCSpawnInfo spawnInfo)
 		{
             return 0f;
         }

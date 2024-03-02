@@ -191,25 +191,10 @@ namespace KirboMod.NPCs
 
 		public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */
 		{
-			if(!Main.expertMode)
-			{
-				return;
-			}
-			if(Main.masterMode)
-			{
-				NPC.lifeMax /= 3;
-				NPC.damage /= 3;
-                NPC.lifeMax = (int)(NPC.lifeMax * 1.4f * balance);
-                NPC.damage = (int)(NPC.damage * 1.4f);
-				return;
-            }
-			NPC.lifeMax /= 2;
-			NPC.damage /= 2;
-			NPC.lifeMax = (int)(NPC.lifeMax * 1.7f * balance);
-			NPC.damage = (int)(NPC.damage * 1.7f);
-		}
+            Helper.BossHpScalingForHigherDifficulty(ref NPC.lifeMax, balance);
+        }
 
-		public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
+        public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
 		{
 			// We can use AddRange instead of calling Add multiple times in order to add multiple items at once
 			bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]

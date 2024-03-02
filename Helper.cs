@@ -8,6 +8,23 @@ namespace KirboMod
 {
     public static class Helper
     {
+        public static void BossHpScalingForHigherDifficulty(ref int lifemax, float balance)
+        {
+            const float expertMultiplier = 1.5f;
+            const float masterMultiplier = 2f;
+            if(Main.masterMode)
+            {
+                lifemax /= 3;
+                lifemax = (int)(lifemax * masterMultiplier * balance);
+
+                return;
+            }
+            if(Main.expertMode)
+            {
+                lifemax /= 2;
+                lifemax = (int)(lifemax * expertMultiplier * balance);
+            }
+        }
         public static bool SpawnInfoNotInAnySpecialBiome(NPCSpawnInfo info)
         {
             if (info.Player.ZoneJungle)

@@ -72,8 +72,8 @@ namespace KirboMod.NPCs.DarkMatter
         }
         public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */
         {
-            NPC.lifeMax = (int)(NPC.lifeMax * 0.7 * balance);
-            NPC.damage = (int)(NPC.damage * 0.6);
+            Helper.BossHpScalingForHigherDifficulty(ref NPC.lifeMax, balance);
+            //NPC.damage = (int)(NPC.damage * bossAdjustment);
         }
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
