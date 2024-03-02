@@ -1384,6 +1384,7 @@ Mods: {
 			MinionBeamSpread.DisplayName: Minion Beam Spread
 			DuoMinionFireSpread.DisplayName: Duo Minion Fire Spread
 			BadIceChunkMist.DisplayName: Bad Ice Chunk Mist
+			NightmareLightningOrb.DisplayName: Nightmare Lightning Orb
 		}
 
 		NPCs: {

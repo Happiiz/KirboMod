@@ -1,11 +1,8 @@
-using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
-using System.Collections.Generic;
 using Terraria;
-using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -25,8 +22,8 @@ namespace KirboMod
             Vector2 origin = GlowBall.Size() / 2;
             Main.EntitySpriteDraw(GlowBall, pos - Main.screenPosition, null, outerColor with { A = 0 }, Main.rand.NextFloat() * MathF.Tau, origin, scaleMultiplier, SpriteEffects.None);
             Main.EntitySpriteDraw(GlowBall, pos - Main.screenPosition, null, innerColor with { A = 0 }, Main.rand.NextFloat() * MathF.Tau, origin, scaleMultiplier * 0.5f, SpriteEffects.None);
-            if(shiny)
-            Main.EntitySpriteDraw(GlowBall, pos - Main.screenPosition, null, Color.White with { A = 0 }, Main.rand.NextFloat() * MathF.Tau, origin, scaleMultiplier * 0.25f, SpriteEffects.None);
+            if (shiny)
+                Main.EntitySpriteDraw(GlowBall, pos - Main.screenPosition, null, Color.White with { A = 0 }, Main.rand.NextFloat() * MathF.Tau, origin, scaleMultiplier * 0.25f, SpriteEffects.None);
         }
         public static void SpawnBlueStarParticle(Projectile proj, Vector2? velocity = null, float scale = 1, Vector2? posOffset = null)
         {
@@ -52,6 +49,7 @@ namespace KirboMod
             glowLine = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowLinePremultiplied");
             glowLineCap = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowLineCapPremultiplied");
             ringShine = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/RingShinePremultiplied");
+            circleOutline = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowOutlinePremultiplied");
         }
         public static Asset<Texture2D> glowLine;
         public static Asset<Texture2D> glowLineCap;
@@ -59,12 +57,14 @@ namespace KirboMod
         public static Asset<Texture2D> ringShine;
         public static Asset<Texture2D> glowBall;
         public static Asset<Texture2D> ring;
+        public static Asset<Texture2D> circleOutline;
         public static Texture2D GlowLine { get => glowLine.Value; }
         public static Texture2D GlowLineCap { get => glowLineCap.Value; }
         public static Texture2D Circle { get => circle.Value; }
         public static Texture2D RingShine { get => ringShine.Value; }
         public static Texture2D Ring { get => ring.Value; }
         public static Texture2D GlowBall { get => glowBall.Value; }
+        public static Texture2D CircleOutline => circleOutline.Value;
         public override void OnWorldLoad()
         {
             LoadTextures();//hopefully this fixes the textures not being loaded??
@@ -129,7 +129,7 @@ namespace KirboMod
             randScale *= 0.15f;
             Main.EntitySpriteDraw(Ring, pos - Main.screenPosition, null, RndElectricCol with { A = 0 } * 0.8f * opacity, randRot, Ring.Size() / 2, randScale, SpriteEffects.None);
             Main.EntitySpriteDraw(Circle, pos - Main.screenPosition, null, RndElectricCol with { A = 0 } * 0.25f * opacity, randRot, Circle.Size() / 2, randScale * 1.8f, SpriteEffects.None);
-            DrawPrettyStarSparkle( opacity, pos - Main.screenPosition + randomOffset, new Color(255, 255, 255, 0), RndElectricCol, 1, 0, 1, 1, 2, rotation, sparkleScale, fatness);
+            DrawPrettyStarSparkle(opacity, pos - Main.screenPosition + randomOffset, new Color(255, 255, 255, 0), RndElectricCol, 1, 0, 1, 1, 2, rotation, sparkleScale, fatness);
         }
 
         public override void Unload()
@@ -150,18 +150,19 @@ namespace KirboMod
             drawColorSmallInnerTrail *= proj.Opacity;
             drawColorStar *= proj.Opacity;
             Texture2D projSprite = TextureAssets.Projectile[proj.type].Value;
-            float scaleMultFromTex = Utils.Remap(projSprite.Size().Length(), 27, 90, 1, 2);
+            float projSPriteSizeLength = projSprite.Size().Length();
+            float scaleMultFromTex = Utils.Remap(projSPriteSizeLength, 27, 120, 1, 2);
             float scaleIncrease = 0.3f;
-            Vector2 spinningpoint = new(0f, 15);
+            Vector2 spinningpoint = new Vector2(0f, 15) * projSPriteSizeLength * .007f;
             Vector2 drawPos = proj.Center + Vector2.Normalize(proj.velocity) * projSprite.Size().Length() / 2 - Main.screenPosition;
             Texture2D starTrailTexture = TextureAssets.Extra[ExtrasID.FallingStar].Value;
             Vector2 starTrailOrigin = new(starTrailTexture.Width / 2f, 10f);
             float timerVar = (float)Main.timeForVisualEffects / 60f;
             float rotation = proj.velocity.ToRotation() + MathHelper.PiOver2;
             drawColorMainTrail *= drawColorMult;
-            Main.EntitySpriteDraw(starTrailTexture, drawPos + spinningpoint.RotatedBy(MathF.Tau * timerVar), null, drawColorMainTrail, rotation, starTrailOrigin,scaleMultFromTex * ( 1.3f + scaleIncrease), SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(starTrailTexture, drawPos + spinningpoint.RotatedBy(MathF.Tau * timerVar), null, drawColorMainTrail, rotation, starTrailOrigin, scaleMultFromTex * (1.3f + scaleIncrease), SpriteEffects.None, 0);
             Main.EntitySpriteDraw(starTrailTexture, drawPos + spinningpoint.RotatedBy(MathF.Tau * timerVar + MathHelper.TwoPi / 3f), null, drawColorMainTrail, rotation, starTrailOrigin, scaleMultFromTex * (0.9f + scaleIncrease), SpriteEffects.None, 0);
-            Main.EntitySpriteDraw(starTrailTexture, drawPos + spinningpoint.RotatedBy(MathF.Tau * timerVar + 4.1887903f), null, drawColorMainTrail, rotation, starTrailOrigin, scaleMultFromTex *( 1.1f + scaleIncrease), SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(starTrailTexture, drawPos + spinningpoint.RotatedBy(MathF.Tau * timerVar + 4.1887903f), null, drawColorMainTrail, rotation, starTrailOrigin, scaleMultFromTex * (1.1f + scaleIncrease), SpriteEffects.None, 0);
             drawPos = proj.Center + Vector2.Normalize(proj.velocity) * -projSprite.Size().Length() / 4 - Main.screenPosition;
             drawColorSmallInnerTrail.A = innerTrailAlpha;
             for (float i = 0f; i < 1f; i += 0.5f)
@@ -177,7 +178,7 @@ namespace KirboMod
                 Color drawColor = drawColorSmallInnerTrail * colorMult;
                 if (innerTrailAlpha != 0)
                     drawColor.A = (byte)Math.Clamp(innerTrailAlpha * colorMult, 0, 255);
-                Main.EntitySpriteDraw(starTrailTexture, drawPos, null, drawColor, rotation, starTrailOrigin, (0.2f + scale * 0.7f) *scaleMultFromTex, SpriteEffects.None, 0);
+                Main.EntitySpriteDraw(starTrailTexture, drawPos, null, drawColor, rotation, starTrailOrigin, (0.2f + scale * 0.7f) * scaleMultFromTex, SpriteEffects.None, 0);
             }
             drawPos = proj.Center - Main.screenPosition;
             Main.instance.LoadProjectile(proj.type);
