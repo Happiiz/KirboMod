@@ -41,7 +41,7 @@ namespace KirboMod.NPCs.MidBosses
 			NPC.height = 136;
 			NPC.damage = Main.hardMode ? 80 : 40;
 			NPC.defense = 20;
-            NPC.lifeMax = Main.hardMode ? 2500 : 400;
+            NPC.lifeMax = Main.hardMode ? 2500 : 800;
             NPC.HitSound = SoundID.NPCHit14; //fishron squeal
 			NPC.DeathSound = SoundID.NPCDeath8; //grunt
 			NPC.value = Item.buyPrice(0, 0, 50, 0); // money it drops
@@ -59,10 +59,9 @@ namespace KirboMod.NPCs.MidBosses
         {
 			if (Main.hardMode)
 			{
-				NPC.lifeMax = (int)(NPC.lifeMax * 0.75f * balance);
-				NPC.damage = (int)(NPC.damage * 0.75f);
-			}
-		}
+                Helper.BossHpScalingForHigherDifficulty(ref NPC.lifeMax, balance);
+            }
+        }
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
 		{

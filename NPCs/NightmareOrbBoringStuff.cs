@@ -65,8 +65,7 @@ namespace KirboMod.NPCs
 
 		public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */ 
 		{
-			NPC.lifeMax = (int)(NPC.lifeMax * 0.75 * balance);
-			NPC.damage = (int)(NPC.damage);
+            Helper.BossHpScalingForHigherDifficulty(ref NPC.lifeMax, balance);
 		}
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
@@ -81,15 +80,6 @@ namespace KirboMod.NPCs
 				new FlavorTextBestiaryInfoElement("An ominous orb that appeared from the fountain after being attracted to it's magic. Acts as the shield for a mysterious yet diabolical sorcerer.")
             });
         }
-
-		public override void SendExtraAI(BinaryWriter writer)
-		{
-        }
-
-		public override void ReceiveExtraAI(BinaryReader reader)
-		{
-        }
-
 		public override void FindFrame(int frameHeight) // animation
         {
             NPC.frameCounter += 1.0;

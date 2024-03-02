@@ -10,9 +10,10 @@ using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles.NightmareLightningOrb
 {
-    public class NightmareLightningOrb : ModProjectile//180x180 proj? use circle collision ofc
+    public class NightmareLightningOrbHoming : ModProjectile//180x180 proj? use circle collision ofc
     {
         const string pathForFiles = "KirboMod/Projectiles/NightmareLightningOrb/";
+        public override string Texture => "KirboMod/Projectiles/NightmareLightningOrb/NightmareLightningOrb";
         private class LightningArc
         {
             float timer;
@@ -20,7 +21,6 @@ namespace KirboMod.Projectiles.NightmareLightningOrb
             float extra;
             float rotation;
             readonly Asset<Texture2D> texture;
-            readonly Asset<Texture2D> texture2;
             float startRotation;
             public LightningArc()
             {
@@ -30,8 +30,6 @@ namespace KirboMod.Projectiles.NightmareLightningOrb
                 extra = Main.rand.NextFloat();
                 //texture = ModContent.Request<Texture2D>(pathForFiles + "spark_0" + Main.rand.Next(1, 5));
                 texture = ModContent.Request<Texture2D>(pathForFiles + "twirl_0" + Main.rand.Next(1, 4));
-                texture2 = ModContent.Request<Texture2D>(pathForFiles + "twirl_0" + Main.rand.Next(1, 4));
-
             }
             public void Draw(Projectile parentOrb)
             {
@@ -133,30 +131,17 @@ namespace KirboMod.Projectiles.NightmareLightningOrb
         }
         static float ScaleUpTime => 20;
         ref float Timer => ref Projectile.localAI[1];
-        ref float TargetPlayerIndex => ref Projectile.ai[1];
-        static float LaunchVelocity => 7;
-        static float OrbInitialVelocityLength => 6;
-        float OrbSpecificLaunchDelay => Projectile.ai[0];
-        static float ExtraLaunchDelay => 0;
-        Vector2 LaunchFrom => new Vector2(Projectile.localAI[0], Projectile.localAI[2]);
+        ref float TargetPlayerIndex => ref Projectile.ai[0];
+        static float MaxVelocity => 6;
+        float MaxSpeed => Projectile.ai[1];
+        static int Duration => 1000;
         static float OrbRadius => 180;
-        float OrbInitialProgressOnAttack => Projectile.ai[2];
-        float AttackDuration => Projectile.ai[2];
-        float LaunchTime => ScaleUpTime + AttackDuration + ExtraLaunchDelay + OrbSpecificLaunchDelay;
-        float GetLaunchVelocity(Vector2 targetPos)
-        {
-            return Vector2.Distance(LaunchFrom, targetPos) / 100;
-        }
         readonly List<LightningArc> arcs = new();
         readonly List<Twirl> twirls = new();
         readonly List<LightningLine> lines = new();
-        public static void GetShootStats(int fireRate, int totalOrbs, int start, int timer, int targetPlayerIndex, out float ai0, out float ai1, out float ai2, out Vector2 velocity)
+        public static float GetMaxSpeed(int firerate, int numOrbs, int start, int timer)
         {
-            float progressOnAttack = Utils.GetLerpValue(0, fireRate * totalOrbs, timer - start);
-            velocity = default;// new Vector2(0, OrbInitialVelocityLength).RotatedBy(progressOnAttack * MathF.Tau);
-            ai0 = MathHelper.Lerp(fireRate * totalOrbs, 0, progressOnAttack);
-            ai1 = targetPlayerIndex;
-            ai2 = fireRate * totalOrbs;
+            return Utils.Remap(timer - start, firerate * numOrbs, 0 , 1, 6);
         }
         public override void SetDefaults()
         {
@@ -172,39 +157,21 @@ namespace KirboMod.Projectiles.NightmareLightningOrb
         public override void AI()
         {
             UpdateParticles();
-            if (Timer == 0)
-            {
-                Projectile.localAI[0] = Projectile.Center.X;
-                Projectile.localAI[2] = Projectile.Center.Y;
-                Projectile.velocity = default;
-            }
             Projectile.scale = Easings.EaseInOutSine(Utils.GetLerpValue(0, ScaleUpTime, Timer, true));
-            Projectile.Opacity = Utils.GetLerpValue(-1, ScaleUpTime, Timer, true) *Utils.GetLerpValue(1000, 990, Timer, true);
-            if (Timer >= 1000)
+            Projectile.Opacity = Utils.GetLerpValue(-1, ScaleUpTime, Timer, true) * Utils.GetLerpValue(Duration, Duration - 10, Timer, true);
+            if (Timer >= Duration)
             {
                 Projectile.Kill();
                 return;
             }
-            if (Timer >= ScaleUpTime && Timer < LaunchTime)
+            if (Timer >= ScaleUpTime)
             {
-                float extraProgress = Utils.GetLerpValue(0, AttackDuration, Timer - ScaleUpTime);
-                Projectile.Center = LaunchFrom + (OrbRadius * Easings.EaseInOutSine(MathHelper.Clamp(extraProgress, 0, 1)) * (extraProgress * MathF.Tau).ToRotationVector2() * 2);
-            }
-            else if (Timer == LaunchTime)
-            {
-                Player target = Main.player[(int)TargetPlayerIndex]; 
-                float launchVelocity = GetLaunchVelocity(target.Center);
-                if (launchVelocity < LaunchVelocity)
-                {
-                    launchVelocity = LaunchVelocity;
-                }
-                Utils.ChaseResults results = Utils.GetChaseResults(LaunchFrom, launchVelocity, target.Center, target.velocity);
-                Projectile.velocity = results.ChaserVelocity;
-                if (!results.InterceptionHappens)
-                {
-
-                    Projectile.velocity = LaunchFrom.DirectionTo(target.Center + (target.velocity * Vector2.Distance(LaunchFrom, target.Center) / launchVelocity)) * launchVelocity;
-                }
+                //homing reach max strength over the course of 100 frames
+                //first is -10 so it has an initial boost
+                float steerSpeed = Utils.GetLerpValue(-10, 100, Timer - ScaleUpTime, true);
+                steerSpeed = Easings.EaseInOutSine(steerSpeed);
+                steerSpeed *= .2f;
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.DirectionTo(Main.player[(int)TargetPlayerIndex].Center) * MaxSpeed, steerSpeed);
             }
             Timer++;
         }
@@ -337,6 +304,5 @@ namespace KirboMod.Projectiles.NightmareLightningOrb
             target.AddBuff(BuffID.Slow, 60 * 3);//ankh shields gives immunity. maybe make dedicated debuff instead?
             target.AddBuff(BuffID.Electrified, 60 * 10);//reduce damage of attack to compensate, but don't reduce too much
         }
-        public override bool ShouldUpdatePosition() => Timer >= LaunchTime;
     }
 }
