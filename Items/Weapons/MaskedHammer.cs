@@ -58,7 +58,6 @@ namespace KirboMod.Items.Weapons
 				}
 				
 				player.velocity.X *= 0.99f; //slow
-                player.endurance += 0.35f; //damage reduction of 35%
                 for (int i = 0; i % 5 == 0; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 				{
 					Vector2 speed = Main.rand.NextVector2Circular(1f, 1f); //circle
@@ -73,7 +72,17 @@ namespace KirboMod.Items.Weapons
             }
 		}
 
-		public override bool? UseItem(Player player)
+        public override void UpdateInventory(Player player)
+        {
+            Item.noMelee = player.ownedProjectileCounts[ModContent.ProjectileType<Projectiles.MaskedFireTornado>()] > 0;
+            KirbPlayer kplr = player.GetModPlayer<KirbPlayer>();
+            if (kplr.RightClicking && player.ItemTimeIsZero) //holding right & not attacking
+            {
+                player.endurance += 0.35f; //damage reduction of 35% (put it here since it won't work in HoldItem()
+            }
+        }
+
+        public override bool? UseItem(Player player)
 		{
 			KirbPlayer kplr = player.GetModPlayer<KirbPlayer>();
 			if (kplr.hammerCharge >= chargeNeededForTornado)

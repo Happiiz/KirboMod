@@ -110,7 +110,7 @@ namespace KirboMod.Projectiles
 			drawPos = (Projectile.Center - Main.screenPosition) + new Vector2(0f, Projectile.gfxOffY);
 			Main.EntitySpriteDraw(texture, drawPos, null, Color.White, Projectile.rotation, origin, Projectile.scale, SpriteEffects.None);
 
-			return false; //draw og
+			return false;
         }
     }
 }

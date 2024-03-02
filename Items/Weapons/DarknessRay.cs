@@ -1,3 +1,4 @@
+using KirboMod.Projectiles.Lightnings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -13,15 +14,12 @@ namespace KirboMod.Items.Weapons
 	{
 		public override void SetStaticDefaults()
 		{
-			// DisplayName.SetDefault("Darkness Ray");
-			/* Tooltip.SetDefault("Fires a dark laser that darts through the sky" +
-				"\nRight click to fire a orb a darkness for more mana"); */
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research 
         }
 
 		public override void SetDefaults()
 		{
-			Item.damage = 90;
+			Item.damage = 120;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 22;
@@ -34,7 +32,7 @@ namespace KirboMod.Items.Weapons
 			Item.rare = ItemRarityID.Yellow;
 			Item.UseSound = SoundID.Item12; //space gun
 			Item.autoReuse = true;
-			Item.shoot = ModContent.ProjectileType<Projectiles.GoodDarkLaser>();
+			Item.shoot = ModContent.ProjectileType<GoodDarkMatterLaser>();
 			Item.shootSpeed = 24f;
 			Item.mana = 4;
 		}
@@ -46,55 +44,26 @@ namespace KirboMod.Items.Weapons
 
 		public override void AddRecipes()
 		{
-			Recipe recipe = CreateRecipe();//the result is staff
+			Recipe recipe = CreateRecipe(); //the result is darkness ray
 			recipe.AddIngredient(ItemID.HeatRay);
 			recipe.AddIngredient(ModContent.ItemType<DarkMaterial>(), 15); //15 dark material
 			recipe.AddTile(TileID.MythrilAnvil); //crafted at mythril anvil
 			recipe.Register(); //adds this recipe to the game
 		}
 
-        public override bool CanUseItem(Player player)
-        {
-			if (player.altFunctionUse == 2) //right click
-			{
-                //damage increase in Shoot()
-				Item.useTime = 60;
-				Item.useAnimation = 60;
-				Item.knockBack = 12;
-				Item.shoot = ModContent.ProjectileType<Projectiles.GoodDarkOrb>();
-				Item.shootSpeed = 16f;
-				Item.mana = 20;
-				Item.UseSound = SoundID.Item117; //conjure arcanum
-            }
-			else //left click
-            {
-				Item.useTime = 8;
-				Item.useAnimation = 8;
-				Item.knockBack = 4;
-				Item.shoot = ModContent.ProjectileType<Projectiles.GoodDarkLaser>();
-				Item.shootSpeed = 32f;
-				Item.mana = 4;
-				Item.UseSound = SoundID.Item12; //space gun
-            }
-			return true;
-		}
-
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {
-			if (player.altFunctionUse == 2) //right clicking
-            {
-                damage *= 10;
-				position.Y -= 15; //move up a little
-            }
 			position += velocity; //move forward a smidge
         }
 
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
 		{
-			return true;
+            LightningProj.GetSpawningStats(velocity, out float ai0, out float ai1);
+            Projectile.NewProjectile(source, position, velocity,
+                ModContent.ProjectileType<GoodDarkMatterLaser>(), damage, knockback, player.whoAmI, ai0, ai1);
+            return false;
 		}
 
-		// Help, my gun isn't being held at the handle! Adjust these 2 numbers until it looks right.
 		public override Vector2? HoldoutOffset()
 		{
 			return new Vector2(-5, 0);

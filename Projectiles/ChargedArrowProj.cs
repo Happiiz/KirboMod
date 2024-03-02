@@ -82,11 +82,10 @@ namespace KirboMod.Projectiles
             afterimage = ModContent.Request<Texture2D>(Texture);
             Texture2D texture = afterimage.Value;
 
-            // Redraw the projectile with the color not influenced by light
             for (int k = 1; k < Projectile.oldPos.Length; k++) //start at 1 so not ontop of actual projectile
             {
-                Vector2 drawOrigin = new Vector2(8, 8);
-                Vector2 drawPos = (Projectile.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
+                Vector2 drawOrigin = texture.Size() / 2;
+                Vector2 drawPos = (Projectile.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(-8f, Projectile.gfxOffY);
 
                 Color color = Color.CornflowerBlue * ((Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);
                 Main.EntitySpriteDraw(texture, drawPos, null, color, Projectile.rotation, drawOrigin, 1, SpriteEffects.None, 0);

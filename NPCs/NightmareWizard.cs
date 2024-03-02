@@ -813,6 +813,7 @@ namespace KirboMod.NPCs
             NPC.damage = 0;
             NPC.active = true;
             NPC.velocity *= 0.01f;
+            NPC.rotation = 0;
 
             if (deathCounter % 10 == 0)
             {

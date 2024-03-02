@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -12,19 +13,15 @@ namespace KirboMod.Items.Weapons
     {
         private Vector2 dash = Main.MouseWorld;
         private bool canUseDash = false;
-        private bool usedDash = false;
+        private int dashCooldown = 0;
         public override void SetStaticDefaults()
         {
-            // DisplayName.SetDefault("Master Sword"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
-            /* Tooltip.SetDefault("While airborne, right-click a direction to do a invincible dash in that direction" +
-				"\nCan only dash in the air once" +
-				"\n'Is this the sword that seals the darkness?'"); */
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research
         }
 
         public override void SetDefaults()
         {
-            Item.damage = 204; //april 2004
+            Item.damage = 408;
             Item.crit += 10;
             Item.DamageType = DamageClass.MeleeNoSpeed;
             Item.width = 30;
@@ -34,7 +31,7 @@ namespace KirboMod.Items.Weapons
             Item.useStyle = ItemUseStyleID.Shoot;
             Item.knockBack = 6;
             Item.value = Item.buyPrice(0, 25, 0, 0);
-            Item.rare = ItemRarityID.Red;
+            Item.rare = ItemRarityID.Purple;
             Item.UseSound = SoundID.Item1;
             Item.autoReuse = true;
             Item.shoot = ModContent.ProjectileType<Projectiles.MasterSwing>();
@@ -102,19 +99,40 @@ namespace KirboMod.Items.Weapons
             return player.ownedProjectileCounts[ModContent.ProjectileType<Projectiles.MasterSwordProj>()] < 1 && player.ownedProjectileCounts[ModContent.ProjectileType<Projectiles.MasterDash>()] < 1;
         }
 
+        public override bool? UseItem(Player player)
+        {
+            if (player.altFunctionUse == 2)
+            {
+                dashCooldown = 60;
+            }
+
+            return true;
+        }
+
+        public override void UpdateInventory(Player player)
+        {
+            if (dashCooldown > 0) //go down
+            {
+                dashCooldown--;
+            }
+
+            if (player.itemAnimation >= player.itemAnimationMax / 2 && player.altFunctionUse == 2)
+            {
+                //damage reduction
+                player.endurance += 0.5f; //+50%
+
+                DisableExtraMovement(player);
+            }
+        }
+
         public override void HoldItem(Player player)
         {
-            //stuff for checking if jumpSpeed or velocity Y is not stagnent (this took waaaaaay too long to figure out!)
+            //stuff for checking if jumpSpeed or velocity Y is not stagnent
             bool airborne = player.velocity.Y != 0f;
 
             //criteria for dashing
 
-            if (airborne == false) //not in air
-            {
-                usedDash = false; //reset usedDash
-            }
-
-            if (airborne == true & usedDash == false) //jumping while not have used dash yet
+            if (airborne == true && dashCooldown <= 0) //able to use dash
             {
                 canUseDash = true;
             }
@@ -129,88 +147,108 @@ namespace KirboMod.Items.Weapons
             {
                 //RIGHT CLICK DASH
 
-                if (player.itemAnimation >= player.itemAnimationMax - 1) //inital strike (one less than useAnimation)       
+                if (player.ItemAnimationJustStarted) //inital strike (one less than useAnimation)       
                 {
                     dash = Main.MouseWorld - player.Center;
                     dash.Normalize(); //reduce to a unit of 1
-                    dash *= 12; //make a speed of 12
+                    dash *= 24; //make a speed of 24
                     player.velocity = dash;
 
-                    usedDash = true; //can't use dash anymore 'til on ground
+                    player.immuneTime = player.itemAnimationMax / 2; //for invincibility timer
+                }
+                else if (player.itemAnimation >= player.itemAnimationMax / 2) //only happen during attack (not including inital)
+                {
+                    //detect if touching surface
+                    for (int i = 0; i < player.width + 2; i++)
+                    {
+                        bool foundCollision = false;
 
-                    player.immuneTime = player.itemAnimationMax - (player.itemAnimationMax / 2); //for invincibility timer
-                }
-                else if (player.itemAnimation >= player.itemAnimationMax - (player.itemAnimationMax / 2)) //only happen during attack (not including inital)
-                {
+                        for (int j = 0; j < player.height + 2; j++)
+                        {
+                            Point tileposition = new Vector2(player.position.X - 1 + i, player.position.Y - 1 + j).ToTileCoordinates();
+
+                            if (WorldGen.SolidOrSlopedTile(Main.tile[tileposition]))
+                            {
+                                for (int k = 0; k < 120; k++)
+                                {
+                                    Vector2 speed = Main.rand.NextVector2Circular(50f, 50f);
+
+                                    Dust d = Dust.NewDustPerfect(player.Center, DustID.SolarFlare, speed, Scale: 2f);
+                                    d.noGravity = true;
+
+                                    SoundEngine.PlaySound(SoundID.Item100, player.Center);
+                                }
+
+                                player.itemAnimation = player.itemAnimationMax / 2; //stop main attack
+
+                                foundCollision = true;
+
+                                break;
+                            }
+                        }
+
+                        if (foundCollision == true)
+                        {
+                            break;
+                        }
+                    }
+
                     player.velocity = dash; //keep moving the way you were
-                }
-                else if (player.itemAnimation < player.itemAnimationMax - (player.itemAnimationMax / 2)) //after attack
-                {
-                    player.fullRotation = 0;
-                }
-                //if max 60, then this 30
-                if (player.itemAnimation >= player.itemAnimationMax - (player.itemAnimationMax / 2)) //only happen during attack (including inital)
-                {
+
                     if (player.dash != 0)
                     {
                         player.dash = 0; //disable dashing
                     }
 
-                    //invincibility (timer above)
-                    player.immune = true;
-                    player.immuneNoBlink = true;
-
-                    //extra...
-                    player.maxFallSpeed = 20;
-                    player.noKnockback = true;
-                    player.GetJumpState(ExtraJump.BlizzardInABottle).Available = false;
-                    player.GetJumpState(ExtraJump.CloudInABottle).Available = false;
-                    player.GetJumpState(ExtraJump.SandstormInABottle).Available = false;
-                    player.GetJumpState(ExtraJump.TsunamiInABottle).Available = false;
-                    player.GetJumpState(ExtraJump.FartInAJar).Available = false;
-                    player.dash = 0;
-
-                    player.canRocket = false;
-                    player.carpet = false;
-                    player.carpetFrame = -1;
-
-                    //disable kirby balloon
-                    player.GetModPlayer<KirbPlayer>().kirbyballoon = false;
-                    player.GetModPlayer<KirbPlayer>().kirbyballoonwait = 1;
-
-                    //double jump effects
-                    player.GetJumpState(ExtraJump.BlizzardInABottle).Disable();/* tModPorter Suggestion: Call Enable() if setting this to true, otherwise call Disable(). */;
-                    player.GetJumpState(ExtraJump.CloudInABottle).Disable()/* tModPorter Suggestion: Call Enable() if setting this to true, otherwise call Disable(). */;
-                    player.GetJumpState(ExtraJump.SandstormInABottle).Disable()/* tModPorter Suggestion: Call Enable() if setting this to true, otherwise call Disable(). */;
-                    player.GetJumpState(ExtraJump.TsunamiInABottle).Disable()/* tModPorter Suggestion: Call Enable() if setting this to true, otherwise call Disable(). */;
-                    player.GetJumpState(ExtraJump.FartInAJar).Disable()/* tModPorter Suggestion: Call Enable() if setting this to true, otherwise call Disable(). */;
-
-                    player.DryCollision(true, true); //fall through platforms
-
-                    player.mount.Dismount(player); //dismount mounts
-
-                    //player.fullRotationOrigin
-                    //player.fullRotation = player.velocity.ToRotation() + MathHelper.ToRadians(90); //rotate towards dash
-
-                    //stop grappling
-                    player.grappling[0] = 0;
-                    player.grapCount = 0;
-                    for (int k = 0; k < 1000; k++)
-                    {
-                        if (Main.projectile[k].active && Main.projectile[k].owner == player.whoAmI && Main.projectile[k].aiStyle == 7)
-                        {
-                            Main.projectile[k].Kill(); //kill grapple hook
-                        }
-                    }
+                    player.maxFallSpeed = 24;
 
                     if (player.itemAnimation % 5 == 0) //every multiple of 5
                     {
-                        SoundEngine.PlaySound(SoundID.Item1, player.Center);
+                        SoundEngine.PlaySound(SoundID.Item20, player.Center); //fire cast
                     }
                 }
-
+                else if (player.itemAnimation < player.itemAnimationMax / 2) //after attack
+                {
+                    player.fullRotation = 0;
+                }
             }
         }
+
+        private void DisableExtraMovement(Player player)
+        {
+            //vvv Disabling other movement options vvv
+
+            player.maxFallSpeed = 20;
+            player.noKnockback = true;
+            player.dashType = 0;
+
+            player.canRocket = false;
+            player.carpet = false;
+            player.carpetFrame = -1;
+
+            //disable kirby balloon
+            player.GetModPlayer<KirbPlayer>().kirbyballoon = false;
+            player.GetModPlayer<KirbPlayer>().kirbyballoonwait = 1;
+
+            //double jump effects
+            player.blockExtraJumps = true;
+
+            player.DryCollision(true, true); //fall through platforms
+
+            player.mount.Dismount(player); //dismount mounts
+
+            //stop grappling
+            player.grappling[0] = 0;
+            player.grapCount = 0;
+            for (int k = 0; k < 1000; k++)
+            {
+                if (Main.projectile[k].active && Main.projectile[k].owner == player.whoAmI && Main.projectile[k].aiStyle == 7)
+                {
+                    Main.projectile[k].Kill(); //kill grapple hook
+                }
+            }
+        }
+
         public override Color? GetAlpha(Color lightColor)
         {
             return Color.White; // Makes it uneffected by light
@@ -219,9 +257,9 @@ namespace KirboMod.Items.Weapons
         public override void AddRecipes()
         {
             Recipe recipe1 = CreateRecipe();//the result is mastersword
-            recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.MetaKnightSword>()); //Knight Hero Sword
-            recipe1.AddIngredient(ModContent.ItemType<Items.RainbowSword.RainbowSword>()); //Epilespy Hero Sword
-            recipe1.AddIngredient(ModContent.ItemType<Items.DarkSword.DarkSword>()); //Edgy Hero Sword
+            recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.MetaKnightSword>()); //Galaxia
+            recipe1.AddIngredient(ModContent.ItemType<Items.RainbowSword.RainbowSword>()); //Rainbow Sword
+            recipe1.AddIngredient(ModContent.ItemType<Items.DarkSword.DarkSword>()); //Dark Sword
             recipe1.AddIngredient(ModContent.ItemType<MiracleMatter>()); //Zero material drop
             recipe1.AddTile(TileID.LunarCraftingStation); //crafted at ancient manipulator
             recipe1.Register(); //adds this recipe to the game

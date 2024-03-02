@@ -45,10 +45,10 @@ namespace KirboMod.NPCs
 		public override void SetDefaults() {
 			NPC.width = 100;
 			NPC.height = 100;
-			NPC.damage = 0; //initally
+			NPC.damage = 70; //initally
 			NPC.noTileCollide = true;
-			NPC.defense = 20; 
-			NPC.lifeMax = 15000;
+			NPC.defense = 25; 
+			NPC.lifeMax = 24000;
 			NPC.HitSound = SoundID.NPCHit4;
 			NPC.DeathSound = SoundID.NPCDeath14; //explosive metal
 			NPC.value = 0f; // money it drops
@@ -61,7 +61,6 @@ namespace KirboMod.NPCs
 			NPC.lavaImmune = true;
 			Music = MusicID.Boss3;
 			NPC.npcSlots = 6;
-			NPC.alpha = 255; //only initally of course
 		}
 
 		public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */ 

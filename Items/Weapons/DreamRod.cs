@@ -26,12 +26,12 @@ namespace KirboMod.Items.Weapons
 			Item.mana = 6;
 			Item.width = 22; //make small for better world hitbox
 			Item.height = 22;
-			Item.useTime = 8;
-			Item.useAnimation = 8;
+			Item.useTime = 5;
+			Item.useAnimation = 5;
 			Item.useStyle = ItemUseStyleID.HoldUp;
 			Item.knockBack = 6;
             Item.value = Item.buyPrice(0, 25, 0, 0);
-            Item.rare = ItemRarityID.Red;
+            Item.rare = ItemRarityID.Purple;
 			Item.autoReuse = true;
 			Item.UseSound = SoundID.Item9; //fallen star
 			Item.scale = 1f;

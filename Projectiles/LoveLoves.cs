@@ -100,11 +100,12 @@ namespace KirboMod.Projectiles
             // Redraw the projectile with the color not influenced by light
             for (int k = 1; k < Projectile.oldPos.Length; k++) //start at 1 so not ontop of actual projectile
             {
-                Vector2 drawOrigin = new Vector2(29, 26);
-                Vector2 drawPos = (Projectile.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
-				float scale = 1 - (0.05f * k);
+				Rectangle frame = texture.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame);
+                Vector2 drawOrigin = frame.Size() / 2;
 
-				Rectangle frame = new Rectangle(0, (texture.Height / 6) * Projectile.frame, Projectile.width, (texture.Height / 6));
+                Vector2 drawPos = (Projectile.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
+
+                float scale = 1 - (0.05f * k);
                 Color color = Projectile.GetAlpha(lightColor) * ((Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);
 
                 Main.EntitySpriteDraw(texture, drawPos, frame, color, Projectile.rotation, drawOrigin, scale, SpriteEffects.None, 0);
