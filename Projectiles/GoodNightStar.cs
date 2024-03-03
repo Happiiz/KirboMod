@@ -21,16 +21,31 @@ namespace KirboMod.Projectiles
 			Projectile.width = 40;
 			Projectile.height = 40;
 			Projectile.friendly = true;
-			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.timeLeft = 240;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = 999;
 			Projectile.scale = 1f;
 			Projectile.usesLocalNPCImmunity = true;
-			Projectile.localNPCHitCooldown = 10;
-		}
-		public override void AI()
+			Projectile.localNPCHitCooldown = -1;
+			Projectile.ArmorPenetration = 40;
+			Projectile.alpha = 255;
+        }
+        int TargetIndex { get => (int)Projectile.ai[0]; set => Projectile.ai[0] = value; }
+        ref float InitialVelLength { get => ref Projectile.ai[1]; }
+        public override void AI()
 		{
+			if(TargetIndex == -1 && Projectile.timeLeft <= 30)
+			{
+				Projectile.timeLeft = 31;
+			}
+			if(Projectile.timeLeft <= 30)
+			{
+				Projectile.Opacity -= 1/30f;
+			}
+			else
+			{
+				Projectile.Opacity += 1 / 5f;
+			}
 			Lighting.AddLight(Projectile.Center, 0.255f, 0f, 0.255f);
 			
 			if (Projectile.velocity.X >= 0)
@@ -47,27 +62,42 @@ namespace KirboMod.Projectiles
 				int dustnumber = Dust.NewDust(Projectile.position, 50, 50, DustID.Shadowflame, 0f, 0f, 200, default, 1f); //dust
 				Main.dust[dustnumber].velocity *= 0.3f;
 			}
-		    /*if (++projectile.frameCounter >= 15) //changes frames every 15 ticks 
+            float rangeSQ = 1500 * 1500;
+            if (!Helper.ValidIndexedTarget(TargetIndex, Projectile, out _, false))
+            {
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Vector2.Normalize(Projectile.velocity) * InitialVelLength, 0.1f);
+                int closestNPC = -1;
+                Vector2 center = Projectile.Center;
+                for (int i = 0; i < Main.npc.Length; i++)
+                {
+                    NPC potentialTarget = Main.npc[i];
+                    float distToClosestPointInPotentialTargetHitbox = center.DistanceSQ(potentialTarget.Hitbox.ClosestPointInRect(center));
+                    if (distToClosestPointInPotentialTargetHitbox > rangeSQ)
+                        continue;
+                    bool notValidTarget = !Helper.ValidHomingTarget(potentialTarget, Projectile, false);
+					if (notValidTarget)
+						continue;
+                    if (!Main.npc.IndexInRange(closestNPC) || center.DistanceSQ(potentialTarget.Hitbox.ClosestPointInRect(center)) < center.DistanceSQ(Main.npc[closestNPC].Hitbox.ClosestPointInRect(center)))
+                        closestNPC = i;
+                }
+                TargetIndex = closestNPC;
+                Projectile.localAI[0] = 1;
+            }
+            if (Helper.ValidIndexedTarget(TargetIndex, Projectile, out NPC target, false))
+            {
+                Projectile.localAI[0]++;
+                float homingStrength = Helper.RemapEased(Projectile.localAI[0], 1, 20, 0, .05f, Easings.EaseInOutSine);
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Vector2.Normalize(target.Center - Projectile.Center) * InitialVelLength, homingStrength);
+            }
+			else
 			{
-				projectile.frameCounter = 0;
-				if (++projectile.frame >= Main.projFrames[projectile.type])
-				{
-					projectile.frame = 0;
-				}
-			}*/
-		}
-        public override void OnKill(int timeLeft) //when the projectile dies
-        {
-			/*for (int i = 0; i < 10; i++)
-			{
-				Vector2 speed = Main.rand.NextVector2Circular(1f, 1f); //circle
-				Dust d = Dust.NewDustPerfect(projectile.position, DustID.Enchanted_Gold, speed * 3, Scale: 1f); //Makes dust in a messy circle
-			}*/
-		}
+				TargetIndex = -1;
+			}
+        }
 
         public override Color? GetAlpha(Color lightColor)
         {
-			return Color.White; // Makes it uneffected by light
+			return new Color(255, 255, 255, 0) * Projectile.Opacity; // Makes it uneffected by light
         }
 
         // This projectile uses additional textures for drawing
@@ -88,14 +118,15 @@ namespace KirboMod.Projectiles
 						(Projectile.position.Y - Main.screenPosition.Y + Projectile.height - star.Height * 0.5f + 2f) - Projectile.velocity.Y * (i * 1.5f)
 				),
 					new Rectangle(0, 0, star.Width, star.Height),
-					new Color(0, 0, 100, 0),
+					new Color(0, 0, 100, 0) * Projectile.Opacity,
 					Projectile.rotation,
                     star.Size() * 0.5f,
 					1f,
 					SpriteEffects.None,
 					0);
 			}
-			return true;
+            VFX.DrawProjWithStarryTrail(Projectile, new Color(173, 245, 255) * .15f, Color.White * .35f * Projectile.Opacity, default, Projectile.Opacity);
+            return true;
 		}
 	}
 }

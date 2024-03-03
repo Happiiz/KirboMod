@@ -106,7 +106,7 @@ namespace KirboMod
         }
         public static bool ValidIndexedTarget(int targetIndex, Projectile proj, out NPC target, bool includeImmuneNPCs = true)
         {
-            bool invalid = !Main.npc.IndexInRange(targetIndex) || !ValidHomingTarget(Main.npc[targetIndex], proj);
+            bool invalid = !Main.npc.IndexInRange(targetIndex) || !ValidHomingTarget(Main.npc[targetIndex], proj, includeImmuneNPCs);
             target = invalid ? null : Main.npc[targetIndex];
             return !invalid;
 

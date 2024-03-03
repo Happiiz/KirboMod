@@ -107,3 +107,5 @@ obj/project.assets.json
 obj/project.nuget.cache
 *.vsidx
 *.cache
+*.bin
+*.dll

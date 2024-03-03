@@ -1,4 +1,3 @@
-using KirboMod.Globals;
 using KirboMod.Items.Weapons;
 using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
@@ -9,7 +8,6 @@ using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using static KirboMod.KirboMod;
 
 namespace KirboMod
 {
@@ -228,7 +226,7 @@ namespace KirboMod
                 playerRightClicks[Main.myPlayer] = Main.mouseRight;
             }
             NetMethods.SyncPlayerRightClick(Player);
-            
+
         }
 
         public override void PostUpdateEquips()
@@ -542,7 +540,7 @@ namespace KirboMod
         void UpdatePlasmaCharge()
         {
             plasmaTimer++;
-            if(plasmaTimer>= 60)
+            if (plasmaTimer >= 60)
             {
                 plasmaCharge--;
                 if (plasmaCharge < 0)
@@ -558,7 +556,7 @@ namespace KirboMod
                 return;
             }
             sbyte plasmaChargeAmount = 0;
-            if(Player.controlRight && plasmaReleaseRight)
+            if (Player.controlRight && plasmaReleaseRight)
                 plasmaChargeAmount++;
             if (Player.controlLeft && plasmaReleaseLeft)
                 plasmaChargeAmount++;
@@ -579,11 +577,11 @@ namespace KirboMod
             plasmaReleaseRight = Player.releaseRight;
             plasmaReleaseUp = Player.releaseUp;
             plasmaReleaseDown = Player.releaseDown;
-            if(plasmaCharge > 20)
+            if (plasmaCharge > 20)
             {
                 plasmaCharge = 20;
             }
-            if(plasmaCharge < 3)
+            if (plasmaCharge < 3)
             {
                 return;//don't try to spawn shield
             }
@@ -793,28 +791,55 @@ namespace KirboMod
             //NIGHT CLOAK
             if (nightcloak)
             {
-                //Pretty self explanatory
-                int damage = 10 + Player.statDefense / 2;
-
-                //down right
-                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, 7, 7, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
-                //right
-                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, 10, 0, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
-                //up right
-                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, 7, -7, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
-                //up
-                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, 0, -10, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
-                //up left
-                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, -7, -7, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
-                //left
-                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, -10, 0, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
-                //down left
-                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, -7, 7, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
-                //down
-                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.Center.Y, 0, 10, Mod.Find<ModProjectile>("GoodNightStar").Type, damage, 3f, Player.whoAmI, 0, 0);
-
-                SoundEngine.PlaySound(SoundID.Item4, Player.Center); //life crystal
+                NightCloakEffect(info);
             }
+        }
+
+        private void NightCloakEffect(Player.HurtInfo info)
+        {
+            int damage = 40;
+            int hitDamage = info.SourceDamage;
+            if (Main.masterMode)
+            {
+                hitDamage /= 3;
+            }
+            else if (Main.expertMode)
+            {
+                hitDamage /= 2;
+            }
+            int numStars = (hitDamage * 3) / damage + 4;
+            if (Main.masterMode)
+            {
+                damage = (int)(damage * 1.5);
+            }
+            float starShootSpeed = 20;
+            int type = ModContent.ProjectileType<GoodNightStar>();
+            for (int i = 0; i < numStars; i++)
+            {
+                float rotation = Utils.Remap(i, 0, numStars - 1, 0, MathF.Tau);
+                Vector2 vel = rotation.ToRotationVector2() * starShootSpeed;
+                if (Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    Projectile.NewProjectile(Player.GetSource_FromThis(), Player.MountedCenter - vel, vel, type, damage, 7f, Player.whoAmI, -1, vel.Length());
+                    if (Main.expertMode)
+                    {
+                        vel = vel.RotatedBy(rotation / 2f) * 2;
+                        Projectile.NewProjectile(Player.GetSource_FromThis(), Player.MountedCenter - vel, vel, type, damage, 7f, Player.whoAmI, -1, vel.Length());
+                    }
+                }
+            }
+            float starSize = 200;
+            float amountOfDots = Utils.Remap(Main.maxDustToDraw, 0, Main.maxDust, 15f, 45f);
+            float extraRotation = MathF.Tau * .2f * Main.rand.NextFloat();
+            for (int i = 0; i < 5; i++)
+            {
+                for (float j = -1; j < 1; j += 1 / amountOfDots)
+                {
+                    Vector2 pos = new Vector2(j, -.33f).RotatedBy(Utils.Remap(i, 0, 5, 0, MathF.Tau) + extraRotation) * starSize;
+                    Dust.NewDustPerfect(pos + Player.Center, DustID.ShadowbeamStaff, Vector2.Zero);
+                }
+            }
+            SoundEngine.PlaySound(SoundID.Item4, Player.Center); //life crystal
         }
     }
 
