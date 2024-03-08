@@ -45,13 +45,6 @@ namespace KirboMod.NPCs
 
 		private float backupoffset = 0; //offset goto position when backing up
 
-		private Vector2 bloodlocation = new Vector2(0,0);
-		private float bloodlocationx = 0;
-		private float bloodlocationy = 0;
-
-		private Vector2 bloodlocation2 = new Vector2(0, 0);
-		private float bloodlocation2x = 0;
-		private float bloodlocation2y = 0;
 
 		private int deathcounter = 0; //for death animation
 
@@ -142,13 +135,6 @@ namespace KirboMod.NPCs
 
             writer.Write(backupoffset);
 
-			writer.WriteVector2(bloodlocation);
-            writer.Write(bloodlocationx);
-            writer.Write(bloodlocationy);
-
-            writer.WriteVector2(bloodlocation2);
-            writer.Write(bloodlocation2x);
-            writer.Write(bloodlocation2y);
 
             writer.Write(deathcounter);
 
@@ -164,15 +150,6 @@ namespace KirboMod.NPCs
 			attacktype = (ZeroAttackType)reader.ReadByte();
 
             backupoffset = reader.ReadSingle();
-
-            bloodlocation = reader.ReadVector2();
-            bloodlocationx = reader.ReadSingle();
-            bloodlocationy = reader.ReadSingle();
-
-            bloodlocation2 = reader.ReadVector2();
-            bloodlocation2x = reader.ReadSingle();
-            bloodlocation2y = reader.ReadSingle();
-
             deathcounter = reader.ReadInt32();
 
             backgroundAttackCountDown = reader.ReadInt32();
@@ -315,6 +292,8 @@ namespace KirboMod.NPCs
 
                     if (NPC.ai[0] % 10 == 0) //every 10 ticks
                     {
+                        Vector2 bloodlocation = new Vector2(NPC.Center.X + NPC.width / 2 * NPC.direction, NPC.Center.Y);
+
                         for (int i = 0; i < 5; i++)
                         {
                             Vector2 spread = Main.rand.NextVector2Circular(10f, 10f); //circle
@@ -323,7 +302,6 @@ namespace KirboMod.NPCs
 
                         if (Main.netMode != NetmodeID.MultiplayerClient)
                         {
-                            Vector2 bloodlocation = new Vector2(NPC.Center.X + NPC.width / 2 * NPC.direction, NPC.Center.Y);
 
                             Projectile.NewProjectile(NPC.GetSource_FromAI(), bloodlocation, new Vector2(NPC.direction * 25, 0), ModContent.ProjectileType<ZeroBloodShot>(), 60 / 2, 6f, Main.myPlayer, NPC.whoAmI, 0);
                         }
@@ -570,8 +548,8 @@ namespace KirboMod.NPCs
                 offset.Y = directionY * ySpacing / 2;
                 offset.X = Utils.Remap(i, 0, mattersInWall - 1, -xSpacing * mattersInWall / 2, xSpacing * mattersInWall / 2);
                 DarkMatterShot.AccountForSpeed(ref offset, player);
-                Vector2 from = NPC.Center + Main.rand.NextVector2Circular(NPC.width, NPC.height);
-                DarkMatterShot.NewDarkMatterShot(NPC, offset + player.Center, from, 80 / 2, directionY, .3f);
+                Vector2 from = NPC.Center + Main.rand.NextVector2Circular(NPC.width, NPC.height) / 3f;
+                DarkMatterShot.NewDarkMatterShot(NPC, offset + player.Center, from, 80 / 2, directionY);
             }
         }
 
@@ -592,6 +570,7 @@ namespace KirboMod.NPCs
             }
 
             lastattacktype = attacktype;
+            attacktype = ZeroAttackType.DarkMatterShots;
 		}
 
         void DefaultMovement(Vector2 playerDistance, Vector2 playerRightDistance, Vector2 playerLeftDistance, float speed, float inertia)
@@ -851,8 +830,18 @@ namespace KirboMod.NPCs
             }
 
 			//draw!
-            spriteBatch.Draw(Zero, NPC.Center - Main.screenPosition + new Vector2(0, 0), Animation(), new Color(r, g, b), NPC.rotation, 
+            spriteBatch.Draw(Zero, NPC.Center - Main.screenPosition, Animation(), new Color(r, g, b), NPC.rotation, 
 				new Vector2(400, 400), NPC.scale, direction, 0f);
+            if(attacktype == ZeroAttackType.Dash)
+            {
+                float progress = Utils.GetLerpValue(0, 240, NPC.ai[0]);
+                float size = Easings.EaseOut(progress, 3) * 5 + 1;
+                float opacity = Easings.RemapProgress(0, 10, 300, 310, NPC.ai[0]);
+                Vector2 drawpos = NPC.Center + new Vector2(NPC.direction * 135, 2) - Main.screenPosition;
+                float rotation = Easings.InOutCirc(progress) * MathF.Tau * 6;
+                VFX.DrawPrettyStarSparkle(opacity, drawpos, Color.Black, Color.Black, 1, 0, .9f, 1.1f, 2, rotation, new Vector2(size) * 2, new Vector2(4));
+                VFX.DrawPrettyStarSparkle(opacity, drawpos, new Color(255, 255, 255, 0), Color.Red, 1, 0, .9f, 1.1f, 2, rotation, new Vector2(size), new Vector2(2));
+            }
             return false;
         }
 
