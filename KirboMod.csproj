@@ -40,6 +40,9 @@
     <None Remove="Projectiles\NightmareLightningOrb\spark_06.png" />
     <None Remove="Projectiles\NightmareLightningOrb\twirl_01.png" />
     <None Remove="Projectiles\NightmareLightningOrb\twirl_02.png" />
+    <None Remove="Projectiles\Tornadoes\tornado_0.png" />
+    <None Remove="Projectiles\Tornadoes\tornado_1.png" />
+    <None Remove="Projectiles\Tornadoes\tornado_2.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="tModLoader.CodeAssist" Version="0.1.*" />
