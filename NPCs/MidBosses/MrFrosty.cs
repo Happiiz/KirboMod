@@ -351,7 +351,7 @@ namespace KirboMod.NPCs.MidBosses
                 {
                     NPC.noTileCollide = true;
 
-                    if (player.Center.Y < NPC.Center.Y || !player.dead) //higher than NPC or dead
+                    if (player.Center.Y < NPC.Center.Y && !player.dead) //higher than NPC or dead
                     {
                         NPC.velocity.Y = -8f;
                     }

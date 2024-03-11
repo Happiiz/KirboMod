@@ -272,7 +272,7 @@ namespace KirboMod.NPCs.MidBosses
 
                     NPC.noTileCollide = true;
 
-                    if (NPC.Bottom.Y < player.Center.Y || NPC.velocity.Y < 0) //higher than player or going up
+                    if (NPC.Bottom.Y < player.Top.Y || NPC.velocity.Y < 0) //higher than player or going up
                     {
                         NPC.ai[1] = 31; //reset
                     }
@@ -378,7 +378,7 @@ namespace KirboMod.NPCs.MidBosses
                 {
                     NPC.noTileCollide = true;
 
-                    if (player.Center.Y < NPC.Center.Y || !player.dead) //higher than NPC or dead
+                    if (player.Center.Y < NPC.Center.Y && !player.dead) //higher than NPC or not dead
                     {
                         NPC.velocity.Y = -4f;
                     }

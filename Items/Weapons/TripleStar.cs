@@ -117,7 +117,6 @@ namespace KirboMod.Items.Weapons
 		{
 			Recipe recipe1 = CreateRecipe();//the result is triple star
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.StarRod>()); //Star Rod
-			recipe1.AddIngredient(ItemID.HallowedBar, 20); //20 hallowed bars
             recipe1.AddIngredient(ModContent.ItemType<HeartMatter>(), 5); //5 Heart Matter
             recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 100); //100 starbits
 			recipe1.AddIngredient(ModContent.ItemType<DreamEssence>(), 50); //50 dream matter
