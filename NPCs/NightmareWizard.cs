@@ -251,9 +251,7 @@ namespace KirboMod.NPCs
             }
             if (timer > firerate * numOrbs + extraTime)
             {
-                NPC.ai[0] = 120;
-                lastattacktype = attacktype;
-                attacktype = NightmareAttackType.SpreadStars;
+                NPC.ai[0] = 119;
             }
         }
 
