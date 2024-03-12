@@ -62,21 +62,21 @@ namespace KirboMod.Projectiles
 						continue;
 					}
 
-					Tile tileSafely = Framing.GetTileSafely(i, j);
-					if (!tileSafely.HasTile)
+					Tile tile = Framing.GetTileSafely(i, j);
+					if (!tile.HasTile)
 					{
 						continue;
 					}
-					Tile tileSafely2 = Framing.GetTileSafely(i, j - 1);
-					if (tileSafely2.HasTile)
+					Tile tileAbove = Framing.GetTileSafely(i, j - 1);
+					if (WorldGen.SolidOrSlopedTile(tileAbove) && TileID.Sets.Platforms[tileAbove.TileType] == true)
 					{
 						continue;
 					}
 
-					int num4 = WorldGen.KillTile_GetTileDustAmount(fail: true, tileSafely, i, j);
+					int num4 = WorldGen.KillTile_GetTileDustAmount(fail: true, tile, i, j);
 					for (int k = 0; k < num4; k++)
 					{
-						Dust obj = Main.dust[WorldGen.KillTile_MakeTileDust(i, j, tileSafely)];
+						Dust obj = Main.dust[WorldGen.KillTile_MakeTileDust(i, j, tile)];
 						obj.velocity.Y -= 3f + (float)((int)Projectile.ai[0] / 3) * 1.5f;
 						obj.velocity.Y *= Main.rand.NextFloat();
 						obj.scale += (float)((int)Projectile.ai[0] / 3) * 0.03f;
@@ -85,7 +85,7 @@ namespace KirboMod.Projectiles
 					{
 						for (int l = 0; l < num4 - 1; l++)
 						{
-							Dust obj2 = Main.dust[WorldGen.KillTile_MakeTileDust(i, j, tileSafely)];
+							Dust obj2 = Main.dust[WorldGen.KillTile_MakeTileDust(i, j, tile)];
 							obj2.velocity.Y -= 1f + (float)((int)Projectile.ai[0] / 3);
 							obj2.velocity.Y *= Main.rand.NextFloat();
 						}

@@ -130,7 +130,14 @@ namespace KirboMod.NPCs
                         }
                         break;
                     case NightmareAttackType.RingStars:
-                        AttackRingStars(NPC.ai[0] - 120, player);
+                        if (phase == 1)
+                        {
+                            AttackRingStars(NPC.ai[0] - 120, player);
+                        }
+                        else
+                        {
+                            EnrageRingStars(NPC.ai[0] - 120, player);
+                        }
                         break;
                     case NightmareAttackType.Swoop:
                         if (phase == 1)
@@ -179,20 +186,22 @@ namespace KirboMod.NPCs
 
         private void AttackLightningOrbPentagon(float timer, Player player)
         {
-            animation = 3;
             int firerate = 30;
             int numOrbs = 5;
-            int start = 40;
+            int start = 60;
             //teleport 
             if (timer == 1)
             {
                 NPC.ai[1] = timer; //time to start teleport
             }
             Teleport(timer - NPC.ai[1], player, new Vector2(0, -100) + player.velocity * (start + 10));
+            if (timer > start)
+            {
+                animation = 5; //damageable
+            }
 
             if (CheckShouldShoot(firerate, numOrbs, start) && NetmodeID.MultiplayerClient != Main.netMode)
             {
-
                 NightmareLightningOrb.GetShootStats(firerate, numOrbs, start, (int)timer, NPC.target, out float ai0, out float ai1, out float ai2, out Vector2 velocity);
                 Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center, velocity, ModContent.ProjectileType<NightmareLightningOrb>(), 40, 0, -1, ai0, ai1, ai2);
             }
@@ -213,10 +222,9 @@ namespace KirboMod.NPCs
 
         private void AttackLightningOrbHoming(float timer, Player player)
         {
-            animation = 3;
             int firerate = 40;
             int numOrbs = 4;
-            int start = 30;
+            int start = 60;
             float extraTime = 200;
             if (Main.expertMode)
                 extraTime *= 0.65f;
@@ -228,6 +236,10 @@ namespace KirboMod.NPCs
                 NPC.ai[1] = timer; //time to start teleport
             }
             Teleport(timer - NPC.ai[1], player, new Vector2(0, -100) + player.velocity * (start + 5));
+            if (timer > start)
+            {
+                animation = 5; //damageable
+            }
 
             if (CheckShouldShoot(firerate, numOrbs, start) && NetmodeID.MultiplayerClient != Main.netMode)
             {
@@ -239,9 +251,7 @@ namespace KirboMod.NPCs
             }
             if (timer > firerate * numOrbs + extraTime)
             {
-                NPC.ai[0] = 120;
-                lastattacktype = attacktype;
-                attacktype = NightmareAttackType.SpreadStars;
+                NPC.ai[0] = 119;
             }
         }
 
@@ -253,7 +263,7 @@ namespace KirboMod.NPCs
                 NPC.ai[1] = timer; //time to start teleport
             }
             bool phase2 = phase != 1;
-            int delayBeforeSlide = phase2 ? 20 : 30;
+            int delayBeforeSlide = phase2 ? /*20 : 30*/ 60 : 90;
             int slideDuration = 30;
             int extraWaitTime = phase2 ? 70 : 100;
             if (Main.getGoodWorld)
@@ -262,7 +272,7 @@ namespace KirboMod.NPCs
             if (timer == delayBeforeSlide) //move to side
             {
                 animation = 1;
-                if (player.velocity.X > 0)
+                if (player.Center.X < NPC.Center.X)
                 {
                     NPC.velocity.X = 20;
                     NPC.direction = -1;
@@ -502,7 +512,7 @@ namespace KirboMod.NPCs
             }
             Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
 
-            if (timer == 60) //move to side
+            if (timer == 40) //move to side
             {
                 animation = 1;
                 if (NPC.Center.X > player.Center.X)

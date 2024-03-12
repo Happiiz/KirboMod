@@ -19,7 +19,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 52; 
+			Item.damage = 64; 
 			Item.noMelee = true;
 			Item.DamageType = DamageClass.Magic;
 			Item.mana = 8;
@@ -32,7 +32,6 @@ namespace KirboMod.Items.Weapons
 			Item.value = Item.buyPrice(0, 0, 15, 50);
 			Item.rare = ItemRarityID.Pink;
 			Item.autoReuse = true;
-			//Item.UseSound = SoundID.Item9; //astral magic noise//I put sound on the projectile
 			Item.scale = 1f;
 			Item.shoot = ModContent.ProjectileType<Projectiles.Star>();
 			Item.shootSpeed = 32f;
@@ -65,7 +64,8 @@ namespace KirboMod.Items.Weapons
             Recipe recipe = CreateRecipe();//Sets result to this item
 			recipe.AddIngredient(ModContent.ItemType<Starbit>(), 40);
 			recipe.AddIngredient(ModContent.ItemType<DreamEssence>(), 20);
-			recipe.AddTile(TileID.Anvils); //Craft with any anvil
+            recipe.AddIngredient(ItemID.HallowedBar, 5); //5 hallowed bars
+            recipe.AddTile(TileID.Anvils); //Craft with any anvil
 			recipe.Register(); //Adds this recipe to the game
 		}
     }

@@ -570,7 +570,6 @@ namespace KirboMod.NPCs
             }
 
             lastattacktype = attacktype;
-            attacktype = ZeroAttackType.DarkMatterShots;
 		}
 
         void DefaultMovement(Vector2 playerDistance, Vector2 playerRightDistance, Vector2 playerLeftDistance, float speed, float inertia)

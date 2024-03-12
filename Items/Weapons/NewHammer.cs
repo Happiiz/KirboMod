@@ -1,3 +1,4 @@
+using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
 using Mono.Cecil;
 using System;
@@ -54,7 +55,7 @@ namespace KirboMod.Items.Weapons
 				Item.noMelee = true;
 				Item.useTime = 30;
 				Item.useAnimation = 30;
-				Item.shoot = Mod.Find<ModProjectile>("NewHammerMissile").Type;
+				Item.shoot = ModContent.ProjectileType<NewHammerMissile>();
 				Item.noUseGraphic = true; //dont use sprite
 				Item.UseSound = SoundID.Item11; //gun
             }
@@ -82,7 +83,7 @@ namespace KirboMod.Items.Weapons
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
 			//hold up animation
-			Projectile.NewProjectile(source, player.Center, new Vector2(0, 0), Mod.Find<ModProjectile>("NewHammerHoldUp").Type, 0, 0, player.whoAmI);
+			Projectile.NewProjectile(source, player.Center, new Vector2(0, 0), ModContent.ProjectileType<NewHammerHoldUp>(), 0, 0, player.whoAmI);
 
 			return true;
 		}

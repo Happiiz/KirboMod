@@ -39,8 +39,8 @@ namespace KirboMod.Items.Placeables
             Recipe recipe = CreateRecipe();
 			recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
 			recipe.AddIngredient(ModContent.ItemType<DreamEssence>(), 40);
-			recipe.AddIngredient(ItemID.HallowedBar, 5); //Hallow Bars
-			recipe.AddTile(TileID.Anvils);
+			recipe.AddRecipeGroup(RecipeGroupID.IronBar, 15); //Iron & Lead
+            recipe.AddTile(TileID.Anvils);
 			recipe.Register(); //Add this recipe to the game
 		}
     }

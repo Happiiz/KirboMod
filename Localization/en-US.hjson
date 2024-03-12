@@ -86,37 +86,37 @@ Mods: {
 
 			DarkMatterPetBuff: {
 				DisplayName: Dark Wanderer
-				Description: '''"It's attracted to the darkness within you."'''
+				Description: It's attracted to the darkness within you
 			}
 
 			KingDededePetBuff: {
 				DisplayName: Dee
-				Description: '''"The one to rule them all... one day..."'''
+				Description: The one to rule them all... one day...
 			}
 
 			KrackoPetBuff: {
 				DisplayName: Lil' Krackle
-				Description: '''"It cries water every once in a while."'''
+				Description: It cries water every once in a while
 			}
 
 			NightmarePetBuff: {
 				DisplayName: Shade Mage
-				Description: '''"What could it be hiding?"'''
+				Description: What could it be hiding?
 			}
 
 			WhispyPetBuff: {
 				DisplayName: Murmuring Woods
-				Description: '''"Pspspsps..."'''
+				Description: Pspspsps...
 			}
 
 			ZeroEyePetBuff: {
 				DisplayName: Zero's Eye
-				Description: '''"Is it in constant pain of not being able to blink?"'''
+				Description: Is it in constant pain of not being able to blink?
 			}
 
 			ZeroPetBuff: {
 				DisplayName: Hollow Wanderer
-				Description: '''"Attracts darkness towards its empty shell."'''
+				Description: Attracts darkness towards its empty shell
 			}
 
 			DragonFireDebuff: {
@@ -133,7 +133,7 @@ Mods: {
 
 			NightCloak: {
 				DisplayName: Night Cloak
-				Tooltip: Shoots stars in eight directions upon being hit
+				Tooltip: Shoots multiple stars that home in on enemies when hit
 			}
 
 			PeeWeePole: {
@@ -503,7 +503,7 @@ Mods: {
 				Tooltip:
 					'''
 					Gives good dreams during the day
-					'Its dreamlike aura attracts wicked nightmares to its presence'
+					Wicked nightmares float around it at night
 					'''
 			}
 
@@ -1403,6 +1403,7 @@ Mods: {
 			GooeyDarkMatterLaser.DisplayName: Gooey Dark Matter Laser
 			NightmareShockOrb.DisplayName: Nightmare Shock Orb
 			NightmareLightningOrbHoming.DisplayName: Nightmare Lightning Orb Homing
+			DededeDropStar.DisplayName: Drop Star
 		}
 
 		NPCs: {

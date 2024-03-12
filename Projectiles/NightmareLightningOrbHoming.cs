@@ -134,7 +134,7 @@ namespace KirboMod.Projectiles.NightmareLightningOrb
         ref float TargetPlayerIndex => ref Projectile.ai[0];
         static float MaxVelocity => 6;
         float MaxSpeed => Projectile.ai[1];
-        static int Duration => 1000;
+        static int Duration => 600;
         static float OrbRadius => 180;
         readonly List<LightningArc> arcs = new();
         readonly List<Twirl> twirls = new();
