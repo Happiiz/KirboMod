@@ -35,9 +35,9 @@ namespace KirboMod.Projectiles
 		{
             Projectile.rotation = Projectile.velocity.ToRotation();
 
-            Projectile.velocity *= 0.9f; //slow
+            Projectile.velocity *= 0.93f; //slow
 
-			if (Math.Abs(Projectile.velocity.X) < 0.5f || Math.Abs(Projectile.velocity.Y) < 0.5f)
+			if (Math.Abs(Projectile.velocity.X) < 1f && Math.Abs(Projectile.velocity.Y) < 1f)
 			{
 				Projectile.alpha += 10; //become more transparent
 			}

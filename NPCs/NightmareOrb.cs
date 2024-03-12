@@ -28,9 +28,9 @@ namespace KirboMod.NPCs
             else if (moveType == 2)
             {
                 offset.Y = 0;
-                offset.X += MathF.CopySign(300, NPC.Center.X - Main.player[NPC.target].Center.X);//300 is horizontal offset to player
+                offset.X += MathF.CopySign(100, NPC.Center.X - Main.player[NPC.target].Center.X);//100 is horizontal offset to player
             }
-            offset.X += MathF.CopySign(300,NPC.Center.X - Main.player[NPC.target].Center.X);//300 is horizontal offset to player
+            offset.X += MathF.CopySign(500,NPC.Center.X - Main.player[NPC.target].Center.X);//500 is horizontal offset to player
             return offset;
         }
         /// <summary>
@@ -64,12 +64,16 @@ namespace KirboMod.NPCs
 					}
 				}
 				else //regular attack stuff
-				{
+                {
+                    //checks if should go frenzy (expert mode special phase)
+                    if (Main.expertMode && NPC.GetLifePercent() <= 0.4f && AttackType == NightmareOrbAtkType.DecideNext)
+                    {
+                        frenzy = true;
+                    }
+
                     DecideNextAttack();
                     AttackPattern();
-					//checks if rapid attacking in expert mode("phase 3" if you want) at the start of the cycle
-                    frenzy = Main.expertMode && NPC.life <= NPC.lifeMax * 0.6; //turn from false to true
-				}
+                }
 			}
 		}
         void DecideNextAttack()
@@ -124,8 +128,8 @@ namespace KirboMod.NPCs
         {
             Vector2 move = player.Center - NPC.Center + GetTargetPosOffset(0.05f);
             float magnitude = move.Length();
-            float inertia = 20f; //Ok so like I'm pretty sure this is supposed to be how wibbly wobbly you want the npc to be before it reaches its destination
-            float speed = 30; //speed I think
+            float inertia = 20f;
+            float speed = 30;
             if (magnitude > speed)
             {
                 move *= speed / magnitude;//sets the move vector's magnitude to be speed
@@ -142,8 +146,8 @@ namespace KirboMod.NPCs
             //>attempts to make code better
             //>actually make it worse
             //>wires.png
-            const int startTime = 30;
-            float fireRate = GetValueMultipliedDependingOnPhaseAndDifficulty(30, 0.85f, 0.85f);
+            const int startTime = 40;
+            float fireRate = GetValueMultipliedDependingOnPhaseAndDifficulty(40, 0.85f, 0.85f);
             int currentSlashBeamIndex = (int)(NPC.ai[0] - startTime) / (int)fireRate;
             Vector2 playerDistance = player.Center - NPC.Center;
             Vector2 playerXOffset = player.Center + new Vector2(playerDistance.X <= 0 ? 650 : -650, 0); //go in front of player
@@ -193,10 +197,10 @@ namespace KirboMod.NPCs
         }
         private void AttackHomingStar()
         {
-            int startTime = frenzy ? 30 : 60;
-            int fireRate = frenzy ? 30 : 60;
+            int startTime = frenzy ? 40 : 60;
+            int fireRate = frenzy ? 40 : 60;
             int numberOfShots = 3;
-            if ((NPC.ai[0] - startTime) % fireRate == 0) //homing stars go behind it
+            if ((NPC.ai[0] - startTime) % fireRate == 0 && (NPC.ai[0] - startTime) <= numberOfShots * fireRate) //homing stars go behind it
             {
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
@@ -213,9 +217,9 @@ namespace KirboMod.NPCs
                         }
                     }
                 }
-                //SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
+                SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
             }
-            if (NPC.ai[0] > startTime + numberOfShots * fireRate)
+            if (NPC.ai[0] > startTime + (numberOfShots + 1) * fireRate)
             {
 				EndAttack();
 			}
@@ -227,7 +231,7 @@ namespace KirboMod.NPCs
             shootVel *= 15f; //projectile speed
             shootVel *= Main.expertMode ? 1.25f : 1;
             shootVel *= frenzy ? 1.25f : 1;
-            int fireRate = frenzy ? 10 : 15;
+            int fireRate = frenzy ? 12 : 15;
             int startTime = 49;
             int numberOfShots = frenzy ? 13 : 8;
 			if ((NPC.ai[0] - startTime) % fireRate == 0)
@@ -247,7 +251,7 @@ namespace KirboMod.NPCs
 
         float DashXOffset()
         {
-            float dashTime = GetValueMultipliedDependingOnPhaseAndDifficulty(90, 0.75f, 0.75f);
+            float dashTime = GetValueMultipliedDependingOnPhaseAndDifficulty(90, 0.85f, 0.85f);
             if (NPC.ai[0] < dashTime)
                 return MathHelper.Lerp(100,900, Easings.EaseInOutSine(Utils.GetLerpValue(0, dashTime, NPC.ai[0]))) * NPC.direction;
             if (NPC.ai[0] < dashTime * 1.8f)
@@ -258,7 +262,7 @@ namespace KirboMod.NPCs
         {
             Player player = Main.player[NPC.target];
             Vector2 targetPos = player.Center - new Vector2(DashXOffset(), 0) ;
-            float dashTime = GetValueMultipliedDependingOnPhaseAndDifficulty(90, 0.75f, 0.75f);
+            float dashTime = GetValueMultipliedDependingOnPhaseAndDifficulty(90, 0.85f, 0.85f);
             float dashSpeed = NPC.ai[0] < dashTime * 1.8f ? 40 : 100;
             float lerpAmount = Utils.Remap(NPC.ai[0], dashTime * 1.8f, dashTime * 1.8f + 15, 0.08f, 0.00f);
             NPC.velocity = Vector2.Lerp(NPC.velocity, NPC.Center.DirectionTo(targetPos) * dashSpeed, lerpAmount);                                                                                                                                //4 is padding

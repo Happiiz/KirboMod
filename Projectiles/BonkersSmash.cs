@@ -1,3 +1,4 @@
+using KirboMod.NPCs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -23,7 +24,7 @@ namespace KirboMod.Projectiles
 			Projectile.height = 120; 
 			Projectile.friendly = false;
 			Projectile.hostile = true;
-			Projectile.timeLeft = 40;
+			Projectile.timeLeft = 5;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
@@ -31,16 +32,33 @@ namespace KirboMod.Projectiles
 		public override void AI()
 		{
             NPC bonkers = Main.npc[(int)Projectile.ai[1]];
+
+            if (bonkers.velocity.Y != 0) //suspend time
+            {
+                Projectile.timeLeft = 5;
+            }
+
             Projectile.Center = bonkers.Center + new Vector2(bonkers.direction * 130, -10);
+
+            if (bonkers.type == ModContent.NPCType<KingDedede>()) //not bonkers
+            {
+                Projectile.Center = bonkers.Center + new Vector2(bonkers.direction * 130, 20);
+            }
             if (Projectile.ai[2] == 0) //Only do once
             {
-                if (Collision.SolidTiles(Projectile.position, Projectile.width, Projectile.height))
+                for (int i = 0; i < Projectile.width; i++)
                 {
-                    SoundEngine.PlaySound(SoundID.Item14, Projectile.position); //bomb sound
+                    Point tileLocation = (Projectile.BottomLeft + new Vector2(i, 0)).ToTileCoordinates();
 
-                    Projectile.ai[2] = 1;
+                    Tile tile = Main.tile[tileLocation];
+
+                    if ((WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType]) && bonkers.velocity.Y == 0)
+                    {
+                        SoundEngine.PlaySound(SoundID.Item14, Projectile.position); //bomb sound
+
+                        Projectile.ai[2] = 1;
+                    }
                 }
-                
             }
             else
             {
@@ -74,7 +92,7 @@ namespace KirboMod.Projectiles
                         continue;
                     }
                     Tile tileAbove = Framing.GetTileSafely(i, j - 1);
-                    if (tileAbove.HasTile)
+                    if (WorldGen.SolidOrSlopedTile(tileAbove) && TileID.Sets.Platforms[tileAbove.TileType] == true)
                     {
                         continue;
                     }

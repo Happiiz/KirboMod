@@ -17,24 +17,35 @@ using Terraria.DataStructures;
 using Terraria.ModLoader.Config;
 using System.IO;
 using Terraria.GameContent.UI;
+using KirboMod.Projectiles;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace KirboMod.NPCs
 {
 
 	[AutoloadBossHead]
 	public class KingDedede : ModNPC
-	{ 
-		int attack = 0; //controls dedede's attack pattern
+	{
+        enum DededeAttackType : byte
+        {
+            Dash,//0
+            Hammer,//1
+            Gordo,//2
+            Slam,//3
+            Chomp,//4
+            DarkShot,//5
+        }
 
-        int attacktype = 0; //which attack dedede will use 
+        float attack { get => NPC.ai[0]; set => NPC.ai[0] = value; } //controls dedede's attack pattern
 
-        int lastattacktype = 0; //sets last attack type
+        DededeAttackType attacktype = DededeAttackType.Dash; //which attack dedede will use 
+
+        DededeAttackType lastattacktype = DededeAttackType.Dash; //sets last attack type
 
 		int phase = 1; //determines what phase is dedede on
 
-        int repeathammer = 0; //for multi hammer swings
-
-        int phasethreefasterer = 0; //speeds up attacks in phase 3
+        int repeathammer = -1; //for multi hammer swings
 
 		int animation = 0; //selection of frames to cycle through
         public override void SetStaticDefaults() {
@@ -73,7 +84,7 @@ namespace KirboMod.NPCs
 			NPC.boss = true;
 			NPC.noGravity = false;
 			NPC.lavaImmune = true;
-            //Music = MusicID.Boss5;
+            Music = MusicID.Boss5;
             if (!Main.dedServ)
             {
                 Music = MusicLoader.GetMusicSlot(Mod, "Sounds/Music/KingDedede");
@@ -106,35 +117,25 @@ namespace KirboMod.NPCs
         public override void SendExtraAI(BinaryWriter writer) //for syncing non NPC.ai[] stuff
         {
             writer.Write(animation);
-            writer.Write(lastattacktype);
-            writer.Write(attacktype);
-            writer.Write(phasethreefasterer);
+            writer.Write((byte)lastattacktype);
+            writer.Write((byte)attacktype);
             writer.Write(repeathammer);
             writer.Write(phase);
-            writer.Write(attack);
         }
 
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             animation = reader.ReadInt32();
-            lastattacktype = reader.ReadInt32();
-            attacktype = reader.ReadInt32();
-            phasethreefasterer = reader.ReadInt32();
-            repeathammer = reader.ReadInt32();
-            phase = reader.ReadInt32();
-            attack = reader.ReadInt32();
+            lastattacktype = (DededeAttackType)reader.ReadSByte();
+            attacktype = (DededeAttackType)reader.ReadSByte();
+            repeathammer = reader.ReadSByte();
+            phase = reader.ReadSByte();
         }
 
         public override void AI() //cycles through each tick
         {
 			Player player = Main.player[NPC.target]; //the player the npc is targeting=
 			NPC.spriteDirection = NPC.direction;
-
-			//cap life
-			if (NPC.life >= NPC.lifeMax)
-            {
-				NPC.life = NPC.lifeMax;
-            }
 
 			//Despawning
 			if (NPC.target < 0 || NPC.target == 255 || player.dead || !player.active) //despawning
@@ -144,9 +145,9 @@ namespace KirboMod.NPCs
 				NPC.noTileCollide = true;
 
 				if (phase == 4)
-                {
+				{
 					NPC.velocity.Y -= 0.2f; //go up
-                }
+				}
 
 				if (NPC.timeLeft > 60)
 				{
@@ -155,16 +156,20 @@ namespace KirboMod.NPCs
 				}
 			}
 			else
-            {
-				AttackPattern();
+			{
+				int phaseThreeSpeedUp = 0;
 
-				if ((attack >= 60 - phasethreefasterer && attacktype == 4) == false && phase != 4) //not slamming or possessed
+                if (NPC.GetLifePercent() <= (Main.expertMode ? 0.6 : 0.25))
+				{
+					phaseThreeSpeedUp = 30;
+                }
+
+                if ((attack >= 60 - phaseThreeSpeedUp && attacktype == DededeAttackType.Slam) == false && phase != 4) //not slamming or possessed
                 {
-					CheckPlatform(player);
+                    CheckPlatform(player);
+                }
 
-					//for stepping up tiles
-					Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
-				}
+                AttackPattern(phaseThreeSpeedUp);
 			}
 		}
 
@@ -187,215 +192,74 @@ namespace KirboMod.NPCs
 			}
 		}
 
-		private void AttackPattern()
+		private void AttackPattern(int phaseThreeSpeedUp)
 		{
 			Player player = Main.player[NPC.target];
 			Vector2 distance = player.Center - NPC.Center;
 
-            //if low enough then change phases
-            if (NPC.life <= NPC.lifeMax * (Main.expertMode ? 0.75 : 0.50) && attack == 0)
-            {
-				if (phase == 1)
-                {
-					phase = 2;
-                }
-            }
-			if (NPC.life <= NPC.lifeMax * (Main.expertMode ? 0.50 : 0.25) && attack == 0)
+			//if low enough then change phases
+			if ((Main.expertMode || NPC.GetLifePercent() <= 0.6) && attack == 0)
 			{
-				if (phase == 2)
+                phase = 2;
+            }
+			if (NPC.GetLifePercent() <= (Main.expertMode ? 0.6 : 0.25) && attack == 0 && phase != 3)
+			{
+                phase = 3;
+
+				if (attack > 29)
 				{
-					phase = 3;
-					phasethreefasterer = 30; //speed up attacks
-                }
-			}
+					attack = 29; //go back to phase 3 attack decision
+				}
+            }
 
 			//phase 4 change(can happen anytime)
-			if (NPC.life <= NPC.lifeMax * 0.25 && Main.expertMode)
+			if (NPC.GetLifePercent() <= 0.3 && Main.expertMode && phase != 4)
 			{
-				if (phase != 4)
-				{
-					attack = 0; //reset
-					phase = 4;
-                }
-			}
-
-			if (phase == 3 && NPC.life <= NPC.lifeMax * (Main.expertMode ? 0.35 : 0.10))
-            {
-				phasethreefasterer = 45; //speed up attacks even more
+				attack = 0; //reset
+				phase = 4;
 			}
 
 			if (attack == 0 & phase >= 2) //for multihammer
             {
-				repeathammer = 1;
+				repeathammer = 3;
             }
 
 			attack++; //go up
 
 			if (phase < 4) //not phase 4
 			{
-				if (attack < 60 - phasethreefasterer) //face player target
+				if (attack < 60 - phaseThreeSpeedUp) //face player target
 				{
 					NPC.TargetClosest(true);
-				}
 
-				if (attack == 59 - phasethreefasterer) //random attack (30 on expert)
-				{
-					//make a line from dedede through player to see if no tiles
-					bool lineOfSight = Collision.CanHitLine(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height);
-					float lineOfDistance = Vector2.Distance(player.Center, NPC.Center);
-
-					bool stuck = false; //determines if stuck between two tiles
-
-					for (float i = 0; i < NPC.width; i++) //counter for stuck
+                    if (attack == 59 - phaseThreeSpeedUp) //random attack
                     {
-						Point abovenpc = new Vector2(NPC.position.X + i, NPC.position.Y).ToTileCoordinates(); //all tiles above npc
-						Point belownpc = new Vector2(NPC.position.X + i, NPC.position.Y + NPC.height).ToTileCoordinates(); //all tiles below npc
+						bool shouldSlam = false;
 
-						//head against celling
-						if (WorldGen.SolidTile(abovenpc.X, abovenpc.Y) == true && Main.tile[belownpc.X, belownpc.Y].HasTile)
+						SlamDecide(player, out shouldSlam);
+
+                        if (shouldSlam)
                         {
-							stuck = true;
+                            attacktype = DededeAttackType.Slam; //slam
+                            lastattacktype = DededeAttackType.Slam;
                         }
-					}
-					
-					//too far, can't reach, or too low (don't ask why can't reach uses regular y system instead of inverted I do not know)
-					if (lineOfSight == false || NPC.position.Y > (player.Center.Y - (player.height / 2) + 400) || lineOfDistance >= 1000 || stuck)
-					{
-						attacktype = 4; //slam
-						lastattacktype = 4;
-					}
-					else //random attack
-					{
-						if (Main.netMode != NetmodeID.MultiplayerClient) //sync cause random
-						{
-							int randattack = Main.rand.Next(1, 4 + 1);
-
-							if (randattack == 1) //dive
-							{
-								if (lastattacktype == 1)
-								{
-									int subrandattack = Main.rand.Next(1, 3 + 1);
-									if (subrandattack == 1)
-									{
-										attacktype = 2;
-										lastattacktype = 2;
-									}
-									else if (subrandattack == 2)
-									{
-										attacktype = 3;
-										lastattacktype = 3;
-									}
-									else
-									{
-										attacktype = 4;
-										lastattacktype = 4;
-									}
-								}
-								else
-								{
-									attacktype = 1;
-									lastattacktype = 1;
-								}
-							}
-							else if (randattack == 2) //hammer
-							{
-								if (lastattacktype == 2)
-								{
-									int subrandattack = Main.rand.Next(1, 3 + 1);
-									if (subrandattack == 1)
-									{
-										attacktype = 1;
-										lastattacktype = 1;
-									}
-									else if (subrandattack == 2)
-									{
-										attacktype = 3;
-										lastattacktype = 3;
-									}
-									else
-									{
-										attacktype = 4;
-										lastattacktype = 4;
-									}
-								}
-								else
-								{
-									attacktype = 2;
-									lastattacktype = 2;
-								}
-							}
-							else if (randattack == 3) //gordos
-							{
-								if (lastattacktype == 3)
-								{
-									int subrandattack = Main.rand.Next(1, 3 + 1);
-									if (subrandattack == 1)
-									{
-										attacktype = 1;
-										lastattacktype = 1;
-									}
-									else if (subrandattack == 2)
-									{
-										attacktype = 2;
-										lastattacktype = 2;
-									}
-									else
-									{
-										attacktype = 4;
-										lastattacktype = 4;
-									}
-								}
-								else
-								{
-									attacktype = 3;
-									lastattacktype = 3;
-								}
-							}
-							else if (randattack == 4) //stomp
-							{
-								if (lastattacktype == 4)
-								{
-									int subrandattack = Main.rand.Next(1, 3 + 1);
-									if (subrandattack == 1)
-									{
-										attacktype = 1;
-										lastattacktype = 1;
-
-									}
-									else if (subrandattack == 2)
-									{
-										attacktype = 2;
-										lastattacktype = 2;
-
-									}
-									else
-									{
-										attacktype = 3;
-										lastattacktype = 3;
-
-									}
-								}
-								else
-								{
-									attacktype = 4;
-									lastattacktype = 4;
-
-								}
-							}
-
-							NPC.netUpdate = true;  //sync cause random
-						}
+                        else //random attack
+                        {
+                            AttackDecideNext();
+                        }
                     }
-				}
+                }
 
-				if (attacktype == 1) //DIVE
+                //DASH
+
+                if (attacktype == DededeAttackType.Dash)
 				{
-					if (attack == 60 - phasethreefasterer)
+					if (attack == 60 - phaseThreeSpeedUp)
 					{
                         animation = 1; //run
                         NPC.velocity.Y = -4;
                     }
-					if (attack >= 90 - phasethreefasterer && attack < 270 - phasethreefasterer)
+					if (attack >= 90 - phaseThreeSpeedUp && attack < 270 - phaseThreeSpeedUp)
 					{
 						if (attack % (phase == 3 ? 15 : 30) == 0) //multiple of 30(or 15)
 						{
@@ -403,39 +267,35 @@ namespace KirboMod.NPCs
 
                             if (phase == 3) //faster
                             {
-                                NPC.velocity.X = NPC.direction * 12; //go 6 in the direction of npc(facing player)
+                                NPC.velocity.X = NPC.direction * 15; //go 15 in the direction of npc(facing player)
 
                             }
                             else
                             {
-                                NPC.velocity.X = NPC.direction * 8; //go 6 in the direction of npc(facing player)
+                                NPC.velocity.X = NPC.direction * 10; //go 10 in the direction of npc(facing player)
 
                             }
                         }
-						else
+                        else
 						{
 							NPC.TargetClosest(false); //don't face player
-						}
-
-						if (NPC.oldVelocity.X == 0 && NPC.velocity.Y == 0 && attack > 90) //jump if not moving X wise
-						{
-							NPC.velocity.Y = -10;
-                            
                         }
+
+                        ClimbTiles(player);
 
 						if (Math.Abs(distance.X) <= 200 && (distance.Y <= 100 && distance.Y >= -150)) //range
 						{
-							attack = 300 - phasethreefasterer;
+							attack = 300 - phaseThreeSpeedUp;
 						}
 					}
-					if (attack == 270 - phasethreefasterer) //3 seconds up
+					if (attack == 270 - phaseThreeSpeedUp) //3 seconds up
 					{
                         NPC.velocity.X *= 0;
                         animation = 0; //stand	
 
                         attack = 0;
 					}
-					if (attack == 300 - phasethreefasterer) //dive
+					if (attack == 300 - phaseThreeSpeedUp) //dive
 					{
 						NPC.TargetClosest(false);
 
@@ -445,7 +305,7 @@ namespace KirboMod.NPCs
 
                         if (phase == 3) //faster
                         {
-                            NPC.velocity.X = NPC.direction * 16; //go 16 in the direction of npc(facing player)
+                            NPC.velocity.X = NPC.direction * 18; //go 18 in the direction of npc(facing player)
 
                         }
                         else
@@ -456,7 +316,7 @@ namespace KirboMod.NPCs
 
                         SoundEngine.PlaySound(SoundID.NPCDeath8, NPC.Center); //beast grunt 
 					}
-					if (attack > 300 - phasethreefasterer)
+					if (attack > 300 - phaseThreeSpeedUp)
 					{
 						if (NPC.velocity.Y == 0) //check if not in air
 						{
@@ -465,7 +325,7 @@ namespace KirboMod.NPCs
 
 						animation = 2; //dive
 					}
-					if (attack >= 360 - phasethreefasterer) //restart from dive
+					if (attack >= 360 - phaseThreeSpeedUp) //restart from dive
 					{
                         NPC.velocity.X *= 0;
                         animation = 0; //stand
@@ -473,16 +333,18 @@ namespace KirboMod.NPCs
 					}
 				}
 
-				if (attacktype == 2) //HAMMER
+                //HAMMER
+
+                if (attacktype == DededeAttackType.Hammer)
 				{
-					if (attack == 60 - phasethreefasterer)
+                    if (attack == 60 - phaseThreeSpeedUp)
 					{
                         NPC.velocity.Y = -4;
                         animation = 3; //draw hammer
                     }
-					if (attack >= 90 - phasethreefasterer && attack < 270 - phasethreefasterer)
+					if (attack >= 90 - phaseThreeSpeedUp && attack < 270 - phaseThreeSpeedUp)
 					{
-                        animation = 4; //run with hammer	
+                        animation = 4; //run with hammer
 
                         if (attack % (phase == 3 ? 7 : 15) == 0) //multiple of 15(or 7)
 						{
@@ -490,32 +352,34 @@ namespace KirboMod.NPCs
 
                             if (phase == 3) //faster
                             {
-                                NPC.velocity.X = NPC.direction * 10; //go 6 in the direction of npc(facing player)
+                                NPC.velocity.X = NPC.direction * 15; //go 15 in the direction of npc(facing player)
 
                             }
                             else
                             {
-                                NPC.velocity.X = NPC.direction * 6; //go 6 in the direction of npc(facing player)
+                                NPC.velocity.X = NPC.direction * 10; //go 10 in the direction of npc(facing player)
 
                             }
                         }
-						else
+                        else
 						{
 							NPC.TargetClosest(false); //don't face player
-						}
+                        }
 
-						if (Math.Abs(distance.X) <= 150) //range
+                        ClimbTiles(player);
+
+                        if (Math.Abs(distance.X) <= 150) //range
 						{
-							attack = 300 - phasethreefasterer;
+							attack = 300 - phaseThreeSpeedUp;
 						}
 					}
-					if (attack == 270 - phasethreefasterer) //3 seconds of running up
+					if (attack == 270 - phaseThreeSpeedUp) //3 seconds of running up
 					{
                         NPC.velocity.X *= 0;
                         animation = 0; //stand	
                         attack = 0;
 					}
-					if (attack == 300 - phasethreefasterer) //charge swing
+					if (attack == 300 - phaseThreeSpeedUp) //charge swing
 					{
 						NPC.TargetClosest(false);
 						SoundEngine.PlaySound(SoundID.NPCDeath8.WithPitchOffset(0.5f), NPC.Center); //beast grunt (high pitch)
@@ -524,14 +388,66 @@ namespace KirboMod.NPCs
                         animation = 5; //ready swing   
                     }
 
+                    //IF ALREADY MULTISWUNG vvv
+                    if (phase > 1 && repeathammer == -1)
+					{
+						if (attack == (phase == 3 ? 307 : 315) - phaseThreeSpeedUp) //jump if player is high and multiswing(quicker in phase 3)
+						{
+							if (distance.Y < -150) //too high
+							{
+								NPC.velocity.Y = distance.Y / (phase == 3 ? 5 : 15); //jump depending on Y distance(quicker in phase 3)
 
-					//IF ALREADY MULTISWUNG
-					if (attack == (phase == 3 ? 307 : 315) - phasethreefasterer && phase >= 2 && repeathammer == 0) //jump if player is high and multiswing(quicker in phase 3)
+								//minimum
+								if (NPC.velocity.Y >= -15)
+								{
+									NPC.velocity.Y = -15;
+
+								}
+								//maximum
+								if (NPC.velocity.Y <= -30)
+								{
+									NPC.velocity.Y = -30;
+
+								}
+							}
+						}
+
+						if (attack == (phase == 3 ? 315 : 330) - phaseThreeSpeedUp) //swing again after multiswinging
+                        {
+                            if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
+                            {
+                                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity *= 0.01f, ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI);
+                            }
+                            NPC.velocity.Y *= 0; // stop rising
+							animation = 6; //swing	
+						}
+						else if (attack > (phase == 3 ? 315 : 330) - phaseThreeSpeedUp)
+						{
+							if (NPC.velocity.Y != 0 && attack < (phase == 3 ? 315 : 330) - phaseThreeSpeedUp + 3) //wait until hit ground
+							{
+								attack = (phase == 3 ? 315 : 330) - phaseThreeSpeedUp + 1; //go back to right before
+							}
+							if (attack == (phase == 3 ? 315 : 330) - phaseThreeSpeedUp + 3)
+							{
+								if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
+								{
+									Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity *= 0.01f, ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI);
+								}
+
+                                launchDropStars();
+
+                                attack = (phase == 3 ? 371 : 401); //just after multiswing
+							}
+						}
+					}
+					//IF ALREADY MULTISWUNG ^^^
+
+					//regular attack
+					if (attack == (phase == 3 ? 315 : 330) - phaseThreeSpeedUp) //jump if player is high(quicker in phase 3)
 					{
 						if (distance.Y < -150) //too high
 						{
                             NPC.velocity.Y = distance.Y / (phase == 3 ? 5 : 15); //jump depending on Y distance(quicker in phase 3)
-
 
                             //minimum
                             if (NPC.velocity.Y >= -15)
@@ -547,110 +463,101 @@ namespace KirboMod.NPCs
                             }
                         }
 					}
-
-					if (attack == (phase == 3 ? 315 : 330) - phasethreefasterer && phase >= 2 && repeathammer == 0) //swing again after multiswinging
+					if (attack == (phase == 3 ? 330 : 360) - phaseThreeSpeedUp) //swing
 					{
 						if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
 						{
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 120, 20), NPC.velocity *= 0, Mod.Find<ModProjectile>("BonkersSmash").Type, 60 / 2, 8f, Main.myPlayer, 0, 0);
+							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity *= 0.01f, ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI);
 						}
-                        NPC.velocity.Y *= 0; // stop rising
-                        animation = 6; //swing	
-
-                        attack = (phase == 3 ? 371 : 401); //just after multiswing
+						NPC.velocity.Y *= 0; // stop rising
+						animation = 6; //swing
 					}
-					//IF ALREADY MULTISWUNG
-
-
-					if (attack == (phase == 3 ? 315 : 330) - phasethreefasterer) //jump if player is high(quicker in phase 3)
+					else if (attack > (phase == 3 ? 330 : 360) - phaseThreeSpeedUp)
 					{
-						if (distance.Y < -150) //too high
+						if (NPC.velocity.Y != 0 && attack < (phase == 3 ? 330 : 360) - phaseThreeSpeedUp + 3) //wait until hit ground
 						{
-                            NPC.velocity.Y = distance.Y / (phase == 3 ? 5 : 15); //jump depending on Y distance(quicker in phase 3)
-
-
-                            //minimum
-                            if (NPC.velocity.Y >= -15)
-                            {
-                                NPC.velocity.Y = -15;
-
+							attack = (phase == 3 ? 330 : 360) - phaseThreeSpeedUp + 1; //go back to right before
+						}
+						if (attack == (phase == 3 ? 330 : 360) - phaseThreeSpeedUp + 3)
+						{
+							if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
+							{
+								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity *= 0.01f, ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI);
                             }
-                            //maximum
-                            if (NPC.velocity.Y <= -30)
-                            {
-                                NPC.velocity.Y = -30;
 
-                            }
+                            launchDropStars();
+
+                            repeathammer -= 1;
                         }
 					}
-					if (attack == (phase == 3 ? 330 : 360) - phasethreefasterer) //swing
-					{
-						if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
-						{
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 120, 20), NPC.velocity *= 0, Mod.Find<ModProjectile>("BonkersSmash").Type, 60 / 2, 8f, Main.myPlayer, 0, 0);
-						}
-                        NPC.velocity.Y *= 0; // stop rising
-                        animation = 6; //swing	
-                    }
 
-					//multiswing
-					if (phase == 2 || phase == 3) //only on phases 2 or 3
+                    //multiswing
+                    if (phase > 1) //only on phases 2 or 3
 					{
-						if (attack == (phase == 3 ? 340 : 370) - phasethreefasterer)
+						if (attack == (phase == 3 ? 340 : 370) - phaseThreeSpeedUp)
 						{
 							NPC.TargetClosest(false);
 
                             NPC.velocity.X *= 0;
                             animation = 5; //ready swing    
                         }
-						if (attack == (phase == 3 ? 350 : 380) - phasethreefasterer)
-						{
-							if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 120, 20), NPC.velocity *= 0, Mod.Find<ModProjectile>("BonkersSmash").Type, 60 / 2, 8f, Main.myPlayer, 0, 0);
-							}
+						if (attack == (phase == 3 ? 350 : 380) - phaseThreeSpeedUp)
+                        {
+                            if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
+                            {
+                                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity *= 0.01f, ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI);
+                            }
+
+                            launchDropStars();
                             NPC.velocity.Y *= 0; // stop rising
-                            animation = 6; //swing	
+                            animation = 6; //swing
+
+                            repeathammer -= 1;
                         }
-						if (attack == (phase == 3 ? 360 : 390) - phasethreefasterer)
+						if (attack == (phase == 3 ? 360 : 390) - phaseThreeSpeedUp)
 						{
 							NPC.TargetClosest(false);
 
                             NPC.velocity.X *= 0f;
                             animation = 5; //ready swing   
                         }
-						if (attack == (phase == 3 ? 370 : 400) - phasethreefasterer)
-						{
-							if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 120, 20), NPC.velocity *= 0, Mod.Find<ModProjectile>("BonkersSmash").Type, 60 / 2, 8f, Main.myPlayer, 0, 0);
-							}
+						if (attack == (phase == 3 ? 370 : 400) - phaseThreeSpeedUp)
+                        {
+                            if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
+                            {
+                                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity *= 0.01f, ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI);
+                            }
+
+                            launchDropStars();
                             NPC.velocity.Y *= 0f; // stop rising
-                            animation = 6; //swing	
+                            animation = 6; //swing
+
+                            repeathammer -= 1;
                         }
 					}
 
-					if (attack == (phase == 3 ? 400 : 430) - phasethreefasterer && repeathammer == 1 && phase >= 2) //cycle back again
+                    //cycle back again if used repeat hammer swings
+                    if (attack == (phase == 3 ? 400 : 430) - phaseThreeSpeedUp && repeathammer == 0 && phase >= 2) 
 					{
 						attack = 90;
-						repeathammer = 0;
+						repeathammer = -1;
 					}
 
-					if (attack == 430 - phasethreefasterer && phase == 3) //restart from swing (phase 3)
+					if (attack >= 430 - phaseThreeSpeedUp && phase == 3) //restart from swing (phase 3)
 					{
 						attack = 0;
 
                         NPC.velocity.X *= 0f;
                         animation = 0; //stand    
                     }
-					if (attack == 460 - phasethreefasterer && phase == 2) //restart from swing (phase 2)
+					if (attack >= 460 - phaseThreeSpeedUp && phase == 2) //restart from swing (phase 2)
 					{
 						attack = 0;
 
                         NPC.velocity.X *= 0f;
                         animation = 0; //stand    
                     }
-					if (attack == 420 - phasethreefasterer && phase == 1) //restart from swing (phase 1)
+					if (attack >= 420 - phaseThreeSpeedUp && phase == 1) //restart from swing (phase 1)
 					{
 						attack = 0;
 
@@ -661,130 +568,49 @@ namespace KirboMod.NPCs
 
                 //GORDOS
 
-                if (attacktype == 3) 
+                if (attacktype == DededeAttackType.Gordo) 
 				{
-					if (attack >= 60 - phasethreefasterer)
+					float timer = attack - 60;
+
+					int numberOfShots = 3 + (2 * phase - 2);
+
+					float phaseThreeAttackSpeed = 1;
+
+					if (phase == 3)
+					{
+						timer = attack - 30;
+						phaseThreeAttackSpeed = 0.5f;
+                    }
+
+                    if (timer >= (60 - phaseThreeSpeedUp) * phaseThreeAttackSpeed)
 					{
 						NPC.TargetClosest(true); //target player
 					}
 
-					if (attack == 60 - phasethreefasterer)
+					float timerRemainder = timer % (60 * phaseThreeAttackSpeed);
+
+                    //every 30th tick and not on any 60th tick
+                    if (timerRemainder == 30 * phaseThreeAttackSpeed && timerRemainder 
+						!= 60 * phaseThreeAttackSpeed && timer <= (60 * numberOfShots) * phaseThreeAttackSpeed)
 					{
 						animation = 7; //ready gordo
                     }
 
-					//low on health
-					if (attack == 90 - phasethreefasterer && phase == 3)
-					{
-                        animation = 8; //swing gordo
-
-                        Vector2 distanceahead = player.Center - (NPC.Center + new Vector2(NPC.direction * 100, 0));
-						distanceahead.Normalize();
-						distanceahead *= 15;
-						if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
-						{
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 100, 0), distanceahead, Mod.Find<ModProjectile>("BouncyGordo").Type, 30 / 2, 4f, Main.myPlayer, 0, 0);
-						}
-						SoundEngine.PlaySound(SoundID.Item10.WithVolumeScale(2), NPC.Center); //impact
-					}
-					if (attack == 100 - phasethreefasterer && phase == 3)
-					{
-                        animation = 7; //ready gordo
-                    }
-					//low on health
-
-					if (attack == 120 - phasethreefasterer)
-					{
+                    if (timerRemainder == 0 && timer <= (60 * numberOfShots) * phaseThreeAttackSpeed && timer != 0)
+                    {
                         animation = 8; //swing gordo
 
                         Vector2 distanceahead = player.Center - (NPC.Center + new Vector2(NPC.direction * 100, 0));
                         distanceahead.Normalize();
-						distanceahead *= 15;
-
-						if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
-						{
-							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 100, 0), distanceahead, Mod.Find<ModProjectile>("BouncyGordo").Type, 30 / 2, 4f, Main.myPlayer, 0, 0);
-						}
-						SoundEngine.PlaySound(SoundID.Item10.WithVolumeScale(2), NPC.Center); //impact
-					}
-					if (attack == 130 - phasethreefasterer)
-					{
-                        animation = 7; //ready gordo
-                    }
-
-					//low on health
-					if (attack == 150 - phasethreefasterer && (phase == 2 || phase == 3))
-					{
-                        animation = 8; //swing gordo
-
-                        Vector2 distanceahead = player.Center - (NPC.Center + new Vector2(NPC.direction * 100, 0));
-						distanceahead.Normalize();
-						distanceahead *= 15;
-
+                        distanceahead *= 18;
                         if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
                         {
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 100, 0), distanceahead, Mod.Find<ModProjectile>("BouncyGordo").Type, 30 / 2, 4f, Main.myPlayer, 0, 0);
+                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 100, 0), distanceahead, ModContent.ProjectileType<BouncyGordo>(), 30 / 2, 4f, Main.myPlayer, 0, 0);
                         }
                         SoundEngine.PlaySound(SoundID.Item10.WithVolumeScale(2), NPC.Center); //impact
-					}
-					if (attack == 160 - phasethreefasterer && (phase == 2 || phase == 3))
-					{
-                        animation = 7; //ready gordo
-                    }
-					//low on health
-
-					if (attack == 180 - phasethreefasterer)
-					{
-                        animation = 8; //swing gordo
-                        Vector2 distanceahead = player.Center - (NPC.Center + new Vector2(NPC.direction * 100, 0));
-                        distanceahead.Normalize();
-						distanceahead *= 15;
-
-                        if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
-                        {
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 100, 0), distanceahead, Mod.Find<ModProjectile>("BouncyGordo").Type, 30 / 2, 4f, Main.myPlayer, 0, 0);
-                        }
-                        SoundEngine.PlaySound(SoundID.Item10.WithVolumeScale(2), NPC.Center); //impact
-					}
-					if (attack == 190 - phasethreefasterer)
-					{
-                        animation = 7; //ready gordo
                     }
 
-					//low on health
-					if (attack == 210 - phasethreefasterer && (phase == 2 || phase == 3))
-					{
-                        animation = 8; //swing gordo
-                        Vector2 distanceahead = player.Center - (NPC.Center + new Vector2(NPC.direction * 100, 0));
-                        distanceahead.Normalize();
-						distanceahead *= 15;
-
-                        if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
-                        {
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 100, 0), distanceahead, Mod.Find<ModProjectile>("BouncyGordo").Type, 30 / 2, 4f, Main.myPlayer, 0, 0);
-                        }
-                        SoundEngine.PlaySound(SoundID.Item10.WithVolumeScale(2), NPC.Center); //impact
-					}
-					if (attack == 220 - phasethreefasterer && (phase == 2 || phase == 3))
-					{
-                        animation = 7; //ready gordo
-                    }
-					//low on health
-
-					if (attack == 240 - phasethreefasterer)
-					{
-                        animation = 8; //swing gordo
-                        Vector2 distanceahead = player.Center - (NPC.Center + new Vector2(NPC.direction * 100, 0));
-                        distanceahead.Normalize();
-						distanceahead *= 15;
-
-                        if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
-                        {
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 100, 0), distanceahead, Mod.Find<ModProjectile>("BouncyGordo").Type, 30 / 2, 4f, Main.myPlayer, 0, 0);
-                        }
-                        SoundEngine.PlaySound(SoundID.Item10.WithVolumeScale(2), NPC.Center); //impact
-					}
-					if (attack >= 300 - phasethreefasterer)
+                    if (timer >= 60 * (numberOfShots + 1) * phaseThreeAttackSpeed)
 					{
                         animation = 0; //stand
 
@@ -792,9 +618,13 @@ namespace KirboMod.NPCs
 					}
 				}
 
-				if (attacktype == 4) //SLAM
+                //SLAM
+
+                if (attacktype == DededeAttackType.Slam)
 				{
-					if (attack == 60 - phasethreefasterer)
+					Vector2 predictDistance = player.Center + player.velocity * 10 - NPC.Center;
+
+					if (attack == 60 - phaseThreeSpeedUp)
 					{
                         animation = 9; //ready jump
                         NPC.TargetClosest(true); //face player
@@ -804,16 +634,14 @@ namespace KirboMod.NPCs
 						NPC.TargetClosest(false); //dont' face player
 					}
 
-					if (attack == (phase == 3 ? 90 : 120) - phasethreefasterer)
+					if (attack == (phase == 3 ? 90 : 120) - phaseThreeSpeedUp)
 					{
 						NPC.noTileCollide = true; //don't collide with tiles
 
-                        NPC.velocity.X = distance.X / 120;
-                        NPC.velocity.Y = distance.Y / 25;
+                        NPC.velocity.X = predictDistance.X / 120;
+                        NPC.velocity.Y = predictDistance.Y / 25;
 
                         animation = 10; //jump
-
-
 
                         //y caps
                         if (NPC.velocity.Y > -15) //less negative
@@ -841,11 +669,11 @@ namespace KirboMod.NPCs
 
                         SoundEngine.PlaySound(SoundID.NPCDeath8.WithPitchOffset(0.5f), NPC.Center); //beast grunt (high pitch)
 					}
-					if (attack > (phase == 3 ? 90 : 120) - phasethreefasterer && attack <= (phase == 3 ? 389 : 419) - phasethreefasterer) //fall for 5 seconds
+					if (attack > (phase == 3 ? 90 : 120) - phaseThreeSpeedUp && attack <= (phase == 3 ? 389 : 419) - phaseThreeSpeedUp) //fall for 5 seconds
 					{
 						NPC.wet = false; //Water collision I think???
 
-						if (NPC.position.Y + NPC.height < player.position.Y || NPC.velocity.Y < 0) //feet higher than player or going up
+						if (NPC.Bottom.Y < player.position.Y || NPC.velocity.Y < 0) //feet higher than player or going up
 						{
 							NPC.noTileCollide = true; //don't collide with tiles
 						}
@@ -858,17 +686,19 @@ namespace KirboMod.NPCs
                                 NPC.velocity.X *= 0;
                                 animation = 9; //end jump
 
-                                //slam
+                                launchDropStars();
+
+                                //slam (just for style)
                                 if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
 								{
-									Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.position.Y + 150, 0, 0, Mod.Find<ModProjectile>("DededeSlam").Type, 40 / 2, 8f, Main.myPlayer, 0, 0);
+									Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.position.Y + 150, 0, 0, ModContent.ProjectileType<DededeSlam>(), 0, 8f, Main.myPlayer, 0, 0);
 								}
 								SoundEngine.PlaySound(SoundID.Item14, NPC.Center); //bomb
-								attack = (phase == 3 ? 390 : 420) - phasethreefasterer; //60 seconds before restart
+								attack = (phase == 3 ? 390 : 420) - phaseThreeSpeedUp; //60 seconds before restart
 							}
 						}
 					}
-					if (attack >= (phase == 3 ? 450 : 480) - phasethreefasterer) //restart cycle
+					if (attack >= (phase == 3 ? 450 : 480) - phaseThreeSpeedUp) //restart cycle
 					{
 						if (NPC.velocity.Y != 0 || NPC.oldVelocity.Y != 0 && animation != 9) //go back if not slam animation
 						{
@@ -885,7 +715,7 @@ namespace KirboMod.NPCs
 				}
 			}
 
-			//END OF NORMAL CYCLE //END OF PHASE 1 //END OF PHASE 1 //END OF PHASE 1 //END OF PHASE 1 //END OF PHASE 1 //END OF PHASE 1 //END OF PHASE 1
+			//END OF PHASE 1 - 3
 
 			else if (phase == 4)
             {
@@ -925,7 +755,7 @@ namespace KirboMod.NPCs
 
                         animation = 12; //possessed fly
                         NPC.velocity.Y = -0.5f; //go up
-                        lastattacktype = 2; //go to first attack
+                        lastattacktype = DededeAttackType.DarkShot; //go to first attack
                     }
                 }
 				else if (attack >= 300) //START FROM HERE
@@ -959,21 +789,10 @@ namespace KirboMod.NPCs
 
 					if (attack == 449)
 					{
-                        if (lastattacktype == 1)
-                        {
-                            attacktype = 2;
-                            lastattacktype = 2;
-                        }
-                        else
-                        {
-                            attacktype = 1;
-                            lastattacktype = 1;
-                        }
+						AttackDecideNext();
                     }
 
-					//no need for attack++ because it's oustide of this giant if statement
-
-					if (attacktype == 1) //maw
+					if (attacktype == DededeAttackType.Chomp) //maw
                     {
 						if (attack == 540)
                         {
@@ -1019,7 +838,7 @@ namespace KirboMod.NPCs
                         }
 					}
 
-					if (attacktype == 2) //eye
+					if (attacktype == DededeAttackType.DarkShot) //eye
 					{
 
 						if (attack == 540) //do this until closing
@@ -1031,7 +850,7 @@ namespace KirboMod.NPCs
                             NPC.velocity *= 0;
                         }
 
-                        if (attack == 570)
+                        if (attack == 570 || (attack == 600 && NPC.GetLifePercent() <= 0.10))
 						{
 							if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
 							{
@@ -1039,17 +858,6 @@ namespace KirboMod.NPCs
 							}
 							NPC.TargetClosest(false);
 						}
-
-						//low
-						if (attack == 600 && NPC.life <= NPC.lifeMax * 0.10)
-						{
-							if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.direction * 100, NPC.Center.Y, NPC.velocity.X * 0, NPC.velocity.Y * 0, ModContent.ProjectileType<Projectiles.DarkOrb>(), 50 / 2, 10f, Main.myPlayer, 0, NPC.target);
-							}
-							NPC.TargetClosest(false);
-						}
-						//low
 
 						if (attack == 630) //close
 						{
@@ -1067,7 +875,135 @@ namespace KirboMod.NPCs
 				}
 			}
 		}
-		public override void FindFrame(int frameHeight) // animation
+
+        void AttackDecideNext()
+        {
+			
+			List<DededeAttackType> possibleAttacks = new() { DededeAttackType.Dash, DededeAttackType.Hammer, DededeAttackType.Gordo, DededeAttackType.Slam};
+
+			if (phase == 4)
+			{
+                possibleAttacks = new() { DededeAttackType.Chomp, DededeAttackType.DarkShot};
+            }
+
+            possibleAttacks.Remove(lastattacktype);
+
+            attacktype = possibleAttacks[Main.rand.Next(possibleAttacks.Count)];
+            NPC.netUpdate = true;
+
+            lastattacktype = attacktype;
+        }
+
+		void launchDropStars()
+        {
+            SoundEngine.PlaySound(SoundID.Item9, NPC.Center); //star swoosh
+
+            if (attacktype == DededeAttackType.Hammer)
+			{
+				if (repeathammer > -1)
+                {
+                    for (int i = 0; i < 6; i++)
+                    {
+                        Vector2 velocity = new Vector2(NPC.direction * (4f * i + (3 - repeathammer) * 6f - 9), -15);
+
+						if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
+						{
+							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 120, 20),
+							velocity, ModContent.ProjectileType<DededeDropStar>(), 40 / 2, 4f, Main.myPlayer, 1, 0);
+						}
+                    }
+                }
+				else
+				{
+                    for (int i = 0; i < 12; i++)
+                    {
+                        Vector2 velocity = new Vector2(NPC.direction * (2f * i - 9), -15);
+
+						if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
+						{
+							Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 120, 20),
+							velocity, ModContent.ProjectileType<DededeDropStar>(), 40 / 2, 4f, Main.myPlayer, 1, 0);
+						}
+                    }
+                }
+            }
+			else if (attacktype == DededeAttackType.Slam)
+			{
+				float maxNumber = 16 + phase * 8;
+
+                for (int i = 0; i < maxNumber; i++)
+                {
+                    Vector2 velocity = new Vector2(MathF.Cos(MathF.Tau / maxNumber * i), MathF.Sin(MathF.Tau / maxNumber * i));
+					velocity *= 10;
+
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Bottom ,
+                        velocity, ModContent.ProjectileType<DededeDropStar>(), 40 / 2, 4f, Main.myPlayer, 0, 0);
+                }
+            }
+		}
+
+		private void SlamDecide(Player player, out bool shouldSlam)
+		{
+			shouldSlam = false;
+
+            //make a line from dedede through player to see if no tiles
+            bool lineOfSight = Collision.CanHitLine(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height);
+            float distanceUnit = Vector2.Distance(player.Center, NPC.Center);
+
+            bool stuck = false; //determines if stuck between two tiles
+
+            for (float i = 0; i < NPC.width; i++) //counter for stuck
+            {
+                Point abovenpc = new Vector2(NPC.position.X + i, NPC.position.Y).ToTileCoordinates(); //all tiles above npc
+                Point belownpc = new Vector2(NPC.position.X + i, NPC.position.Y + NPC.height).ToTileCoordinates(); //all tiles below npc
+
+                //head against celling
+                if (WorldGen.SolidTile(abovenpc.X, abovenpc.Y) == true && Main.tile[belownpc.X, belownpc.Y].HasTile)
+                {
+                    stuck = true;
+                }
+            }
+
+			//too far, can't reach, or too low
+			if (/*lineOfSight == false || */NPC.position.Y > player.Bottom.Y + 400 || distanceUnit >= 2000 || stuck)
+			{
+				shouldSlam = true;
+			}
+        }
+        private void ClimbTiles(Player player)
+        {
+            bool climableTiles = false;
+
+            for (int i = 0; i < NPC.height; i++)
+            {
+                if (NPC.direction == 1)
+                {
+                    //checks for tiles on right side of NPC
+                    Tile tile = Main.tile[(new Vector2((NPC.Right.X), NPC.position.Y + i)).ToTileCoordinates()];
+                    climableTiles = WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType] || tile.IsHalfBlock;
+                }
+                else
+                {
+                    //checks for tiles on left side of NPC
+                    Tile tile = Main.tile[(new Vector2((NPC.Left.X), NPC.position.Y + i)).ToTileCoordinates()];
+                    climableTiles = WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType] || tile.IsHalfBlock;
+                }
+
+                if (climableTiles || NPC.velocity.X == 0)
+                {
+                    NPC.noTileCollide = true;
+
+                    if (player.Center.Y < NPC.Bottom.Y && !player.dead) //higher than NPC or not dead
+                    {
+                        NPC.velocity.Y = -4f;
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        public override void FindFrame(int frameHeight) // animation
         {
 		   if (animation == 0) //stance
             {
@@ -1365,13 +1301,12 @@ namespace KirboMod.NPCs
         {
 			Player player = Main.player[NPC.target]; //the player the npc is targeting
 
-			//make a line from dedede through player to see if no tiles
-			bool lineOfSight = Collision.CanHitLine(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height);
-			float lineOfDistance = Vector2.Distance(player.Center, NPC.Center);
+            bool shouldSlam = false;
 
-			//not line of sight because it's annyoing
-			if ((NPC.position.Y > (player.Center.Y - (player.height / 2) + 400) || lineOfDistance >= 1000) && phase != 4)
-			{
+            SlamDecide(player, out shouldSlam);
+
+            if (shouldSlam && phase != 4)
+            {
 				NPC.dontTakeDamage = true; //invunerable
 
 				return new Color (255, 128, 128); //warning tint (light red)

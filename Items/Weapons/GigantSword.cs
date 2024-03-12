@@ -31,7 +31,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item1.WithPitchOffset(-0.5f); //lower pitch to emphasis power
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.GigantSlash>();
-			Item.shootSpeed = 60; //overridden in ModifyShootStats()
+			Item.shootSpeed = 60;
 		}
 
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
