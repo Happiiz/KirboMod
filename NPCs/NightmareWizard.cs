@@ -27,9 +27,18 @@ namespace KirboMod.NPCs
 
         int tpEffectCounter = 12;
         Vector2 tpEffectPos;
-
+        static void ClampLength(ref Vector2 vector, float length = 100)
+        {
+            length = 300;
+            float vecLength = vector.Length();
+            if(vecLength < length)
+            {
+                vector *= length / vecLength;
+            }
+        }
         public override void AI() //constantly cycles each time
         {
+
             Player player = Main.player[NPC.target];
 
             NPC.spriteDirection = NPC.direction; //face whatever direction
@@ -183,7 +192,13 @@ namespace KirboMod.NPCs
                 animation = 2;
             }
         }
-
+        Vector2 GetTeleportLocation(int framesAhead)
+        {
+            Player plr = Main.player[NPC.target];
+            Vector2 result = new Vector2(0, -100) + plr.velocity * framesAhead;
+            ClampLength(ref result);
+            return result;
+        }
         private void AttackLightningOrbPentagon(float timer, Player player)
         {
             int firerate = 30;
@@ -194,7 +209,7 @@ namespace KirboMod.NPCs
             {
                 NPC.ai[1] = timer; //time to start teleport
             }
-            Teleport(timer - NPC.ai[1], player, new Vector2(0, -100) + player.velocity * (start + 10));
+            Teleport(timer - NPC.ai[1], player, new Vector2(0, -100) + GetTeleportLocation(30));
             if (timer > start)
             {
                 animation = 5; //damageable
@@ -235,7 +250,7 @@ namespace KirboMod.NPCs
             {
                 NPC.ai[1] = timer; //time to start teleport
             }
-            Teleport(timer - NPC.ai[1], player, new Vector2(0, -100) + player.velocity * (start + 5));
+            Teleport(timer - NPC.ai[1], player, GetTeleportLocation(20));
             if (timer > start)
             {
                 animation = 5; //damageable
@@ -268,7 +283,7 @@ namespace KirboMod.NPCs
             int extraWaitTime = phase2 ? 70 : 100;
             if (Main.getGoodWorld)
                 extraWaitTime = 0;
-            Teleport(timer - NPC.ai[1], player, new Vector2(0, -100) + player.velocity * (delayBeforeSlide + 5));
+            Teleport(timer - NPC.ai[1], player, new Vector2(0, -100) + player.velocity * (60));
             if (timer == delayBeforeSlide) //move to side
             {
                 animation = 1;
@@ -333,7 +348,7 @@ namespace KirboMod.NPCs
             {
                 NPC.ai[1] = timer; //time to start teleport
             }
-            Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
+            Teleport(timer - NPC.ai[1], player, GetTeleportLocation(25));
 
             if (timer > 40)
             {
@@ -373,7 +388,7 @@ namespace KirboMod.NPCs
             {
                 NPC.ai[1] = timer; //time to start teleport
             }
-            Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
+            Teleport(timer - NPC.ai[1], player, GetTeleportLocation(25));
 
             if (timer >= 60)
             {
@@ -418,7 +433,7 @@ namespace KirboMod.NPCs
             {
                 NPC.ai[1] = timer; //time to start teleport
             }
-            Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
+            Teleport(timer - NPC.ai[1], player, GetTeleportLocation(30));
 
             if (timer >= 60) //initiate animation
             {
@@ -510,7 +525,7 @@ namespace KirboMod.NPCs
             {
                 NPC.ai[1] = timer; //time to start teleport
             }
-            Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
+            Teleport(timer - NPC.ai[1], player, GetTeleportLocation(25));
 
             if (timer == 40) //move to side
             {
@@ -569,24 +584,27 @@ namespace KirboMod.NPCs
         private void EnrageRingStars(float timer, Player player)
         {
             //teleport
-            if (timer < 240)
+            animation = 0;
+            if (timer <= 265)
             {
+                int tpRate = 55;
                 //teleport throughout attack
-                if (timer % 40 == 0 || timer == 1)
+                if (timer % tpRate == 0 || timer == 1)
                 {
                     NPC.ai[1] = timer; //time to start teleport
                 }
-                Teleport(timer - NPC.ai[1], player, new Vector2(Main.rand.Next(-300, 300), -400));
+                Vector2 offset = new Vector2(0, -50) + player.velocity * (50);
+                ClampLength(ref offset);
+                Teleport(timer - NPC.ai[1], player, offset);
 
                 animation = 5; //damageable
-
-                if ((timer + 20) % 40 == 0)
+                if ((timer - (tpRate - 10)) % tpRate == 0)
                 {
                     for (float i = 0; i < 13; i += 1f)
                     {
                         float angle = ((timer - 60) * 2f) + (i * (MathF.PI / 6));
 
-                        Vector2 vel = new Vector2(MathF.Cos(angle) * 10, MathF.Sin(angle) * 10);
+                        Vector2 vel = new Vector2(MathF.Cos(angle) * 15, MathF.Sin(angle) * 15);
 
                         SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
 
@@ -612,7 +630,7 @@ namespace KirboMod.NPCs
             }
             if (timer < 60)
             {
-                Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
+                Teleport(timer - NPC.ai[1], player, GetTeleportLocation(25));
             }
             float side = Main.rand.NextBool() == true ? 1 : -1;
 
@@ -684,7 +702,7 @@ namespace KirboMod.NPCs
             }
             if (timer < 30)
             {
-                Teleport(timer - NPC.ai[1], player, new Vector2(0, -200));
+                Teleport(timer - NPC.ai[1], player, GetTeleportLocation(30));
             }
             else if (timer >= 30) //initiate animation
             {
