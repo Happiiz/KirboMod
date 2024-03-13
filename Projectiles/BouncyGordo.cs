@@ -13,7 +13,7 @@ namespace KirboMod.Projectiles
 			// DisplayName.SetDefault("Gordo");
 			Main.projFrames[Projectile.type] = 1;
 		}
-
+		public static float GordoGravity => .12f;
 		public override void SetDefaults()
 		{
 			Projectile.width = 50;
@@ -26,11 +26,7 @@ namespace KirboMod.Projectiles
 		}
 		public override void AI()
 		{
-			Projectile.velocity.Y = Projectile.velocity.Y + 0.2f;
-			if (Projectile.velocity.Y >= 6f)
-            {
-				Projectile.velocity.Y = 6f;
-            }
+			Projectile.velocity.Y += GordoGravity;
 			Projectile.rotation += 0.1f; // rotates projectile
 			/*if (++projectile.frameCounter >= 15) //changes frames every 15 ticks 
 			{

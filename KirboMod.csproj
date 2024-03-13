@@ -47,4 +47,7 @@
   <ItemGroup>
     <PackageReference Include="tModLoader.CodeAssist" Version="0.1.*" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="NPCs\DarkMatter\NovaPasta\" />
+  </ItemGroup>
 </Project>
