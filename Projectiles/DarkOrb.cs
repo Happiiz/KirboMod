@@ -20,8 +20,8 @@ namespace KirboMod.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 90;
-			Projectile.height = 90;
+			Projectile.width = 70;
+			Projectile.height = 70;
 			Projectile.friendly = false;
 			Projectile.hostile = false;
 			Projectile.timeLeft = 120;
@@ -29,6 +29,7 @@ namespace KirboMod.Projectiles
 			Projectile.penetrate = 1;
 		}
 		float Scale { get => Utils.GetLerpValue(0, 20, Projectile.ai[0], true); }
+		bool Predictive { get => Projectile.ai[2] == 1; }
 		public override void AI()
 		{
 			Player player = Main.player[(int)Projectile.ai[1]]; //chooses npc target player
@@ -42,15 +43,23 @@ namespace KirboMod.Projectiles
 
             Projectile.ai[0]++;
 			Projectile.scale = Easings.EaseInOutSine(Scale);
+			float shootSpeed = 30;
 			if (Projectile.ai[0] == 30) //Start hurtin'
             {
 				SoundEngine.PlaySound(SoundID.Item117, Projectile.Center); //conjure arcanum sfx
 
-				Vector2 move = (player.Center + player.velocity * 5) - Projectile.Center; //aims ahead of player
-				Projectile.hostile = true; //hurt
-				move.Normalize();
-
-                move *= 30;
+				Vector2 move = (player.Center + player.velocity * 10) - Projectile.Center; //aims ahead of player
+				if (Predictive)
+				{
+					Utils.ChaseResults results = Utils.GetChaseResults(Projectile.Center, shootSpeed, player.Center, player.velocity);
+					if (results.InterceptionHappens)
+					{
+						move = results.ChaserVelocity;
+					}
+				}
+                move.Normalize();
+                move *= shootSpeed;
+                Projectile.hostile = true; //hurt
 
                 Projectile.velocity = move; //move
 			}

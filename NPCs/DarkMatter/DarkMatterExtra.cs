@@ -68,7 +68,10 @@ namespace KirboMod.NPCs.DarkMatter
             NPC.boss = true;
             NPC.noGravity = true;
             NPC.lavaImmune = true;
-            Music = MusicID.Boss4;
+            if (!Main.dedServ)//if not dedicated server
+            {
+                Music = MusicLoader.GetMusicSlot("KirboMod/Music/DeathZ_DarkMatterSwordsmanmp3");
+            }
         }
         public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */
         {

@@ -37,13 +37,16 @@ namespace KirboMod.Projectiles
 		{
 			if (dropStarMode == 1) //gravity mode
 			{
-				Projectile.velocity.Y = Projectile.velocity.Y + 0.3f;
-				if (Projectile.velocity.Y >= 9f)
+				Projectile.velocity.Y = Projectile.velocity.Y + 0.6f;
+				if (Projectile.velocity.Y >= 50)
 				{
-					Projectile.velocity.Y = 9f;
+					Projectile.velocity.Y = 50;
 				}
 			}
-
+			else
+			{
+				Projectile.velocity *= 1.013f;
+			}
 			Projectile.rotation += 0.1f; // rotates projectile
 
 			Projectile.Opacity = Utils.GetLerpValue(0, 60, Projectile.timeLeft, true);
