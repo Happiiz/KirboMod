@@ -8,6 +8,10 @@ namespace KirboMod
 {
     public static class Helper
     {
+        /// <summary>
+        /// the golden ratio constant, phi, defined as (1 + sqrt(5))/2
+        /// </summary>
+        public const float Phi = 1.61803398875f;
         public static void BossHpScalingForHigherDifficulty(ref int lifemax, float balance)
         {
             const float expertMultiplier = 1.5f;

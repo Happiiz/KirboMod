@@ -38,6 +38,7 @@ namespace KirboMod.Projectiles.Flames
         public const int defaultDuration = 60;
         public const int defaultFadeOutDuration = 12;
         protected float whiteInsideSizeMultiplier = 1;
+        protected float trailLengthMultiplier = 1;
         public int TotalDuration { get => (duration + fadeOutDuration); 
             set
             {
@@ -112,13 +113,13 @@ namespace KirboMod.Projectiles.Flames
             float middleColorThreshold = 0.7f;
             float endColorThreshold = 0.85f;
             float decrementStep = (Projectile.localAI[0] > duration - 10f) ? 0.175f : 0.2f;
-            int verticalFrames = 7;
             float fadeOutProgress = Utils.Remap(Projectile.localAI[0], duration, totalDuration, 1f, 0f);
             float startOffset = Math.Min(Projectile.localAI[0], 20f);
             float progress = Utils.Remap(Projectile.localAI[0], 0f, totalDuration, 0f, 1f);
             float drawScale = Utils.Remap(progress, 0.2f, 0.5f, startScale, endScale);
             float oldDrawScale = Utils.Remap(Utils.GetLerpValue(0, totalDuration, Projectile.localAI[0] - 1), 0.2f, 0.5f, startScale, endScale);
-            Rectangle frame = texture.Frame(1, verticalFrames, 0, 3);
+            int frameY = progress > endColorThreshold ? 4 : 3;
+            Rectangle frame = texture.Frame(1, 7, 0, frameY);
             if (progress >= 1f)
             {
                 return false;
@@ -136,7 +137,7 @@ namespace KirboMod.Projectiles.Flames
                         Color.Lerp(smokeColor, Color.Transparent, Utils.GetLerpValue(endColorThreshold, 1f, progress, clamped: true)))))));
 
                     float fadeFromTrail = (1f - j) * Utils.Remap(progress, 0f, 0.2f, 0f, 1f);
-                    Vector2 drawPos = Projectile.Center - Main.screenPosition + Projectile.velocity * -startOffset * j;
+                    Vector2 drawPos = Projectile.Center - Main.screenPosition + Projectile.velocity * -startOffset * j * trailLengthMultiplier;
                     Color secondaryTrailColor = color * fadeFromTrail;
                     Color drawColor = secondaryTrailColor;
                     if (hueshiftType != HueshiftType.DontDarken)

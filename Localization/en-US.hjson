@@ -1404,6 +1404,10 @@ Mods: {
 			NightmareShockOrb.DisplayName: Nightmare Shock Orb
 			NightmareLightningOrbHoming.DisplayName: Nightmare Lightning Orb Homing
 			DededeDropStar.DisplayName: Drop Star
+			BasicTestTornado.DisplayName: Basic Test Tornado
+			VolcanoFireFire1.DisplayName: Volcano Fire Fire1
+			VolcanoFireFire2.DisplayName: Volcano Fire Fire2
+			VolcanoFireFire3.DisplayName: Volcano Fire Fire3
 		}
 
 		NPCs: {

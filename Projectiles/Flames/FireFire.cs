@@ -9,7 +9,7 @@ namespace KirboMod.Projectiles.Flames
         public override void SetDefaults()
         {
             base.FlamethrowerStats();//copy flamethrower stats of bad fire(including color)
-            debuffID = BuffID.OnFire;
+            debuffID = BuffID.OnFire3;
             debuffDuration = 600;
             duration = defaultDuration;
             fadeOutDuration = defaultFadeOutDuration;
@@ -19,10 +19,10 @@ namespace KirboMod.Projectiles.Flames
             Projectile.penetrate = -1;
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = 10;
-            startScale = .7f;
-            Projectile.extraUpdates = 2;
-            startScale = .4f;
-            endScale = 1.1f;
+            Projectile.extraUpdates = 1;
+            startScale = .5f;
+            endScale = 1f;
+            trailLengthMultiplier = .6f;
             TotalDuration /= 2;
             whiteInsideSizeMultiplier = 1;
         }

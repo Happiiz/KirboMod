@@ -1,3 +1,4 @@
+using KirboMod.Projectiles.VolcanoFire;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -34,14 +35,17 @@ namespace KirboMod.Items.Weapons
 			Item.rare = ItemRarityID.LightRed;
 			Item.UseSound = SoundID.Item34;
 			Item.autoReuse = true;
-			Item.shoot = ModContent.ProjectileType<Projectiles.VolcanoFireFire>();
-			Item.shootSpeed = 12f;
+			Item.shoot = ModContent.ProjectileType<VolcanoFireFire1>();
+			Item.shootSpeed = 10;//1 extraupdate
 			Item.mana = 6;
 		}
 
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {
-            velocity = new Vector2(velocity.X, velocity.Y - 6).RotatedByRandom(MathHelper.ToRadians(15)); // 15 degree spread
+			type = VolcanoFireFire1.RandomType;
+			Utils.ChaseResults results = Utils.GetChaseResults(position, velocity.Length(), Main.MouseWorld, default);
+			velocity = Utils.FactorAcceleration(velocity, results.InterceptionTime, new Vector2(0, 0.12f), 0);
+            velocity = velocity.RotatedByRandom(MathHelper.ToRadians(10)); // 10 degree spread
         }
 
 		public override void AddRecipes()

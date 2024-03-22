@@ -25,8 +25,8 @@ namespace KirboMod.Projectiles
 			Projectile.timeLeft = 500;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
-            Projectile.usesIDStaticNPCImmunity = true;
-            Projectile.idStaticNPCHitCooldown = 10;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = 10;
         }
 
 		public override void AI()
@@ -43,7 +43,6 @@ namespace KirboMod.Projectiles
 					d.noGravity = true;
 				}
 			}
-			
 			Projectile.velocity *= 0.96f;
 		}
 

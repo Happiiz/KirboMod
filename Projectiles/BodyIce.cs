@@ -14,6 +14,7 @@ namespace KirboMod.Projectiles
 		public override void SetStaticDefaults()
 		{
 			Main.projFrames[Projectile.type] = 1;
+			
 		}
 
 		public override void SetDefaults()
@@ -21,13 +22,14 @@ namespace KirboMod.Projectiles
 			Projectile.width = 18;
 			Projectile.height = 18;
 			Projectile.friendly = true;
-			Projectile.timeLeft = 500;
+			Projectile.timeLeft = 300;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 			Projectile.ignoreWater = true;
 			Projectile.alpha = 100;
-			Projectile.usesIDStaticNPCImmunity = true; //shares immunity cooldowns with projectiles of same type
-			Projectile.idStaticNPCHitCooldown = 10;
+			Projectile.usesLocalNPCImmunity = true;
+			Projectile.localNPCHitCooldown = 30;//high iframes because stacking hits
+			Projectile.ArmorPenetration = 1000;//low damage so ignores def to compensate otherwise balance hell
 		}
 
 		public override void AI()
@@ -44,7 +46,7 @@ namespace KirboMod.Projectiles
             if (bodyToAttachTo.active && !bodyToAttachTo.dontTakeDamage)
             {
 				//random position on body
-                Projectile.Center = bodyToAttachTo.position + randomOffset;
+                Projectile.Center = bodyToAttachTo.position + randomOffset + bodyToAttachTo.netOffset;
                 Projectile.gfxOffY = bodyToAttachTo.gfxOffY;
             }
 			else

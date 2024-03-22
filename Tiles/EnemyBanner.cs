@@ -101,7 +101,7 @@ namespace KirboMod.Tiles
 						type = ModContent.NPCType<NPCs.SirKibble>();
 						break;
 					case 13:
-						type = ModContent.NPCType<NPCs.Twister>();
+						type = ModContent.NPCType<NPCs.Twister.Twister>();
 						break;
 					case 14:
 						type = ModContent.NPCType<NPCs.UFO>();
