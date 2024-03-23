@@ -138,9 +138,6 @@ namespace KirboMod.NPCs.MidBosses
             {
                 IceToss();
             }
-
-            //for stepping up tiles
-            Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
         }
 
 		public override void FindFrame(int frameHeight) // animation
@@ -332,28 +329,28 @@ namespace KirboMod.NPCs.MidBosses
         {
             bool climableTiles = false;
 
-            for (int i = 0; i < 128; i++)
+            for (int i = 0; i < NPC.height - 30; i++)
             {
                 if (NPC.direction == 1)
                 {
                     //checks for tiles on right side of NPC
-                    Tile tile = Main.tile[(new Vector2((NPC.Right.X), NPC.position.Y + i)).ToTileCoordinates()];
+                    Tile tile = Main.tile[new Vector2(NPC.Right.X + 1, NPC.position.Y + i).ToTileCoordinates()];
                     climableTiles = WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType] || tile.IsHalfBlock;
                 }
                 else
                 {
                     //checks for tiles on left side of NPC
-                    Tile tile = Main.tile[(new Vector2((NPC.Left.X), NPC.position.Y + i)).ToTileCoordinates()];
+                    Tile tile = Main.tile[new Vector2(NPC.Left.X - 1, NPC.position.Y + i).ToTileCoordinates()];
                     climableTiles = WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType] || tile.IsHalfBlock;
                 }
 
-                if (climableTiles || NPC.velocity.X == 0)
+                if (climableTiles && MathF.Abs(NPC.Bottom.Y - player.Bottom.Y) > 20f || NPC.velocity.X == 0)
                 {
                     NPC.noTileCollide = true;
 
                     if (player.Center.Y < NPC.Center.Y && !player.dead) //higher than NPC or dead
                     {
-                        NPC.velocity.Y = -8f;
+                        NPC.velocity.Y = -4f;
                     }
 
                     break;
