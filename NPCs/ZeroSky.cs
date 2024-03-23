@@ -17,8 +17,9 @@ namespace KirboMod.NPCs
         private Asset<Texture2D> cloudstexture;
         private bool playerleaving;
 
-        private static int EffectOffset = 0;
-        const int slideSpeed = 2;
+        private static int bgOffset = 0;
+        static float fgOffset = 0;
+        const int slideSpeed = 7;
         public override void Update(GameTime gameTime)
         {
             if (Main.gamePaused || !Main.hasFocus)
@@ -26,12 +27,18 @@ namespace KirboMod.NPCs
                 return;
             }
 
-            //loop around
-            EffectOffset += slideSpeed; //go faster than special sky in sonic mod
-            if (EffectOffset >= 512)
+            bgOffset += slideSpeed; //go faster than special sky in sonic mod
+            fgOffset += slideSpeed * Helper.Phi;
+            fgOffset %= 1024;
+            if(fgOffset >= 1024)
             {
-                EffectOffset %= 512;//wrap around
+                fgOffset %= 1024;
             }
+            if (bgOffset >= 1024)//1024 is texture size
+            {
+                bgOffset %= 1024;//wrap around
+            }
+            
         }
 
         private float GetIntensity()
@@ -59,19 +66,31 @@ namespace KirboMod.NPCs
             //Main cloud
             if (ModContent.GetInstance<KirbConfig>().HyperzoneClouds) //enabled in the config
             {
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
                 hyperZoneFront ??= ModContent.Request<Texture2D>("KirboMod/ExtraTextures/HyperZoneFront");
                 hyperZoneBack ??= ModContent.Request<Texture2D>("KirboMod/ExtraTextures/HyperZoneBack");
                 Texture2D back = hyperZoneBack.Value;
                 Vector2 texSize = hyperZoneBack.Size();
-                for (int i = -2; i < 4; i++)
+                Vector2 plrPos = Main.screenPosition;
+                for (int i = -2; i < 3; i++)
                 {
-                    for (int j = 0; j < 4; j++)
+                    for (int j = 0; j < 3; j++)
                     {
                         int offsetX = (int)(i * texSize.X);
                         int offsetY = (int)(j * texSize.Y);
-                        spriteBatch.Draw(back, new Rectangle(offsetX + EffectOffset, offsetY + EffectOffset * -1, (int)texSize.X, (int)texSize.Y), Color.White);
+                        offsetX -= (int)(plrPos.X % texSize.X);
+                        offsetY -= (int)(plrPos.Y % texSize.Y);
+                        offsetX += bgOffset;
+                        offsetY -= bgOffset;
+                        Rectangle destination = new Rectangle(offsetX, offsetY, (int)texSize.X, (int)texSize.Y);
+                        
+                        spriteBatch.Draw(back, destination, Color.White);
                     }
                 }
+                //what spritebatch was before
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.BackgroundViewMatrix.TransformationMatrix);
             }
         }
         public static void DrawFrontLayer(SpriteBatch sb)
@@ -79,13 +98,19 @@ namespace KirboMod.NPCs
             hyperZoneFront ??= ModContent.Request<Texture2D>("KirboMod/ExtraTextures/HyperZoneFront");
             Texture2D back = hyperZoneFront.Value;
             Vector2 texSize = hyperZoneFront.Size();
-            for (int i = 0; i < 7; i++)
+            Vector2 referencePos = Main.screenPosition;
+            for (int i = 0; i < 4; i++)
             {
-                for (int j = -2; j < 3; j++)
+                for (int j = -1; j < 3; j++)
                 {
-                    int offsetX = (int)(i * texSize.X);
-                    int offsetY = (int)(j * texSize.Y);
-                    sb.Draw(back, new Rectangle(offsetX + EffectOffset * -1, offsetY + EffectOffset, (int)texSize.X, (int)texSize.Y), Color.White * .5f);
+                    float offsetX = i * texSize.X;
+                    float offsetY = j * texSize.Y;
+                    offsetX -= referencePos.X % texSize.X;
+                    offsetY -= referencePos.Y % texSize.Y;
+                    offsetX -= fgOffset;
+                    offsetY += fgOffset;
+
+                    sb.Draw(back, new Rectangle((int)(offsetX + .5f), (int)(offsetY + .5f), (int)(texSize.X), (int)(texSize.Y)), Color.White * .5f);
                 }
             }
 
@@ -102,11 +127,11 @@ namespace KirboMod.NPCs
                         {
                             BlueCloud = ModContent.Request<Texture2D>("KirboMod/NPCs/DarkCloud2");
                             //this one goes left and down (also shifted to the left a bit)
-                            spriteBatch.Draw(BlueCloud.Value, new Rectangle(j - EffectOffset - 200, i + EffectOffset * 1, BlueCloud.Width(), BlueCloud.Height()), new Color(255, 255, 255));
+                            spriteBatch.Draw(BlueCloud.Value, new Rectangle(j - bgOffset - 200, i + bgOffset * 1, BlueCloud.Width(), BlueCloud.Height()), new Color(255, 255, 255));
 
                             Cloud = ModContent.Request<Texture2D>("KirboMod/NPCs/DarkCloud");
                             //this one goes up and right
-                            spriteBatch.Draw(Cloud.Value, new Rectangle(j + EffectOffset, i + EffectOffset * -1, Cloud.Width(), Cloud.Height()), new Color(255, 255, 255));
+                            spriteBatch.Draw(Cloud.Value, new Rectangle(j + bgOffset, i + bgOffset * -1, Cloud.Width(), Cloud.Height()), new Color(255, 255, 255));
                         }
                     }
                 }

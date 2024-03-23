@@ -1,6 +1,7 @@
 ﻿using KirboMod.NPCs;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.GameContent.Events;
 using Terraria.Graphics.Effects;
 using Terraria.ModLoader;
 namespace KirboMod.Biomes
@@ -9,17 +10,15 @@ namespace KirboMod.Biomes
     {
         public override void Load()
         {
-            On_Main.DrawItemTextPopups += On_Main_DrawItemTextPopups;
+            On_ScreenObstruction.Draw += On_ScreenObstruction_Draw;
         }
-        private void On_Main_DrawItemTextPopups(On_Main.orig_DrawItemTextPopups orig, float scaleTarget)
+
+        private void On_ScreenObstruction_Draw(On_ScreenObstruction.orig_Draw orig, SpriteBatch spriteBatch)
         {
-            orig(scaleTarget);
+            orig(spriteBatch);
             if (!SkyManager.Instance["KirboMod:HyperZone"].IsActive() || !ModContent.GetInstance<KirbConfig>().HyperzoneClouds)
                 return;
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer);
-            ZeroSky.DrawFrontLayer(Main.spriteBatch);
-            //DON'T END SPRITEBATCH BECAUSE VANILLA ENDS IT AFTER THIS DETOUR!!
+            ZeroSky.DrawFrontLayer(spriteBatch);
         }
     }
 }
