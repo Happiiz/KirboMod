@@ -6,8 +6,8 @@ using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles
 {
-	public class BouncyGordo : ModProjectile
-	{
+	public class BouncyGordo : ModProjectile //gordo projectile used by Whispy Woods
+    {
 		public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Gordo");
@@ -16,8 +16,8 @@ namespace KirboMod.Projectiles
 		public static float GordoGravity => .12f;
 		public override void SetDefaults()
 		{
-			Projectile.width = 50;
-			Projectile.height = 50;
+			Projectile.width = 78;
+			Projectile.height = 78;
 			Projectile.friendly = false;
 			Projectile.hostile = true;
 			Projectile.timeLeft = 300;

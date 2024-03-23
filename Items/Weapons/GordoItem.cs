@@ -33,7 +33,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.GoodGordo>();
-			Item.shootSpeed = 6f;
+			Item.shootSpeed = 12f;
 			Item.consumable = true;
 			Item.maxStack = 9999;
 			Item.noMelee = true;

@@ -4,6 +4,8 @@ using KirboMod.Items.Weapons;
 using KirboMod.Projectiles;
 using KirboMod.Systems;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -85,7 +87,6 @@ namespace KirboMod.NPCs
                 Music = MusicLoader.GetMusicSlot(Mod, "Sounds/Music/KingDedede");
             }
 
-            //bossBag/* tModPorter Note: Removed. Spawn the treasure bag alongside other loot via npcLoot.Add(ItemDropRule.//bossBag(type)) */ = ModContent.ItemType<Items.KingDedede.KingDededeBag>();
             NPC.friendly = false;
             NPC.buffImmune[BuffID.Confused] = true;
         }
@@ -138,6 +139,7 @@ namespace KirboMod.NPCs
                 attack = 0;
                 NPC.TargetClosest(false);
                 NPC.noTileCollide = true;
+                NPC.noGravity = false; //make him able to fall normally
 
                 if (phase == 4)
                 {
@@ -147,28 +149,22 @@ namespace KirboMod.NPCs
                 if (NPC.timeLeft > 60)
                 {
                     NPC.timeLeft = 60;
-                    return;
                 }
             }
             else
             {
                 int phaseThreeSpeedUp = 0;
 
-                if (NPC.GetLifePercent() <= (Main.expertMode ? 0.6 : 0.25))
+                if (phase == 3)
                 {
                     phaseThreeSpeedUp = 30;
-                }
-
-                if ((attack >= 60 - phaseThreeSpeedUp && attacktype == DededeAttackType.Slam) == false && phase != 4) //not slamming or possessed
-                {
-                    CheckPlatform(player);
                 }
 
                 AttackPattern(phaseThreeSpeedUp);
             }
         }
 
-        private void CheckPlatform(Player player) //trust me this is totally unique and original code and definitely not stolen from Spirit Mod's public source code(thx so much btw you don't know the hell I went through with this)
+        private void CheckPlatform(Player player) //referenced from Spirit mod's public source code
         {
             bool onplatform = true;
             for (int i = (int)NPC.position.X; i < NPC.position.X + NPC.width; i += NPC.width / 4)
@@ -177,7 +173,7 @@ namespace KirboMod.NPCs
                 if (!TileID.Sets.Platforms[tile.TileType])
                     onplatform = false;
             }
-            if (onplatform && (NPC.Center.Y < player.position.Y - 75)) //if they are and the player is lower than the boss, temporarily let the boss ignore tiles to go through them
+            if (onplatform && (NPC.Center.Y < player.position.Y - 100)) //if they are and the player is lower than the boss, temporarily let the boss ignore tiles to go through them
             {
                 NPC.noTileCollide = true;
             }
@@ -228,13 +224,14 @@ namespace KirboMod.NPCs
                     NPC.TargetClosest(true);
                     if (attack == 59 - phaseThreeSpeedUp) //random attack
                     {
-
                         SlamDecide(player, out bool shouldSlam);
 
                         if (shouldSlam)
                         {
                             attacktype = DededeAttackType.Slam; //slam
                             lastattacktype = DededeAttackType.Slam;
+
+                            attack = phase == 3 ? 60 : 90;
                         }
                         else //random attack
                         {
@@ -246,10 +243,12 @@ namespace KirboMod.NPCs
                 NPC.GravityMultiplier = MultipliableFloat.One;
                 if (attacktype == DededeAttackType.Dash)
                 {
+                    CheckPlatform(player);
                     AttackDash(phaseThreeSpeedUp, player, distance);
                 }
                 if (attacktype == DededeAttackType.Hammer)
                 {
+                    CheckPlatform(player);
                     NPC.noGravity = true;
                     AttackHammer(phaseThreeSpeedUp, player, distance);
                     NPC.velocity.Y += NPC.gravity;
@@ -257,12 +256,13 @@ namespace KirboMod.NPCs
                 }
                 if (attacktype == DededeAttackType.Gordo)
                 {
+                    CheckPlatform(player);
                     AttackGordo(phaseThreeSpeedUp, player);
                 }
                 if (attacktype == DededeAttackType.Slam)
                 {
                     NPC.noGravity = true;
-                    NPC.GravityMultiplier *= MultipliableFloat.One * 3;
+                    NPC.GravityMultiplier *= MultipliableFloat.One * 2;
                     AttackSlam(phaseThreeSpeedUp, player);
                     NPC.velocity.Y += NPC.gravity;
                 }
@@ -434,7 +434,7 @@ namespace KirboMod.NPCs
             if (attack == 60 - phaseThreeSpeedUp)
             {
                 animation = 1; //run
-                NPC.velocity.Y = -4;
+                NPC.velocity.Y = -4; //short up to signify start
             }
             if (attack >= 90 - phaseThreeSpeedUp && attack < 270 - phaseThreeSpeedUp)
             {
@@ -460,14 +460,14 @@ namespace KirboMod.NPCs
 
                 ClimbTiles(player);
 
-                if (Math.Abs(distance.X) <= 200 && (distance.Y <= 100 && distance.Y >= -150)) //range
+                if (Math.Abs(distance.X) <= 200 && (distance.Y <= 50 && distance.Y >= -200)) //range
                 {
                     attack = 300 - phaseThreeSpeedUp;
                 }
             }
             if (attack == 270 - phaseThreeSpeedUp) //3 seconds up
             {
-                NPC.velocity.X *= 0;
+                NPC.velocity.X *= 0f;
                 animation = 0; //stand	
 
                 attack = 0;
@@ -476,18 +476,18 @@ namespace KirboMod.NPCs
             {
                 NPC.TargetClosest(false);
 
-                NPC.velocity.Y = -8;//jump very high for dive
+                NPC.velocity.Y = MathHelper.Clamp((player.Bottom.Y - NPC.Bottom.Y) / 10, -8f, -4f);//jump depending on player height for dive
                 animation = 2; //dive
 
 
-                if (phase == 3) //faster
+                if (phase == 3) //farther
                 {
-                    NPC.velocity.X = NPC.direction * 18; //go 18 in the direction of npc(facing player)
+                    NPC.velocity.X = NPC.direction * 20; //5 units higher than run
 
                 }
                 else
                 {
-                    NPC.velocity.X = NPC.direction * 12; //go 12 in the direction of npc(facing player)
+                    NPC.velocity.X = NPC.direction * 15; //5 units higher than run
 
                 }
 
@@ -504,7 +504,7 @@ namespace KirboMod.NPCs
             }
             if (attack >= 360 - phaseThreeSpeedUp) //restart from dive
             {
-                NPC.velocity.X *= 0;
+                NPC.velocity.X *= 0f;
                 animation = 0; //stand
                 attack = 0;
             }
@@ -514,7 +514,7 @@ namespace KirboMod.NPCs
         {
             if (attack == 60 - phaseThreeSpeedUp)
             {
-                NPC.velocity.Y = -4;
+                NPC.velocity.Y = -4; //short up to signify start
                 animation = 3; //draw hammer
             }
             if (attack >= 90 - phaseThreeSpeedUp && attack < 270 - phaseThreeSpeedUp)
@@ -548,18 +548,12 @@ namespace KirboMod.NPCs
                     attack = 300 - phaseThreeSpeedUp;
                 }
             }
-            if (attack == 270 - phaseThreeSpeedUp) //3 seconds of running up
-            {
-                NPC.velocity.X *= 0;
-                animation = 0; //stand	
-                attack = 0;
-            }
             if (attack == 300 - phaseThreeSpeedUp) //charge swing
             {
                 NPC.TargetClosest(false);
                 SoundEngine.PlaySound(SoundID.NPCDeath8.WithPitchOffset(0.5f), NPC.Center); //beast grunt (high pitch)
 
-                NPC.velocity.X *= 0;
+                NPC.velocity.X *= 0f;
                 animation = 5; //ready swing   
             }
 
@@ -570,20 +564,8 @@ namespace KirboMod.NPCs
                 {
                     if (distance.Y < -150) //too high
                     {
-                        NPC.velocity.Y = distance.Y / (phase == 3 ? 5 : 15); //jump depending on Y distance(quicker in phase 3)
-
-                        //minimum
-                        if (NPC.velocity.Y >= -15)
-                        {
-                            NPC.velocity.Y = -15;
-
-                        }
-                        //maximum
-                        if (NPC.velocity.Y <= -30)
-                        {
-                            NPC.velocity.Y = -30;
-
-                        }
+                        //jump depending on Y distance(quicker in phase 3)
+                        NPC.velocity.Y = MathHelper.Clamp(distance.Y / (phase == 3 ? 5 : 10), -30, -15);
                     }
                 }
 
@@ -625,20 +607,8 @@ namespace KirboMod.NPCs
             {
                 if (distance.Y < -150) //too high
                 {
-                    NPC.velocity.Y = distance.Y / (phase == 3 ? 5 : 15); //jump depending on Y distance(quicker in phase 3)
-
-                    //minimum
-                    if (NPC.velocity.Y >= -15)
-                    {
-                        NPC.velocity.Y = -15;
-
-                    }
-                    //maximum
-                    if (NPC.velocity.Y <= -30)
-                    {
-                        NPC.velocity.Y = -30;
-
-                    }
+                    //jump depending on Y distance(quicker in phase 3)
+                    NPC.velocity.Y = MathHelper.Clamp(distance.Y / (phase == 3 ? 5 : 10), -30, -15);
                 }
             }
             if (attack == (phase == 3 ? 330 : 360) - phaseThreeSpeedUp) //swing
@@ -647,7 +617,6 @@ namespace KirboMod.NPCs
                 {
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity *= 0.01f, ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI);
                 }
-                NPC.velocity.Y = -4; // stop rising
                 animation = 6; //swing
             }
             else if (attack > (phase == 3 ? 330 : 360) - phaseThreeSpeedUp)
@@ -680,7 +649,7 @@ namespace KirboMod.NPCs
                 {
                     NPC.TargetClosest(false);
 
-                    NPC.velocity.X *= 0;
+                    NPC.velocity.X *= 0f;
                     animation = 5; //ready swing    
                 }
                 if (attack == (phase == 3 ? 350 : 380) - phaseThreeSpeedUp)
@@ -691,7 +660,6 @@ namespace KirboMod.NPCs
                     }
 
                     launchDropStars();
-                    NPC.velocity.Y = -4; // stop rising
                     animation = 6; //swing
                     repeathammer -= 1;
                 }
@@ -710,7 +678,6 @@ namespace KirboMod.NPCs
                     }
 
                     launchDropStars();
-                    NPC.velocity.Y = -4; // stop rising
                     animation = 6; //swing
 
                     repeathammer -= 1;
@@ -750,43 +717,38 @@ namespace KirboMod.NPCs
         {
             Vector2 predictDistance = player.Center + player.velocity * 10 - NPC.Center;
 
-            if (attack == 60 - phaseThreeSpeedUp)
+            if (attack < (phase == 3 ? 90: 120))
             {
                 animation = 9; //ready jump
                 NPC.TargetClosest(true); //face player
-            }
-            else
-            {
-                NPC.TargetClosest(false); //dont' face player
             }
 
             if (attack == (phase == 3 ? 90 : 120) - phaseThreeSpeedUp)
             {
                 NPC.noTileCollide = true; //don't collide with tiles
 
-                NPC.velocity.X = predictDistance.X / 40;
-                NPC.velocity.Y = predictDistance.Y / 2;
+                NPC.velocity.Y = MathHelper.Clamp(predictDistance.Y / 2, -40, -30);
+                NPC.velocity.X = MathHelper.Clamp(predictDistance.X / 90, -30, 30);
                 animation = 10; //jump
-
-                NPC.velocity.Y = MathHelper.Clamp(NPC.velocity.Y, -60, -25);
-                NPC.velocity.X = MathHelper.Clamp(NPC.velocity.X, -30, 30);
 
                 SoundEngine.PlaySound(SoundID.NPCDeath8.WithPitchOffset(0.5f), NPC.Center); //beast grunt (high pitch)
             }
-            if (attack > (phase == 3 ? 90 : 120) - phaseThreeSpeedUp && attack <= (phase == 3 ? 389 : 419) - phaseThreeSpeedUp) //fall for 5 seconds
+            if (attack > (phase == 3 ? 90 : 120) - phaseThreeSpeedUp) //fall for 5 seconds
             {
-                NPC.wet = false; //Water collision I think???
+                NPC.GravityIgnoresLiquid = true;
 
-                if (NPC.Bottom.Y < player.position.Y || NPC.velocity.Y < 0) //feet higher than player or going up
+                animation = 10; //jump
+
+                if (NPC.Center.Y < player.position.Y - 200 || NPC.velocity.Y < 0) //higher than player or going up
                 {
                     NPC.noTileCollide = true; //don't collide with tiles
                 }
                 else
                 {
                     NPC.noTileCollide = false; //collide with tiles
-                    if (NPC.velocity.Y == 0 || NPC.oldVelocity.Y == 0) //oon ground or can't move anymore for some reason
+                    if (NPC.velocity.Y == 0 || NPC.oldVelocity.Y == 0) //on ground or can't move anymore for some reason
                     {
-                        NPC.velocity.X *= 0;
+                        NPC.velocity.X *= 0f;
                         animation = 9; //end jump
 
                         launchDropStars();
@@ -801,16 +763,15 @@ namespace KirboMod.NPCs
                     }
                 }
             }
-            if (attack >= (phase == 3 ? 450 : 480) - phaseThreeSpeedUp) //restart cycle
+            if (attack >= (phase == 3 ? 389 : 419) - phaseThreeSpeedUp) //restart cycle
             {
-                if (NPC.velocity.Y != 0 || NPC.oldVelocity.Y != 0 && animation != 9) //go back if not slam animation
+                if (NPC.velocity.Y != 0 || NPC.oldVelocity.Y != 0 && animation != 9) //go back if not in final slam animation
                 {
                     attack = (phase == 3 ? 91 : 121);
                 }
                 else //continue
                 {
                     animation = 0; //stance
-                    NPC.noTileCollide = false; //collide with tiles
                     attack = 0;
                 }
             }
@@ -852,7 +813,7 @@ namespace KirboMod.NPCs
                 Vector2 shootFrom = NPC.Center + new Vector2(NPC.direction * 100, 0);
                 Utils.ChaseResults results = Utils.GetChaseResults(shootFrom, shootSpeed, player.Center, player.velocity);
                 Vector2 velocity;
-                if (results.InterceptionHappens)
+                if (results.InterceptionHappens && phase < 3) //predict location if phase is less than 3
                 {
                     velocity = Utils.FactorAcceleration(results.ChaserVelocity, results.InterceptionTime, new Vector2(0, BouncyGordo.GordoGravity), 0);
                 }
@@ -964,7 +925,7 @@ namespace KirboMod.NPCs
             }
 
             //too far, can't reach, or too low
-            if (/*lineOfSight == false || */NPC.position.Y > player.Bottom.Y + 400 || distanceUnit >= 2000 || stuck)
+            if (NPC.position.Y > player.Bottom.Y + 400 || distanceUnit >= 1500 || stuck)
             {
                 shouldSlam = true;
             }
@@ -978,21 +939,21 @@ namespace KirboMod.NPCs
                 if (NPC.direction == 1)
                 {
                     //checks for tiles on right side of NPC
-                    Tile tile = Main.tile[(new Vector2((NPC.Right.X), NPC.position.Y + i)).ToTileCoordinates()];
+                    Tile tile = Main.tile[new Vector2(NPC.Right.X + 1, NPC.position.Y + i).ToTileCoordinates()];
                     climableTiles = WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType] || tile.IsHalfBlock;
                 }
                 else
                 {
                     //checks for tiles on left side of NPC
-                    Tile tile = Main.tile[(new Vector2((NPC.Left.X), NPC.position.Y + i)).ToTileCoordinates()];
+                    Tile tile = Main.tile[new Vector2(NPC.Left.X - 1, NPC.position.Y + i).ToTileCoordinates()];
                     climableTiles = WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType] || tile.IsHalfBlock;
                 }
 
-                if (climableTiles || NPC.velocity.X == 0)
+                if (climableTiles && MathF.Abs(NPC.Bottom.Y - player.Bottom.Y) > 20f || NPC.velocity.X == 0)
                 {
                     NPC.noTileCollide = true;
 
-                    if (player.Center.Y < NPC.Bottom.Y && !player.dead) //higher than NPC or not dead
+                    if (player.Bottom.Y < NPC.Bottom.Y && !player.dead) //higher than NPC or not dead
                     {
                         NPC.velocity.Y = -4f;
                     }
@@ -1317,6 +1278,18 @@ namespace KirboMod.NPCs
         public override void ModifyHoverBoundingBox(ref Rectangle boundingBox)
         {
             boundingBox = NPC.Hitbox;
+        }
+
+        public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+        {
+            if (animation == 7) //draw gordo on gordo prep
+            {
+                Texture2D gordo = ModContent.Request<Texture2D>("KirboMod/Projectiles/Gordo").Value;
+                Vector2 position = NPC.Center + new Vector2(NPC.direction * 100, -10);
+                Vector2 origin = gordo.Size() / 2;
+
+                Main.EntitySpriteDraw(gordo, position - Main.screenPosition, null, drawColor, 0, origin, 1f, SpriteEffects.None);
+            }
         }
     }
 }

@@ -6,25 +6,27 @@ using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles
 {
-	public class Gordo : ModProjectile
+	public class Gordo : ModProjectile //gordo projectile used by Whispy Woods
 	{
-		private bool hmmnah = false; // if its true then it will bounce in one direction
+		private bool stickToDirection = false; // if its true then it will bounce in one direction
 
-		public override void SetStaticDefaults()
+        public override string Texture => "KirboMod/Projectiles/BouncyGordo";
+
+        public override void SetStaticDefaults()
 		{
 			Main.projFrames[Projectile.type] = 1;
 		}
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 50;
-			Projectile.height = 50;
+			Projectile.width = 78;
+			Projectile.height = 78;
 			Projectile.friendly = false;
 			Projectile.hostile = true;
 			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.timeLeft = 600;
 			Projectile.tileCollide = true;
-			Projectile.penetrate = 999;
+			Projectile.penetrate = -1;
 		}
 		public override void AI()
 		{
@@ -63,17 +65,17 @@ namespace KirboMod.Projectiles
 				Projectile.velocity.Y = -3;
 			}
 
-			if (hmmnah == false)
+			if (stickToDirection == false)
 			{
 				if (hmm.X >= 0)
 				{
 					Projectile.velocity.X = 4f; //bounce towards player upon drop
-					hmmnah = true;
+                    stickToDirection = true;
 				}
 				else
 				{
 					Projectile.velocity.X = -4f; //go other way
-					hmmnah = true;
+                    stickToDirection = true;
 				}
 			}
 
@@ -89,7 +91,7 @@ namespace KirboMod.Projectiles
                 player = Main.player[Main.myPlayer]; //chooses me :)
             }
 
-            if (player.Center.Y - 10 > Projectile.Center.Y && hmmnah == false) //player is lower & hasn't bounced yet
+            if (player.Top.Y - 10 > Projectile.Bottom.Y && stickToDirection == false) //player is lower & hasn't bounced yet
 			{
 				fallThrough = true;
 			}
@@ -100,7 +102,7 @@ namespace KirboMod.Projectiles
 			return true;
 		}
 
-		public override void OnKill(int timeLeft) //when the projectile dies
+        public override void OnKill(int timeLeft) //when the projectile dies
 		{
 			for (int i = 0; i < 15; i++)
 			{

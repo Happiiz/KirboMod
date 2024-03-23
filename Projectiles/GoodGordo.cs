@@ -16,8 +16,8 @@ namespace KirboMod.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 50;
-			Projectile.height = 50;
+			Projectile.width = 78;
+			Projectile.height = 78;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.timeLeft = 300;
@@ -28,11 +28,8 @@ namespace KirboMod.Projectiles
 		}
 		public override void AI()
 		{
-            Projectile.velocity.Y = Projectile.velocity.Y + 0.2f;
-			if (Projectile.velocity.Y >= 6f)
-            {
-				Projectile.velocity.Y = 6f;
-            }
+            Projectile.velocity.Y += 0.2f;
+			Projectile.velocity.Y = MathHelper.Clamp(Projectile.velocity.Y, -12, 12);
 			Projectile.rotation += 0.1f; // rotates projectile
 		}
 
