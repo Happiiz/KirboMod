@@ -15,14 +15,14 @@ namespace KirboMod.Projectiles
 			Main.projFrames[Projectile.type] = 1;
             // DisplayName.SetDefault("Spark Explosion");
         }
-
+		static int Lifetime => 20;
 		public override void SetDefaults()
 		{
 			Projectile.width = 100;
 			Projectile.height = 100;
 			Projectile.friendly = false;
 			Projectile.hostile = true;
-			Projectile.timeLeft = 20;
+			Projectile.timeLeft = Lifetime;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
@@ -30,12 +30,11 @@ namespace KirboMod.Projectiles
 		}
 		public override void AI()
 		{
-		    if (Projectile.ai[0] >= 10)
-            {
-				Projectile.alpha += 10;
-            }
 
-			Projectile.scale += 0.05f;
+			Projectile.scale = Utils.GetLerpValue(Lifetime, 0, Projectile.timeLeft);
+			Projectile.scale = Easings.EaseOut(Projectile.scale, 2);
+			Projectile.scale = MathHelper.Lerp(1, 1 + 0.05f * Lifetime, Projectile.scale);
+			Projectile.Opacity = Utils.Remap(Projectile.timeLeft, Lifetime * .7f, 0, 0.8f, 0);
 			Lighting.AddLight(Projectile.Center, 1f, 0.9f, 0);
 		}
 

@@ -1,26 +1,12 @@
 using KirboMod.NPCs;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
 using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
-using Terraria.Graphics;
 using Terraria.Graphics.Effects;
+using Terraria.ModLoader;
 
 namespace KirboMod.Biomes
 {
     public class Hyperzone : ModSceneEffect
     {
-        public override void SetStaticDefaults()
-        {
-          
-        }
-
         public override bool IsSceneEffectActive(Player player)
         {
             if (NPC.AnyNPCs(ModContent.NPCType<Zero>()) || NPC.AnyNPCs(ModContent.NPCType<ZeroEye>()))
@@ -36,7 +22,6 @@ namespace KirboMod.Biomes
                 return false;
             }
         }
-
         public override void SpecialVisuals(Player player, bool isActive)
         {
             player.ManageSpecialBiomeVisuals("KirboMod:HyperZone", isActive, default);

@@ -23,7 +23,7 @@ namespace KirboMod.Projectiles.Flames
             debuffDuration = 120;
             duration = 20;
             fadeOutDuration /= 4;
-            whiteInsideOpacity = 1;
+            whiteInsideOpacity = 1;         
         }
 
         public override void SetDefaults()

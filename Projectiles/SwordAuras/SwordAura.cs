@@ -29,7 +29,10 @@ namespace KirboMod.Projectiles
             float progress = Projectile.localAI[0] / Projectile.ai[1];
             float whichSide = Projectile.ai[0];
             float velToRot = Projectile.velocity.ToRotation();
-            float realRotation = (float)Math.PI * whichSide * progress + velToRot + whichSide * (float)Math.PI + player.fullRotation;
+            float realRotation = MathF.PI * whichSide * progress 
+                + velToRot
+                + whichSide * MathF.PI 
+                + player.fullRotation;
             Projectile.rotation = realRotation;
             Projectile.Center = player.RotatedRelativePoint(player.MountedCenter) - Projectile.velocity;
             Projectile.scale = BaseScale + progress * ScaleIncrease;

@@ -79,7 +79,12 @@ namespace KirboMod.Projectiles
 			if (target.active) //checks if the npc is active
 			{
 				//spawns body ice on npc 
-				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + Projectile.velocity, Projectile.velocity, ModContent.ProjectileType<BodyIce>(), Projectile.damage / 4, 0, Projectile.owner, target.whoAmI); 
+				int bodyIceDamage = Projectile.damage / 10;
+				if(bodyIceDamage < 1)
+				{
+					bodyIceDamage = 1;
+				}
+				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + Projectile.velocity, Projectile.velocity, ModContent.ProjectileType<BodyIce>(), bodyIceDamage, 0, Projectile.owner, target.whoAmI); 
 			}
 			target.AddBuff(BuffID.Frostburn, 400);
 			target.AddBuff(BuffID.Frostburn2, 400);//frostbite, inflicted by frozen armor
@@ -103,7 +108,7 @@ namespace KirboMod.Projectiles
         {
             if (Main.rand.NextBool(5)) //chance of making a blizzard formation
             {
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.position, Projectile.velocity * 0, ModContent.ProjectileType<BlizzardFormation>(), Projectile.damage / 2, 4f, Projectile.owner);
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.position, Projectile.velocity * 0, ModContent.ProjectileType<BlizzardFormation>(), Projectile.damage, 4f, Projectile.owner);
             }
 			return true;
         }
