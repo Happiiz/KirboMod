@@ -32,7 +32,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.BladoProj>();
-			Item.shootSpeed = 12f;
+			Item.shootSpeed = 18f;
 			Item.consumable = true;
 			Item.maxStack = 9999;
 			Item.noMelee = true;

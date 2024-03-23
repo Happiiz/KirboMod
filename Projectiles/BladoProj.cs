@@ -19,8 +19,8 @@ namespace KirboMod.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 58;
-			Projectile.height = 58;
+			Projectile.width = 80;
+			Projectile.height = 80;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.timeLeft = 300;
@@ -34,7 +34,7 @@ namespace KirboMod.Projectiles
 				touchedground = true; //touch ground
             }
 
-			Projectile.velocity.Y = Projectile.velocity.Y + 0.4f;
+			Projectile.velocity.Y += 0.4f;
 			if (Projectile.velocity.Y >= 12f)
 			{
 				Projectile.velocity.Y = 12f;
@@ -105,6 +105,13 @@ namespace KirboMod.Projectiles
         {
 			return false; //doesn't die
 		}
+
+        public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
+        {
+			fallThrough = false;
+
+			return true;
+        }
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone) //decrease damage for each hit
         {
