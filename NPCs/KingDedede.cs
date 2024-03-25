@@ -81,10 +81,10 @@ namespace KirboMod.NPCs
             NPC.boss = true;
             NPC.noGravity = false;
             NPC.lavaImmune = true;
-            Music = MusicID.Boss5;
             if (!Main.dedServ)
             {
-                Music = MusicLoader.GetMusicSlot(Mod, "Sounds/Music/KingDedede");
+                //Music = MusicLoader.GetMusicSlot(Mod, "Sounds/Music/KingDedede");
+                Music = MusicID.Boss5;
             }
 
             NPC.friendly = false;

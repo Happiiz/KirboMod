@@ -18,7 +18,7 @@ namespace KirboMod.Projectiles
 		{
 			Projectile.width = 16;
 			Projectile.height = 16;
-			DrawOriginOffsetX = -5;
+			DrawOriginOffsetX = -9;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.timeLeft = 40; //40 seconds

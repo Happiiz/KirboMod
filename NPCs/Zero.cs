@@ -579,7 +579,6 @@ namespace KirboMod.NPCs
                 attacktype = possibleAttacks[Main.rand.Next(possibleAttacks.Count)];
                 NPC.netUpdate = true;
             }
-            attacktype = ZeroAttackType.Sparks;//DEBUG LINE DELETE LATER
             lastattacktype = attacktype;
         }
 

@@ -13,7 +13,7 @@ namespace KirboMod.Bestiary
     {
         public Asset<Texture2D> GetBackgroundImage()
         {
-            return ModContent.Request<Texture2D>("KirboMod/Bestiary/Blue"); //blue background
+            return Main.Assets.Request<Texture2D>("Images/MapBG1"); //placeholder
         }
 
         public Color? GetBackgroundColor()
