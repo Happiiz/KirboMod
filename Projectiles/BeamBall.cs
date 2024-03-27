@@ -19,7 +19,7 @@ namespace KirboMod.Projectiles
 			Projectile.height = 30;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Magic;
-			Projectile.timeLeft = 15;
+			Projectile.timeLeft = 3000;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 			

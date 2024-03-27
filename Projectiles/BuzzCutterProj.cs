@@ -114,7 +114,6 @@ namespace KirboMod.Projectiles
 			{
 				Projectile.ai[1]++;
 				Projectile.ai[0] = 39;
-				Projectile.damage = Projectile.originalDamage / 3;
                 if (NPCToStickTo == -1)
 				{
 					Projectile.velocity *= 0;
@@ -168,9 +167,10 @@ namespace KirboMod.Projectiles
         {
 			Texture2D tex = TextureAssets.Projectile[Type].Value;
 			if(NPCToStickTo == -1)
-            for (float i = -10; i < 11; i+= 1f/4f)//motion blur effect
+            for (float i = -10; i < 11; i+= 1f/3f)//motion blur effect
             {
-				Vector2 posOffset = Projectile.velocity * i * 0.5f - Main.screenPosition;
+
+				Vector2 posOffset = Projectile.velocity * i * 0.2f - Main.screenPosition;
 				float opacity = 1 - MathF.Abs(i) / 10;
 				Main.EntitySpriteDraw(tex, Projectile.Center + posOffset, null, Projectile.GetAlpha(Color.White) * opacity * 0.125f, Projectile.rotation, tex.Size() / 2, Projectile.scale , SpriteEffects.None);
                 }
