@@ -28,9 +28,9 @@ namespace KirboMod.Items.Weapons
 			Item.noMelee = true;
 			Item.width = 25;
 			Item.height = 25;
-			Item.useTime = 4;
-			Item.useAnimation = 20;
-			Item.useStyle = ItemUseStyleID.Shoot;
+			Item.useTime = 7;
+			Item.useAnimation = Item.useTime * 5;
+            Item.useStyle = ItemUseStyleID.Shoot;
 			Item.knockBack = 0.2f;
 			Item.value = Item.buyPrice(0, 5, 50, 0);
 			Item.rare = ItemRarityID.Yellow;
@@ -74,7 +74,7 @@ namespace KirboMod.Items.Weapons
 		{
 			Recipe recipe1 = CreateRecipe();//the result is dragonfire
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.VolcanoFire>()); //Volcano Fire
-			recipe1.AddIngredient(ItemID.ApprenticeStaffT3); //Betsy's Wrath
+			recipe1.AddIngredient(ItemID.ShadowbeamStaff); //Shadowbeam Staff
 			recipe1.AddIngredient(ItemID.LaserMachinegun); //Laser Machinegun
 			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 100); //100 starbits
 			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 5); //5 rare stones

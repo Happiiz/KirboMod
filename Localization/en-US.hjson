@@ -748,6 +748,7 @@ Mods: {
 					'''
 					Sprays a flurry of fireballs
 					Enemies hit by one will catch on fire
+					{$CommonItemTooltip.DefensePenetration}
 					'''
 			}
 

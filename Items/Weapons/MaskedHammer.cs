@@ -146,7 +146,7 @@ namespace KirboMod.Items.Weapons
 			Recipe maskedhammerrecipe = CreateRecipe();//the result is Wild Hammer
 			maskedhammerrecipe.AddIngredient(ModContent.ItemType<Items.Weapons.WildHammer>()); //Wild Hammer
 			maskedhammerrecipe.AddIngredient(ItemID.PossessedHatchet); //Possessed Hatchet
-            maskedhammerrecipe.AddIngredient(ItemID.DD2SquireBetsySword); //Flying Dragon
+            maskedhammerrecipe.AddIngredient(ItemID.TheHorsemansBlade); //The Horseman's Blade
             maskedhammerrecipe.AddIngredient(ItemID.FragmentSolar, 9); //Solar Fragment
 			maskedhammerrecipe.AddIngredient(ModContent.ItemType<Items.Starbit>(), 200); //200 starbits
 			maskedhammerrecipe.AddIngredient(ModContent.ItemType<Items.RareStone>(), 8); //8 rare stones

@@ -133,8 +133,8 @@ namespace KirboMod.Items.Weapons
 			Recipe recipe1 = CreateRecipe();//the result is Wild Hammer
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.ToyHammer>()); //Toy Hammer
 			recipe1.AddIngredient(ItemID.ChlorophyteGreataxe); //Chlorophyte Greataxe
-			recipe1.AddIngredient(ItemID.TheHorsemansBlade); //The Horseman's Blade
-			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 100); //100 starbits
+			recipe1.AddIngredient(ItemID.DeathSickle); //Death Sickle
+            recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 100); //100 starbits
 			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 5); //5 rare stones
 			recipe1.AddTile(TileID.MythrilAnvil); //crafted at mythril/orichalcum anvil
 			recipe1.Register(); //adds this recipe to the game

@@ -21,14 +21,14 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 45;
+			Item.damage = 38;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 36;
 			Item.height = 40;
-			Item.useTime = 3;
-			Item.useAnimation = 15;
-			Item.useStyle = ItemUseStyleID.Shoot;
+			Item.useTime = 5;
+			Item.useAnimation = Item.useTime * 5;
+            Item.useStyle = ItemUseStyleID.Shoot;
 			Item.knockBack = 4f;
 			Item.value = Item.buyPrice(0, 0, 45, 0);
 			Item.rare = ItemRarityID.LightRed;
@@ -41,12 +41,11 @@ namespace KirboMod.Items.Weapons
 
 		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {
-            Vector2 rotationoffset = new Vector2(velocity.X, velocity.Y).RotatedByRandom(MathHelper.ToRadians(30)); //30 degree spread for dusts
+            Vector2 rotationoffset = new Vector2(velocity.X, velocity.Y).RotatedByRandom(MathHelper.ToRadians(20)); //20 degree spread for dusts
 
-            velocity = velocity.RotatedByRandom(MathHelper.ToRadians(30)); //30 degree spread for proj too
+            velocity = velocity.RotatedByRandom(MathHelper.ToRadians(20)); //20 degree spread for proj too
 
-            //do it before setting velocity to perturbed speed
-            Dust.NewDustPerfect(player.Center, ModContent.DustType<Dusts.Flake>(), rotationoffset);
+            Dust.NewDustPerfect(player.Center, ModContent.DustType<Dusts.Flake>(), rotationoffset * 3);
         }
 
 		public override void AddRecipes()

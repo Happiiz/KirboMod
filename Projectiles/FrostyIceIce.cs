@@ -1,4 +1,6 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using System;
 using Terraria;
 using Terraria.Audio;
@@ -8,8 +10,10 @@ using Terraria.ModLoader;
 namespace KirboMod.Projectiles
 {
 	public class FrostyIceIce : ModProjectile
-	{
-		public override void SetStaticDefaults()
+    {
+        readonly int style = Main.rand.Next(1, 4);
+
+        public override void SetStaticDefaults()
 		{
 			
 		}
@@ -19,28 +23,24 @@ namespace KirboMod.Projectiles
 			Projectile.height = 24;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Magic;
-			Projectile.timeLeft = 20;
+			Projectile.timeLeft = 40;
 			Projectile.tileCollide = true;
 			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
-            Projectile.usesIDStaticNPCImmunity = true;
-            Projectile.idStaticNPCHitCooldown = 10;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = 10;
+            Projectile.extraUpdates = 1;
         }
 		public override void AI()
         {
             //scale with timeLeft
-            Projectile.scale = 1 + 0.05f * (10 - Projectile.timeLeft) < 1.5f ? 1 + 0.05f * (10 - Projectile.timeLeft) : 1.5f;
+            Projectile.scale = 1f + Utils.GetLerpValue(40, 0, Projectile.timeLeft, true);
 
             if (Main.rand.NextBool(100)) // happens 1/100 times
 			{
 				//swap X vel and Y vel(also make them negative)
-				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity / 2, ModContent.ProjectileType<Projectiles.FrostySculpture>(), Projectile.damage, 0f, Projectile.owner);
+				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity / 2, ModContent.ProjectileType<Projectiles.FrostySculpture>(), Projectile.damage / 2, 0f, Projectile.owner);
 			}
-
-            if (Projectile.timeLeft <= 5) //fade when close to death
-            {
-                Projectile.alpha += 51;
-            }
         }
 
         public override bool OnTileCollide(Vector2 oldVelocity)
@@ -69,5 +69,29 @@ namespace KirboMod.Projectiles
                 Projectile.NewProjectile(Projectile.GetSource_FromThis(), target.position, new Vector2(player.direction * 5, 0), ModContent.ProjectileType<Projectiles.IceChunk>(), Projectile.damage * 2, 6, Projectile.owner);
             }
 		}
-	}
+
+        public override bool PreDraw(ref Color lightColor)
+        {
+            Texture2D iceMist = ModContent.Request<Texture2D>("KirboMod/Projectiles/IceMist/IceMist" + style).Value;
+
+            Color color = Color.LightCyan * Utils.GetLerpValue(0, 10, Projectile.timeLeft, true);
+
+            float scale = Utils.GetLerpValue(40, 30, Projectile.timeLeft, true);
+
+            Main.EntitySpriteDraw(iceMist, Projectile.Center - Main.screenPosition, null, color, 0, iceMist.Size() / 2, scale * 0.5f, SpriteEffects.None);
+
+            color = Color.White * Utils.GetLerpValue(0, 5, Projectile.timeLeft, true);
+
+            Main.EntitySpriteDraw(iceMist, Projectile.Center - Main.screenPosition, null, color, 0, iceMist.Size() / 2, scale * 0.25f, SpriteEffects.None);
+
+            return false;
+        }
+
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+        {
+            float scaler = Utils.GetLerpValue(40, 30, Projectile.timeLeft, true);
+
+            return Utils.CenteredRectangle(Projectile.Center, new Vector2(200 * scaler)).Intersects(targetHitbox);
+        }
+    }
 }

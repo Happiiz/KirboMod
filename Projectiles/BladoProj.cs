@@ -19,8 +19,8 @@ namespace KirboMod.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 80;
-			Projectile.height = 80;
+			Projectile.width = 78;
+			Projectile.height = 78;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.timeLeft = 300;

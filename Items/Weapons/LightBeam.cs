@@ -110,8 +110,8 @@ namespace KirboMod.Items.Weapons
 		{
 			Recipe recipe1 = CreateRecipe();//the result is gigantsword
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.LaserBeam>()); //Laser Beam Staff
-			recipe1.AddIngredient(ItemID.ShadowbeamStaff); //Shadowbeam Staff
-			recipe1.AddIngredient(ItemID.FairyQueenMagicItem); //Nightglow
+			recipe1.AddIngredient(ItemID.RainbowRod); //Rainbow Rod
+            recipe1.AddIngredient(ItemID.FairyQueenMagicItem); //Nightglow
 			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 100); //100 starbits
 			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 5); //5 rare stones
 			recipe1.AddTile(TileID.MythrilAnvil); //crafted at mythril/orichalcum anvil

@@ -22,14 +22,14 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 35;
+			Item.damage = 32;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 32;
 			Item.height = 40;
-			Item.useTime = 5;
-			Item.useAnimation = 25;
-			Item.useStyle = ItemUseStyleID.Shoot;
+			Item.useTime = 7;
+			Item.useAnimation = Item.useTime * 5;
+            Item.useStyle = ItemUseStyleID.Shoot;
 			Item.knockBack = 7f;
 			Item.value = Item.buyPrice(0, 0, 45, 0);
 			Item.rare = ItemRarityID.LightRed;

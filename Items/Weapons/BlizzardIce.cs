@@ -27,8 +27,8 @@ namespace KirboMod.Items.Weapons
 			Item.width = 48;
 			Item.height = 52;
 			Item.useTime = 5;
-			Item.useAnimation = 25;
-			Item.useStyle = ItemUseStyleID.Shoot;
+			Item.useAnimation = Item.useTime * 5;
+            Item.useStyle = ItemUseStyleID.Shoot;
 			Item.knockBack = 0.1f;
 			Item.value = Item.buyPrice(0, 5, 50, 0);
 			Item.rare = ItemRarityID.Yellow;
