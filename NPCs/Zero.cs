@@ -1,6 +1,7 @@
 using KirboMod.Bestiary;
 using KirboMod.Items.Zero;
 using KirboMod.Projectiles;
+using KirboMod.Projectiles.ZeroDashHitbox;
 using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -317,11 +318,27 @@ namespace KirboMod.NPCs
                 if (attacktype == ZeroAttackType.Dash) //dash
                 {
                     NPC.TargetClosest(false); //don't face player during attack
-
-                    if (NPC.ai[0] <= 150) //backup
+                   
+                    if (NPC.ai[0] <= 160) //backup
                     {
                         if (NPC.ai[0] == 121)
                         {
+                            int dmgHitboxType = ModContent.ProjectileType<ZeroDamageHitbox>();
+                            bool shouldSpawnDamageHitbox = true;
+                            for (int i = 0; i < Main.maxProjectiles; i++)
+                            {
+                                Projectile compare = Main.projectile[i];
+                                if(compare.active && compare.type == dmgHitboxType && compare.ai[0] == NPC.whoAmI)
+                                {
+                                    shouldSpawnDamageHitbox = false;
+                                    break;
+                                }
+                            }
+                            if (shouldSpawnDamageHitbox)
+                            {
+                                int dashDamage = NPC.GetAttackDamage_ForProjectiles(150, 220) / 2;
+                                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, default, dmgHitboxType, dashDamage, 0, Main.myPlayer, NPC.whoAmI); 
+                            }
                             NPC.velocity *= 0.01f; //freeze to warn player (but not too much else it might disappear)
                         }
                         else
@@ -329,10 +346,10 @@ namespace KirboMod.NPCs
                             NPC.velocity.X -= NPC.direction * 0.5f; //back up
                         }
                     }
-                    else if (NPC.ai[0] <= 270) //dash
+                    else if (NPC.ai[0] <= 300) //dash
                     {
                         NPC.velocity.X += NPC.direction * 0.6f;
-                    }
+                    }//IF YOU CHANGE THE DURATION OF THE DASH REMEMBER TO CHANGE IT IN THE ZERODAMAGEHITBOX PROJECTILE!!
                     else //reset
                     {
                         NPC.ai[0] = 0;
@@ -342,22 +359,17 @@ namespace KirboMod.NPCs
                     //go up or down
                     if (player.Center.Y < NPC.Center.Y)
                     {
-                        NPC.velocity.Y -= 0.5f;
+                        NPC.velocity.Y -= 0.35f;
                     }
                     else
                     {
-                        NPC.velocity.Y += 0.5f;
+                        NPC.velocity.Y += 0.35f;
                     }
 
                     //cap
-                    if (NPC.velocity.Y > 7.5f)
-                    {
-                        NPC.velocity.Y = 7.5f;
-                    }
-                    if (NPC.velocity.Y < -7.5f)
-                    {
-                        NPC.velocity.Y = -7.5f;
-                    }
+                    NPC.velocity.Y = MathHelper.Clamp(NPC.velocity.Y, -7.5f, 7.5f);
+
+               
                 }
 
                 if (attacktype == ZeroAttackType.DarkMatterShots) //dark matter shot
@@ -579,7 +591,6 @@ namespace KirboMod.NPCs
                 attacktype = possibleAttacks[Main.rand.Next(possibleAttacks.Count)];
                 NPC.netUpdate = true;
             }
-            attacktype = ZeroAttackType.Sparks;//DEBUG LINE DELETE LATER
             lastattacktype = attacktype;
         }
 

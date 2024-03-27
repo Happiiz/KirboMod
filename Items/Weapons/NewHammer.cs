@@ -16,8 +16,9 @@ namespace KirboMod.Items.Weapons
 	public class NewHammer : ModItem
 	{
 		private int uses = 0;
-		public override void SetStaticDefaults() 
+		public override void SetStaticDefaults()
 		{
+			ItemID.Sets.ItemsThatAllowRepeatedRightClick[Type] = true;
 			 // DisplayName.SetDefault("Ham-O-Matic"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
 			/* Tooltip.SetDefault("Swing on the ground to cause shockwaves and right click to fire missiles" +
 				"\n'Now with 2x the clobbering power!'"); */
@@ -40,6 +41,7 @@ namespace KirboMod.Items.Weapons
 			Item.autoReuse = true;
 			Item.shoot = ProjectileID.None;
 			Item.noUseGraphic = false; //use sprite
+			SetStaticDefaults();
 		}
 
         public override bool AltFunctionUse(Player player)
@@ -83,8 +85,10 @@ namespace KirboMod.Items.Weapons
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
 			//hold up animation
-			Projectile.NewProjectile(source, player.Center, new Vector2(0, 0), ModContent.ProjectileType<NewHammerHoldUp>(), 0, 0, player.whoAmI);
-
+			if (player.whoAmI == Main.myPlayer)
+			{
+				Projectile.NewProjectile(source, player.Center, new Vector2(0, 0), ModContent.ProjectileType<NewHammerHoldUp>(), 0, 0, player.whoAmI);
+			}
 			return true;
 		}
 
