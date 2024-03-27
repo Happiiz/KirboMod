@@ -15,7 +15,8 @@ namespace KirboMod.Gores
         {
             dust.customData = 0;
             dust.alpha = 0;
-            dust.frame = new Rectangle(0, 0, TextureX, TextureY);           
+            dust.frame = new Rectangle(0, 0, TextureX, TextureY);
+            
         }
         public override bool PreDraw(Dust dust)
         {

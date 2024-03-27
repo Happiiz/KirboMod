@@ -30,7 +30,6 @@ namespace KirboMod.Projectiles
 			Projectile.penetrate = -1;
 			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.extraUpdates = 2;
-			Projectile.alpha = 255;
 			Projectile.usesLocalNPCImmunity = true; //doesn't wait for other projectiles to hit again
 			Projectile.localNPCHitCooldown = 20; //time until able to hit npc even if npc has just been struck
 		}
@@ -56,19 +55,16 @@ namespace KirboMod.Projectiles
 		ref float VelLength { get => ref Projectile.ai[2]; }
         public override void AI()
 		{
-			Projectile.Opacity += .1f;
 			Lighting.AddLight(Projectile.Center, Color.Gold.ToVector3());
 			Player player = Main.player[Projectile.owner];
 			Projectile.rotation += Projectile.direction * 0.5f;
-			if (Projectile.velocity.LengthSquared() > 1)
-			{
-				Dust dust = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.SpelunkerGlowstickSparkle);
-				dust.scale = 2;
-                dust.velocity += Projectile.velocity * 0.4f;
-            }
-            if (Projectile.ai[0] >= 72)//return
+			Dust dust = Main.dust[Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.SpelunkerGlowstickSparkle)];
+			dust.scale = 2;
+			//if(Main.rand.NextBool())
+				dust.velocity += Projectile.velocity * 0.4f;
+			if (Projectile.ai[0] >= 60)//return
             {
-				if(Projectile.ai[0] == 72)
+				if(Projectile.ai[0] == 60)
                 {
 					Projectile.velocity = Vector2.Normalize( Projectile.velocity).RotatedBy(Projectile.ai[1] * MathF.PI / 2) * VelLength;
                 }
@@ -83,12 +79,12 @@ namespace KirboMod.Projectiles
 				Rectangle box = Projectile.Hitbox;
 				if (box.Intersects(player.Hitbox)) //if touching player
                 {
-					Projectile.Kill();
+					Projectile.Kill(); //KILL
                 }
 				return;
             }
 			Projectile.velocity.Normalize();
-			Projectile.velocity *= Helper.RemapEased(Projectile.ai[0], 0, 36, VelLength, 0.001f, Easings.EaseInCubic);
+			Projectile.velocity *= Helper.RemapEased(Projectile.ai[0], 0, 40, VelLength, 0.1f, Easings.EaseInOutSine);
 		}
 
         public static Asset<Texture2D> afterimage;
@@ -107,12 +103,12 @@ namespace KirboMod.Projectiles
 			for (int i = Projectile.oldPos.Length - 1; i >= 0; i--)
             {
 				 drawPos = (Projectile.oldPos[i] - Main.screenPosition) + new Vector2(0f, Projectile.gfxOffY) + Projectile.Size / 2;
-				Color color = Color.White * Utils.GetLerpValue(Projectile.oldPos.Length, 0, i) * Projectile.Opacity;
+				Color color = Color.White * Utils.GetLerpValue(Projectile.oldPos.Length, 0, i);
 				Main.EntitySpriteDraw(texture, drawPos, null, color, Projectile.rotation, origin, 1, SpriteEffects.None, 0);
 
 			}
 			drawPos = (Projectile.Center - Main.screenPosition) + new Vector2(0f, Projectile.gfxOffY);
-			Main.EntitySpriteDraw(texture, drawPos, null, Color.White * Projectile.Opacity, Projectile.rotation, origin, Projectile.scale, SpriteEffects.None);
+			Main.EntitySpriteDraw(texture, drawPos, null, Color.White, Projectile.rotation, origin, Projectile.scale, SpriteEffects.None);
 
 			return false;
         }

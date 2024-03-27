@@ -551,7 +551,7 @@ Mods: {
 				DisplayName: Sky Blanket
 				Tooltip:
 					'''
-					Calls on Kracko Jr.
+					Calls on a Kracko Jr.
 					'I need my blankey!'
 					'''
 			}
@@ -605,9 +605,8 @@ Mods: {
 				DisplayName: Buzz-Saw Cutter
 				Tooltip:
 					'''
-					Shoots a flying sawblade that bounces off walls and sticks to enemies.
-					Ignores 1000 defense
-
+					Shoots a flying sawblade that bounces off nearby walls and grinds on enemies
+					Returns to the player if it can't reach any walls to bounce off of
 					'''
 			}
 
@@ -625,8 +624,8 @@ Mods: {
 				DisplayName: Chakram Cutter
 				Tooltip:
 					'''
-					Shoots 2 chakrams
-					After a bit, they hover in place for a brief moment, shoot outwards in the opposite directions, and return to you
+					Shoots out in an arc
+					Returns to the player after a bit
 					'''
 			}
 

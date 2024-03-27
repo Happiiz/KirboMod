@@ -34,7 +34,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item93; //electro zap
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.BeamBall>();
-			Item.shootSpeed = 17;
+			Item.shootSpeed = 12f;
 			Item.mana = 8;
 		}
 
