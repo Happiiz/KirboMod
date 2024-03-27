@@ -24,6 +24,20 @@ namespace KirboMod
         {
             return 1 - MathF.Pow(1 - progress, exponent);
         }
+        public static float EaseOutSquare(float progress)
+        {
+            progress = 1 - progress;
+            progress *= progress;
+            return 1 - progress;
+        }
+        public static float EaseInSquare(float progress)
+        {
+            return progress * progress;
+        }
+        public static float EaseInCubic(float progress)
+        {
+            return progress * progress * progress;
+        }
         public static float EaseIn(float progress, float exponent)
         {
             return MathF.Pow(progress, exponent);

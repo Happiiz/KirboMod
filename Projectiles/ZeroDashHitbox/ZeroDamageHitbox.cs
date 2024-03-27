@@ -15,9 +15,10 @@ namespace KirboMod.Projectiles.ZeroDashHitbox
         public override string Texture => "KirboMod/NothingTexture";
         public override void SetDefaults()
         {
+            Projectile.width = Projectile.height = 250;
             Projectile.tileCollide = false;
             Projectile.ignoreWater = true;
-            Projectile.timeLeft = int.MaxValue;//1 year and 49 days.
+            Projectile.timeLeft = 300; //duration of zero's dash
             Projectile.hostile = true;
         }
         public override void AI()
@@ -50,6 +51,7 @@ namespace KirboMod.Projectiles.ZeroDashHitbox
             if (zero.ModNPC is Zero zeroModNPC)
             {
                 Projectile.ai[1] = zeroModNPC.attacktype == Zero.ZeroAttackType.BackgroundShots ? 1 : 0;
+
             }
             else//more failsafe
             {
@@ -62,7 +64,7 @@ namespace KirboMod.Projectiles.ZeroDashHitbox
         {
             if (Projectile.ai[1] == 1)//1 if zero is on the background
                 return false;
-            return Helper.CheckCircleCollision(targetHitbox, Projectile.Center, 380);//398 is zero's width and height. it's 380 to be a bit more forgiving
+            return Helper.CheckCircleCollision(targetHitbox, Projectile.Center, 190);//398 is zero's width and height. it's 380/2 (/2 because it's radius not diameter) to be a bit more forgiving
         }
         public override bool PreDraw(ref Color lightColor)
         {

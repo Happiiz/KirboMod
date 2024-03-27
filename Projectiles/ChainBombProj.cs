@@ -130,38 +130,36 @@ namespace KirboMod.Projectiles
         {
             ChainBombChain = ModContent.Request<Texture2D>("KirboMod/Projectiles/ChainBombChain");
 
-            
-            Vector2 playerCenter = Main.player[Projectile.owner].MountedCenter;
-            //Vector2 center = Projectile.Center;
-
             Power = 0; //reset power
-
+            int type = Type;
+            Vector2 origin = ChainBombChain.Size() * .5f;
+            Color white = Color.White;
+            float chainWidth = ChainBombChain.Height();
             for (int i = 0; i <= Main.maxProjectiles; i++)
             {
                 Projectile proj = Main.projectile[i];
 
-                if (Vector2.Distance(Projectile.Center, proj.Center) < 200 && proj.type == ModContent.ProjectileType<ChainBombProj>() 
-                    && Projectile.whoAmI != proj.whoAmI && proj.active)
+                if (proj.active && proj.type == type && Vector2.DistanceSquared(Projectile.Center, proj.Center) < 200 * 200)
                 {
-                    Power += 1; //add 1 to power
-
-                    Vector2 directionToBomb = Projectile.Center - proj.Center;
+                    if(Projectile.whoAmI != i)
+                    {
+                        Power += 1; //add 1 to power
+                    }
+                    if (Projectile.whoAmI > i)
+                        continue;
                     Vector2 center = proj.Center;
+                    Vector2 directionToBomb = Projectile.Center - center;
                     float projRotation = directionToBomb.ToRotation() - MathHelper.PiOver2;
                     float distance = directionToBomb.Length();
-                    while (distance > 15f && !float.IsNaN(distance)) //draw only while 15 units away from source bomb (and an actual number I guess)
+                    if (float.IsNaN(distance))
+                        continue;
+                    float increment = chainWidth / distance;
+                    for (float j = 0; j < 1; j += increment)
                     {
-                        directionToBomb.Normalize();                   //get unit vector
-                        directionToBomb *= ChainBombChain.Height();     // multiply by chain link length
-                        center += directionToBomb;                   //update draw position
-                        directionToBomb = Projectile.Center - center;    //update distance
-                        distance = directionToBomb.Length();
-                        Color drawColor = Lighting.GetColor((int)center.X / 16, (int)(center.Y / 16));
-
-                        //Draw chain
-                        Main.EntitySpriteDraw(ChainBombChain.Value, center - Main.screenPosition,
-                            ChainBombChain.Value.Bounds, Color.White, projRotation,
-                            ChainBombChain.Size() * 0.5f, 1f, SpriteEffects.None, 0);
+                        //j is  progress
+                        Vector2 pos = center + directionToBomb * j;
+                        pos -= Main.screenPosition;
+                        Main.EntitySpriteDraw(ChainBombChain.Value, pos, null, white, projRotation, origin, 1f, SpriteEffects.None);
                     }
                 }
             }
