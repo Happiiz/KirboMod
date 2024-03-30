@@ -42,13 +42,18 @@ namespace KirboMod.Items.Weapons
 			Item.ArmorPenetration = ArmPen;
 		}
 
-		public override Vector2? HoldoutOffset()
-		{
-			return new Vector2(-10, 0);
-		}
+        public override Vector2? HoldoutOffset()
+        {
+            return new Vector2(-10, -10);
+        }
 
-		//Draw Flame
-		public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
+        public override void HoldItemFrame(Player player)
+        {
+            Item.scale = 0.8f; //make small while holding
+        }
+
+        //Draw Flame
+        public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
 		{
 			Texture2D texture = ModContent.Request<Texture2D>("KirboMod/Items/Weapons/DragonFire_Glowmask").Value; //GlowMask (flame)
 

@@ -37,7 +37,7 @@ namespace KirboMod.Items.Weapons
 			Item.shoot = ModContent.ProjectileType<Projectiles.IceIce>();
 			Item.shootSpeed = 16f;
 			Item.mana = 3;
-		}
+        }
 
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {

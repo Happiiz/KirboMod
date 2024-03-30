@@ -3,31 +3,35 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace KirboMod.Projectiles
+namespace KirboMod.Projectiles.HammerSwings
 {
-    public class MaskedFireTornado : ModProjectile
+    public class WildHammerSwing : ModProjectile
     {
+        int spinDirection = 1;
+        private Vector2 dash = Main.MouseWorld;
         public override void SetStaticDefaults()
         {
             Main.projFrames[Projectile.type] = 3;
-            // DisplayName.SetDefault("Fire Spin");
         }
+
+        public override string Texture => "KirboMod/NothingTexture";
 
         public override void SetDefaults()
         {
-            Projectile.width = 200;
+            Projectile.width = 450;
             Projectile.height = 200;
             Projectile.friendly = true;
             Projectile.DamageType = DamageClass.Melee;
-            Projectile.timeLeft = 90;
+            Projectile.timeLeft = 20;
             Projectile.tileCollide = false;
             Projectile.penetrate = -1;
             Projectile.usesLocalNPCImmunity = true;
-            Projectile.localNPCHitCooldown = 10;
+            Projectile.localNPCHitCooldown = 20;
             Projectile.ownerHitCheck = true;
         }
 
@@ -54,48 +58,31 @@ namespace KirboMod.Projectiles
             player.ChangeDir(((Projectile.localAI[1] % 8) < 4) ? -1 : 1);
             for (int i = 0; i < 6; i++)
             {
-                int dustnumber = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.SolarFlare, 0f, 0f, 200, default, 1.2f); //dust
+                int dustnumber = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Torch, 0f, 0f, 200, default, 2f); //dust
                 Main.dust[dustnumber].velocity *= 0.3f;
                 Main.dust[dustnumber].noGravity = true;
             }
-            
-
-            Lighting.AddLight(Projectile.Center, 0.9f, 0.5f, 0f); //orange light
-
 
             player.immuneTime = player.itemAnimationMax + 10;
             player.immune = true;
             player.immuneNoBlink = true;
 
-            //extra...
-            player.maxFallSpeed = 0;
             player.noKnockback = true;
             player.dashType = 0;
 
-            player.canRocket = false;
-            player.carpet = false;
-            player.carpetFrame = -1;
-
-            //disable kirby balloon
-            player.GetModPlayer<KirbPlayer>().kirbyballoon = false;
-            player.GetModPlayer<KirbPlayer>().kirbyballoonwait = 1;
-
-            //double jump effects
-            player.blockExtraJumps = true;
             player.DryCollision(true, true); //fall through platforms
+
             player.mount.Dismount(player); //dismount mounts
 
-            player.velocity.Y -= player.gravity;
             if (Main.myPlayer == player.whoAmI)
             {
-                float dashTopSpeed = Utils.Remap(Projectile.localAI[1], 0, 80, 12, 22);
-                float dashSteeringRate = .07f;
-                Vector2 targetVelocity = player.Center.DirectionTo(Main.MouseWorld) * dashTopSpeed;
-                player.velocity = Vector2.Lerp(player.velocity, targetVelocity, dashSteeringRate);
                 if (Projectile.localAI[0] == 0)//first frame
                 {
-                    player.velocity = targetVelocity;
+                    dash = player.Center.DirectionTo(Main.MouseWorld) * 30;
                 }
+
+                player.velocity = dash;
+
                 if (Main.netMode == NetmodeID.MultiplayerClient)
                 {
                     if (Projectile.timeLeft > 1 && Projectile.localAI[0] == 1)
@@ -118,48 +105,28 @@ namespace KirboMod.Projectiles
             Projectile.localAI[0] = 1;
 
         }
+
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-            target.AddBuff(BuffID.Daybreak, 1800);
+            target.AddBuff(BuffID.OnFire, 300); //inflict with fire for 5 seconds 
         }
+
         public override bool PreDraw(ref Color lightColor)
         {
-            int frames = Main.projFrames[Type];
-            Texture2D tex = TextureAssets.Projectile[Type].Value;
             Player plr = Main.player[Projectile.owner];
             Vector2 drawPos = plr.Center - Main.screenPosition;
             DrawHammers(drawPos);
-            Rectangle frame = tex.Frame(1, frames, 0, Projectile.frame);
-            int frameHeight = tex.Height / Main.projFrames[Type];
-            DrawSegmentedTornado(tex, drawPos, frame, frameHeight, default, 1, Color.White, .7f, 1.2f);
-
-            frame = tex.Frame(1, frames, 0, (Projectile.frame + 2) % frames);
-            Color col = (Color.White with { A = 128 }) * .3f;
-            DrawSegmentedTornado(tex, drawPos, frame, frameHeight, default, 1.5f, col, .7f, 1.2f);
 
             return false;
         }
 
-        private void DrawSegmentedTornado(Texture2D tex, Vector2 drawPos, Rectangle frame, int segments, int frameHeight, float drawScale, Color col, float bottomXScale, float topXScale)
-        {
-            frameHeight = (tex.Height / Main.projFrames[Type]) / segments;
-            for (int i = 0; i < segments; i++)
-            {
-                Rectangle f = frame;
-                f.Height /= segments;
-                f.Y = (int)Utils.Remap(i, 0, segments - 1, f.Y, f.Y + (segments - 1) * frameHeight);
-                Vector2 offset = new Vector2(0, frameHeight * i - (frameHeight * (segments - 1) * .5f)) * drawScale;
-                Main.EntitySpriteDraw(tex, drawPos + offset, f, col * Projectile.Opacity, Projectile.rotation, f.Size() / 2, Projectile.scale * new Vector2(Utils.Remap(i, 0, segments, topXScale, bottomXScale), 1) * drawScale, SpriteEffects.None);
-            }
-        }
-
         void DrawHammers(Vector2 drawPos)
         {
-            Texture2D tex = ModContent.Request<Texture2D>("KirboMod/Items/Weapons/MaskedHammerHeld").Value;
+            Texture2D tex = ModContent.Request<Texture2D>("KirboMod/Items/Weapons/WildHammerHeld").Value;
             for (int i = 0; i < 2; i++)
             {
                 float timer = MathF.Cos(i * MathF.PI + Projectile.localAI[1] * 0.4f);
-                Vector2 scale = new Vector2(timer, 1) * .7f;
+                Vector2 scale = new Vector2(timer, 1) * 1.5f;
                 SpriteEffects fx = SpriteEffects.None;
                 Vector2 origin = new Vector2(0, tex.Height / 2);
                 if (scale.X < 0)
@@ -171,10 +138,6 @@ namespace KirboMod.Projectiles
                 float rotationOffset = MathF.Sin(Projectile.localAI[1] * .2f) * .2f;
                 Main.EntitySpriteDraw(tex, drawPos + new Vector2(timer * 10, -2), null, Color.White * Projectile.Opacity, Projectile.rotation + rotationOffset, origin, scale, fx);
             }
-        }
-        public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
-        {
-            Main.instance.DrawCacheProjsOverWiresUI.Add(index); //go in front of players
         }
     }
 }

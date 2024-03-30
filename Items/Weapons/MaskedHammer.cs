@@ -39,7 +39,7 @@ namespace KirboMod.Items.Weapons
 			Item.autoReuse = true;
 			Item.noMelee = false;
 			Item.noUseGraphic = false;
-		}
+        }
 		public override void HoldItem(Player player)
 		{
 			Item.noMelee = player.ownedProjectileCounts[ModContent.ProjectileType<Projectiles.MaskedFireTornado>()] > 0;

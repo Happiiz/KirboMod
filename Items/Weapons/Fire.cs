@@ -43,9 +43,9 @@ namespace KirboMod.Items.Weapons
 			Item.shootSpeed = 15f;
 			Item.mana = 3;
 			Item.ArmorPenetration = ArmPen;
-		}
+        }
 
-		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
+        public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
 		{
 			velocity = new Vector2(velocity.X, velocity.Y).RotatedByRandom(MathHelper.ToRadians(5)); // 5 degree spread
 		}

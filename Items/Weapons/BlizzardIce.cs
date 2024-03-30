@@ -41,7 +41,12 @@ namespace KirboMod.Items.Weapons
 
         public override Vector2? HoldoutOffset()
         {
-            return new Vector2(-10, -6);
+            return new Vector2(-8, -10);
+        }
+
+        public override void HoldItemFrame(Player player)
+        {
+            Item.scale = 0.8f; //make small while holding
         }
 
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)

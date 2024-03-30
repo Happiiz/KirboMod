@@ -37,9 +37,9 @@ namespace KirboMod.Items.Weapons
 			Item.shoot = ModContent.ProjectileType<Projectiles.FrostyIceIce>(); 
 			Item.shootSpeed = 16f;
 			Item.mana = 6;
-		}
+        }
 
-		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
+        public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {
             Vector2 rotationoffset = new Vector2(velocity.X, velocity.Y).RotatedByRandom(MathHelper.ToRadians(20)); //20 degree spread for dusts
 

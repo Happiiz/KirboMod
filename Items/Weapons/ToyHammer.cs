@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using System;
 using Terraria;
 using Terraria.Audio;
+using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -11,7 +12,8 @@ namespace KirboMod.Items.Weapons
 	public class ToyHammer : ModItem
 	{
 		private int meleeCharge = 0;
-		private int attackTime = 0;
+
+        const int chargeCap = 60;
 		public override void SetStaticDefaults() 
 		{
 			 // DisplayName.SetDefault("Toy Hammer"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
@@ -37,66 +39,74 @@ namespace KirboMod.Items.Weapons
 		}
 
 		public override void HoldItem(Player player)
-		{
-			if (Main.mouseRight == true & attackTime < 1) //holding right & not attacking
+        {
+            KirbPlayer kplr = player.GetModPlayer<KirbPlayer>();
+
+            if (player.ItemTimeIsZero)
+            {
+                if (kplr.RightClicking) //holding right & not attacking
+                {
+                    meleeCharge++; //go up
+                    player.velocity.X *= 0.9f; //slow
+
+                    for (int i = 0; i % 5 == 0; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+                    {
+                        Vector2 speed = Main.rand.NextVector2Circular(1f, 1f); //circle
+                        Dust d = Dust.NewDustPerfect(player.Center, DustID.Smoke, speed * 5, Scale: 2f, newColor: Color.DarkGray); //Makes dust in a messy circle
+                        d.noGravity = true;
+                    }
+                }
+                else
+                {
+                    meleeCharge = 0; //reset
+                }
+            }
+            else
+            {
+                meleeCharge = 0; //reset
+            }
+
+            if (meleeCharge >= chargeCap) //cap
 			{
-				meleeCharge++; //go up
-				player.velocity.X *= 0.9f; //slow
-
-				for (int i = 0; i % 5 == 0; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-				{
-					Vector2 speed = Main.rand.NextVector2Circular(1f, 1f); //circle
-					Dust d = Dust.NewDustPerfect(player.Center, DustID.Smoke, speed * 5, Scale: 2f, newColor: Color.DarkGray); //Makes dust in a messy circle
-					d.noGravity = true;
-				}
-			}
-
-			if (Main.mouseRight == false & attackTime < 1) //not attacking or charging
-			{
-				meleeCharge = 0; //reset
-			}
-
-			if (meleeCharge >= 60) //cap
-			{
-				meleeCharge = 60;
-
-				Item.damage = 1150; //change damage
-				Item.scale = 1.5f;
+				meleeCharge = chargeCap;
 				Item.knockBack = 14;
 
-				for (int i = 0; i % 5 == 0; i++) // inital statement ; conditional ; loop
-				{
-					Vector2 speed = Main.rand.NextVector2Circular(1f, 1f); //circle
-					Dust dust = Dust.NewDustPerfect(player.Center, DustID.Torch, speed * 10, Scale: 2f, newColor: Color.DarkGray); //Makes dust in a messy circle
-					dust.noGravity = true;
-				}
-			}
-			else if (meleeCharge < 60)
+                for (int i = 0; i % 5 == 0; i++) // inital statement ; conditional ; loop
+                {
+                    Vector2 speed = Main.rand.NextVector2Circular(1f, 1f); //circle
+                    Dust dust = Dust.NewDustPerfect(player.Center, DustID.Torch, speed * 10, Scale: 2f);
+                    dust.noGravity = true;
+                }
+            }
+			else
 			{
-				Item.damage = 115; //original damage 
-				Item.UseSound = SoundID.Item1;
-				Item.scale = 1;
 				Item.knockBack = 6;
 			}
 
-			attackTime--; //go down
+            if (player.itemTime == 5) //restart when used while charged
+            {
+                meleeCharge = 0;
+            }
+        }
 
-			if (attackTime == 5) //restart when used while charged (2 otherwise there will be window to strong hit again)
-			{
-				meleeCharge = 0;
-			}
-		}
+        public override bool? UseItem(Player player)/* tModPorter Suggestion: Return null instead of false */
+        {
+            if (meleeCharge >= chargeCap)
+            {
+                Item.noMelee = true;
+                Item.noUseGraphic = true;
 
-		public override bool? UseItem(Player player)/* tModPorter Suggestion: Return null instead of false */
-		{
-			attackTime = Item.useTime;
+                SoundEngine.PlaySound(SoundID.Item74, player.Center);  //inferno explosion
 
-			if (meleeCharge == 60)
-			{
-				SoundEngine.PlaySound(SoundID.Item74, player.Center);  //inferno explosion
-			}
-			return true;
-		}
+                Projectile.NewProjectile(new EntitySource_ItemUse(Main.player[player.whoAmI], player.HeldItem), player.Center, player.velocity,
+                    ModContent.ProjectileType<Projectiles.HammerSwings.ToyHammerSwing>(), player.GetWeaponDamage(player.HeldItem), Item.knockBack, player.whoAmI);
+            }
+            else
+            {
+                Item.noMelee = false;
+            }
+            return true;
+        }
 
         public override void OnHitNPC(Player player, NPC target, NPC.HitInfo hit, int damageDone)
         {

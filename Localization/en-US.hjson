@@ -795,7 +795,7 @@ Mods: {
 				DisplayName: Bonking Hammer
 				Tooltip:
 					'''
-					Hold right to slow and charge a firey swing
+					Hold right to slowdown and charge a firey swing
 					Left click to release when at full power
 					'''
 			}
@@ -872,7 +872,7 @@ Mods: {
 				Tooltip:
 					'''
 					Hold left on the ground to swing fire tornados in the direction you're facing
-					Hold right click to charge a firey and invincible spin attack that launches you towards the cursor
+					Hold right click to charge a blazing firey swing that flies towards the cursor
 					Left click to release when at full power
 					Charging gives you a 35% damage reduction bonus
 					'''
@@ -1039,7 +1039,7 @@ Mods: {
 				DisplayName: Toy Hammer
 				Tooltip:
 					'''
-					Hold right to slow and charge a powerful swing
+					Hold right to slowdown and charge a quick and firey swing
 					Left click to release when at full power
 					'''
 			}
@@ -1076,7 +1076,7 @@ Mods: {
 				DisplayName: Wild Hammer
 				Tooltip:
 					'''
-					Hold right to slow and charge a firey and powerful swing
+					Hold right to slowdown and charge a powerful and firey swing that launches you toward the cursor
 					Left click to release when at full power
 					Charging gives you a 35% damage reduction bonus
 					'''
@@ -1411,6 +1411,9 @@ Mods: {
 			VolcanoFireFire2.DisplayName: Volcano Fire Fire2
 			VolcanoFireFire3.DisplayName: Volcano Fire Fire3
 			ZeroDamageHitbox.DisplayName: Zero Damage Hitbox
+			HammerSwing.DisplayName: Hammer Swing
+			ToyHammerSwing.DisplayName: Toy Hammer Swing
+			WildHammerSwing.DisplayName: Wild Hammer Swing
 		}
 
 		NPCs: {

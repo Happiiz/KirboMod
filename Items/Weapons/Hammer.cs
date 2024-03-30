@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using System;
 using Terraria;
 using Terraria.Audio;
+using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -11,8 +12,9 @@ namespace KirboMod.Items.Weapons
 	public class Hammer : ModItem
 	{
 		private int meleeCharge = 0;
-		private int attackTime = 0;
-		public override void SetStaticDefaults() 
+
+        const int chargeCap = 60;
+        public override void SetStaticDefaults() 
 		{
 			 // DisplayName.SetDefault("Bonking Hammer"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
 			/* Tooltip.SetDefault("Hold right to slow and charge a firey swing" +
@@ -33,89 +35,78 @@ namespace KirboMod.Items.Weapons
 			Item.value = Item.buyPrice( 0, 0, 12, 0);
 			Item.rare = ItemRarityID.Green;
 			Item.UseSound = SoundID.Item1;
-			Item.autoReuse = false;
+			Item.autoReuse = true;
 		}
 
 		public override void HoldItem(Player player)
 		{
-			if (Main.mouseRight == true & attackTime < 1) //holding right & not attacking
-			{
-				meleeCharge++; //go up
-				player.velocity.X *= 0.9f; //slow
+            KirbPlayer kplr = player.GetModPlayer<KirbPlayer>();
 
-				for (int i = 0; i % 5 == 0; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-				{
-					Vector2 speed = Main.rand.NextVector2Circular(1f, 1f); //circle
-					Dust d = Dust.NewDustPerfect(player.Center, DustID.Smoke, speed * 5, Scale: 2f, newColor: Color.DarkGray); //Makes dust in a messy circle
-					d.noGravity = true;
+            if (player.ItemTimeIsZero)
+			{
+				if (kplr.RightClicking) //holding right & not attacking
+                {
+					meleeCharge++; //go up
+					player.velocity.X *= 0.9f; //slow
+
+					for (int i = 0; i % 5 == 0; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+					{
+						Vector2 speed = Main.rand.NextVector2Circular(1f, 1f); //circle
+						Dust d = Dust.NewDustPerfect(player.Center, DustID.Smoke, speed * 5, Scale: 2f, newColor: Color.DarkGray); //Makes dust in a messy circle
+						d.noGravity = true;
+					}
 				}
-			}
+				else
+				{
+                    meleeCharge = 0; //reset
+                }
+            }
+            else
+            {
+                meleeCharge = 0; //reset
+            }
 
-			if (Main.mouseRight == false & attackTime < 1) //not attacking or charging
+            if (meleeCharge >= chargeCap) //cap
 			{
-				meleeCharge = 0; //reset
-			}
+				meleeCharge = chargeCap;
 
-			if (meleeCharge >= 60) //cap
-			{
-				meleeCharge = 60;
-
-				Item.damage = 180; //change damage
 				Item.knockBack = 12;
 
 				for (int i = 0; i % 5 == 0; i++) // inital statement ; conditional ; loop
 				{
 					Vector2 speed = Main.rand.NextVector2Circular(1f, 1f); //circle
-					Dust dust = Dust.NewDustPerfect(player.Center, DustID.Torch, speed * 10, Scale: 2f, newColor: Color.DarkGray); //Makes dust in a messy circle
-					dust.noGravity = true;
+                    Dust dust = Dust.NewDustPerfect(player.Center, DustID.Torch, speed * 10, Scale: 2f);
+                    dust.noGravity = true;
 				}
 			}
-			else if (meleeCharge < 60)
+			else
 			{
-				Item.damage = 36; //original damage 
 				Item.knockBack = 8;
-				Item.UseSound = SoundID.Item1;
 			}
 
-			attackTime--; //go down
-
-			if (attackTime == 5) //restart when used while charged (2 otherwise there will be window to strong hit again)
+			if (player.itemTime == 5) //restart when used while charged
 			{
 				meleeCharge = 0;
 			}
 		}
 
-		public override void MeleeEffects(Player player, Rectangle hitbox)
-		{
-			if (meleeCharge == 60)
-			{
-				for (int i = 0; i < 4; i++) // inital statement ; conditional ; loop
-				{
-					int dust = Dust.NewDust(new Vector2(hitbox.X, hitbox.Y), hitbox.Width, hitbox.Height, DustID.Torch, Scale: 2f);
-					Main.dust[dust].noGravity = false;
-				}
-
-				for (int i = 0; i < 200; i++)
-				{
-					NPC npc = Main.npc[i];
-
-					if (hitbox.Intersects(npc.Hitbox) && npc.friendly == false)
-					{
-						npc.AddBuff(BuffID.OnFire, 600); //10 seconds 
-					}
-				}
-			}
-		}
-
 		public override bool? UseItem(Player player)/* tModPorter Suggestion: Return null instead of false */
 		{
-			attackTime = Item.useTime;
-
-			if (meleeCharge == 60)
+			if (meleeCharge >= chargeCap)
 			{
-				SoundEngine.PlaySound(SoundID.Item74, player.Center);  //inferno explosion
-			}
+                Item.noMelee = true;
+                Item.noUseGraphic = true;
+
+                SoundEngine.PlaySound(SoundID.Item74, player.Center);  //inferno explosion
+
+                Projectile.NewProjectile(new EntitySource_ItemUse(Main.player[player.whoAmI], player.HeldItem), player.Center, player.velocity, 
+					ModContent.ProjectileType<Projectiles.HammerSwings.HammerSwing>(), player.GetWeaponDamage(player.HeldItem), Item.knockBack, player.whoAmI);
+            }
+			else
+			{
+                Item.noMelee = false;
+            }
 			return true;
 		}
-	}
+    }
 }

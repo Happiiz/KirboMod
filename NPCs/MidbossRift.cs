@@ -163,30 +163,15 @@ namespace KirboMod.NPCs
 
             Texture2D rift = Rift.Value;
 
-            float multiplier = (120 - NPC.ai[0]) / 120 * 50 < 0 ? 0 : (120 - NPC.ai[0]) / 120 * 50;
+            Vector2 yOffset = new Vector2(0, -20); //move down with scale to match up with center
 
-            Vector2 positionOffset = new Vector2(MathF.Cos(NPC.ai[0] / 18) * multiplier, MathF.Sin(NPC.ai[0] / 18) * multiplier);
+            float Xscale = Utils.GetLerpValue(0, 40, NPC.ai[0], true) * Utils.GetLerpValue(240, 200, NPC.ai[0], true);
 
-            if (NPC.ai[0] < 120)
-            {
-                NPC.Opacity = (float)Utils.GetLerpValue(0, 60, NPC.ai[0]) / 2; //up to half
-            }
-            else
-            {
-                NPC.Opacity = 1;
-            }
+            VFX.DrawGlowBallAdditive(NPC.Center + yOffset, Xscale * 1.5f, Color.DeepSkyBlue, Color.White);
 
-            float scale = 1 - (float)Utils.GetLerpValue(200, 240, NPC.ai[0], true); //get smaller after spawning NPC
+            Vector2 scale = new Vector2(Xscale, 1);
 
-            Vector2 yOffset = new Vector2(0, scale * -20); //move down with scale to match up with center
-
-            VFX.DrawGlowBallAdditive(NPC.Center + positionOffset + yOffset, scale * 1.5f, Color.DeepSkyBlue, Color.White);
-
-            VFX.DrawGlowBallAdditive(NPC.Center - positionOffset + yOffset, scale * 1.5f, Color.DeepSkyBlue, Color.White);
-
-            Main.EntitySpriteDraw(rift, NPC.Center - Main.screenPosition + positionOffset, NPC.frame, Color.White * NPC.Opacity, 0, NPC.frame.Size() / 2, scale, SpriteEffects.None);
-            //another one
-            Main.EntitySpriteDraw(rift, NPC.Center - Main.screenPosition - positionOffset, NPC.frame, Color.White * NPC.Opacity, 0, NPC.frame.Size() / 2, scale, SpriteEffects.None);
+            Main.EntitySpriteDraw(rift, NPC.Center - Main.screenPosition, NPC.frame, Color.White, 0, NPC.frame.Size() / 2, scale, SpriteEffects.None);
 
             return false;
         }
