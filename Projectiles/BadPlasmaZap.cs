@@ -22,11 +22,13 @@ namespace KirboMod.Projectiles
 			Projectile.friendly = false;
 			Projectile.DamageType = DamageClass.Magic;
 			Projectile.hostile = true;
-			Projectile.timeLeft = 3000;
+			Projectile.timeLeft = 240;
 			Projectile.extraUpdates = 3;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = 3;
-		}
+            Projectile.localNPCHitCooldown = 10;
+            Projectile.usesLocalNPCImmunity = true;
+        }
 		public override void AI()
 		{
 			

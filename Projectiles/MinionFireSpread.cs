@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
+using Terraria.IO;
 using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles
@@ -24,8 +25,8 @@ namespace KirboMod.Projectiles
 			Projectile.width = 10;
 			Projectile.height = 10;
 			Projectile.friendly = true;
-			Projectile.DamageType = DamageClass.Summon;
-			Projectile.timeLeft = 2;
+            Projectile.DamageType = DamageClass.Summon;
+            Projectile.timeLeft = 2;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = 3;
 			Projectile.usesLocalNPCImmunity = true;
@@ -54,7 +55,16 @@ namespace KirboMod.Projectiles
             for (int i = 0; i < 4; i++)
             {
                 Vector2 speed = Main.rand.NextVector2Unit(directionRotation - (MathF.Tau * 50 / 360 / 2), MathF.Tau * 50/360); //circle
-				Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.Torch, speed * 20, Scale: 2);
+
+                if (Projectile.ai[1] == 0) //which fire type?
+                {
+                    speed *= 20;
+                }
+                else
+                {
+                    speed *= 40;
+                }
+                    Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.Torch, speed, Scale: 2);
 				d.noGravity = true;
             }
 
@@ -85,7 +95,14 @@ namespace KirboMod.Projectiles
 
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
-            return Utils.IntersectsConeFastInaccurate(targetHitbox, Projectile.Center, 200, Projectile.rotation, MathHelper.ToRadians(25));
+            if (Projectile.ai[1] == 0) //which fire type?
+            {
+                return Utils.IntersectsConeFastInaccurate(targetHitbox, Projectile.Center, 200, Projectile.rotation, MathHelper.ToRadians(25));
+            }
+            else
+            {
+                return Utils.IntersectsConeFastInaccurate(targetHitbox, Projectile.Center, 400, Projectile.rotation, MathHelper.ToRadians(25));
+            }
         }
 
         private Vector2 GetSpreadDirection(BurningLeoMinion leoOwner)

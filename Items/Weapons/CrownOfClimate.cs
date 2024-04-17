@@ -21,7 +21,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 42;
+			Item.damage = 18;
 			Item.knockBack = 1;
 			Item.mana = 8;
 			Item.width = 30; //for world hitbox

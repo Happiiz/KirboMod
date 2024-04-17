@@ -26,7 +26,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 32;
+			Item.damage = 18;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 34;
@@ -41,7 +41,7 @@ namespace KirboMod.Items.Weapons
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.PlasmaZap>();
 			Item.shootSpeed = 20f;
-			Item.mana = 3;
+			Item.mana = 5;
 		}
 
         public override bool CanUseItem(Player player)
@@ -66,11 +66,11 @@ namespace KirboMod.Items.Weapons
 			int plasmaChargeLevel = player.GetModPlayer<KirbPlayer>().PlasmaShieldLevel;
 			if(plasmaChargeLevel == 1)
             {
-				reduce = -20;
+				reduce = -2;
             }
 			else if(plasmaChargeLevel == 2)
             {
-				reduce = -80;
+				reduce = -5;
             }
         }
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
@@ -83,20 +83,21 @@ namespace KirboMod.Items.Weapons
 				chargeFromShot = 1;
 				velocity *= 1.3f;
                 type = ModContent.ProjectileType<PlasmaZap>();
+				timeToPressKey = Item.useTime; //cancels out to become 1
             }
             else if (chargeFromShot < 12)
             {
                 type = ModContent.ProjectileType<PlasmaLaser>();
                 velocity *= 2;
 				position += velocity;
-				chargeBonus = 3;
+				chargeBonus = 1;
             }
             else
             {
                 type = ModContent.ProjectileType<PlasmaBlast>();
                 velocity *= 3;
                 position += velocity;
-				chargeBonus = 7;
+				chargeBonus = 1;
             }
 			//higher time to press key = higher damage
 			//higher use time = less damage because then dthe time taken to charge is less of a difference compared to normal firing

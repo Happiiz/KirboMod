@@ -69,7 +69,7 @@ namespace KirboMod.Projectiles
 			return false;
 		}
 
-		// This is mandatory if your minion deals contact damage (further related stuff in AI() in the Movement region)
+		// This is mandatory if your minion deals contact damage
 		public override bool MinionContactDamage()
 		{
 			return false;
@@ -98,7 +98,7 @@ namespace KirboMod.Projectiles
             {
                 Projectile.velocity.Y += 0.7f;
 
-                if (attack <= 0) //not attacking
+                if (attacking == false) //not attacking
 				{
                     if (Projectile.velocity.Y >= 10f)
                     {
@@ -417,9 +417,19 @@ namespace KirboMod.Projectiles
         {
 			Projectile.velocity.X *= 0.8f;
 			attack++;
-			if (attack == 1)
+
+            Vector2 direction = aggroTarget.Center - Projectile.Center; //start - end 
+
+            if (attack >= 15) //over 15
+            {
+                if (direction.Length() > 160 || !aggroTarget.active)
+                {
+                    attacking = false;
+                    attack = 0;
+                }
+            }
+            if (attack % 15 == 0)
 			{
-				Vector2 direction = aggroTarget.Center - Projectile.Center; //start - end 
 				direction.Normalize();
 				direction *= 15;
 
@@ -427,11 +437,6 @@ namespace KirboMod.Projectiles
                 Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, direction, 
                     ModContent.ProjectileType<MinionBeamSpread>(), Projectile.damage, 0, player.whoAmI, Projectile.whoAmI);
 			}
-            if (attack >= 15) //over 15
-            {
-                attacking = false;
-                attack = 0;
-            }
 
             Projectile.frame = 8;
         }
@@ -439,7 +444,7 @@ namespace KirboMod.Projectiles
         {
             Projectile.velocity.Y = -10f; //velocityY boosts up 
             jumpTimer = 15;
-            Projectile.frame = 12;
+            Projectile.frame = 9;
         }
 
         //all of this for falling through tiles

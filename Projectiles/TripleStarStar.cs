@@ -144,6 +144,13 @@ namespace KirboMod.Projectiles
                 direction *= speed;
                 Projectile.velocity = (Projectile.velocity * (inertia - 1) + direction) / inertia;
             }
+
+            //very far away from player
+            if (Vector2.Distance(player.Center, Projectile.Center) > 2000)
+            {
+                Projectile.Center = player.Center;
+                BehaviourMode = TripleStarBehaviourMode.CirclingPlayer;
+            }
         }
         Vector2 GetWeirdAsfPosOffsetForCirclingPlayer()
         {

@@ -18,6 +18,8 @@ namespace KirboMod.Projectiles
 
         public override string Buff => "LeoAndChillyBuff";
 
+        public override float fireType => 1;
+
         public override void SetDefaults()
         {
             base.SetDefaults();

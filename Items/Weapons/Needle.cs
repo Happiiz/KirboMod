@@ -19,7 +19,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults() 
 		{
-			Item.damage = 32;
+			Item.damage = 16;
 			Item.DamageType = DamageClass.Ranged;
 			Item.width = 62;
 			Item.height = 62;

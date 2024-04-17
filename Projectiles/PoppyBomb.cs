@@ -48,10 +48,15 @@ namespace KirboMod.Projectiles
             dust.scale *= 2;
             dust.velocity += Projectile.velocity;
         }
+
+        public override void OnHitPlayer(Player target, Player.HurtInfo info)
+        {
+            Projectile.Kill(); //ensuring that it'll detonate upon player contact
+        }
+
         public override void OnKill(int timeLeft)
         {
             Projectile.Hitbox = Utils.CenteredRectangle(Projectile.Center, Projectile.Size * 2);
-            Projectile.Damage();
             SoundEngine.PlaySound(SoundID.Item14, Projectile.position); //bomb sound
             for (int i = 0; i < 20; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
             {

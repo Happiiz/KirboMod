@@ -38,6 +38,13 @@ namespace KirboMod.Projectiles.Tornadoes
         {
             Timer+= 1;
         }
+
+        public virtual Color[] SetPalette()
+        {
+            Color[] palette = { new Color(204, 255, 247), new Color(152, 255, 238), Color.LightCyan };
+            return palette;
+        }
+
         public override bool PreDraw(ref Color lightColor)
         {
             tornado1 ??= ModContent.Request<Texture2D>("KirboMod/Projectiles/Tornadoes/tornado_1");
@@ -47,15 +54,15 @@ namespace KirboMod.Projectiles.Tornadoes
             int spirals = (int)MathF.Round(maxheight * 0.11333333333f);
             float wobbleSpeed = .1f;
             UnifiedRandom rnd = new UnifiedRandom(Projectile.identity * 1000);
-            Color[] palette = { new Color(204, 255, 247), new Color(152, 255, 238), Color.LightCyan };
+            Color[] palette = SetPalette();
             float scrollSpeed = 4;
 
-            TornadoPass2(textures, spirals, maxheight, wobbleSpeed, rnd, palette, scrollSpeed);
-            TornadoPass1(textures, spirals, maxheight, wobbleSpeed, rnd, palette);
+            TornadoPass2(textures, spirals, (int)(maxheight * Projectile.scale), wobbleSpeed, rnd, palette, scrollSpeed, lightColor);
+            TornadoPass1(textures, spirals, (int)(maxheight * Projectile.scale), wobbleSpeed, rnd, palette, lightColor);
             return false;
         }
 
-        private void TornadoPass2(Texture2D[] textures, int spirals, int maxheight, float wobbleSpeed, UnifiedRandom rnd, Color[] palette, float scrollSpeed)
+        private void TornadoPass2(Texture2D[] textures, int spirals, int maxheight, float wobbleSpeed, UnifiedRandom rnd, Color[] palette, float scrollSpeed, Color lightColor)
         {
             for (int i = 0; i < spirals; i++)
             {
@@ -71,11 +78,11 @@ namespace KirboMod.Projectiles.Tornadoes
                 float wobble = MathHelper.Lerp(-.05f, .05f, wobbleT);
                 Vector2 scale = new Vector2(MathHelper.Lerp(.5f, 1, progress), .25f);
                 scale *= MathHelper.Lerp(.4f, .6f, rnd.NextFloat());
-                Main.EntitySpriteDraw(t, Projectile.Center - Main.screenPosition + offset + new Vector2(0, maxheight * .5f), frame, palette[rnd.Next(palette.Length)] * opacity * Projectile.Opacity, wobble, frame.Size() / 2, scale, (SpriteEffects)rnd.Next(3));
+                Main.EntitySpriteDraw(t, Projectile.Center - Main.screenPosition + offset + new Vector2(0, maxheight * .5f), frame, palette[rnd.Next(palette.Length)].MultiplyRGB(lightColor) * opacity * Projectile.Opacity, wobble, frame.Size() / 2, scale, (SpriteEffects)rnd.Next(3));
             }
         }
 
-        private void TornadoPass1(Texture2D[] textures, int spirals, int maxheight, float wobbleSpeed, UnifiedRandom rnd, Color[] palette)
+        private void TornadoPass1(Texture2D[] textures, int spirals, int maxheight, float wobbleSpeed, UnifiedRandom rnd, Color[] palette, Color lightColor)
         {
             for (int i = 0; i < spirals; i++)
             {
@@ -88,7 +95,7 @@ namespace KirboMod.Projectiles.Tornadoes
                 scale *= MathHelper.Lerp(.3f, .45f, rnd.NextFloat());
                 Vector2 offset = rnd.NextVector2Unit(Timer * MathHelper.Lerp(.1f, .2f, rnd.NextFloat())) * 4;
                 offset.Y -= i % spirals * (maxheight / spirals);
-                Main.EntitySpriteDraw(t, Projectile.Center - Main.screenPosition + offset + new Vector2(0, maxheight * .5f), frame, palette[rnd.Next(palette.Length)] * Projectile.Opacity, wobble, frame.Size() / 2, scale, (SpriteEffects)rnd.Next(3));
+                Main.EntitySpriteDraw(t, Projectile.Center - Main.screenPosition + offset + new Vector2(0, maxheight * .5f), frame, palette[rnd.Next(palette.Length)].MultiplyRGB(lightColor) * Projectile.Opacity, wobble, frame.Size() / 2, scale, (SpriteEffects)rnd.Next(3));
             }
         }
 

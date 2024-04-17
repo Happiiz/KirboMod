@@ -14,7 +14,7 @@ namespace KirboMod.Items.Weapons
 		private int meleeCharge = 0;
 		private int attackTime = 0;
 
-        const int chargeCap = 60;
+        const int chargeCap = 90;
         public override void SetStaticDefaults() 
 		{
 			 // DisplayName.SetDefault("Wild Hammer"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.

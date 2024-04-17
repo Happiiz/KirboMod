@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
@@ -44,6 +45,7 @@ namespace KirboMod.Projectiles
                 }
             }
             Projectile.scale *= 1.005f;
+
             if (Projectile.Opacity == 0)
             {
                 Projectile.Kill();

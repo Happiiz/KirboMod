@@ -64,11 +64,12 @@ namespace KirboMod.Items.Weapons
 		{
 			int target = FindTarget(Main.MouseWorld);
 			if (target == -1)
-				position = Main.MouseWorld + new Vector2(0, -1000);
+				position = Main.MouseWorld;
 			else 
-				position = Main.npc[target].Center + new Vector2(0, -1000);		
+				position = Main.npc[target].Center;		
 			position.X += Main.rand.Next(-300, 300);
-			Vector2 targetPos = target == -1 ? Main.MouseWorld : Main.npc[target].Center;		
+			position.Y -= 1000;
+            Vector2 targetPos = target == -1 ? Main.MouseWorld : Main.npc[target].Center;		
 			velocity = Vector2.Normalize(targetPos - position) * 30;
 		}
 
@@ -78,12 +79,7 @@ namespace KirboMod.Items.Weapons
 			return true;
 		}
 
-        /*public override Color? GetAlpha(Color lightColor)
-        {
-            return Color.White; // Makes it uneffected by light
-        }*/
-
-		//draw light
+        //draw light
         public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
         {
             Texture2D texture = ModContent.Request<Texture2D>("KirboMod/Items/Weapons/LightBeam_Glowmask").Value; //GlowMask (light)

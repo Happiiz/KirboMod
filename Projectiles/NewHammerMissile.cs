@@ -41,13 +41,16 @@ namespace KirboMod.Projectiles
         {
 			for (int i = 0; i < 10; i++)
 			{
-				Vector2 speed = Main.rand.NextVector2Circular(4f, 4f); //circle
-				Dust d = Dust.NewDustPerfect(Projectile.position, DustID.Smoke, speed, Scale: 2f); //Makes dust in a messy circle
-
-				Vector2 speed2 = Main.rand.NextVector2Circular(4f, 4f); //circle
-				Dust u = Dust.NewDustPerfect(Projectile.position, DustID.Torch, speed2, Scale: 2f); //Makes dust in a messy circle
-				u.noGravity = true;
+				Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
+				Dust.NewDustPerfect(Projectile.position, DustID.Smoke, speed, Scale: 2f); //Makes dust in a messy circle
 			}
+
+			for (int i = 0; i < 20; i++)
+			{
+                Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
+                Dust d = Dust.NewDustPerfect(Projectile.position, DustID.Torch, speed, Scale: 2f); //Makes dust in a messy circle
+                d.noGravity = true;
+            }
 
 			SoundEngine.PlaySound(SoundID.Item14, Projectile.Center); //explosion
 		}

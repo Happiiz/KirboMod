@@ -213,7 +213,7 @@ namespace KirboMod.NPCs
                     NPC.frameCounter = 0.0;
                 }
             }
-            if (attacktype == 1)
+            if (attacktype == 1) //charge
             {
                 NPC.frameCounter += 1.0;
                 if (NPC.frameCounter < 5.0)
@@ -229,34 +229,26 @@ namespace KirboMod.NPCs
                     NPC.frameCounter = 0.0;
                 }
             }
-            if (attacktype == 2)
+            if (attacktype == 2) //slash
             {
                 NPC.frameCounter += 1.0;
-                if (NPC.frameCounter < 5.0)
+                if (NPC.frameCounter < 4.0)
                 {
                     NPC.frame.Y = frameHeight * 6;
                 }
-                else if (NPC.frameCounter < 10.0)
+                else if (NPC.frameCounter < 8.0)
                 {
                     NPC.frame.Y = frameHeight * 7;
                 }
-                else if (NPC.frameCounter < 15.0)
+                else if (NPC.frameCounter < 12.0)
                 {
                     NPC.frame.Y = frameHeight * 8;
                 }
-                else if (NPC.frameCounter < 20.0)
+                else if (NPC.frameCounter < 16.0)
                 {
                     NPC.frame.Y = frameHeight * 9;
                 }
-                else if (NPC.frameCounter < 15.0)
-                {
-                    NPC.frame.Y = frameHeight * 10;
-                }
-                else if (NPC.frameCounter < 30.0)
-                {
-                    NPC.frame.Y = frameHeight * 11;
-                }
-                else if (NPC.frameCounter < 35.0)
+                else if (NPC.frameCounter < 20.0)
                 {
                     NPC.frame.Y = frameHeight * 12;
                 }

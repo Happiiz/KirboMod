@@ -21,7 +21,7 @@ namespace KirboMod.Items.Weapons
 
         public override void SetDefaults()
         {
-            Item.damage = 408;
+            Item.damage = 310;
             Item.crit += 10;
             Item.DamageType = DamageClass.MeleeNoSpeed;
             Item.width = 30;

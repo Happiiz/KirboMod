@@ -22,8 +22,8 @@ namespace KirboMod.Projectiles
 			Projectile.timeLeft = 300;
 			Projectile.tileCollide = true;
 			Projectile.penetrate = -1;
-            Projectile.usesIDStaticNPCImmunity = true; //wait for npc to recover from other projectiles of same type
-            Projectile.idStaticNPCHitCooldown = 10;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = 10;
         }
 		public override void AI()
 		{

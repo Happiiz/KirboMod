@@ -32,7 +32,7 @@ namespace KirboMod.Projectiles
 			Projectile.extraUpdates = 2;
 			Projectile.alpha = 255;
 			Projectile.usesLocalNPCImmunity = true; //doesn't wait for other projectiles to hit again
-			Projectile.localNPCHitCooldown = 20; //time until able to hit npc even if npc has just been struck
+			Projectile.localNPCHitCooldown = 10; //time until able to hit npc even if npc has just been struck
 		}
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
@@ -63,7 +63,7 @@ namespace KirboMod.Projectiles
 			if (Projectile.velocity.LengthSquared() > 1)
 			{
 				Dust dust = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.SpelunkerGlowstickSparkle);
-				dust.scale = 2;
+				dust.scale = 1;
                 dust.velocity += Projectile.velocity * 0.4f;
             }
             if (Projectile.ai[0] >= 72)//return

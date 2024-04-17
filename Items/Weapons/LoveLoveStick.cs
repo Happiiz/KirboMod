@@ -19,7 +19,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 180;
+			Item.damage = 260;
 			Item.DamageType = DamageClass.Magic;
 			Item.mana = 12;
 			Item.width = 20; //half of sprite size(only effects world dimensions)

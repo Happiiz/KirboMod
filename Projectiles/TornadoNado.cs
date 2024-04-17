@@ -1,3 +1,4 @@
+using KirboMod.Projectiles.Tornadoes;
 using Microsoft.CodeAnalysis;
 using Microsoft.Xna.Framework;
 using System;
@@ -8,8 +9,8 @@ using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles
 {
-	public class TornadoNado : ModProjectile
-	{
+	public class TornadoNado : Tornado
+    {
         public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Tornado");
@@ -18,24 +19,25 @@ namespace KirboMod.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 90;
-			Projectile.height = 100;
+			Projectile.width = 30;
+			Projectile.height = 30;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Magic;
-			Projectile.timeLeft = 240;
 			Projectile.tileCollide = true;
 			Projectile.penetrate = -1;
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = 5;
-		}
+			Projectile.ArmorPenetration = 9999;
+
+        }
 
 		public override void AI()
 		{
 			Player player = Main.player[Projectile.owner];
             Projectile.ai[0]++;
-
-			//stuff here so it doesn't oppose drain
-			player.manaRegenDelay = 20;
+			
+            //stuff here so it doesn't oppose drain
+            player.manaRegenDelay = 20;
             player.manaRegenCount = 0;
             player.manaCost = 1;
 
@@ -45,10 +47,12 @@ namespace KirboMod.Projectiles
 
             if (stillInUse) //HOMING
             {
+				Projectile.timeLeft = 2;
+
 				if (Projectile.owner == Main.myPlayer)
 				{
 					float speed = 40f; //top speed
-					float inertia = 35f; //acceleration and decceleration speed
+					float inertia = 20f; //acceleration and decceleration speed
 
 					Vector2 direction = Main.MouseWorld - Projectile.Center; //start - end 
 
@@ -81,15 +85,25 @@ namespace KirboMod.Projectiles
 
         public override void OnKill(int timeLeft)
         {
-			for (int i = 0; i < 20; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+			for (int i = 0; i < 30; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 			{
-				Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
+				Vector2 speed = Main.rand.NextVector2Circular(8f, 10f); //circle
 				Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.Cloud, speed * 2, Scale: 3f); //Makes dust in a messy circle
 				d.noGravity = true;
 			}
 		}
 
-		public override bool OnTileCollide(Vector2 oldVelocity)
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+        {
+            return Utils.CenteredRectangle(Projectile.Center, new Vector2(90, 100)).Intersects(targetHitbox);
+        }
+
+        public override bool? CanHitNPC(NPC target)
+        {
+			return Collision.CanHit(Projectile, target);
+        }
+
+        public override bool OnTileCollide(Vector2 oldVelocity)
 		{
 			if (Projectile.velocity.X != oldVelocity.X) //bounce
 			{

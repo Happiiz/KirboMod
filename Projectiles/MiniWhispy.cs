@@ -17,15 +17,18 @@ namespace KirboMod.Projectiles
 			// This is necessary for right-click targeting
 			ProjectileID.Sets.MinionTargettingFeature[Projectile.type] = true;
 
-			// These below are needed for a minion
-			// Denotes that this projectile is a pet or minion
-			//Main.projPet[projectile.type] = true;
-			// This is needed so your minion can properly spawn when summoned and replaced when other minions are summoned
-			//ProjectileID.Sets.MinionSacrificable[projectile.type] = true;
-			// Don't mistake this with "if this is true, then it will automatically home". It is just for damage reduction for certain NPCs
-			//ProjectileID.Sets.Homing[projectile.type] = true;
+            // Denotes that this projectile is a pet or minion
+            Main.projPet[Projectile.type] = true;
 
-		}
+            // These below are needed for a minion
+            // Denotes that this projectile is a pet or minion
+            //Main.projPet[projectile.type] = true;
+            // This is needed so your minion can properly spawn when summoned and replaced when other minions are summoned
+            //ProjectileID.Sets.MinionSacrificable[projectile.type] = true;
+            // Don't mistake this with "if this is true, then it will automatically home". It is just for damage reduction for certain NPCs
+            //ProjectileID.Sets.Homing[projectile.type] = true;
+
+        }
 
 		public sealed override void SetDefaults()
 		{
@@ -43,8 +46,6 @@ namespace KirboMod.Projectiles
 			// Amount of slots this minion occupies from the total minion slots available to the player (more on that later)
 			// Needed so the minion doesn't despawn on collision with enemies or tiles
 			Projectile.penetrate = -1;
-
-			Projectile.damage = 0;
 		}
 
 		// Here you can decide if your minion breaks things like grass or pots
@@ -61,7 +62,6 @@ namespace KirboMod.Projectiles
 
 		public override void AI()
 		{
-			Projectile.damage = 0;
 			Player player = Main.player[Projectile.owner];
 
 			Projectile.velocity.Y += 0.2f;
@@ -117,11 +117,11 @@ namespace KirboMod.Projectiles
 				animation = 1; //shake
 
 				Projectile.ai[0]++;
-				if (Projectile.ai[0] % 30 == 0) //every multiple of 30
+				if (Projectile.ai[0] % 15 == 0) //every multiple of 15
 				{
-					Vector2 speed = Main.rand.NextVector2Circular(3.2f, 3f); //circle
+					Vector2 speed = Main.rand.NextVector2Circular(9.6f, 9f); //circle
 				    //add more commas then specified if you want to specify things like x and y
-					Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center.X, Projectile.Center.Y - 50f, speed.X * 3, speed.Y * 3, ModContent.ProjectileType<SmullApple>(), Projectile.damage, 3, player.whoAmI, 0, 0);
+					Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center.X, Projectile.Center.Y - 50f, speed.X, speed.Y, ModContent.ProjectileType<SmullApple>(), Projectile.damage, 3, player.whoAmI, 0, 0);
 					for (int i = 0; i < 5; i++) //spawns 5 grassblades
 					{
 						Vector2 yoffset = new Vector2(0f, -50); //50 up

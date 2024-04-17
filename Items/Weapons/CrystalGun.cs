@@ -22,7 +22,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 3000;//redeeming quality: damage(it has no piercing or AoE and is also relatively slow)
+			Item.damage = 500;//redeeming quality: damage(it has no piercing or AoE)
 			Item.DamageType = DamageClass.Ranged;
 			Item.noMelee = true;
 			Item.width = 80;
@@ -70,7 +70,7 @@ namespace KirboMod.Items.Weapons
             }
 			else
             {
-				return true; //consume
+				return !(player.itemAnimation < Item.useAnimation - 2); //conusme if only the 1st shot
             }
         }
 

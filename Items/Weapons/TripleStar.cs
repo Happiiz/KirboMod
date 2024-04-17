@@ -25,7 +25,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 172;
+			Item.damage = 240;
 			Item.noMelee = true;
 			Item.DamageType = DamageClass.Magic;
 			Item.mana = 8;
@@ -43,6 +43,7 @@ namespace KirboMod.Items.Weapons
 			Item.shoot = ModContent.ProjectileType<Projectiles.TripleStarStar>();
 			Item.shootSpeed = 32f;
 			Item.crit += 24; //same as star rod
+			Item.ArmorPenetration = 60;
 		}
 
         public override bool AltFunctionUse(Player player)

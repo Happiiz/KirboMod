@@ -80,7 +80,7 @@ namespace KirboMod.Projectiles
             { Vector2 offset = Main.rand.NextVector2Circular(1000, 1000) / 100;
 				Dust dust = Dust.NewDustPerfect(Projectile.Center + offset, DustID.RainbowMk2, offset * 0.3f, 0, Color.Lerp(Color.Red, Color.HotPink, Main.rand.NextFloat()), 1 + Main.rand.NextFloat());
 				dust.noGravity = true;
-				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LoveDot>(), Projectile.damage, 0, Projectile.owner, Projectile.Center.X, Projectile.Center.Y, i * MathF.Tau);		
+				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LoveDot>(), Projectile.damage / 10, 0, Projectile.owner, Projectile.Center.X, Projectile.Center.Y, i * MathF.Tau);		
 			}
 		}
 

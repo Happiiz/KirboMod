@@ -54,7 +54,7 @@ namespace KirboMod.Projectiles.Flames
             Projectile.width = 20;
             Projectile.height = 20;
             Projectile.tileCollide = false;
-            Projectile.penetrate = 99;
+            Projectile.penetrate = -1;
             Projectile.localNPCHitCooldown = 10;
             Projectile.usesLocalNPCImmunity = true;
             FlamethrowerStats();

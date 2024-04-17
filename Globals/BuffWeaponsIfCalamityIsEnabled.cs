@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KirboMod.Items.Weapons;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
@@ -24,7 +25,11 @@ namespace KirboMod.Globals
         public override bool AppliesToEntity(Item entity, bool lateInstantiation)
         {
             bool calam = ModLoader.TryGetMod("CalamityMod", out _);
-            return entity.damage > 0 && calam && entity.ModItem != null && entity.ModItem.Mod.Name == "KirboMod";
+            return entity.damage > 0 && calam && entity.ModItem != null && entity.ModItem.Mod.Name == "KirboMod"
+                && entity.ModItem != ModContent.GetModItem(ModContent.ItemType<MasterSword>())
+                && entity.ModItem != ModContent.GetModItem(ModContent.ItemType<CrystalGun>())
+                && entity.ModItem != ModContent.GetModItem(ModContent.ItemType<LoveLoveStick>())
+                && entity.ModItem != ModContent.GetModItem(ModContent.ItemType<DreamRod>());
         }
         public override void SetDefaults(Item entity)
         {

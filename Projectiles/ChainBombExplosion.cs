@@ -21,12 +21,12 @@ namespace KirboMod.Projectiles
 			Projectile.height = 150;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Ranged;
-			Projectile.timeLeft = 20;
+			Projectile.timeLeft = 60;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
             Projectile.usesLocalNPCImmunity = true;
-            Projectile.localNPCHitCooldown = 20;
+            Projectile.localNPCHitCooldown = 10;
             Projectile.alpha = 50;
 		}
 		public override void AI()
@@ -37,11 +37,9 @@ namespace KirboMod.Projectiles
 				SoundEngine.PlaySound(SoundID.Item14, Projectile.position); //bomb sound
 			}
 
-		    if (Projectile.ai[0] >= 10)
-            {
-				Projectile.alpha += 10;
-            }
-            Projectile.scale += 0.02f;
+			Projectile.Opacity = Utils.GetLerpValue(0, 10, Projectile.timeLeft, true);
+
+            Projectile.scale = 1 + Utils.GetLerpValue(10, 0, Projectile.timeLeft, true);
 
             Lighting.AddLight(Projectile.Center, 1f, 1f, 0);
 

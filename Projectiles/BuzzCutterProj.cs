@@ -34,17 +34,19 @@ namespace KirboMod.Projectiles
 			Projectile.penetrate = -1;
 			Projectile.usesLocalNPCImmunity = true; //uses own immunity frames
 			Projectile.extraUpdates = 3;//detect collision more often to more accurately get a collision point
-			Projectile.localNPCHitCooldown = 7; //time before hit again, very short to really get the feeling that this grinds enemies
-			Projectile.ArmorPenetration = 18; 
-		}
+			Projectile.localNPCHitCooldown = 10; //time before hit again
+            Projectile.ArmorPenetration = 9999;
+        }
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
 			return Helper.CheckCircleCollision(targetHitbox, Projectile.Center, 60);
         }
-        int amountOfTimesToGrindTarget = 30;
+
+        int amountOfTimesToGrindTarget = 10;
+
         public override void AI()
-		{
-			Player player = Main.player[Projectile.owner];
+        {
+            Player player = Main.player[Projectile.owner];
 			Projectile.rotation -= 0.12f; // rotates projectile
 			if (Projectile.ai[0] == 0)
 				NPCToStickTo = -1;

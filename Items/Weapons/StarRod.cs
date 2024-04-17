@@ -19,7 +19,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 64; 
+			Item.damage = 80; 
 			Item.noMelee = true;
 			Item.DamageType = DamageClass.Magic;
 			Item.mana = 8;
@@ -36,7 +36,8 @@ namespace KirboMod.Items.Weapons
 			Item.shoot = ModContent.ProjectileType<Projectiles.Star>();
 			Item.shootSpeed = 32f;
 			Item.crit += 24;
-		}
+            Item.ArmorPenetration = 60;
+        }
 
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {

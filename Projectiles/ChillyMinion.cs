@@ -66,7 +66,7 @@ namespace KirboMod.Projectiles
 			return false;
 		}
 
-		// This is mandatory if your minion deals contact damage (further related stuff in AI() in the Movement region)
+		// This is mandatory if your minion deals contact damage
 		public override bool MinionContactDamage()
 		{
 			return false;
@@ -96,7 +96,7 @@ namespace KirboMod.Projectiles
             {
                 Projectile.velocity.Y += 0.7f;
 
-                if (attack <= 0) //not attacking
+                if (attacking == false) //not attacking
                 {
                     if (Projectile.velocity.Y >= 10f)
                     {
@@ -203,7 +203,7 @@ namespace KirboMod.Projectiles
                 Vector2 direction = aggroTarget.Center - Projectile.Center; //start - end
                 Vector2 absDirection = new Vector2(Math.Abs(direction.X), Math.Abs(direction.Y));
 
-                if (((absDirection.X < 60f && absDirection.Y < 60f) || aggroTarget.Hitbox.Intersects(Projectile.Hitbox)) 
+                if ((direction.Length() < 60 || aggroTarget.Hitbox.Intersects(Projectile.Hitbox)) 
 					&& jumpTimer <= 0 & spaceJumping == false) //attack when criteria met
 				{
 					attacking = true;
@@ -396,23 +396,29 @@ namespace KirboMod.Projectiles
 				Projectile.direction = -1;
 			}
 
-			Vector2 projshoot = aggroTarget.Center - Projectile.Center;
-			projshoot.Normalize();
-			projshoot *= 10f;
+            if (attack >= 10) //reset
+            {
+                if (direction.Length() > 100 || !aggroTarget.active)
+                {
+                    attacking = false;
+                    attack = 0;
+                }
+            }
 
             attack++;
 
 			if (attack == 1)
 			{
+                direction.Normalize();
+                Projectile.velocity = direction * 10; //launch toward enemy
+			}
+
+            if (attack % 10 == 0) //every 10th tick
+            {
                 Player player = Main.player[Projectile.owner];
                 Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, new Vector2(0.01f * Projectile.direction, 1),
                     ModContent.ProjectileType<ChillyMinionFreeze>(), Projectile.damage, 1, player.whoAmI, 0, Projectile.whoAmI);
-			}
-			if (attack >= 10) //reset
-			{
-				attack = 0;
-				attacking = false;
-			}
+            }
 
             //animation for freezing
             Projectile.frameCounter++;
@@ -434,7 +440,7 @@ namespace KirboMod.Projectiles
         {
             Projectile.velocity.Y = -10f; //velocityY boosts up 
             jumpTimer = 15;
-            Projectile.frame = 12;
+            Projectile.frame = 8;
         }
 
         //all of this for falling through tiles
