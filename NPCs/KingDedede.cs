@@ -83,8 +83,7 @@ namespace KirboMod.NPCs
             NPC.lavaImmune = true;
             if (!Main.dedServ)
             {
-                //Music = MusicLoader.GetMusicSlot(Mod, "Sounds/Music/KingDedede");
-                Music = MusicID.Boss5;
+                Music = MusicLoader.GetMusicSlot(Mod, "Music/Happiz_KingDedede");
             }
 
             NPC.friendly = false;
@@ -758,7 +757,6 @@ namespace KirboMod.NPCs
                         {
                             Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.position.Y + 150, 0, 0, ModContent.ProjectileType<DededeSlam>(), 0, 8f, Main.myPlayer, 0, 0);
                         }
-                        SoundEngine.PlaySound(SoundID.Item14, NPC.Center); //bomb
                         attack = (phase == 3 ? 390 : 420) - phaseThreeSpeedUp; //60 seconds before restart
                     }
                 }
@@ -857,6 +855,8 @@ namespace KirboMod.NPCs
         void launchDropStars()
         {
             SoundEngine.PlaySound(SoundID.Item9, NPC.Center); //star swoosh
+
+            SoundEngine.PlaySound(SoundID.Item14, NPC.Center); //bomb
 
             if (attacktype == DededeAttackType.Hammer)
             {

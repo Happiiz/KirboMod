@@ -1197,6 +1197,16 @@ Mods: {
 					Consumes 50 starbits per use
 					'''
 			}
+
+			DededeMusicBox: {
+				DisplayName: Music Box (King Dedede)
+				Tooltip: ""
+			}
+
+			DarkMatterMusicBox: {
+				DisplayName: Music Box (Dark Matter Swordsman)
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {
@@ -1519,6 +1529,8 @@ Mods: {
 			EnemyBanner.MapEntry: Banner
 			FountainOfDreams.MapEntry: Fountain of Dreams
 			RareStone.MapEntry: Rare Stone
+			DededeMusicBoxTile.MapEntry: Dedede Music Box Tile
+			DarkMatterMusicBoxTile.MapEntry: Dark Matter Music Box Tile
 		}
 
 		Configs: {

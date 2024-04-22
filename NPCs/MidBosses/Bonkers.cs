@@ -95,13 +95,17 @@ namespace KirboMod.NPCs.MidBosses
 
             NPC.ai[0]++; //attack delay timer
 
-            if (NPC.ai[0] < 120) //not attacking
+            if (NPC.ai[0] < 60)
+            {
+                attacktype = -1; //don't do anything
+            }
+            else if (NPC.ai[0] < 180) //not attacking
             {
                 attacktype = 0; //walking
             }
             else
             {
-                if (NPC.ai[0] == 120)
+                if (NPC.ai[0] == 180)
                 {
                     NPC.noTileCollide = false; //don't phase through tiles
 
@@ -132,6 +136,7 @@ namespace KirboMod.NPCs.MidBosses
             }
             NPC.noGravity = attacktype == 1;
             NPC.GravityMultiplier = MultipliableFloat.One;
+
             //declaring attacktype values
             if (attacktype == 0)
             {
@@ -225,7 +230,7 @@ namespace KirboMod.NPCs.MidBosses
             Rectangle hitbox = Utils.CenteredRectangle(NPC.Center, new Vector2(NPC.width + 140, NPC.height + 500));
             if (hitbox.Intersects(player.Hitbox))
             {
-                NPC.ai[0] = 119;//reached player, stop chasing to avoid stunlock
+                NPC.ai[0] = 179;//reached player, stop chasing to avoid stunlock
             }
         }
         static float TimeToReachYPoint(float fromY, float toY, float accelY, float initialVelY)
@@ -300,7 +305,7 @@ namespace KirboMod.NPCs.MidBosses
                 }
                 if (NPC.ai[1] >= 120) //restart
                 {
-                    NPC.ai[0] = 0;
+                    NPC.ai[0] = 60;
                     NPC.ai[1] = 0;
                 }
             }
@@ -351,7 +356,7 @@ namespace KirboMod.NPCs.MidBosses
             if (NPC.ai[1] >= (Main.expertMode ? 90 : 120)) //restart
             {
                 NPC.ai[1] = 0;
-                NPC.ai[0] = 0;
+                NPC.ai[0] = 60;
             }
         }
 

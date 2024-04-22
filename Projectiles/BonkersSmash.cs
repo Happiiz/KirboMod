@@ -38,9 +38,11 @@ namespace KirboMod.Projectiles
                 Projectile.timeLeft = 5;
             }
 
+            bool isDedede = bonkers.type == ModContent.NPCType<KingDedede>();  //not bonkers
+
             Projectile.Center = bonkers.Center + new Vector2(bonkers.direction * 130, -10);
 
-            if (bonkers.type == ModContent.NPCType<KingDedede>()) //not bonkers
+            if (isDedede)
             {
                 Projectile.Center = bonkers.Center + new Vector2(bonkers.direction * 130, 20);
             }
@@ -54,8 +56,6 @@ namespace KirboMod.Projectiles
 
                     if ((WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType]) && bonkers.velocity.Y == 0)
                     {
-                        SoundEngine.PlaySound(SoundID.Item14, Projectile.position); //bomb sound
-
                         Projectile.ai[2] = 1;
                     }
                 }
