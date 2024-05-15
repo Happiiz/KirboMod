@@ -33,6 +33,8 @@ namespace KirboMod.NPCs.MidBosses
                 Position = new Vector2(20, 80),
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
+
+            NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true; //immune because of boss-like behavior
         }
 
 		public override void SetDefaults()
@@ -40,8 +42,8 @@ namespace KirboMod.NPCs.MidBosses
 			NPC.width = 100;
 			NPC.height = 136;
 			NPC.damage = Main.hardMode ? 80 : 40;
-			NPC.defense = 20;
-            NPC.lifeMax = Main.hardMode ? 2500 : 800;
+			NPC.defense = Main.hardMode ? 30 : 15;
+            NPC.lifeMax = Main.hardMode ? 16000 : 800;
             NPC.HitSound = SoundID.NPCHit14; //fishron squeal
 			NPC.DeathSound = SoundID.NPCDeath8; //grunt
 			NPC.value = Item.buyPrice(0, 0, 50, 0); // money it drops
@@ -86,43 +88,47 @@ namespace KirboMod.NPCs.MidBosses
 			Player player = Main.player[NPC.target];
 			Vector2 distance = player.Center - NPC.Center;
 
-            if (NPC.ai[0] == 0) //not attacking
-            {
-                attacktype = 0; //standing
-                NPC.ai[3]++; //attack timer
-            }
-            else
-            {
-                NPC.ai[3] = 0; //restart attack timer
-            }
-
-            if (NPC.ai[3] >= (Main.expertMode ? 30 : 60)) //times up! (50 if in expertmode)
-            {
-                if (attacktype == 0)
-                {
-                    NPC.ai[0] += 1; //attack!
-                    NPC.ai[3] = 0;
-                }
-            }
-
-            if (NPC.ai[0] == 1) //stancing or 
-            {
-                if (lastattack == 2) //ice
-                {
-                    attacktype = 1; //dash
-                    lastattack = 1; //also ddash
-                }
-                else
-                {
-                    attacktype = 2; //ice
-                    lastattack = 2; //also ice
-                }
-
-            }
 
             if (player.dead) //player has died
             {
                 attacktype = 1; //dive dash
+                NPC.timeLeft = 40;
+            }
+            else
+            {
+                if (NPC.ai[0] == 0) //not attacking
+                {
+                    attacktype = 0; //standing
+                    NPC.ai[3]++; //attack timer
+                }
+                else
+                {
+                    NPC.ai[3] = 0; //restart attack timer
+                }
+
+                if (NPC.ai[3] >= (Main.expertMode ? 30 : 60)) //times up! (50 if in expertmode)
+                {
+                    if (attacktype == 0)
+                    {
+                        NPC.ai[0] += 1; //attack!
+                        NPC.ai[3] = 0;
+                    }
+                }
+
+                if (NPC.ai[0] == 1) //stancing or 
+                {
+                    if (lastattack == 2) //ice
+                    {
+                        attacktype = 1; //dash
+                        lastattack = 1; //also ddash
+                    }
+                    else
+                    {
+                        attacktype = 2; //ice
+                        lastattack = 2; //also ice
+                    }
+
+                }
             }
 
             //declaring attacktype values
@@ -227,6 +233,7 @@ namespace KirboMod.NPCs.MidBosses
                     CheckPlatform(player); //go down platforms when player is low
 
                     float speed = Main.expertMode ? 15f : 10f; //top speed (15 in expertmode)
+                    speed *= Main.hardMode ? 1.5f : 1;
 					float inertia = 20f; //acceleration and decceleration speed
 
                     ClimbTiles(player);
@@ -235,17 +242,17 @@ namespace KirboMod.NPCs.MidBosses
 
                     Vector2 distance = player.Center - NPC.Center;
 
-					bool pastPlayer = distance.X < 5; //checks if past the player because it doesn't turn
+                    bool inRangeX = MathF.Abs(distance.X) < (Main.hardMode ? 200 : 10);
 
-					if (NPC.direction == -1)
-					{
-                        pastPlayer = distance.X > -5; //check for if facing left
-                    }
+                    bool inRangeY = distance.Y > (Main.hardMode ? -600 : -200) &&  distance.Y < 100;
 
-                    bool inRangeY = distance.Y > -200 &&  distance.Y < 100;
-
-                    if (MathF.Abs(distance.X) < 10 && inRangeY && player.dead == false) //past the player, near player and player not dead
+                    if (inRangeX && inRangeY && player.dead == false) //past the player, near player and player not dead
                     {
+                        if (Main.hardMode)
+                        {
+                            NPC.velocity.Y = Math.Clamp(((player.Center.Y - NPC.Center.Y) / 10), -20f, 0);
+                        }
+
 						NPC.ai[0] = 180; //dive
                     }
 
@@ -268,6 +275,7 @@ namespace KirboMod.NPCs.MidBosses
 					{
 						SoundEngine.PlaySound(SoundID.Item1, NPC.Center); 
 					}
+
 					if (NPC.ai[0] >= 240) //restart after 1 second
 					{
                         NPC.ai[0] = 0;

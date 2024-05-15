@@ -49,7 +49,7 @@ namespace KirboMod.Items.Weapons
         public override void AddRecipes()
         {
 			Recipe chainbombrecipe = CreateRecipe(300);//the result is chain bomb
-			chainbombrecipe.AddIngredient(ModContent.ItemType<Items.Weapons.Bomb>()); 
+			chainbombrecipe.AddIngredient(ModContent.ItemType<Items.Weapons.Bomb>(), 5); 
 			chainbombrecipe.AddIngredient(ItemID.Wire, 10); //Wire
 			chainbombrecipe.AddIngredient(ModContent.ItemType<Items.Starbit>(), 15);
 			chainbombrecipe.AddIngredient(ModContent.ItemType<Items.RareStone>(), 1); //1 rare stones

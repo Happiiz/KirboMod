@@ -49,7 +49,7 @@ namespace KirboMod.Items.Weapons
         public override void AddRecipes()
         {
 			Recipe homingbombrecipe = CreateRecipe(300);//the result is homing bombs
-			homingbombrecipe.AddIngredient(ModContent.ItemType<Items.Weapons.ChainBomb>());
+			homingbombrecipe.AddIngredient(ModContent.ItemType<Items.Weapons.ChainBomb>(), 50);
 			homingbombrecipe.AddIngredient(ItemID.ClusterRocketI, 5); // 5 Cluster Rockets
 			homingbombrecipe.AddIngredient(ItemID.ChlorophyteBullet, 5); //5 Chlorophyte Bullets
 			homingbombrecipe.AddIngredient(ModContent.ItemType<Items.Starbit>(), 30);

@@ -80,7 +80,7 @@ namespace KirboMod.Projectiles
                     //MAKE TRAJECTORY OF ROCK
                     Vector2 speed = Main.MouseWorld - player.Center;
 					speed.Normalize();
-					speed *= 15;
+					speed *= 25;
 					Vector2 peturbedspeed = speed.RotatedByRandom(MathHelper.ToRadians(20f)); //spread em
 
 					if (peturbedspeed.Y > -4) //go upper
@@ -119,5 +119,10 @@ namespace KirboMod.Projectiles
 				}
 			}
 		}
+
+        public override Color? GetAlpha(Color lightColor)
+        {
+            return Color.White * Projectile.Opacity; //independent from light level while still being affected by opacity
+        }
     }
 }

@@ -42,44 +42,9 @@ namespace KirboMod.NPCs
         }
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
-            if (spawnInfo.Player.ZoneRockLayerHeight & Main.hardMode) //if player is within cave height and world is in hardmode
+            if (spawnInfo.Player.ZoneRockLayerHeight && Main.hardMode) //if player is within cave height
             {
-                if (spawnInfo.Player.ZoneJungle)
-                {
-                    return 0f;
-                }
-                else if (spawnInfo.Player.ZoneSnow)
-                {
-                    return 0f;
-                }
-                else if (spawnInfo.Player.ZoneBeach) //don't spawn on beach
-                {
-                    return 0f;
-                }
-                else if (spawnInfo.Player.ZoneDesert) //don't spawn on beach
-                {
-                    return 0f;
-                }
-                else if (spawnInfo.Player.ZoneCorrupt) //don't spawn on beach
-                {
-                    return 0f;
-                }
-                else if (spawnInfo.Player.ZoneCrimson) //don't spawn on beach
-                {
-                    return 0f;
-                }
-                else if (spawnInfo.Player.ZoneDungeon) //don't spawn in dungeon
-                {
-                    return 0f;
-                }
-                else if (spawnInfo.Water) //don't spawn in water
-                {
-                    return 0f;
-                }
-                else //only forest
-                {
-                    return spawnInfo.SpawnTileType == TileID.Stone || spawnInfo.SpawnTileType == TileID.Dirt ? .06f : 0f; //functions like a mini if else statement
-                }
+                return spawnInfo.SpawnTileType == TileID.Dirt || spawnInfo.SpawnTileType == TileID.Stone ? .03f : 0f; //functions like a mini if else statement
             }
             else
             {

@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework;
 using System;
 using Terraria;
 using Terraria.ID;
@@ -19,11 +20,12 @@ namespace KirboMod.Projectiles
 			Projectile.friendly = true;
 			Projectile.timeLeft = 7;
 			Projectile.tileCollide = false;
-			Projectile.penetrate = 99;
+			Projectile.penetrate = -1;
 			Projectile.DamageType = DamageClass.Melee;
 			Projectile.usesLocalNPCImmunity = true; //uses own immunity frames
 			Projectile.localNPCHitCooldown = 7; //time before hit again
-			Projectile.alpha = 30;
+            Projectile.ownerHitCheck = true;
+            Projectile.alpha = 30;
 		}
 		public override void AI()
 		{
@@ -35,9 +37,12 @@ namespace KirboMod.Projectiles
 		{
 			Player player = Main.player[Projectile.owner];
 
-			player.GetModPlayer<KirbPlayer>().fighterComboResetDelay = 60;
-
 			player.GetModPlayer<KirbPlayer>().fighterComboCounter += 1;
 		}
-	}
+
+        public override Color? GetAlpha(Color lightColor)
+        {
+            return Color.White * Projectile.Opacity; //independent from light level while still being affected by opacity
+        }
+    }
 }

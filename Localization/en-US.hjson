@@ -738,7 +738,7 @@ Mods: {
 				Tooltip:
 					'''
 					Right click to do a uppercut, sending you upwards
-					Punching many times RIGHT before uppercutting will make it stronger
+					The more punches you land, the stronger the uppercut
 					'''
 			}
 
@@ -902,9 +902,9 @@ Mods: {
 				Tooltip:
 					'''
 					Right click and hold up to uppercut!
-					Combo punches to make uppercuts stronger!
+					Land punches to make uppercuts stronger!
 					Spike on the ground and in the air by just holding right click!
-					'Fly like a ballistic missile, sting like a ballistic missile'
+					'Float like a ballistic missile, sting like a ballistic missile'
 					'''
 			}
 
@@ -1015,11 +1015,7 @@ Mods: {
 
 			SwayingBranch: {
 				DisplayName: Twitchy Twig
-				Tooltip:
-					'''
-					Summons a whispy woods sentry to spew apples at your enemies
-					Apples will momentarily spawn weak
-					'''
+				Tooltip: Summons a whispy woods sentry to rain apples on your enemies
 			}
 
 			SwishyTree: {

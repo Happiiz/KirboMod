@@ -28,10 +28,9 @@ namespace KirboMod.Projectiles
             Projectile.DamageType = DamageClass.Summon;
             Projectile.timeLeft = 2;
 			Projectile.tileCollide = false;
-			Projectile.penetrate = 3;
+			Projectile.penetrate = -1;
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = 20;
-			Projectile.stopsDealingDamageAfterPenetrateHits = true; //cancels out damage without killing projectile
 		}
 
 		public override void AI()
@@ -52,7 +51,7 @@ namespace KirboMod.Projectiles
 
             Projectile.rotation = directionRotation; //offset a bit
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 1; i++)
             {
                 Vector2 speed = Main.rand.NextVector2Unit(directionRotation - (MathF.Tau * 50 / 360 / 2), MathF.Tau * 50/360); //circle
 
@@ -86,7 +85,11 @@ namespace KirboMod.Projectiles
 
         public override bool? CanHitNPC(NPC target) //can hit only if there's a line of sight
         {
-            return Collision.CanHit(Projectile, target);
+            if (Collision.CanHit(Projectile, target))
+            {
+                return null;
+            }
+            return false;
         }
         public override bool CanHitPvp(Player target) //can hit only if there's a line of sight
         {

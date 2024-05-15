@@ -20,7 +20,7 @@ namespace KirboMod.Projectiles
 			Projectile.hostile = true;
 			Projectile.timeLeft = 15;
 			Projectile.tileCollide = false;
-			Projectile.penetrate = 99;
+			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
 			Projectile.alpha = 255;
 		}

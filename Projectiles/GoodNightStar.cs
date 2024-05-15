@@ -23,7 +23,7 @@ namespace KirboMod.Projectiles
 			Projectile.friendly = true;
 			Projectile.timeLeft = 240;
 			Projectile.tileCollide = false;
-			Projectile.penetrate = 999;
+			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = -1;

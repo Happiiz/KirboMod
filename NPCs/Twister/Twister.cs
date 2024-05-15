@@ -36,13 +36,14 @@ namespace KirboMod.NPCs.Twister
             BannerItem = ModContent.ItemType<Items.Banners.TwisterBanner>();
             NPC.aiStyle = -1;
             NPC.noGravity = false;
+            NPC.GravityIgnoresLiquid = false;
         }
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
             if (spawnInfo.Player.ZoneDirtLayerHeight || spawnInfo.Player.ZoneRockLayerHeight) //if player is within cave height
             {
-                return spawnInfo.SpawnTileType == TileID.Marble ? .4f : 0f; //functions like a mini if else statement
+                return spawnInfo.SpawnTileType == TileID.Marble ? .3f : 0f; //functions like a mini if else statement
             }
             else
             {

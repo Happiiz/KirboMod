@@ -49,22 +49,11 @@ namespace KirboMod.NPCs
 
         }
 
-        public override float SpawnChance(NPCSpawnInfo spawnInfo)
+		public override float SpawnChance(NPCSpawnInfo spawnInfo)
 		{
 			//if player is in jungle biome and daytime or underground and not in water
-			if (spawnInfo.Player.ZoneTowerVortex)
-			{
-				return 0f;
-			}
-			else if (spawnInfo.Player.ZoneTowerSolar)
-			{
-				return 0f;
-			}
-			else if (spawnInfo.Player.ZoneTowerNebula)
-			{
-				return 0f;
-			}
-			else if (spawnInfo.Player.ZoneTowerStardust)
+			if (spawnInfo.Player.ZoneTowerVortex || spawnInfo.Player.ZoneTowerSolar 
+				|| spawnInfo.Player.ZoneTowerNebula || spawnInfo.Player.ZoneTowerStardust)
 			{
 				return 0f;
 			}

@@ -45,7 +45,10 @@ namespace KirboMod
         public bool hasdarkShield; //additional check that only updates when not dashing
 
         public int fighterComboCounter = 0; //combo Counter to determine strength of uppercut in regular fighter glove
-        public int fighterComboResetDelay = 0; //delay until combo Counter resets
+
+        public bool airWalkerSet = false;
+        public bool airWalkerJump = false;
+        public bool blockAirWalkerJump = false;
 
         public bool personalcloud; //checks if have personal cloud accesory
         public bool personalcloudalive = false; //checks if personal cloud is alive
@@ -109,6 +112,9 @@ namespace KirboMod
             kingDededePet = false;
             darkMatterPet = false;
             zeroPet = false;
+
+            airWalkerSet = false;
+            blockAirWalkerJump = false;
         }
         public override void PreUpdate()
         {
@@ -116,17 +122,6 @@ namespace KirboMod
             //-1 to compensate when you detect right click it adds to the counter
             if (finalCutterAnimationCounter > -1)
                 finalCutterAnimationCounter--;
-
-            //fighter glove
-            if (fighterComboResetDelay > 0) //go down 'til 0
-            {
-                fighterComboResetDelay -= 1;
-            }
-
-            if (fighterComboResetDelay == 0 && fighterComboCounter != 0) //go down
-            {
-                fighterComboCounter--;
-            }
 
             //plasmacharge minimum
             if (plasmaCharge < 0)
@@ -139,6 +134,16 @@ namespace KirboMod
             if (darkDashTime < 0)
             {
                 darkDashTime = 0;
+            }
+
+            if (fighterComboCounter > 100)
+            {
+                fighterComboCounter = 100;
+            }
+
+            if (Player.dead) //reset fighter counter if dead
+            {
+                fighterComboCounter = 0;
             }
         }
         public TripleStarStar GetAvailableTripleStarStar()
@@ -395,6 +400,40 @@ namespace KirboMod
             else //also reset
             {
                 gloombadgeattackcount = 0;
+            }
+
+            //AIR WALKER JUMP
+
+            if (airWalkerSet)
+            {
+                if (player.velocity.Y == 0)
+                {
+                    airWalkerJump = true;
+                }
+                else
+                {
+                    //do air walker jump
+                    if (player.controlJump && player.releaseJump && airWalkerJump == true && blockAirWalkerJump == false)
+                    {
+                        player.velocity.Y = -7.5f;
+                        airWalkerJump = false;
+                        player.blockExtraJumps = true; //temporarily disallow other jumps
+
+                        for (int i = 0; i < 3; i++)
+                        {
+                            Vector2 position = player.Bottom + new Vector2(-45 + 30 * i, 0); //circle
+                            Gore.NewGorePerfect(player.GetSource_FromThis(), position, Vector2.Zero, Main.rand.Next(11, 13), Scale: 1f); //double jump smoke
+                        }
+
+                        for (int i = 0; i < 12; i++)
+                        {
+                            Vector2 position = player.Bottom + new Vector2(Main.rand.NextFloat(-50, 50), 0); //circle
+                            Dust.NewDustPerfect(position, DustID.Electric); //sparks
+                        }
+
+                        SoundEngine.PlaySound(SoundID.DoubleJump, player.Center);
+                    }
+                }
             }
 
             //small things

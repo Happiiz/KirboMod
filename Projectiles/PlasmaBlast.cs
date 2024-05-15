@@ -20,12 +20,12 @@ namespace KirboMod.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 80;
-			Projectile.height = 80;
+			Projectile.width = 10;
+			Projectile.height = 10;
 			Projectile.friendly = true;
 			Projectile.hostile = false;
 			Projectile.timeLeft = 120;
-			Projectile.tileCollide = false; 
+			Projectile.tileCollide = true; 
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = -1;
 			Projectile.extraUpdates = 2;
@@ -66,10 +66,10 @@ namespace KirboMod.Projectiles
 
 		public override void OnKill(int timeLeft)
 		{
-			for (int i = 0; i < 40; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+			for (int i = 0; i < 100; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 			{
 				Vector2 speed = Main.rand.NextVector2Circular(20, 20); //circle
-				Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.TerraBlade, speed, Scale: 1f); //Makes dust in a messy circle
+				Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.TerraBlade, speed, Scale: 2f); //Makes dust in a messy circle
 				d.noGravity = true;
 			}
 		}

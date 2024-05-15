@@ -26,7 +26,12 @@ namespace KirboMod.Projectiles
 			Projectile.localNPCHitCooldown = -1; //default
 		}
 
-		public override void AI()
+        public override bool? CanCutTiles()
+        {
+            return false;
+        }
+
+        public override void AI()
 		{
 			Projectile.rotation += 0.2f * (float)Projectile.direction; // rotates projectile
 			if (++Projectile.frameCounter >= 2) //changes frames every 2 ticks 

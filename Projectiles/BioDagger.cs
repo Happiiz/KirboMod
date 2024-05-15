@@ -21,7 +21,7 @@ namespace KirboMod.Projectiles
 			Projectile.hostile = true;
 			Projectile.timeLeft = 40;
 			Projectile.tileCollide = true;
-			Projectile.penetrate = 99;
+			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
 		}
 		public override void AI()

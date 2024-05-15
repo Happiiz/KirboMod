@@ -62,7 +62,11 @@ namespace KirboMod.Projectiles
 
         public override bool? CanHitNPC(NPC target) //can hit only if there's a line of sight
         {
-            return Collision.CanHit(Projectile, target);
+            if (Collision.CanHit(Projectile, target))
+            {
+                return null;
+            }
+            return false;
         }
         public override bool CanHitPvp(Player target) //can hit only if there's a line of sight
         {

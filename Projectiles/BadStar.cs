@@ -25,7 +25,7 @@ namespace KirboMod.Projectiles
 			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.timeLeft = 240;
 			Projectile.tileCollide = false;
-			Projectile.penetrate = 999;
+			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
 			Projectile.alpha = 255;
 		}

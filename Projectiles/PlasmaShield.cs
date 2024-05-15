@@ -32,10 +32,17 @@ namespace KirboMod.Projectiles
         {
 			return false;
         }
+
+        public override bool? CanCutTiles()
+        {
+            return false;
+        }
+
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
 			return Helper.CheckCircleCollision(targetHitbox, Projectile.Center, Projectile.ai[0]);
         }
+
         public override void AI()
 		{
 		
@@ -58,9 +65,9 @@ namespace KirboMod.Projectiles
 		}
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-			if (target.boss || target.type == NPCID.TargetDummy)
+			if (target.boss || target.type == NPCID.TargetDummy || target.knockBackResist == 0f)
 				return;
-			Vector2 push = Vector2.Normalize(target.Center - Projectile.Center) * 40;
+			Vector2 push = Vector2.Normalize(target.Center - Projectile.Center) * 10;
 			push *= target.knockBackResist < .1f ? .1f : target.knockBackResist;
 			target.velocity = push;
 			NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, target.whoAmI);

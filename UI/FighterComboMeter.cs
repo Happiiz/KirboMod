@@ -99,7 +99,7 @@ namespace KirboMod.UI
 			// Setting the text per tick to update and show our resource values.
 			text.SetText($"{modPlayer.fighterComboCounter}");
 
-			if (modPlayer.fighterComboCounter > 100) //beeg combo
+			if (modPlayer.fighterComboCounter >= 100) //max combo
 			{
 				text.TextColor = Color.Yellow;
 			}

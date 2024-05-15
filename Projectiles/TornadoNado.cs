@@ -22,6 +22,7 @@ namespace KirboMod.Projectiles
 			Projectile.width = 30;
 			Projectile.height = 30;
 			Projectile.friendly = true;
+			Projectile.hostile = false;
 			Projectile.DamageType = DamageClass.Magic;
 			Projectile.tileCollide = true;
 			Projectile.penetrate = -1;
@@ -100,7 +101,11 @@ namespace KirboMod.Projectiles
 
         public override bool? CanHitNPC(NPC target)
         {
-			return Collision.CanHit(Projectile, target);
+			if (Collision.CanHit(Projectile, target))
+			{
+				return null;
+			}
+			return false;
         }
 
         public override bool OnTileCollide(Vector2 oldVelocity)

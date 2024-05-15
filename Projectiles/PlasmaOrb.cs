@@ -39,6 +39,11 @@ namespace KirboMod.Projectiles
             return false;
         }
 
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+        {
+            return Helper.CheckCircleCollision(targetHitbox, Projectile.Center, Projectile.ai[0]);
+        }
+
         public override Color? GetAlpha(Color lightColor)
         {
             return Color.White * Projectile.Opacity; //unaffected by light, but can be transparent

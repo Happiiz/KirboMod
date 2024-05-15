@@ -40,16 +40,10 @@ namespace KirboMod.NPCs
 
 		public override float SpawnChance(NPCSpawnInfo spawnInfo) 
 		{
-			if (spawnInfo.Player.ZoneOverworldHeight && Main.dayTime && !Main.raining) //if player is within surface height, daytime and not raining
-			{
-				if (spawnInfo.Player.ZoneJungle || spawnInfo.Player.ZoneSnow || spawnInfo.Player.ZoneBeach || spawnInfo.Player.ZoneDesert || spawnInfo.Player.ZoneCorrupt || spawnInfo.Player.ZoneCrimson || spawnInfo.Invasion || spawnInfo.Player.ZoneMeteor || spawnInfo.Player.ZoneDungeon || spawnInfo.Water || spawnInfo.Sky || Main.eclipse)
-				{
-					return 0f; //no spawn rate
-				}
-                else //only forest
-				{
-					return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? .5f : 0f; //functions like a mini if else statement
-				}
+            //if player is within surface height, daytime, not raining, no invasions, and in forest/purity
+            if (spawnInfo.Player.ZoneOverworldHeight && Main.dayTime && !Main.raining && spawnInfo.Player.ZoneForest && !spawnInfo.Invasion)
+            {
+                return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? .5f : 0f; //functions like a mini if else statement
 			}
 			else
 			{
@@ -116,12 +110,12 @@ namespace KirboMod.NPCs
 			direction.Normalize();
 			direction *= speed;
 
-			NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
-																					   //Cap or no Cap
+			//Don't negate X movement in the air else Cappy flies large distances
+            NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
 
-			//Jump When land
+            //Jump When land
 
-			if (NPC.velocity.Y == 0) 
+            if (NPC.velocity.Y == 0) 
             {
 				jump = 5;
 				if (animation == 0)

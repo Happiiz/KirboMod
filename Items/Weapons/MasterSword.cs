@@ -230,8 +230,9 @@ namespace KirboMod.Items.Weapons
             player.GetModPlayer<KirbPlayer>().kirbyballoon = false;
             player.GetModPlayer<KirbPlayer>().kirbyballoonwait = 1;
 
-            //double jump effects
+            //disable double jump effects
             player.blockExtraJumps = true;
+            player.GetModPlayer<KirbPlayer>().blockAirWalkerJump = true;
 
             player.DryCollision(true, true); //fall through platforms
 

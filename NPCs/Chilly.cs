@@ -46,25 +46,13 @@ namespace KirboMod.NPCs
 		}
 		public override float SpawnChance(NPCSpawnInfo spawnInfo)
 		{
-			//if player is in snow biome and daytime or underground and not in water
-
-			if (spawnInfo.Player.ZoneTowerVortex)
-			{
-				return 0f;
-			}
-			else if (spawnInfo.Player.ZoneTowerSolar)
-			{
-				return 0f;
-			}
-			else if (spawnInfo.Player.ZoneTowerNebula)
-			{
-				return 0f;
-			}
-			else if (spawnInfo.Player.ZoneTowerStardust)
-			{
-				return 0f;
-			}
-			else if (spawnInfo.Player.ZoneSnow && (Main.dayTime || spawnInfo.Player.ZoneRockLayerHeight) && !spawnInfo.Water && !spawnInfo.Sky
+            //if player is in snow biome and daytime or underground and not in water
+            if (spawnInfo.Player.ZoneTowerVortex || spawnInfo.Player.ZoneTowerSolar
+                || spawnInfo.Player.ZoneTowerNebula || spawnInfo.Player.ZoneTowerStardust)
+            {
+                return 0f;
+            }
+            else if (spawnInfo.Player.ZoneSnow && (Main.dayTime || spawnInfo.Player.ZoneRockLayerHeight) && !spawnInfo.Water && !spawnInfo.Sky
                 && !Main.eclipse)
 			{
 				return spawnInfo.SpawnTileType == TileID.SnowBlock || spawnInfo.SpawnTileType == TileID.IceBlock ? .4f : 0f; //functions like a mini if else statement

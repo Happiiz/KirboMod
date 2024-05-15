@@ -66,9 +66,12 @@ namespace KirboMod.Tiles
 		{
 			Player player = Main.LocalPlayer;
 
+			bool holdingStarRod = player.inventory[player.selectedItem].type == ModContent.ItemType<Items.Weapons.StarRod>()
+				|| player.inventory[player.selectedItem].type == ModContent.ItemType<Items.Weapons.TripleStar>();
+
             //checks if nightmare isn't alive ,holding star rod & if night
-            if (player.inventory[player.selectedItem].type == ModContent.ItemType<Items.Weapons.StarRod>() && !Main.dayTime 
-				&& !NPC.AnyNPCs(ModContent.NPCType<NPCs.NightmareOrb>()) && !NPC.AnyNPCs(ModContent.NPCType<NPCs.NightmareWizard>()))
+            if (holdingStarRod && !Main.dayTime && !NPC.AnyNPCs(ModContent.NPCType<NPCs.NightmareOrb>()) 
+				&& !NPC.AnyNPCs(ModContent.NPCType<NPCs.NightmareWizard>()))
 			{
                 if (Main.netMode != NetmodeID.MultiplayerClient) // If the player is not in multiplayer, spawn directly
                 {

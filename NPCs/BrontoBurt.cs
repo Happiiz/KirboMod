@@ -43,76 +43,10 @@ namespace KirboMod.NPCs
 
 		public override float SpawnChance(NPCSpawnInfo spawnInfo) 
 		{
-			if (spawnInfo.Player.ZoneOverworldHeight && Main.dayTime && !Main.raining) //if player is within surface height, daytime and not raining
-			{
-				if (spawnInfo.Player.ZoneJungle)
-				{
-					return 0f; //no spawn rate
-				}
-				else if (spawnInfo.Player.ZoneSnow)
-				{
-					return 0f; //no spawn rate
-				}
-				else if (spawnInfo.Player.ZoneBeach) //don't spawn on beach
-				{
-					return 0f; //no spawn rate
-				}
-				else if (spawnInfo.Player.ZoneDesert) //don't spawn on beach
-				{
-					return 0f; //no spawn rate
-				}
-				else if (spawnInfo.Player.ZoneCorrupt) //don't spawn on beach
-				{
-					return 0f; //no spawn rate
-				}
-				else if (spawnInfo.Player.ZoneCrimson) //don't spawn on beach
-				{
-					return 0f; //no spawn rate
-				}
-				else if (spawnInfo.Invasion) //don't spawn during invasions
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneMeteor) //don't spawn on meteor
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneDungeon) //don't spawn in dungeon
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Water) //don't spawn in water
-				{
-					return 0f;
-				}
-                else if (spawnInfo.Sky) //don't spawn in space
-                {
-                    return 0f;
-                }
-                else if (Main.eclipse) //don't spawn during eclipse
-                {
-                    return 0f;
-                }
-                else if (spawnInfo.Player.ZoneTowerVortex)
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneTowerSolar)
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneTowerNebula)
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneTowerStardust)
-				{
-					return 0f;
-				}
-				else //only forest
-				{
-					return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? .3f : 0f; //functions like a mini if else statement
-				}
+            //if player is within surface height, daytime, not raining, no invasions, and in forest/purity
+            if (spawnInfo.Player.ZoneOverworldHeight && Main.dayTime && !Main.raining && spawnInfo.Player.ZoneForest && !spawnInfo.Invasion)
+            {
+                return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? .5f : 0f;
 			}
 			else
 			{

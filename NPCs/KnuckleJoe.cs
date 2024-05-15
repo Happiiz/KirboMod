@@ -89,7 +89,7 @@ namespace KirboMod.NPCs
                 }
                 else //only forest
                 {
-					return spawnInfo.SpawnTileType == TileID.Stone || spawnInfo.SpawnTileType == TileID.Dirt ? .06f : 0f; //functions like a mini if else statement
+					return spawnInfo.SpawnTileType == TileID.Stone || spawnInfo.SpawnTileType == TileID.Dirt ? .03f : 0f; //functions like a mini if else statement
 				}
 			}
 			else
@@ -133,7 +133,9 @@ namespace KirboMod.NPCs
             Player player = Main.player[NPC.target];
             Vector2 distance = player.Center - NPC.Center;
 
-            bool inRange = Math.Abs(distance.X) < 400 && Math.Abs(distance.Y) < 200 && !player.dead;
+            bool inRange = Math.Abs(distance.X) < 400 && Math.Abs(distance.Y) < 400 && !player.dead;
+
+            bool lineOfSight = Collision.CanHitLine(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height);
 
             if (attacktype > 1 || inRange) //attacking or in range
             {
@@ -150,9 +152,7 @@ namespace KirboMod.NPCs
                 }
                 else if (attackTimer == 120) //times up!
                 {
-                    bool lineOfSight = Collision.CanHitLine(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height);
-
-                    if (Math.Abs(distance.X) < 150) //close enough
+                    if (Math.Abs(distance.X) < 150 && Math.Abs(distance.X) < 200) //close enough
                     {
                         attacktype = 2; //vulcan jab
                     }
@@ -387,7 +387,7 @@ namespace KirboMod.NPCs
 
                     if (attackTimer % 5 == 0) //every 5 ticks
                     {
-                        SoundEngine.PlaySound(SoundID.Item1, NPC.Center); //we dont define the stuff after coordinates because legacy sound style
+                        SoundEngine.PlaySound(SoundID.Item1, NPC.Center);
                     }
                 }
                 if (attackTimer >= 120 + 180) //restart after 2 seconds
@@ -406,7 +406,7 @@ namespace KirboMod.NPCs
                 NPC.velocity.X *= 0.5f; //slow
             }
             Player player = Main.player[NPC.target];
-            Vector2 projshoot = NPC.Center + new Vector2(NPC.direction * 200, 0) - NPC.Center; //200 in the direction it's facing(doesn't have to be 200 because we normalize it)
+            Vector2 projshoot = NPC.Center.DirectionTo(player.Center);
             projshoot.Normalize();
             projshoot *= 10f;
 

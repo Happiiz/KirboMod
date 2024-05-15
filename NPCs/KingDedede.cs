@@ -513,7 +513,7 @@ namespace KirboMod.NPCs
         {
             if (attack == 60 - phaseThreeSpeedUp)
             {
-                NPC.velocity.Y = -4; //short up to signify start
+                NPC.velocity.Y = -4; //short hop to signify start
                 animation = 3; //draw hammer
             }
             if (attack >= 90 - phaseThreeSpeedUp && attack < 270 - phaseThreeSpeedUp)
@@ -596,11 +596,12 @@ namespace KirboMod.NPCs
 
                         launchDropStars();
 
-                        attack = (phase == 3 ? 371 : 401); //just after multiswing
+                        attack = (phase == 3 ? 371 : 401); //just after multiswing section
                     }
                 }
             }
             //IF ALREADY MULTISWUNG ^^^
+
             //regular attack
             if (attack == (phase == 3 ? 315 : 330) - phaseThreeSpeedUp) //jump if player is high(quicker in phase 3)
             {
@@ -716,7 +717,7 @@ namespace KirboMod.NPCs
         {
             Vector2 predictDistance = player.Center + player.velocity * 10 - NPC.Center;
 
-            if (attack < (phase == 3 ? 90: 120))
+            if (attack >= 60 - phaseThreeSpeedUp && attack < (phase == 3 ? 90: 120) - phaseThreeSpeedUp)
             {
                 animation = 9; //ready jump
                 NPC.TargetClosest(true); //face player
@@ -732,7 +733,8 @@ namespace KirboMod.NPCs
 
                 SoundEngine.PlaySound(SoundID.NPCDeath8.WithPitchOffset(0.5f), NPC.Center); //beast grunt (high pitch)
             }
-            if (attack > (phase == 3 ? 90 : 120) - phaseThreeSpeedUp) //fall for 5 seconds
+            if (attack > (phase == 3 ? 90 : 120) - phaseThreeSpeedUp
+                && attack < (phase == 3 ? 390 : 420) - phaseThreeSpeedUp) //fall for 5 seconds
             {
                 NPC.GravityIgnoresLiquid = true;
 
@@ -745,9 +747,10 @@ namespace KirboMod.NPCs
                 else
                 {
                     NPC.noTileCollide = false; //collide with tiles
+
                     if (NPC.velocity.Y == 0 || NPC.oldVelocity.Y == 0) //on ground or can't move anymore for some reason
                     {
-                        NPC.velocity.X *= 0f;
+                        NPC.velocity.X *= 0.01f;
                         animation = 9; //end jump
 
                         launchDropStars();
@@ -757,21 +760,25 @@ namespace KirboMod.NPCs
                         {
                             Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.position.Y + 150, 0, 0, ModContent.ProjectileType<DededeSlam>(), 0, 8f, Main.myPlayer, 0, 0);
                         }
-                        attack = (phase == 3 ? 390 : 420) - phaseThreeSpeedUp; //60 seconds before restart
+                        attack = (phase == 3 ? 390 : 420) - phaseThreeSpeedUp; //30 ticks before restart
                     }
                 }
             }
-            if (attack >= (phase == 3 ? 389 : 419) - phaseThreeSpeedUp) //restart cycle
+            if (attack == (phase == 3 ? 389 : 419) - phaseThreeSpeedUp) //1 tick before rest
             {
-                if (NPC.velocity.Y != 0 || NPC.oldVelocity.Y != 0 && animation != 9) //go back if not in final slam animation
+                if (NPC.velocity.Y != 0 || NPC.oldVelocity.Y != 0) //go back if not on ground or immobile
                 {
                     attack = (phase == 3 ? 91 : 121);
                 }
                 else //continue
                 {
-                    animation = 0; //stance
-                    attack = 0;
+                    NPC.velocity.X *= 0.01f;
                 }
+            }
+            if (attack >= (phase == 3 ? 420 : 450) - phaseThreeSpeedUp)
+            {
+                animation = 0; //stance
+                attack = 0;
             }
         }
 
@@ -1012,7 +1019,7 @@ namespace KirboMod.NPCs
             }
             if (animation == 3) //pull hammer
             {
-                NPC.frame.Y = frameHeight * 6; //faceplant
+                NPC.frame.Y = frameHeight * 6; // :D
                 NPC.frameCounter = 0;
             }
             if (animation == 4) //run with hammer

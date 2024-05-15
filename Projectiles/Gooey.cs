@@ -485,24 +485,19 @@ namespace KirboMod.Projectiles
                 Projectile.ignoreWater = true;
                 flying = false; // hold till not space jumping
                 Projectile.alpha = 255; //hide projectile
+                
+                float speed = Math.Clamp(direction2.Length() / 30, 20f, float.MaxValue);
+                Projectile.extraUpdates = 3; //run three extra ticks for space jump
 
-                float speed = direction2.Length() / 30;
-                if (speed < 100) //don't go below 100
-                {
-                    speed = 100;
-                }
-                float inertia = 6f;
-
-                Vector2 direction = player.Center - Projectile.Center; //start - end
-                direction.Normalize();
-                direction *= speed;
-                Projectile.velocity = (Projectile.velocity * (inertia - 1) + direction) / inertia;  //fly towards player
+                //fly toward player
+                Projectile.velocity = Projectile.DirectionTo(player.Center) * speed;
             }
             else
             {
-                //Projectile.tileCollide = true; //Don't use this as Gooey also doesn't collide with tiles while flying
+                Projectile.tileCollide = false;
                 Projectile.ignoreWater = false;
                 Projectile.alpha = 0; //show projectile
+                Projectile.extraUpdates = 0;
             }
 
             //space jump end

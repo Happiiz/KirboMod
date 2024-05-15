@@ -49,7 +49,7 @@ namespace KirboMod.Items.Weapons
 		{
 			Recipe recipe1 = CreateRecipe(10);//the result is needle ball
 			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 5); //5 starbits
-			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.GordoItem>(), 5); //5 gordos
+			recipe1.AddIngredient(ItemID.SpikyBall, 5); //5 spiky balls
 			recipe1.AddTile(TileID.Anvils); //crafted at anvil
 			recipe1.Register(); //adds this recipe to the game
 		}

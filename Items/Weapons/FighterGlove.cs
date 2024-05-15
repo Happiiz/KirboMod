@@ -35,7 +35,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.FlyingPunch>();
-			Item.shootSpeed = 15f;
+			Item.shootSpeed = 20f;
 		}
 
 		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
@@ -86,7 +86,7 @@ namespace KirboMod.Items.Weapons
 				Item.useTime = 5;
 				Item.useAnimation = 5;
 				Item.shoot = ModContent.ProjectileType<Projectiles.FlyingPunch>();
-				Item.shootSpeed = 15f;
+				Item.shootSpeed = 20f;
 				Item.useStyle = ItemUseStyleID.Swing;
 
 				return true;
