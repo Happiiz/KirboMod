@@ -479,6 +479,9 @@ namespace KirboMod.NPCs
             {
                 pupilOffset = Vector2.Zero;
             }
+            pupilOffset /= 2;
+            pupilOffset = pupilOffset.Floor() * 2 + Vector2.One;
+
             spriteBatch.Draw(eyeBase.Value, NPC.Center - screenPos, null, new Color(255, 255, 255), 0, eyeBase.Size() / 2, 1f, SpriteEffects.None, 0f);
             spriteBatch.Draw(pupil.Value, NPC.Center - screenPos + pupilOffset, null, Color.White, 0, pupil.Size() / 2, 1, SpriteEffects.None, 0);
             if (drawEyelid)
