@@ -74,7 +74,7 @@ namespace KirboMod.Items.Weapons
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.RangerGun>()); //Ranger Gun
 			recipe1.AddIngredient(ItemID.ClockworkAssaultRifle); //Clockwork Assult Rifle
 			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 50); //50 starbits
-			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 2); //2 rare stones
+			recipe1.AddIngredient(ModContent.ItemType<RareStone>(), 1); //1 rare stone
 			recipe1.AddTile(TileID.Anvils); //crafted at anvil
 			recipe1.Register(); //adds this recipe to the game
 		}

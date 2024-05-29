@@ -149,7 +149,7 @@ namespace KirboMod.Items.Weapons
             maskedhammerrecipe.AddIngredient(ItemID.TheHorsemansBlade); //The Horseman's Blade
             maskedhammerrecipe.AddIngredient(ItemID.FragmentSolar, 9); //Solar Fragment
 			maskedhammerrecipe.AddIngredient(ModContent.ItemType<Items.Starbit>(), 200); //200 starbits
-			maskedhammerrecipe.AddIngredient(ModContent.ItemType<Items.RareStone>(), 8); //8 rare stones
+			maskedhammerrecipe.AddIngredient(ModContent.ItemType<Items.RareStone>(), 3); //3 rare stones
 			maskedhammerrecipe.AddTile(TileID.LunarCraftingStation); //crafted at ancient manipulator
 			maskedhammerrecipe.Register(); //adds this recipe to the game
 		}

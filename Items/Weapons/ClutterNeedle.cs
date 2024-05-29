@@ -47,7 +47,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void AddRecipes()
 		{
-			Recipe recipe1 = CreateRecipe(300);//the result is clutter needle ball
+			Recipe recipe1 = CreateRecipe(600);//the result is clutter needle ball
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.Needle>(), 5); // 5 Needle balls
 			recipe1.AddIngredient(ItemID.SpikyBall, 5); // 5 Spiky Balls
 			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 10); //10 starbits

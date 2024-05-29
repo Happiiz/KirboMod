@@ -128,5 +128,10 @@ namespace KirboMod.Projectiles
             VFX.DrawProjWithStarryTrail(Projectile, new Color(173, 245, 255) * .15f, Color.White * .35f * Projectile.Opacity, default, Projectile.Opacity);
             return true;
 		}
-	}
+
+        public override bool? CanCutTiles()
+        {
+			return false;
+        }
+    }
 }

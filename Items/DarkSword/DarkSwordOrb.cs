@@ -29,6 +29,9 @@ namespace KirboMod.Items.DarkSword
             Projectile.localNPCHitCooldown = 4;
         }
         ref float Timer { get => ref Projectile.ai[0]; }
+
+        float bouncesLeft { get => Projectile.ai[1]; set => Projectile.ai[1] = value; }
+
         public override void AI()
         {
             Timer++;
@@ -81,6 +84,7 @@ namespace KirboMod.Items.DarkSword
             if (oldVelocity.X != Projectile.velocity.X)
                 Projectile.velocity.X = -oldVelocity.X;
             //Projectile.penetrate--;
+            Timer += 60; //kill faster everytime it bounces (so it doesn't pile up in tight spaces)
             return false;
         }
         public override Color? GetAlpha(Color lightColor) => Color.White * Projectile.Opacity;

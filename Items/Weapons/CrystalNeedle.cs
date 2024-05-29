@@ -48,12 +48,12 @@ namespace KirboMod.Items.Weapons
 
 		public override void AddRecipes()
 		{
-			Recipe recipe1 = CreateRecipe(300);//the result is crystal needle ball
-			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.ClutterNeedle>(), 10); //Clutter Needle
+			Recipe recipe1 = CreateRecipe(600);//the result is crystal needle ball
+			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.ClutterNeedle>(), 100); //Clutter Needle
 			recipe1.AddIngredient(ItemID.CrystalShard, 5); //5 crystals
 			recipe1.AddIngredient(ItemID.BeetleHusk); //1 Beetle Husk
 			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 15); //15 starbits
-			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 1); //1 rare stones
+			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 1); //1 rare stone
 			recipe1.AddTile(TileID.MythrilAnvil); //crafted at mythril/orichalcum anvil
 			recipe1.Register(); //adds this recipe to the game
 		}

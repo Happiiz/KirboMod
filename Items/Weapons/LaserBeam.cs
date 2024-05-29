@@ -60,7 +60,7 @@ namespace KirboMod.Items.Weapons
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.BeamStaff>()); //Beam Staff
 			recipe1.AddIngredient(ItemID.LaserRifle); //Laser Rifle
 			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 50); //100 starbits
-			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 2); //2 rare stones
+			recipe1.AddIngredient(ModContent.ItemType<RareStone>(), 1); //1 rare stone
 			recipe1.AddTile(TileID.MythrilAnvil); //crafted at mythril/orichalcum anvil
 			recipe1.Register(); //adds this recipe to the game
 		}

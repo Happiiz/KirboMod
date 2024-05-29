@@ -25,7 +25,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 240;
+			Item.damage = 120;
 			Item.noMelee = true;
 			Item.DamageType = DamageClass.Magic;
 			Item.mana = 8;
@@ -119,9 +119,9 @@ namespace KirboMod.Items.Weapons
 			Recipe recipe1 = CreateRecipe();//the result is triple star
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.StarRod>()); //Star Rod
             recipe1.AddIngredient(ModContent.ItemType<HeartMatter>(), 5); //5 Heart Matter
-            recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 100); //100 starbits
+            recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 200); //200 starbits
 			recipe1.AddIngredient(ModContent.ItemType<DreamEssence>(), 50); //50 dream matter
-			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 5); //5 rare stones
+			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 3); //3 rare stones
 			recipe1.AddTile(TileID.MythrilAnvil); //crafted at hardmode anvil
 			recipe1.Register(); //adds this recipe to the game
 		}

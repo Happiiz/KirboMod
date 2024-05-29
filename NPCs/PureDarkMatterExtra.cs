@@ -65,7 +65,7 @@ namespace KirboMod.NPCs
             NPC.buffImmune[BuffID.OnFire] = true;
             NPC.buffImmune[BuffID.CursedInferno] = true;
             NPC.buffImmune[BuffID.ShadowFlame] = true;
-            Music = MusicID.Boss4;
+            Music = MusicID.Boss1;
             NPC.buffImmune[BuffID.Confused] = true;
         }
 

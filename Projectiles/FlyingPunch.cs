@@ -27,10 +27,10 @@ namespace KirboMod.Projectiles
 			Projectile.ownerHitCheck = true;
 			Projectile.alpha = 60;
 		}
+
 		public override void AI()
 		{
             Projectile.rotation = Projectile.velocity.ToRotation(); 
-			Player player = Main.player[Projectile.owner];
 		}
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -39,6 +39,20 @@ namespace KirboMod.Projectiles
 
 			player.GetModPlayer<KirbPlayer>().fighterComboCounter += 1;
 		}
+
+        public override bool? CanCutTiles() //only cut if player can "see" projectile (Hasn't gone through a wall)
+        {
+            Player player = Main.player[Projectile.owner];
+
+            if (Collision.CanHit(player, Projectile))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
         public override Color? GetAlpha(Color lightColor)
         {

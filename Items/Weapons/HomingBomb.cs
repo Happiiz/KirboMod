@@ -48,12 +48,12 @@ namespace KirboMod.Items.Weapons
 
         public override void AddRecipes()
         {
-			Recipe homingbombrecipe = CreateRecipe(300);//the result is homing bombs
-			homingbombrecipe.AddIngredient(ModContent.ItemType<Items.Weapons.ChainBomb>(), 50);
+			Recipe homingbombrecipe = CreateRecipe(600);//the result is homing bombs
+			homingbombrecipe.AddIngredient(ModContent.ItemType<Items.Weapons.ChainBomb>(), 100);
 			homingbombrecipe.AddIngredient(ItemID.ClusterRocketI, 5); // 5 Cluster Rockets
 			homingbombrecipe.AddIngredient(ItemID.ChlorophyteBullet, 5); //5 Chlorophyte Bullets
 			homingbombrecipe.AddIngredient(ModContent.ItemType<Items.Starbit>(), 30);
-			homingbombrecipe.AddIngredient(ModContent.ItemType<Items.RareStone>(), 2); //2 rare stones
+			homingbombrecipe.AddIngredient(ModContent.ItemType<RareStone>(), 1); //1 rare stone
 			homingbombrecipe.AddTile(TileID.Anvils); //crafted at anvil
 			homingbombrecipe.Register(); //adds this recipe to the game
 		}

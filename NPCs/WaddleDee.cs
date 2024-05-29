@@ -34,7 +34,7 @@ namespace KirboMod.NPCs
 
 		public override float SpawnChance(NPCSpawnInfo spawnInfo) 
 		{
-			if (spawnInfo.Player.ZoneOverworldHeight && Main.dayTime && !spawnInfo.Invasion) //if player is within surface height & daytime
+			if (spawnInfo.Player.ZoneOverworldHeight && Main.dayTime && !spawnInfo.Invasion && !Main.eclipse) //if player is within surface height & daytime
 			{
 				if (spawnInfo.Player.ZoneJungle)
 				{

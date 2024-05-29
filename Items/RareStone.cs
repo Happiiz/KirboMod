@@ -15,7 +15,7 @@ namespace KirboMod.Items
 			// Tooltip.SetDefault("Used to evolve certain weapons");
 			ItemID.Sets.SortingPriorityMaterials[Item.type] = 1006; //go to *this* spot in material group
 
-            CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 5; // Configure the amount of this item that's needed to research it in Journey mode.
+            CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 2; // Configure the amount of this item that's needed to research it in Journey mode.
         }
 
 		public override void SetDefaults() 

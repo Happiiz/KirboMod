@@ -494,7 +494,6 @@ namespace KirboMod.Projectiles
             }
             else
             {
-                Projectile.tileCollide = false;
                 Projectile.ignoreWater = false;
                 Projectile.alpha = 0; //show projectile
                 Projectile.extraUpdates = 0;

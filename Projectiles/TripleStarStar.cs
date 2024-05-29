@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -66,7 +67,7 @@ namespace KirboMod.Projectiles
                     break;
                 }
                 if (target == -1 || Main.npc[targetsInCone[i]].DistanceSQ(searchCenter) < Main.npc[target].DistanceSQ(searchCenter))
-                    target = i;
+                    target = targetsInCone.ElementAt(i);
             }
             //debug visualization of cone
             //for (float i = 0; i < 1; i += 10f / maxRange)

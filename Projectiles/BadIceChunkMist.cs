@@ -63,9 +63,18 @@ namespace KirboMod.Projectiles
             //Go down in prehardmode, accelerate up in hardmode
             if (Main.hardMode)
             {
-                Projectile.velocity.Y -= .1f;
-                if (Projectile.velocity.Y < -40)
-                    Projectile.velocity.Y = -40;
+                if (NPC.downedGolemBoss) //go up slightly slower to tighten the area more
+                {
+                    Projectile.velocity.Y -= .05f;
+                    if (Projectile.velocity.Y < -20)
+                        Projectile.velocity.Y = -20;
+                }
+                else
+                {
+                    Projectile.velocity.Y -= .1f;
+                    if (Projectile.velocity.Y < -40)
+                        Projectile.velocity.Y = -40;
+                }
             }
             else
             {

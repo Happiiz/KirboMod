@@ -21,12 +21,12 @@ namespace KirboMod.Projectiles
         }
 		public override void SetDefaults()
 		{
-			Projectile.width = 60;
-			Projectile.height = 60;
+			Projectile.width = 10;
+			Projectile.height = 10;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.timeLeft = 3600; //1 minute
-			Projectile.tileCollide = false;
+			Projectile.tileCollide = true;
 			Projectile.penetrate = -1;
 			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.extraUpdates = 2;
@@ -68,7 +68,9 @@ namespace KirboMod.Projectiles
             }
             if (Projectile.ai[0] >= 72)//return
             {
-				if(Projectile.ai[0] == 72)
+				Projectile.tileCollide = false;
+
+                if (Projectile.ai[0] == 72)
                 {
 					Projectile.velocity = Vector2.Normalize( Projectile.velocity).RotatedBy(Projectile.ai[1] * MathF.PI / 2) * VelLength;
                 }
@@ -90,6 +92,12 @@ namespace KirboMod.Projectiles
 			Projectile.velocity.Normalize();
 			Projectile.velocity *= Helper.RemapEased(Projectile.ai[0], 0, 36, VelLength, 0.001f, Easings.EaseInCubic);
 		}
+
+        public override bool OnTileCollide(Vector2 oldVelocity)
+        {
+			Projectile.ai[0] = 72; //skip to return (past turn)
+			return false;
+        }
 
         public static Asset<Texture2D> afterimage;
 
