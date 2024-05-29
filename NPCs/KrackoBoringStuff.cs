@@ -187,7 +187,14 @@ namespace KirboMod.NPCs
 			NPC.friendly = false;
 			NPC.npcSlots = 4;
 			NPC.buffImmune[BuffID.Confused] = true;
-		}
+            if (!Main.dedServ)//if not dedicated server
+            {
+                int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Evobyte_K1Boss");
+                Music = musicSlot;
+                Main.musicFade[musicSlot] = 1;
+                Main.musicNoCrossFade[musicSlot] = true;
+            }
+        }
 
 		public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */
 		{
