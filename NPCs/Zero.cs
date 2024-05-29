@@ -212,7 +212,7 @@ namespace KirboMod.NPCs
             Player player = Main.player[NPC.target];
             Vector2 playerDistance = player.Center - NPC.Center;
             float playerSineDistanceExtra = attacktype == ZeroAttackType.BloodShots && NPC.ai[0] > 120 ?
-                MathF.Sin((NPC.ai[0] / 60 % 3600) * 2) * 300 : 0;
+                MathF.Sin((NPC.ai[0] / 60 % 3600) * 2) * 600 : 0;
 
             Vector2 playerRightDistance = player.Center + new Vector2(500 + backupoffset, playerSineDistanceExtra) - NPC.Center;
             Vector2 playerLeftDistance = player.Center + new Vector2(-500 - backupoffset, playerSineDistanceExtra) - NPC.Center;
@@ -521,7 +521,7 @@ namespace KirboMod.NPCs
 
                             if (Main.netMode != NetmodeID.MultiplayerClient)
                             {
-                                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, BackgroundplayerDistance / 60, ModContent.ProjectileType<ZeroScreenBlood>(), 80 / 2, 1f, Main.myPlayer, 0, NPC.ai[0] % 2 == 0 ? 0 : 1);
+                                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, BackgroundplayerDistance / 60, ModContent.ProjectileType<ZeroScreenBlood>(), 60 / 2, 1f, Main.myPlayer, 0, NPC.ai[0] % 2 == 0 ? 0 : 1);
                             }
                             SoundEngine.PlaySound(SoundID.NPCHit9.WithVolumeScale(0.8f), NPC.Center); //leech hit
 

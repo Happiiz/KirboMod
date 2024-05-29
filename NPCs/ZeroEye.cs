@@ -58,8 +58,8 @@ namespace KirboMod.NPCs
 
 			NPC.lavaImmune = true;
 
-			Music = MusicID.Boss2;
-			SceneEffectPriority = SceneEffectPriority.BossHigh; // By default, musicPriority is BossLow		
+            Music = MusicLoader.GetMusicSlot(Mod, "Music/Happiz_PlaceholderZero");
+            SceneEffectPriority = SceneEffectPriority.BossHigh; // By default, musicPriority is BossLow		
 		}
 
         public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */

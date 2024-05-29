@@ -41,7 +41,8 @@ namespace KirboMod.Projectiles
         //call this
         public static void AccountForSpeed(ref Vector2 offset, Player target)
         {
-            offset += target.velocity * TimeBeforeAccelerating;
+            offset.X += target.velocity.X * TimeBeforeAccelerating;
+            offset.Y += target.velocity.Y * 0.75f * TimeBeforeAccelerating;
         }
         public static void NewDarkMatterShot(NPC zero, Vector2 target, Vector2 from, int damage, float directionY)
         {
