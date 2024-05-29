@@ -24,8 +24,10 @@ namespace KirboMod.Projectiles
 			Projectile.tileCollide = true;
 			Projectile.penetrate = 1;
 			Projectile.scale = 1f;
-			
-		}
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = 10;
+
+        }
 		public override void AI()
 		{
 			Lighting.AddLight(Projectile.Center, 0.255f, 0.255f, 0f);

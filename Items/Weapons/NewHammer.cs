@@ -55,8 +55,8 @@ namespace KirboMod.Items.Weapons
             {
 				Item.useStyle = ItemUseStyleID.HoldUp;
 				Item.noMelee = true;
-				Item.useTime = 30;
-				Item.useAnimation = 30;
+				Item.useTime = 45;
+				Item.useAnimation = 45;
 				Item.shoot = ModContent.ProjectileType<NewHammerMissile>();
 				Item.noUseGraphic = true; //dont use sprite
 				Item.UseSound = SoundID.Item11; //gun

@@ -3,6 +3,7 @@ Mods: {
 		CommonItemTooltip: {
 			DefenseVariesDamage: Damage varies with the amount of defense you have
 			DefensePenetration: Ignores {0} points of enemy defense
+			IgnoresDefense: Ignores enemy defense completely
 		}
 
 		ProgressionDescription: {
@@ -282,7 +283,11 @@ Mods: {
 
 			CrystalShard: {
 				DisplayName: Crystal Shard
-				Tooltip: A makeshift version of special otherworldy crystals
+				Tooltip:
+					'''
+					A makeshift version of special otherworldy crystals
+					'The cooler Crystal Shard'
+					'''
 			}
 
 			DarkMaterial: {
@@ -605,9 +610,8 @@ Mods: {
 				DisplayName: Buzz-Saw Cutter
 				Tooltip:
 					'''
-					Shoots a flying sawblade that bounces off walls and sticks to enemies.
-					Ignores 1000 defense
-
+					Shoots flying sawblades that bounce off walls and grind against enemies
+					{$CommonItemTooltip.IgnoresDefense}
 					'''
 			}
 
@@ -634,7 +638,7 @@ Mods: {
 				DisplayName: Cleaning Broom
 				Tooltip:
 					'''
-					Swing on the ground to kick up dust at your enemies
+					Swing on the ground to kick up dust toward the cursor
 					'Sweep, sweep, sweep!'
 					'''
 			}
@@ -734,7 +738,7 @@ Mods: {
 				Tooltip:
 					'''
 					Right click to do a uppercut, sending you upwards
-					Punching many times RIGHT before uppercutting will make it stronger
+					The more punches you land, the stronger the uppercut
 					'''
 			}
 
@@ -749,7 +753,6 @@ Mods: {
 					'''
 					Sprays a flurry of fireballs
 					Enemies hit by one will catch on fire
-					{$CommonItemTooltip.DefensePenetration}
 					'''
 			}
 
@@ -760,6 +763,7 @@ Mods: {
 					Control a tornado by holding down the mouse
 					Splits into multiple feathers upon death
 					Drains mana while being used
+					{$CommonItemTooltip.IgnoresDefense}
 					'''
 			}
 
@@ -871,7 +875,7 @@ Mods: {
 				DisplayName: Wildfire Hammer
 				Tooltip:
 					'''
-					Hold left on the ground to swing fire tornados in the direction you're facing
+					Hold left on the ground to swing fire tornadoes in the direction you're facing
 					Hold right click to charge a blazing firey swing that flies towards the cursor
 					Left click to release when at full power
 					Charging gives you a 35% damage reduction bonus
@@ -898,15 +902,15 @@ Mods: {
 				Tooltip:
 					'''
 					Right click and hold up to uppercut!
-					Combo punches to make uppercuts stronger!
+					Land punches to make uppercuts stronger!
 					Spike on the ground and in the air by just holding right click!
-					'Fly like a ballistic missile, sting like a ballistic missile'
+					'Float like a ballistic missile, sting like a ballistic missile'
 					'''
 			}
 
 			Needle: {
 				DisplayName: Needle Ball
-				Tooltip: Slows down when not poking enemies
+				Tooltip: Rolls across the ground, poking enemies in its path
 			}
 
 			NewHammer: {
@@ -947,7 +951,7 @@ Mods: {
 					'''
 					Sends out electric shocks with varying strength
 					Strength depends on how much you charge by pressing any directional input
-					Stronger blasts consume more mana
+					Stronger blasts consume less mana
 					'''
 			}
 
@@ -1005,16 +1009,13 @@ Mods: {
 					Control a giant tornado by holding down the mouse
 					Leaves storm clouds and bursts of electricity 
 					Drains mana while being used
+					{$CommonItemTooltip.IgnoresDefense}
 					'''
 			}
 
 			SwayingBranch: {
 				DisplayName: Twitchy Twig
-				Tooltip:
-					'''
-					Summons a whispy woods sentry to spew apples at your enemies
-					Apples will momentarily spawn weak
-					'''
+				Tooltip: Summons a whispy woods sentry to rain apples on your enemies
 			}
 
 			SwishyTree: {
@@ -1032,6 +1033,7 @@ Mods: {
 					'''
 					Control a tornado by holding down the mouse
 					Drains mana while being used
+					{$CommonItemTooltip.IgnoresDefense}
 					'''
 			}
 
@@ -1190,6 +1192,16 @@ Mods: {
 					Enemy summoned depends on the biome you're in
 					Consumes 50 starbits per use
 					'''
+			}
+
+			DededeMusicBox: {
+				DisplayName: Music Box (King Dedede)
+				Tooltip: ""
+			}
+
+			DarkMatterMusicBox: {
+				DisplayName: Music Box (Dark Matter Swordsman)
+				Tooltip: ""
 			}
 		}
 
@@ -1410,10 +1422,11 @@ Mods: {
 			VolcanoFireFire1.DisplayName: Volcano Fire Fire1
 			VolcanoFireFire2.DisplayName: Volcano Fire Fire2
 			VolcanoFireFire3.DisplayName: Volcano Fire Fire3
-			ZeroDamageHitbox.DisplayName: Zero Damage Hitbox
+			ZeroDamageHitbox.DisplayName: Zero Dash
 			HammerSwing.DisplayName: Hammer Swing
 			ToyHammerSwing.DisplayName: Toy Hammer Swing
 			WildHammerSwing.DisplayName: Wild Hammer Swing
+			StormTornadoLightning.DisplayName: Storm Tornado Lightning
 		}
 
 		NPCs: {
@@ -1512,6 +1525,8 @@ Mods: {
 			EnemyBanner.MapEntry: Banner
 			FountainOfDreams.MapEntry: Fountain of Dreams
 			RareStone.MapEntry: Rare Stone
+			DededeMusicBoxTile.MapEntry: Dedede Music Box Tile
+			DarkMatterMusicBoxTile.MapEntry: Dark Matter Music Box Tile
 		}
 
 		Configs: {

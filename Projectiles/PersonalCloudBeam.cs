@@ -16,18 +16,22 @@ namespace KirboMod.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 50;
-			Projectile.height = 50;
+			Projectile.width = 15;
+			Projectile.height = 15;
 			Projectile.friendly = true;
 			Projectile.timeLeft = 300;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
-			Projectile.extraUpdates = 3;
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = -1; //default
 		}
 
-		public override void AI()
+        public override bool? CanCutTiles()
+        {
+            return false;
+        }
+
+        public override void AI()
 		{
 			Projectile.rotation += 0.2f * (float)Projectile.direction; // rotates projectile
 			if (++Projectile.frameCounter >= 2) //changes frames every 2 ticks 
@@ -38,21 +42,28 @@ namespace KirboMod.Projectiles
 					Projectile.frame = 0;
 				}
 			}
-		}
+
+            if (Projectile.ai[1] == 0)
+            {
+                Projectile.ai[1] = Projectile.velocity.Length();
+            }
+            NPC npc = Main.npc[(int)Projectile.ai[0]];
+            if (Helper.ValidHomingTarget(npc, Projectile, false))
+            {
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.DirectionTo(npc.Center) * Projectile.ai[1], .2f);
+            }
+        }
         public override bool PreDraw(ref Color lightColor)
         {
-			if(Projectile.ai[1] == 0)
-            {
-				Projectile.ai[1] = Projectile.velocity.Length();
-            }
-			NPC npc = Main.npc[(int)Projectile.ai[0]];
-			if(Helper.ValidHomingTarget(npc, Projectile, false))
-            {
-				Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.DirectionTo(npc.Center) * Projectile.ai[1], .2f); 
-            }
 			VFX.DrawElectricOrb(Projectile.Center, Vector2.One * 1.3f, Projectile.Opacity, Projectile.rotation);
 			return false;
         }
+
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+        {
+            return Utils.CenteredRectangle(Projectile.Center, Projectile.Size * (10 * 1/3)).Intersects(targetHitbox);
+        }
+
         public override Color? GetAlpha(Color lightColor)
 		{
 			return Color.White; // Makes it uneffected by light

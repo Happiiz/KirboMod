@@ -29,9 +29,17 @@ namespace KirboMod.Projectiles
 			DrawOriginOffsetY = -3;
 			Projectile.friendly = false;
 			Projectile.hostile = true;
-			Projectile.timeLeft = 300;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
+
+			if (dropStarMode == 1)
+			{
+                Projectile.timeLeft = 300;
+            }
+			else
+			{
+                Projectile.timeLeft = 120;
+            }
 		}
 		public override void AI()
 		{

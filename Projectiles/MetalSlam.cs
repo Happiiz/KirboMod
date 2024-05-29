@@ -127,7 +127,7 @@ namespace KirboMod.Projectiles
 			}
 		}
 		/// <summary>
-         /// Custom method used for the spikes that shoot out if a slam hits the ground or an NPC.
+         /// Custom method used for the spikes that shoot out if a slam hits the ground or an NPC. (This was written just to test summaries)
          /// </summary>
 
         private void SlamSpikes(Player player) //custom method for 
@@ -149,6 +149,11 @@ namespace KirboMod.Projectiles
                 direction *= 25;
                 Main.projectile[proj].velocity = direction;
             }
+        }
+
+        public override Color? GetAlpha(Color lightColor)
+        {
+            return Color.White * Projectile.Opacity; //independent from light level while still being affected by opacity
         }
     }
 }

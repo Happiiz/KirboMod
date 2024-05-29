@@ -88,7 +88,20 @@ namespace KirboMod.NPCs
 
             possibleAttacks.Remove(lastattacktype);
 
+            for (int i = 0; i < Main.maxProjectiles; i++) //checking if orbs are out while homing orb attack is about to be used
+            {
+                if (attacktype == NightmareAttackType.LightningOrbsHoming 
+                    && (Main.projectile[i].type == ModContent.ProjectileType<NightmareLightningOrb>() ||
+                    Main.projectile[i].type == ModContent.ProjectileType<NightmareLightningOrbHoming>()))
+                {
+                    possibleAttacks.Remove(NightmareAttackType.LightningOrbsHoming);
+
+                    break;
+                }
+            }
+
             attacktype = possibleAttacks[Main.rand.Next(possibleAttacks.Count)];
+
             lastattacktype = attacktype;
             NPC.netUpdate = true;
         }

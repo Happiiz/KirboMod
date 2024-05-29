@@ -10,6 +10,7 @@ using Terraria.GameContent.ItemDropRules;
 using SoundEngine = Terraria.Audio.SoundEngine;
 using KirboMod.Projectiles;
 using Terraria.ModLoader.Utilities;
+using KirboMod.ItemDropRules.DropConditions;
 
 namespace KirboMod.NPCs.MidBosses
 {
@@ -35,6 +36,8 @@ namespace KirboMod.NPCs.MidBosses
                 PortraitPositionXOverride = 0,
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
+
+            NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true; //immune because of boss-like behavior
         }
 
 		public override void SetDefaults()
@@ -42,13 +45,13 @@ namespace KirboMod.NPCs.MidBosses
 			NPC.width = 100;
 			NPC.height = 100;
 			DrawOffsetY = 70;
-			NPC.damage = Main.hardMode ? 100 : 50;
-			NPC.defense = 15;
-			NPC.lifeMax = Main.hardMode ? 2500 : 800;
-			NPC.HitSound = SoundID.NPCHit1;
+			NPC.damage = Main.hardMode ? (NPC.downedGolemBoss ? 120 : 80) : 40;
+            NPC.defense = Main.hardMode ? 30 : 15;
+            NPC.lifeMax = Main.hardMode ? (NPC.downedGolemBoss ? 32000 : 16000) : 800;
+            NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
-			NPC.value = Item.buyPrice(0, 0, 50, 0); // money it drops
-			NPC.knockBackResist = 0f; //how much knockback applies
+            NPC.value = Main.hardMode ? (NPC.downedGolemBoss ? 200000 : 50000) : 5000; // money it drops (20 gold / 5 gold / 50 silver)
+            NPC.knockBackResist = 0f; //how much knockback applies
             Banner = NPC.type;
             BannerItem = ModContent.ItemType<Items.Banners.BonkersBanner>();
             NPC.aiStyle = -1; 
@@ -95,43 +98,51 @@ namespace KirboMod.NPCs.MidBosses
 
             NPC.ai[0]++; //attack delay timer
 
-            if (NPC.ai[0] < 120) //not attacking
-            {
-                attacktype = 0; //walking
-            }
-            else
-            {
-                if (NPC.ai[0] == 120)
-                {
-                    NPC.noTileCollide = false; //don't phase through tiles
-
-                    if (lastattack == 2) //coconut was last
-                    {
-                        attacktype = 1; //hammer
-                        lastattack = 1; //next is coconut
-                    }
-                    else
-                    {
-                        coconutRounds = Main.expertMode ? 6 : 3; //3 or 6 coconut throws
-
-                        attacktype = 2; //coconut
-                        lastattack = 2; //next is hammer
-                        int delayBeforeFirstCoconut = (int)Utils.Remap(NPC.Distance(player.Center), 100, 600, -30, 0);
-                        NPC.ai[1] = delayBeforeFirstCoconut;
-                    }
-                }
-
-                NPC.ai[1]++; //attack timer
-            }
-
-            if (player.dead) //player has died
+            if (player.dead)
             {
                 attacktype = 0; //walk
                 NPC.ai[0] = 0;
                 NPC.ai[1] = 0;
+                NPC.timeLeft = 40;
+            }
+            else
+            {
+                if (NPC.ai[0] < 60)
+                {
+                    attacktype = -1; //don't do anything
+                }
+                else if (NPC.ai[0] < 180) //not attacking
+                {
+                    attacktype = 0; //walking
+                }
+                else
+                {
+                    if (NPC.ai[0] == 180)
+                    {
+                        NPC.noTileCollide = false; //don't phase through tiles
+
+                        if (lastattack == 2) //coconut was last
+                        {
+                            attacktype = 1; //hammer
+                            lastattack = 1; //next is coconut
+                        }
+                        else
+                        {
+                            coconutRounds = Main.expertMode ? 6 : 3; //3 or 6 coconut throws
+
+                            attacktype = 2; //coconut
+                            lastattack = 2; //next is hammer
+                            int delayBeforeFirstCoconut = (int)Utils.Remap(NPC.Distance(player.Center), 100, 600, -30, 0);
+                            NPC.ai[1] = delayBeforeFirstCoconut;
+                        }
+                    }
+
+                    NPC.ai[1]++; //attack timer
+                }
             }
             NPC.noGravity = attacktype == 1;
             NPC.GravityMultiplier = MultipliableFloat.One;
+
             //declaring attacktype values
             if (attacktype == 0)
             {
@@ -216,8 +227,9 @@ namespace KirboMod.NPCs.MidBosses
 
 			CheckPlatform(player); //go down platforms when player is low
 
-            float speed = Main.expertMode ? 12f : 8f; 
-			float inertia = 15f; //acceleration and decceleration speed
+            float speed = Main.expertMode ? 12f : 8f;
+            speed *= Main.hardMode ? 1.5f : 1;
+            float inertia = 15f; //acceleration and decceleration speed
 
             ClimbTiles(player);
 
@@ -225,7 +237,7 @@ namespace KirboMod.NPCs.MidBosses
             Rectangle hitbox = Utils.CenteredRectangle(NPC.Center, new Vector2(NPC.width + 140, NPC.height + 500));
             if (hitbox.Intersects(player.Hitbox))
             {
-                NPC.ai[0] = 119;//reached player, stop chasing to avoid stunlock
+                NPC.ai[0] = 179;//reached player, stop chasing to avoid stunlock
             }
         }
         static float TimeToReachYPoint(float fromY, float toY, float accelY, float initialVelY)
@@ -242,6 +254,7 @@ namespace KirboMod.NPCs.MidBosses
         {
             Player player = Main.player[NPC.target];
             Vector2 distance = player.Center - NPC.Center;
+
             if (NPC.ai[1] < 60) //charge
             {
                 NPC.TargetClosest(true); //face player
@@ -266,8 +279,8 @@ namespace KirboMod.NPCs.MidBosses
                         NPC.ai[2] = MathF.Abs(NPC.velocity.X);
                     }
 
-                    float speed = NPC.ai[2];
-                    float inertia = 25f; //acceleration and decceleration speed
+                    float speed = 10f;
+                    float inertia = Main.hardMode ? 25f : 30f; //acceleration and decceleration speed
                     MoveX(player, speed, inertia);
 
                     NPC.noTileCollide = true;
@@ -293,14 +306,15 @@ namespace KirboMod.NPCs.MidBosses
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
                         Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 130, -10), default, 
-							ModContent.ProjectileType<BonkersSmash>(), (Main.hardMode ? 100 : 50) / 2, 8f, Main.myPlayer, 0, NPC.whoAmI); 
+							ModContent.ProjectileType<BonkersSmash>(), (Main.hardMode ? (NPC.downedGolemBoss ? 150 : 100) : 50) / 2, 
+                            8f, Main.myPlayer, 0, NPC.whoAmI); 
                     }
 
                     SoundEngine.PlaySound(SoundID.Item1, NPC.Center); //we dont define the stuff after coordinates because legacy sound style
                 }
                 if (NPC.ai[1] >= 120) //restart
                 {
-                    NPC.ai[0] = 0;
+                    NPC.ai[0] = 60;
                     NPC.ai[1] = 0;
                 }
             }
@@ -334,9 +348,10 @@ namespace KirboMod.NPCs.MidBosses
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
                     Vector2 shootFrom = NPC.Center;
-                    Vector2 projVel = PredictForAcceleratingProj(player, 15, new Vector2(0, Projectiles.ExplosiveCoconut.yAcceleration), player.Center, shootFrom);
+                    float shootSpeed = Main.hardMode ? 20f: 15f;
+                    Vector2 projVel = PredictForAcceleratingProj(player, shootSpeed, new Vector2(0, Projectiles.ExplosiveCoconut.yAcceleration), player.Center, shootFrom);
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), shootFrom, projVel, 
-                        ModContent.ProjectileType<ExplosiveCoconut>(), (Main.hardMode ? 50 : 25) / 2, 0f, Main.myPlayer, 0, 0, projVel.Y); 
+                        ModContent.ProjectileType<ExplosiveCoconut>(), (Main.hardMode ? (NPC.downedGolemBoss ? 75 : 50) : 25) / 2, 0f, Main.myPlayer, 0, 0, projVel.Y); 
                 }
                 SoundEngine.PlaySound(SoundID.Item1, NPC.Center);
 
@@ -351,7 +366,7 @@ namespace KirboMod.NPCs.MidBosses
             if (NPC.ai[1] >= (Main.expertMode ? 90 : 120)) //restart
             {
                 NPC.ai[1] = 0;
-                NPC.ai[0] = 0;
+                NPC.ai[0] = 60;
             }
         }
 
@@ -416,9 +431,25 @@ namespace KirboMod.NPCs.MidBosses
 
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
-            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<Items.Weapons.Hammer>(), 1, 1)); // Guaranteed in all difficulties
+            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Items.Weapons.Hammer>())); // Guaranteed drop
             npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Starbit>(), 1, 24, 24));
-            npcLoot.Add(ItemDropRule.ByCondition(new Conditions.IsHardmode(), ModContent.ItemType<Items.RareStone>(), 1, 1, 1));
+
+            //1 for pre-Golem, 1 for post-Golem. Both in Hardmode
+
+            PreGolemHardmodeCondition PreGolemCondition = new PreGolemHardmodeCondition();
+            IItemDropRule HardmodePreGolem = new LeadingConditionRule(PreGolemCondition);
+
+            PostGolemHardmodeCondition PostGolemCondition = new PostGolemHardmodeCondition();
+            IItemDropRule HardmodePostGolem = new LeadingConditionRule(PostGolemCondition);
+
+            //Drop two Rare Stones if post-Golem
+
+            HardmodePreGolem.OnSuccess(ItemDropRule.Common(ModContent.ItemType<RareStone>()));
+
+            HardmodePostGolem.OnSuccess(ItemDropRule.Common(ModContent.ItemType<RareStone>(), 1, 2, 2));
+
+            npcLoot.Add(HardmodePreGolem);
+            npcLoot.Add(HardmodePostGolem);
         }
 
         public override void HitEffect(NPC.HitInfo hit)

@@ -46,68 +46,32 @@ namespace KirboMod.NPCs
             NPC.direction = Main.rand.NextBool(2) == true ? 1 : -1;
         }
 
-		public override float SpawnChance(NPCSpawnInfo spawnInfo) 
-		{
-			if (spawnInfo.Player.ZoneOverworldHeight && Main.dayTime) //if player is within surface height & daytime
-			{
-				if (spawnInfo.Player.ZoneJungle)
-				{
-					return spawnInfo.SpawnTileType == TileID.JungleGrass || spawnInfo.SpawnTileType == TileID.Mud ? .15f : 0f; //functions like a mini if else statement
-				}
-				else if (spawnInfo.Player.ZoneSnow)
-				{
-					return spawnInfo.SpawnTileType == TileID.SnowBlock ? .15f : 0f; //functions like a mini if else statement
-				}
-				else if (spawnInfo.Player.ZoneBeach) //don't spawn on beach
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneDesert) //don't spawn on beach
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneCorrupt) //don't spawn on beach
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneCrimson) //don't spawn on beach
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Invasion) //don't spawn during invasions
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneMeteor) //don't spawn on meteor
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneDungeon) //don't spawn in dungeon
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Water) //don't spawn in water
-				{
-					return 0f;
-				}
-                else if (spawnInfo.Sky) //don't spawn in space
+		public override float SpawnChance(NPCSpawnInfo spawnInfo)
+        {
+            if (spawnInfo.Player.ZoneOverworldHeight && Main.dayTime && !spawnInfo.Invasion && !Main.eclipse) //if player is within surface height & daytime
+            {
+                if (spawnInfo.Player.ZoneJungle)
                 {
-                    return 0f;
+                    return spawnInfo.SpawnTileType == TileID.JungleGrass || spawnInfo.SpawnTileType == TileID.Mud ? .15f : 0f;
                 }
-                else if (Main.eclipse) //don't spawn during eclipse
+                else if (spawnInfo.Player.ZoneSnow)
                 {
-                    return 0f;
+                    return spawnInfo.SpawnTileType == TileID.SnowBlock ? .15f : 0f;
                 }
-                else //only forest
-				{
-					return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? .3f : 0f; //functions like a mini if else statement
-				}
-			}
-			else
-			{
-				return 0f; //no spawn rate
-			}
-		}
+                else if (spawnInfo.Player.ZoneForest) //if forest
+                {
+                    return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? .3f : 0f;
+                }
+                else
+                {
+                    return 0f; //no spawn rate
+                }
+            }
+            else
+            {
+                return 0f; //no spawn rate
+            }
+        }
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
@@ -130,7 +94,7 @@ namespace KirboMod.NPCs
         {
 			NPC.spriteDirection = NPC.direction;
 
-            //reduce gravity by one third 
+            //reduce gravity by one fourth 
             NPC.GravityMultiplier /= 4; 
 			NPC.MaxFallSpeedMultiplier /= 4;
 

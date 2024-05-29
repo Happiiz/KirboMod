@@ -536,7 +536,7 @@ namespace KirboMod.NPCs.DarkMatter
                 if (NPC.ai[0] % 20 == 0) //shoot
                 {
                     Vector2 Yoffset = new Vector2(0, -170);
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, default, 0, player.whoAmI, NPC.whoAmI);
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, default, 0, player.whoAmI, 0);
                 }
                 //spin around player
                 NPC.Center = player.Center + new Vector2(MathF.Cos((NPC.ai[0] - 100) / 30) * 500, MathF.Sin((NPC.ai[0] - 100) / 30) * 500);

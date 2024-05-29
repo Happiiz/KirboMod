@@ -22,12 +22,16 @@ namespace KirboMod.Projectiles
 			Projectile.tileCollide = true;
 			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
-			Projectile.alpha = 50;
 			
 		}
 		public override void AI()
 		{
 			Projectile.rotation = Projectile.velocity.ToRotation();
 		}
-	}
+
+        public override Color? GetAlpha(Color lightColor)
+        {
+            return Color.White * Projectile.Opacity; //independent from light level while still being affected by opacity
+        }
+    }
 }

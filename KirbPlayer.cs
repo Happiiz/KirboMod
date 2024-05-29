@@ -45,7 +45,10 @@ namespace KirboMod
         public bool hasdarkShield; //additional check that only updates when not dashing
 
         public int fighterComboCounter = 0; //combo Counter to determine strength of uppercut in regular fighter glove
-        public int fighterComboResetDelay = 0; //delay until combo Counter resets
+
+        public bool airWalkerSet = false;
+        public bool airWalkerJump = false;
+        public bool blockAirWalkerJump = false;
 
         public bool personalcloud; //checks if have personal cloud accesory
         public bool personalcloudalive = false; //checks if personal cloud is alive
@@ -109,6 +112,9 @@ namespace KirboMod
             kingDededePet = false;
             darkMatterPet = false;
             zeroPet = false;
+
+            airWalkerSet = false;
+            blockAirWalkerJump = false;
         }
         public override void PreUpdate()
         {
@@ -116,17 +122,6 @@ namespace KirboMod
             //-1 to compensate when you detect right click it adds to the counter
             if (finalCutterAnimationCounter > -1)
                 finalCutterAnimationCounter--;
-
-            //fighter glove
-            if (fighterComboResetDelay > 0) //go down 'til 0
-            {
-                fighterComboResetDelay -= 1;
-            }
-
-            if (fighterComboResetDelay == 0 && fighterComboCounter != 0) //go down
-            {
-                fighterComboCounter--;
-            }
 
             //plasmacharge minimum
             if (plasmaCharge < 0)
@@ -139,6 +134,16 @@ namespace KirboMod
             if (darkDashTime < 0)
             {
                 darkDashTime = 0;
+            }
+
+            if (fighterComboCounter > 100)
+            {
+                fighterComboCounter = 100;
+            }
+
+            if (Player.dead) //reset fighter counter if dead
+            {
+                fighterComboCounter = 0;
             }
         }
         public TripleStarStar GetAvailableTripleStarStar()
@@ -348,8 +353,10 @@ namespace KirboMod
                     {
                         Point belowplayer = new Vector2(player.position.X + i, player.position.Y + player.height).ToTileCoordinates(); //all tiles below npc
 
+                        Tile tile = Main.tile[belowplayer.X, belowplayer.Y];
+
                         //touching ground while groundpounding
-                        if (Main.tile[belowplayer.X, belowplayer.Y].HasTile && falltime >= 5)
+                        if ((WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType]) && falltime >= 5)
                         {
                             Projectile.NewProjectile(player.GetSource_FromThis(), player.Center.X, player.position.Y + player.height, player.direction * 0.01f, 0, ModContent.ProjectileType<PlayerSlam>(), 100 + (falltime - 5), 8f, Main.myPlayer, 0, 0);
                             SoundEngine.PlaySound(SoundID.Item14, player.Center); //bomb
@@ -395,6 +402,40 @@ namespace KirboMod
             else //also reset
             {
                 gloombadgeattackcount = 0;
+            }
+
+            //AIR WALKER JUMP
+
+            if (airWalkerSet)
+            {
+                if (player.velocity.Y == 0)
+                {
+                    airWalkerJump = true;
+                }
+                else
+                {
+                    //do air walker jump
+                    if (player.controlJump && player.releaseJump && airWalkerJump == true && blockAirWalkerJump == false)
+                    {
+                        player.velocity.Y = -7.5f;
+                        airWalkerJump = false;
+                        player.blockExtraJumps = true; //temporarily disallow other jumps
+
+                        for (int i = 0; i < 3; i++)
+                        {
+                            Vector2 position = player.Bottom + new Vector2(-45 + 30 * i, 0); //circle
+                            Gore.NewGorePerfect(player.GetSource_FromThis(), position, Vector2.Zero, Main.rand.Next(11, 13), Scale: 1f); //double jump smoke
+                        }
+
+                        for (int i = 0; i < 12; i++)
+                        {
+                            Vector2 position = player.Bottom + new Vector2(Main.rand.NextFloat(-50, 50), 0); //circle
+                            Dust.NewDustPerfect(position, DustID.Electric); //sparks
+                        }
+
+                        SoundEngine.PlaySound(SoundID.DoubleJump, player.Center);
+                    }
+                }
             }
 
             //small things
@@ -627,7 +668,7 @@ namespace KirboMod
                     Rectangle rect = npc.getRect();
                     if (rectangle.Intersects(rect) && (npc.noTileCollide || player.CanHit(npc)))
                     {
-                        float damage = player.GetTotalDamage(DamageClass.Melee).ApplyTo(35f);
+                        float damage = player.GetTotalDamage(DamageClass.Melee).ApplyTo(70f);
                         bool crit = false;
 
                         if (Main.rand.Next(100) < player.GetTotalCritChance(DamageClass.Melee))
@@ -669,26 +710,26 @@ namespace KirboMod
                     Main.dust[d].velocity *= 0.2f;
                 }
 
-                player.noKnockback = true; //disable knockback
+                player.noKnockback = true; //disable knockback so it can go through enemies
+                player.doorHelper.AllowOpeningDoorsByVelocityAloneForATime(60); //what it says on the tin
                 player.vortexStealthActive = false; //turn off vortex stealth
 
-                //slow
+                //slow if going above a certain speed
 
                 if (player.velocity.X > 12 || player.velocity.X < -12)
                 {
-                    player.velocity.X *= 0.985f;
+                    player.velocity.X *= 0.992f; //same slowdown as tabi
                     return;
                 }
                 float maxspeed = Math.Max(player.accRunSpeed, player.maxRunSpeed);
                 if (player.velocity.X > maxspeed || player.velocity.X < -maxspeed)
                 {
-                    player.velocity.X *= 0.94f; //lasts too long when using Soaring Insignia with no speed boots but hey it happens to SoC too so...
+                    player.velocity.X *= 0.96f; //same slowdown as tabi
                     return;
                 }
 
                 darkDashDelay = 20; //set delay cooldown 
 
-                //idk what this solves
                 if (player.velocity.X < 0f)
                 {
                     player.velocity.X = -maxspeed;
@@ -711,7 +752,7 @@ namespace KirboMod
 
                     if (initaldash == true)
                     {
-                        player.velocity.X = 16f * dir;
+                        player.velocity.X = 16.9f * dir;
 
                         //when on ground
                         Point point = (player.Center + new Vector2(player.direction * player.width / 2 + 2, player.gravDir * -player.height / 2f + player.gravDir * 2f)).ToTileCoordinates();

@@ -23,8 +23,8 @@ namespace KirboMod.Projectiles
 			Projectile.timeLeft = 300;
 			Projectile.tileCollide = true;
 			Projectile.penetrate = -1;
-            Projectile.usesIDStaticNPCImmunity = true; //wait for npc to recover from other projectiles of same type
-            Projectile.idStaticNPCHitCooldown = 10;
+            Projectile.usesLocalNPCImmunity = true; //wait for very own timer
+            Projectile.localNPCHitCooldown = 10;
         }
 		public override void AI()
 		{
@@ -43,10 +43,16 @@ namespace KirboMod.Projectiles
 				Projectile.velocity.X *= 0.992f; //slow down
 			}
 
-			//for stepping up tiles
-			float stepspeed = Projectile.velocity.X * 0.005f;
-			float localgfxOffY = 0f;
-			Collision.StepUp(ref Projectile.position, ref Projectile.velocity, Projectile.width, Projectile.height, ref stepspeed, ref localgfxOffY);
+            Projectile.ai[0]++;
+
+            if (Projectile.ai[0] % 30 == 0) //every 30 ticks
+            {
+                Vector2 speed = Main.rand.NextVector2CircularEdge(8f, 8f); //circle
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, speed, ModContent.ProjectileType<Projectiles.Clutter>(), Projectile.damage, 4, Projectile.owner, 0, 0);
+            }
+
+            //for stepping up tiles
+            Collision.StepUp(ref Projectile.position, ref Projectile.velocity, Projectile.width, Projectile.height, ref Projectile.stepSpeed, ref Projectile.gfxOffY);
 		}
 
         public override void OnKill(int timeLeft) //when the projectile dies
@@ -65,10 +71,11 @@ namespace KirboMod.Projectiles
 				Vector2 speed = Main.rand.NextVector2Circular(1f, 1f); //circle
 				Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.Iron, speed * 3, Scale: 1.5f); //Makes dust in a messy circle
 			}
+
 			//nail projectiles
-			for (int i = 0; i < 5; i++)
+			for (int i = 0; i < 20; i++)
 			{
-				Vector2 speed = Main.rand.NextVector2CircularEdge(8f, 8f); //circle
+				Vector2 speed = Main.rand.NextVector2CircularEdge(16f, 16f); //circle
 				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, speed, ModContent.ProjectileType<Projectiles.Clutter>(), Projectile.damage, 4, Projectile.owner, 0, 0); 
 			}
 		}

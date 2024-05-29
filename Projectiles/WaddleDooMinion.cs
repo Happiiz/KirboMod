@@ -69,7 +69,7 @@ namespace KirboMod.Projectiles
 			return false;
 		}
 
-		// This is mandatory if your minion deals contact damage (further related stuff in AI() in the Movement region)
+		// This is mandatory if your minion deals contact damage
 		public override bool MinionContactDamage()
 		{
 			return false;
@@ -98,7 +98,7 @@ namespace KirboMod.Projectiles
             {
                 Projectile.velocity.Y += 0.7f;
 
-                if (attack <= 0) //not attacking
+                if (attacking == false) //not attacking
 				{
                     if (Projectile.velocity.Y >= 10f)
                     {
@@ -369,23 +369,18 @@ namespace KirboMod.Projectiles
                 jumpTimer = 1; // hold till not space jumping
                 Projectile.alpha = 255; //hide projectile
 
-                float speed = direction2.Length() / 30;
-                if (speed < 100) //don't go below 100
-                {
-                    speed = 100;
-                }
-                float inertia = 6f;
+                float speed = Math.Clamp(direction2.Length() / 30, 20f, float.MaxValue);
+                Projectile.extraUpdates = 3; //run three extra ticks for space jump
 
-                Vector2 direction = player.Center - Projectile.Center; //start - end
-                direction.Normalize();
-                direction *= speed;
-                Projectile.velocity = (Projectile.velocity * (inertia - 1) + direction) / inertia;  //fly towards player
+                //fly toward player
+                Projectile.velocity = Projectile.DirectionTo(player.Center) * speed;
             }
             else
             {
                 Projectile.tileCollide = true;
                 Projectile.ignoreWater = false;
                 Projectile.alpha = 0; //show projectile
+                Projectile.extraUpdates = 0;
             }
 
             //space jump end
@@ -417,9 +412,19 @@ namespace KirboMod.Projectiles
         {
 			Projectile.velocity.X *= 0.8f;
 			attack++;
-			if (attack == 1)
+
+            Vector2 direction = aggroTarget.Center - Projectile.Center; //start - end 
+
+            if (attack >= 15) //over 15
+            {
+                if (direction.Length() > 160 || !aggroTarget.active)
+                {
+                    attacking = false;
+                    attack = 0;
+                }
+            }
+            if (attack % 15 == 0)
 			{
-				Vector2 direction = aggroTarget.Center - Projectile.Center; //start - end 
 				direction.Normalize();
 				direction *= 15;
 
@@ -427,11 +432,6 @@ namespace KirboMod.Projectiles
                 Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, direction, 
                     ModContent.ProjectileType<MinionBeamSpread>(), Projectile.damage, 0, player.whoAmI, Projectile.whoAmI);
 			}
-            if (attack >= 15) //over 15
-            {
-                attacking = false;
-                attack = 0;
-            }
 
             Projectile.frame = 8;
         }
@@ -439,7 +439,7 @@ namespace KirboMod.Projectiles
         {
             Projectile.velocity.Y = -10f; //velocityY boosts up 
             jumpTimer = 15;
-            Projectile.frame = 12;
+            Projectile.frame = 9;
         }
 
         //all of this for falling through tiles

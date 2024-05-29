@@ -36,7 +36,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item11; //basic gun shot
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.RangerStar>();
-			Item.shootSpeed = 8f;
+			Item.shootSpeed = 12f;
 			Item.useAmmo = AmmoID.Bullet;
 		}
 
@@ -47,10 +47,7 @@ namespace KirboMod.Items.Weapons
                 type = ModContent.ProjectileType<Projectiles.RangerStar>();
             }
 
-            Vector2 shootdir = Main.MouseWorld - player.Center; //distance 
-            shootdir.Normalize();//reduce to 1
-            shootdir *= 40f;//speed
-            position = player.Center + shootdir;//move from player apon spawning
+            position = player.Center + velocity * 3;//move from player apon spawning
         }
 
 		public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
@@ -61,7 +58,7 @@ namespace KirboMod.Items.Weapons
 			}
 			else //multi ranger star
             {
-				Projectile.NewProjectile(source, position.X, position.Y, velocity.X * 2, velocity.Y * 2, ModContent.ProjectileType<Projectiles.PinkRangerStar>(), damage, 10, Item.playerIndexTheItemIsReservedFor, 0, 0);
+				Projectile.NewProjectile(source, position, velocity * 2, ModContent.ProjectileType<Projectiles.PinkRangerStar>(), damage, 10, player.whoAmI, 0, 0);
 				return false;
 			}
 		}
@@ -77,7 +74,7 @@ namespace KirboMod.Items.Weapons
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.RangerGun>()); //Ranger Gun
 			recipe1.AddIngredient(ItemID.ClockworkAssaultRifle); //Clockwork Assult Rifle
 			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 50); //50 starbits
-			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 2); //2 rare stones
+			recipe1.AddIngredient(ModContent.ItemType<RareStone>(), 1); //1 rare stone
 			recipe1.AddTile(TileID.Anvils); //crafted at anvil
 			recipe1.Register(); //adds this recipe to the game
 		}

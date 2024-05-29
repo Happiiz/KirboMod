@@ -301,8 +301,18 @@ namespace KirboMod.Projectiles.NightmareLightningOrb
         }
         public override void OnHitPlayer(Player target, Player.HurtInfo info)
         {
-            target.AddBuff(BuffID.Slow, 60 * 3);//ankh shields gives immunity. maybe make dedicated debuff instead?
-            target.AddBuff(BuffID.Electrified, 60 * 10);//reduce damage of attack to compensate, but don't reduce too much
+            //target.AddBuff(BuffID.Slow, 60 * 3);//ankh shields gives immunity. maybe make dedicated debuff instead?
+            target.AddBuff(BuffID.Electrified, 60 * 5);//reduce damage of attack to compensate, but don't reduce too much
+        }
+
+        public override void OnKill(int timeLeft)
+        {
+            for (int i = 0; i < 60; i++)
+            {
+                Vector2 position = Projectile.Center + Main.rand.NextVector2Circular(180, 180); //circle
+                Dust d = Dust.NewDustPerfect(position, Main.rand.Next(57, 59), Vector2.Zero, Scale: 2f);
+                d.noGravity = true;
+            }
         }
     }
 }

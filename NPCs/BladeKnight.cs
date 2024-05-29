@@ -31,8 +31,8 @@ namespace KirboMod.NPCs
 			NPC.height = 33;
 			DrawOffsetY = 6;
 			NPC.damage = 4;
-			NPC.defense = 18;//he has armor and is a knight so high defense makes sense
-			NPC.lifeMax = 90;
+			NPC.defense = 4;
+			NPC.lifeMax = 40;
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
 			NPC.value = Item.buyPrice(0, 0, 0, 5);
@@ -45,81 +45,29 @@ namespace KirboMod.NPCs
 		}
 		public override float SpawnChance(NPCSpawnInfo spawnInfo)
 		{
-			if (spawnInfo.Player.ZoneOverworldHeight && Main.dayTime) //if player is within surface height & daytime
-			{
-				if (spawnInfo.Player.ZoneJungle)
-				{
-					return spawnInfo.SpawnTileType == TileID.JungleGrass || spawnInfo.SpawnTileType == TileID.Mud ? .15f : 0f; //functions like a mini if else statement
-				}
-				else if (spawnInfo.Player.ZoneSnow)
-				{
-					return spawnInfo.SpawnTileType == TileID.SnowBlock ? .15f : 0f; //functions like a mini if else statement
-				}
-				else if (spawnInfo.Player.ZoneBeach) //don't spawn on beach
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneDesert) //don't spawn on beach
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneCorrupt) //don't spawn on beach
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneCrimson) //don't spawn on beach
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Invasion) //don't spawn during invasions
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneMeteor) //don't spawn on meteor
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneDungeon) //don't spawn in dungeon
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Water) //don't spawn in water
-				{
-					return 0f;
-				}
-                else if (spawnInfo.Sky) //don't spawn in space
+            if (spawnInfo.Player.ZoneOverworldHeight && Main.dayTime && !spawnInfo.Invasion && !Main.eclipse) //if player is within surface height & daytime
+            {
+                if (spawnInfo.Player.ZoneJungle)
                 {
-                    return 0f;
+                    return spawnInfo.SpawnTileType == TileID.JungleGrass || spawnInfo.SpawnTileType == TileID.Mud ? .15f : 0f;
                 }
-                else if (Main.eclipse) //don't spawn during eclipse
+                else if (spawnInfo.Player.ZoneSnow)
                 {
-                    return 0f;
+                    return spawnInfo.SpawnTileType == TileID.SnowBlock ? .15f : 0f;
                 }
-                else if (spawnInfo.Player.ZoneTowerVortex)
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneTowerSolar)
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneTowerNebula)
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneTowerStardust)
-				{
-					return 0f;
-				}
-				else //only forest
-				{
-					return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? .3f : 0f; //functions like a mini if else statement
-				}
-			}
-			else
-			{
-				return 0f; //no spawn rate
-			}
+                else if (spawnInfo.Player.ZoneForest) //if forest
+                {
+                    return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? .3f : 0f;
+                }
+                else
+                {
+                    return 0f; //no spawn rate
+                }
+            }
+            else
+            {
+                return 0f; //no spawn rate
+            }
 		}
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
@@ -213,7 +161,7 @@ namespace KirboMod.NPCs
                     NPC.frameCounter = 0.0;
                 }
             }
-            if (attacktype == 1)
+            if (attacktype == 1) //charge
             {
                 NPC.frameCounter += 1.0;
                 if (NPC.frameCounter < 5.0)
@@ -229,34 +177,26 @@ namespace KirboMod.NPCs
                     NPC.frameCounter = 0.0;
                 }
             }
-            if (attacktype == 2)
+            if (attacktype == 2) //slash
             {
                 NPC.frameCounter += 1.0;
-                if (NPC.frameCounter < 5.0)
+                if (NPC.frameCounter < 4.0)
                 {
                     NPC.frame.Y = frameHeight * 6;
                 }
-                else if (NPC.frameCounter < 10.0)
+                else if (NPC.frameCounter < 8.0)
                 {
                     NPC.frame.Y = frameHeight * 7;
                 }
-                else if (NPC.frameCounter < 15.0)
+                else if (NPC.frameCounter < 12.0)
                 {
                     NPC.frame.Y = frameHeight * 8;
                 }
-                else if (NPC.frameCounter < 20.0)
+                else if (NPC.frameCounter < 16.0)
                 {
                     NPC.frame.Y = frameHeight * 9;
                 }
-                else if (NPC.frameCounter < 15.0)
-                {
-                    NPC.frame.Y = frameHeight * 10;
-                }
-                else if (NPC.frameCounter < 30.0)
-                {
-                    NPC.frame.Y = frameHeight * 11;
-                }
-                else if (NPC.frameCounter < 35.0)
+                else if (NPC.frameCounter < 20.0)
                 {
                     NPC.frame.Y = frameHeight * 12;
                 }
@@ -331,7 +271,7 @@ namespace KirboMod.NPCs
 
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
-            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<Items.Weapons.HeroSword>(), 20, 10)); // 1 in 40 (2.5%) chance in Normal. 1 in 20 (5%) chance in Expert
+            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<Items.Weapons.HeroSword>(), 40, 20)); // 1 in 40 (2.5%) chance in Normal. 1 in 20 (5%) chance in Expert
             npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Starbit>(), 1, 2, 4));
         }
 

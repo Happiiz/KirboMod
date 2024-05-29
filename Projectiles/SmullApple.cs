@@ -11,7 +11,8 @@ namespace KirboMod.Projectiles
 		public override void SetStaticDefaults()
 		{
 			Main.projFrames[Projectile.type] = 1;
-		}
+            ProjectileID.Sets.MinionShot[Type] = true;
+        }
 
 		public override void SetDefaults()
 		{
@@ -21,8 +22,8 @@ namespace KirboMod.Projectiles
 			Projectile.timeLeft = 240;
 			Projectile.tileCollide = true; 
 			Projectile.penetrate = 1;
-			Projectile.minion = true;
-		}
+            Projectile.DamageType = DamageClass.Summon;
+        }
 		public override void AI()
 		{
 			Projectile.ai[0]++;
@@ -32,14 +33,6 @@ namespace KirboMod.Projectiles
 				Projectile.velocity.Y = 6f;
             }
 			Projectile.rotation += 0.1f; // rotates projectile
-			if (Projectile.ai[0] < 25)
-			{
-				Projectile.damage = 5;
-			}
-			else
-            {
-				Projectile.damage = 15;
-            }
 		}
         public override void OnKill(int timeLeft) //when the projectile dies
         {

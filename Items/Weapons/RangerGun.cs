@@ -13,15 +13,12 @@ namespace KirboMod.Items.Weapons
 	{
 		public override void SetStaticDefaults()
 		{
-			// DisplayName.SetDefault("Pow Shot Gun"); // display name
-			/* Tooltip.SetDefault("Converts all bullets into star bubbles" + //first line
-				"\nConverts star bullets into giant star bubbles"); */ //second line
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research
         }
 
 		public override void SetDefaults()
 		{
-			Item.damage = 24;
+			Item.damage = 32;
 			Item.DamageType = DamageClass.Ranged;
 			Item.noMelee = true;
 			Item.width = 35;
@@ -35,14 +32,12 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item11; //basic gun shot
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.RangerStar>();
-			Item.shootSpeed = 8f;
+			Item.shootSpeed = 12f;
 			Item.useAmmo = AmmoID.Bullet;
 		}
 
 		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
 		{
-            position = player.Center + velocity * 5;//move from player apon spawning
-
             if (type != ModContent.ProjectileType<Projectiles.StarBulletProj>())
             {
                 type = ModContent.ProjectileType<Projectiles.RangerStar>();
@@ -51,9 +46,11 @@ namespace KirboMod.Items.Weapons
 			{
                 position.Y -= 10; //start higher when charged
             }
+
+            position = player.Center + velocity * 3;//move from player apon spawning
         }
 
-		public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+        public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
 			if (type != ModContent.ProjectileType<Projectiles.StarBulletProj>())
 			{

@@ -20,10 +20,6 @@ namespace KirboMod.Items.Weapons
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research 
         }
 
-        static int ArmPen = 12;
-
-        public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(ArmPen);
-
         public override void SetDefaults()
 		{
 			Item.damage = 8;
@@ -42,7 +38,6 @@ namespace KirboMod.Items.Weapons
 			Item.shoot = ModContent.ProjectileType<Projectiles.Flames.FireFire>();
 			Item.shootSpeed = 15f;
 			Item.mana = 3;
-			Item.ArmorPenetration = ArmPen;
         }
 
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)

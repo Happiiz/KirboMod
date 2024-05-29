@@ -21,18 +21,18 @@ namespace KirboMod.Projectiles
         }
 		public override void SetDefaults()
 		{
-			Projectile.width = 60;
-			Projectile.height = 60;
+			Projectile.width = 10;
+			Projectile.height = 10;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.timeLeft = 3600; //1 minute
-			Projectile.tileCollide = false;
+			Projectile.tileCollide = true;
 			Projectile.penetrate = -1;
 			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.extraUpdates = 2;
 			Projectile.alpha = 255;
 			Projectile.usesLocalNPCImmunity = true; //doesn't wait for other projectiles to hit again
-			Projectile.localNPCHitCooldown = 20; //time until able to hit npc even if npc has just been struck
+			Projectile.localNPCHitCooldown = 10; //time until able to hit npc even if npc has just been struck
 		}
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
@@ -63,12 +63,14 @@ namespace KirboMod.Projectiles
 			if (Projectile.velocity.LengthSquared() > 1)
 			{
 				Dust dust = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.SpelunkerGlowstickSparkle);
-				dust.scale = 2;
+				dust.scale = 1;
                 dust.velocity += Projectile.velocity * 0.4f;
             }
             if (Projectile.ai[0] >= 72)//return
             {
-				if(Projectile.ai[0] == 72)
+				Projectile.tileCollide = false;
+
+                if (Projectile.ai[0] == 72)
                 {
 					Projectile.velocity = Vector2.Normalize( Projectile.velocity).RotatedBy(Projectile.ai[1] * MathF.PI / 2) * VelLength;
                 }
@@ -90,6 +92,12 @@ namespace KirboMod.Projectiles
 			Projectile.velocity.Normalize();
 			Projectile.velocity *= Helper.RemapEased(Projectile.ai[0], 0, 36, VelLength, 0.001f, Easings.EaseInCubic);
 		}
+
+        public override bool OnTileCollide(Vector2 oldVelocity)
+        {
+			Projectile.ai[0] = 72; //skip to return (past turn)
+			return false;
+        }
 
         public static Asset<Texture2D> afterimage;
 

@@ -81,7 +81,7 @@ namespace KirboMod.NPCs
             DrawOffsetY = 193;
             //NPC.damage = 150; //damage in projectile
             NPC.noTileCollide = true;
-            NPC.defense = 150;
+            NPC.defense = 60;
             NPC.lifeMax = 280000;
             NPC.HitSound = SoundID.NPCHit1; //slime
             NPC.DeathSound = SoundID.NPCDeath1;
@@ -97,8 +97,8 @@ namespace KirboMod.NPCs
             /*Music = MusicID.Boss2;*/
             if (!Main.dedServ)
             {
-                //Music = MusicLoader.GetMusicSlot(Mod, "Sounds/Music/Zero");
-                Music = MusicID.Boss2;
+                Music = MusicLoader.GetMusicSlot(Mod, "Music/Happiz_PlaceholderZero");
+                //Music = MusicID.Boss2;
             }
 
             SceneEffectPriority = SceneEffectPriority.BossHigh; // By default, musicPriority is BossLow
@@ -239,6 +239,8 @@ namespace KirboMod.NPCs
             if (playerDistance.Length() > 5000)
             {
                 speed += 10 + playerDistance.Length() - 5000; //make Zero move faster 
+                if (speed > 100)
+                    speed = 100;
             }
 
             if (NPC.ai[0] <= 120)
@@ -300,7 +302,7 @@ namespace KirboMod.NPCs
                         if (Main.netMode != NetmodeID.MultiplayerClient)
                         {
 
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), bloodlocation, new Vector2(NPC.direction * 25, 0), ModContent.ProjectileType<ZeroBloodShot>(), 60 / 2, 6f, Main.myPlayer, NPC.whoAmI, 0);
+                            Projectile.NewProjectile(NPC.GetSource_FromAI(), bloodlocation, new Vector2(NPC.direction * 20, 0), ModContent.ProjectileType<ZeroBloodShot>(), 60 / 2, 6f, Main.myPlayer, NPC.whoAmI, 0);
                         }
                         SoundStyle SkinTear = new SoundStyle("KirboMod/Sounds/Item/SkinTear");
                         SoundEngine.PlaySound(SkinTear, NPC.Center);

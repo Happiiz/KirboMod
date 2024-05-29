@@ -99,5 +99,10 @@ namespace KirboMod.Projectiles
                 d.noGravity = true;
             }
         }
+        
+        public override Color? GetAlpha(Color lightColor)
+        {
+            return Color.White;
+        }
     }
 }

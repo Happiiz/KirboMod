@@ -46,15 +46,6 @@ namespace KirboMod.Projectiles
 			return false;
 		}
 
-        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone) //decrease damage for each hit
-        {
-			Projectile.damage -= 1;
-			if (Projectile.damage <= 6)
-            {
-				Projectile.damage = 6;
-            }
-		}
-
 		public override void OnKill(int timeLeft) //when the projectile dies
 		{
 			for (int i = 0; i < 15; i++)

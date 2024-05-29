@@ -29,7 +29,7 @@ namespace KirboMod.NPCs
 			NPC.defense = 30;
 			NPC.HitSound = SoundID.NPCHit4; //metal
 			NPC.DeathSound = SoundID.NPCDeath14; //mech explode
-			NPC.value = Item.buyPrice(10, 0, 0, 0); // money it drops
+			NPC.value = Item.buyPrice(1, 0, 0, 0); // money it drops
 			NPC.rarity = 4; //1 is dungeon slime, 4 is mimic
 			NPC.knockBackResist = 0; //How much of the knockback it receives will actually apply
 			Banner = NPC.type;

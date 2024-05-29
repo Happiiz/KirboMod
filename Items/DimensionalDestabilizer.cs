@@ -23,7 +23,7 @@ namespace KirboMod.Items
 		{
 			Item.width = 52;
 			Item.height = 52;
-			Item.value = Item.buyPrice(0, 0, 0, 50);
+			Item.value = Item.buyPrice(0, 0, 2, 50);
 			Item.rare = ItemRarityID.Orange;
 			Item.maxStack = 1;
 			Item.useTime = 60;
@@ -70,7 +70,7 @@ namespace KirboMod.Items
 			Recipe recipe = CreateRecipe();//the result is dimen destabilizer
 			recipe.AddIngredient(ItemID.FallenStar, 5); //5 fallen stars
 			recipe.AddIngredient(ItemID.MeteoriteBar, 20); //20 meteorite bars
-            recipe.AddTile(TileID.MythrilAnvil); //crafted at hardmode anvil
+            recipe.AddTile(TileID.Anvils); //crafted at anvil
 			recipe.Register(); //adds this recipe to the game
 		}
     }

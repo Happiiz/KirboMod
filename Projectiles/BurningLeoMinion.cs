@@ -69,7 +69,7 @@ namespace KirboMod.Projectiles
 			return false;
 		}
 
-		// This is mandatory if your minion deals contact damage (further related stuff in AI() in the Movement region)
+		// This is mandatory if your minion deals contact damage
 		public override bool MinionContactDamage()
 		{
 			return false;
@@ -99,7 +99,7 @@ namespace KirboMod.Projectiles
             {
                 Projectile.velocity.Y += 0.7f;
 
-                if (attack <= 0) //not attacking
+                if (attacking == false) //not attacking
                 {
                     if (Projectile.velocity.Y >= 10f)
                     {
@@ -339,23 +339,18 @@ namespace KirboMod.Projectiles
                 jumpTimer = 1; // hold till not space jumping
                 Projectile.alpha = 255; //hide projectile
 
-                float speed = direction2.Length() / 30;
-                if (speed < 100) //don't go below 100
-                {
-                    speed = 100;
-                }
-                float inertia = 6f;
+                float speed = Math.Clamp(direction2.Length() / 30, 20f, float.MaxValue);
+                Projectile.extraUpdates = 3; //run three extra ticks for space jump
 
-                Vector2 direction = player.Center - Projectile.Center; //start - end
-                direction.Normalize();
-                direction *= speed;
-                Projectile.velocity = (Projectile.velocity * (inertia - 1) + direction) / inertia;  //fly towards player
+                //fly toward player
+                Projectile.velocity = Projectile.DirectionTo(player.Center) * speed;
             }
             else
             {
                 Projectile.tileCollide = true;
                 Projectile.ignoreWater = false;
                 Projectile.alpha = 0; //show projectile
+                Projectile.extraUpdates = 0;
             }
 
             //space jump end
@@ -383,6 +378,10 @@ namespace KirboMod.Projectiles
             }
 		}
 
+
+        public virtual float fireType => 0; //determines if using prehardmode fire or hardmode fire
+
+
         public void Attack()
         {
 			Projectile.velocity.X *= 0.8f;
@@ -399,27 +398,31 @@ namespace KirboMod.Projectiles
             }
             Projectile.spriteDirection = Projectile.direction;
 
-            float directionRotation = direction.ToRotation();
+            if (attack >= 20) //if over the lifespan of projectile
+            {
+                float maxLength = 180;
+
+                if (fireType == 1)
+                {
+                    maxLength = 360;
+                }
+
+                if (direction.Length() > maxLength || !aggroTarget.active)
+                {
+                    attacking = false;
+                    attack = 0;
+                }
+            }
 
             direction.Normalize();
             direction *= 10f;
 
             attack++;
-			if (attack == 1)
+			if (attack % 20 == 0)
 			{
                 Player player = Main.player[Projectile.owner];
                 Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, direction.RotatedByRandom(MathHelper.ToRadians(50)),
-                    ModContent.ProjectileType<MinionFireSpread>(), Projectile.damage, 1, player.whoAmI, Projectile.whoAmI, directionRotation);
-            }
-
-            if (attack % 10 == 0) //every 10th tick
-            {
-                SoundEngine.PlaySound(SoundID.Item34, Projectile.Center); //flamethrower
-            }
-			if (attack >= 20) //over we want the lifespan of projectile
-			{
-                attacking = false;
-                attack = 0;
+                    ModContent.ProjectileType<MinionFireSpread>(), Projectile.damage, 1, player.whoAmI, Projectile.whoAmI, fireType);
             }
 
             //animation for burning
@@ -442,7 +445,7 @@ namespace KirboMod.Projectiles
         {
             Projectile.velocity.Y = -10f; //velocityY boosts up 
             jumpTimer = 15;
-            Projectile.frame = 12;
+            Projectile.frame = 8;
         }
 
         //all of this for falling through tiles

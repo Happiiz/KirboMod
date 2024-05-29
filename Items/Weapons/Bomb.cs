@@ -47,7 +47,7 @@ namespace KirboMod.Items.Weapons
 
         public override void AddRecipes()
         {
-            Recipe bombrecipe = CreateRecipe();
+            Recipe bombrecipe = CreateRecipe(10);
 			bombrecipe.AddIngredient(ItemID.Bomb);
 			bombrecipe.AddIngredient(ModContent.ItemType<Starbit>(), 5);
 			bombrecipe.AddTile(TileID.Anvils);

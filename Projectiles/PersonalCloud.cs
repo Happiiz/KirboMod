@@ -27,6 +27,7 @@ namespace KirboMod.Projectiles
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
+			Projectile.timeLeft = 2;
 		}
 
         public override bool? CanCutTiles() //can cut foliage?
@@ -39,6 +40,11 @@ namespace KirboMod.Projectiles
 			Projectile.ai[0]++;
 
 			Projectile.Center = player.Center + new Vector2(0, -50); //stay above player
+			
+			if (player.whoAmI == Main.myPlayer && player.oldPosition != player.position) //if client player has changed position
+			{
+				Projectile.netUpdate = true; //sync projectile position change due to player
+			}
 
 			//equipping accesory
 			if (player.GetModPlayer<KirbPlayer>().personalcloud == true)
@@ -114,7 +120,7 @@ namespace KirboMod.Projectiles
                 {
 					Vector2 distance = aggroTarget.Center - Projectile.Center;
 					distance.Normalize();
-					distance *= 10;
+					distance *= 17;
 					int damage = 30;
                     if (Main.masterMode)
                     {
@@ -124,7 +130,7 @@ namespace KirboMod.Projectiles
                     {
 						damage = (int)(damage * 2f);
                     }
-					Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, distance, ModContent.ProjectileType<PersonalCloudBeam>(), 30, 4, Projectile.owner);
+					Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, distance, ModContent.ProjectileType<PersonalCloudBeam>(), damage, 4, Projectile.owner, aggroTarget.whoAmI);
 
 					Projectile.ai[0] = 0;
 				}

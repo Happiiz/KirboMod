@@ -22,7 +22,7 @@ namespace KirboMod.Projectiles
 			Projectile.DamageType = DamageClass.Magic;
 			Projectile.timeLeft = 9;
 			Projectile.tileCollide = false;
-			Projectile.penetrate = 99;
+			Projectile.penetrate = -1;
 		}
         public override bool PreDraw(ref Color lightColor)
         {

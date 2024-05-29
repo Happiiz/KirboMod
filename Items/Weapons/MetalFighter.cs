@@ -36,7 +36,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.MetalFistProj>();
-			Item.shootSpeed = 45f;
+			Item.shootSpeed = 50f;
 		}
 
 		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
@@ -120,7 +120,7 @@ namespace KirboMod.Items.Weapons
 			recipe1.AddIngredient(ItemID.PaladinsHammer); //Paladin's Hammer
 			recipe1.AddIngredient(ItemID.GolemFist); //Golem Fist
 			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 100); //100 starbits
-			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 5); //5 rare stones
+			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 2); //2 rare stones
 			recipe1.AddTile(TileID.MythrilAnvil); //crafted at mythril/orichalcum anvil
 			recipe1.Register(); //adds this recipe to the game
 		}

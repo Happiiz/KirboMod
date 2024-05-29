@@ -25,7 +25,7 @@ namespace KirboMod.Projectiles
 			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.timeLeft = 600;
 			Projectile.tileCollide = true;
-			Projectile.penetrate = 999;
+			Projectile.penetrate = -1;
 		}
 		public override void AI()
 		{

@@ -1,3 +1,6 @@
+using KirboMod.Particles;
+using KirboMod.Projectiles.Lightnings;
+using KirboMod.Projectiles.Tornadoes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -9,13 +12,8 @@ using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles
 {
-    public class StormTornadoNado : ModProjectile
+    public class StormTornadoNado : Tornado
     {
-        public override bool PreDraw(ref Color lightColor)
-        {
-
-            return true;
-        }
         public override void SetStaticDefaults()
         {
             // DisplayName.SetDefault("Storm Tornado");
@@ -24,23 +22,32 @@ namespace KirboMod.Projectiles
 
         public override void SetDefaults()
         {
-            Projectile.width = 140;
-            Projectile.height = 200;
+            Projectile.width = 30;
+            Projectile.height = 30;
             Projectile.friendly = true;
+            Projectile.hostile = false;
             Projectile.DamageType = DamageClass.Magic;
-            Projectile.timeLeft = 240;
             Projectile.tileCollide = false;
             Projectile.penetrate = -1;
 
             //uses own immunity frames
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = 5;
+            Projectile.ArmorPenetration = 9999;
+        }
+
+        public override Color[] SetPalette()
+        {
+            Color[] palette = { Color.Black, Color.Gray, Color.LightGray };
+            return palette;
         }
 
         public override void AI()
         {
             Player player = Main.player[Projectile.owner];
             Projectile.ai[0]++;
+
+            Projectile.scale = 1.6f;
 
             //stuff here so it doesn't oppose drain
             player.manaRegenDelay = 20;
@@ -53,7 +60,7 @@ namespace KirboMod.Projectiles
 
             if (stillInUse) //HOMING
             {
-                float speed = 30f; //top speed
+                float speed = 40f; //top speed
                 float inertia = 30f; //acceleration and decceleration speed
 
                 if (Projectile.owner == Main.myPlayer)
@@ -87,7 +94,7 @@ namespace KirboMod.Projectiles
             //Storm Cloud
             if (Projectile.ai[0] % 5 == 0 && Main.myPlayer == Projectile.owner)
             {
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * 0, ModContent.ProjectileType<Projectiles.StormTornadoCloud>(), Projectile.damage / 3, 0f, Projectile.owner);
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * 0, ModContent.ProjectileType<Projectiles.StormTornadoCloud>(), Projectile.damage / 2, 0f, Projectile.owner);
             }
 
             //"Thunder"
@@ -98,8 +105,10 @@ namespace KirboMod.Projectiles
 
             if (Main.rand.NextBool(20)) //1/20 every tick
             {
-                Vector2 speed = Main.rand.NextVector2Circular(30f, 30f); //circle 
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, speed, ModContent.ProjectileType<Projectiles.StormTornadoShock>(), Projectile.damage / 2, 0f, Projectile.owner);
+                Vector2 speed = Main.rand.NextVector2CircularEdge(15f, 15f); //circle 
+                LightningProj.GetSpawningStats(speed, out float ai0, out float ai1);
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, speed, 
+                    ModContent.ProjectileType<StormTornadoLightning>(), Projectile.damage / 2, 0f, Projectile.owner, ai0, ai1);
                 SoundEngine.PlaySound(SoundID.Item122, Projectile.Center);
             }
         }
@@ -112,18 +121,33 @@ namespace KirboMod.Projectiles
 
         public override void OnKill(int timeLeft)
         {
-            for (int i = 0; i < 30; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+            for (int i = 0; i < 60; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
             {
-                Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
+                Vector2 speed = Main.rand.NextVector2Circular(24f, 30f); //circle
                 Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.RainCloud, speed, Scale: 5f, newColor: new Color(80, 80, 80)); //Makes dust in a messy circle
                 d.noGravity = true;
             }
             for (int i = 0; i < 6; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
             {
-                Vector2 speed = Main.rand.NextVector2Circular(30f, 30f); //circle 
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, speed, ModContent.ProjectileType<Projectiles.StormTornadoShock>(), Projectile.damage / 2, 0f, Projectile.owner);
-                SoundEngine.PlaySound(SoundID.Item122, Projectile.Center);
+                Vector2 speed = Main.rand.NextVector2CircularEdge(15f, 15f); //circle 
+                LightningProj.GetSpawningStats(speed, out float ai0, out float ai1);
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, speed,
+                    ModContent.ProjectileType<StormTornadoLightning>(), Projectile.damage / 2, 0f, Projectile.owner, ai0, ai1);
             }
+        }
+
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+        {
+            return Utils.CenteredRectangle(Projectile.Center, new Vector2(180, 200)).Intersects(targetHitbox);
+        }
+
+        public override bool? CanHitNPC(NPC target)
+        {
+            if (Collision.CanHit(Projectile, target))
+            {
+                return null;
+            }
+            return false;
         }
 
         public override bool OnTileCollide(Vector2 oldVelocity)

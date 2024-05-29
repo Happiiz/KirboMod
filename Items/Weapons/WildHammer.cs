@@ -14,7 +14,7 @@ namespace KirboMod.Items.Weapons
 		private int meleeCharge = 0;
 		private int attackTime = 0;
 
-        const int chargeCap = 60;
+        const int chargeCap = 90;
         public override void SetStaticDefaults() 
 		{
 			 // DisplayName.SetDefault("Wild Hammer"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
@@ -125,7 +125,7 @@ namespace KirboMod.Items.Weapons
 			recipe1.AddIngredient(ItemID.ChlorophyteGreataxe); //Chlorophyte Greataxe
 			recipe1.AddIngredient(ItemID.DeathSickle); //Death Sickle
             recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 100); //100 starbits
-			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 5); //5 rare stones
+			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 2); //2 rare stones
 			recipe1.AddTile(TileID.MythrilAnvil); //crafted at mythril/orichalcum anvil
 			recipe1.Register(); //adds this recipe to the game
 		}

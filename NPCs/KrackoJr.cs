@@ -1,6 +1,7 @@
 using KirboMod.Particles;
 using KirboMod.Projectiles.KrackoJrBomb;
 using KirboMod.Projectiles.KrackoJrCannonball;
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -85,7 +86,8 @@ namespace KirboMod.NPCs
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
-            if (spawnInfo.Player.ZoneSkyHeight && NPC.downedBoss2 && !Main.hardMode) //if player is within space height, not in hardmode and defeated evil boss
+            //if player is within space height, not in hardmode, defeated evil boss but not Kracko
+            if (spawnInfo.Player.ZoneSkyHeight && NPC.downedBoss2 && !DownedBossSystem.downedKrackoBoss && !Main.hardMode) 
             {
                 return !NPC.AnyNPCs(ModContent.NPCType<NPCs.Kracko>()) ? 0.15f : 0; //return spawn rate if kracko isn't here
             }
@@ -350,7 +352,7 @@ namespace KirboMod.NPCs
                     dust.velocity *= Main.rand.NextFloat() * .2f + .2f;
                 }
                 if (Main.netMode != NetmodeID.MultiplayerClient)
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, velocity, ModContent.ProjectileType<KrackoJrCannonball>(), 30, 0);
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, velocity, ModContent.ProjectileType<KrackoJrCannonball>(), 30 / 2, 0);
             }
         }
         int GetExtraAttackWaitTime()
@@ -380,7 +382,7 @@ namespace KirboMod.NPCs
 
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<KrackoJrBomb>(), 30, 0, Main.myPlayer, plr.whoAmI);
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<KrackoJrBomb>(), 30 / 2, 0, Main.myPlayer, plr.whoAmI);
                 }
             }
         }

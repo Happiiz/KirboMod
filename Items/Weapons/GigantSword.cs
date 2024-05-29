@@ -49,7 +49,7 @@ namespace KirboMod.Items.Weapons
             gigantsword.AddIngredient(ModContent.ItemType<HeroSword>()); //Hero Sword
             gigantsword.AddIngredient(ItemID.BreakerBlade); //Breaker Blade
             gigantsword.AddIngredient(ModContent.ItemType<Starbit>(), 50); //50 starbits
-			gigantsword.AddIngredient(ModContent.ItemType<RareStone>(), 2); //2 rare stones
+			gigantsword.AddIngredient(ModContent.ItemType<RareStone>(), 1); //1 rare stone
 			gigantsword.AddTile(TileID.Anvils); //crafted at anvil
 			gigantsword.Register(); //adds this recipe to the game
 		}

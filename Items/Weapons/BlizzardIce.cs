@@ -21,7 +21,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 50;
+			Item.damage = 92;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 48;
@@ -61,7 +61,7 @@ namespace KirboMod.Items.Weapons
 			recipe1.AddIngredient(ItemID.BlizzardStaff); //Blizzard Staff
 			recipe1.AddIngredient(ItemID.BubbleGun); //Bubble Gun
 			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 100); //100 starbits
-			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 5); //5 rare stones
+			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 2); //2 rare stones
             recipe1.AddTile(TileID.MythrilAnvil); //crafted at mythril/orichalcum anvil
 			recipe1.Register(); //adds this recipe to the game
 		}

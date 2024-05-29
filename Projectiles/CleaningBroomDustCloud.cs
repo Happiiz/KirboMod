@@ -26,25 +26,17 @@ namespace KirboMod.Projectiles
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
+			Projectile.usesLocalNPCImmunity = true;
+			Projectile.localNPCHitCooldown = 10;
 		}
 		public override void AI()
 		{
-			//detect direction of movement
-			int direction = 1;
-			if (Projectile.velocity.X < 0)
+			if (Projectile.timeLeft == 59)
 			{
-				direction = -1;
-			}
-
-			Projectile.ai[0]++;
-			if (Projectile.ai[0] == 1)
-			{
-                for (int i = 0; i < 3; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+                for (int i = 0; i < 6; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
                 {
-                    Vector2 speed = new Vector2(Main.rand.Next(3,6) * direction, 0);
-                    Gore.NewGorePerfect(Projectile.GetSource_FromThis(), direction == -1 ? Projectile.Center - new Vector2(40, 0): Projectile.Center, 
-						speed.RotatedByRandom(MathHelper.ToRadians(35f)), 
-						Main.rand.Next(61, 63), Scale: 1f); //smoke
+                    Gore.NewGorePerfect(Projectile.GetSource_FromThis(), Projectile.position, Projectile.velocity.RotatedByRandom(MathF.PI / 8) * Main.rand.NextFloat(1f, 2f), 
+						Main.rand.Next(61, 63)); //smoke
                 }
             }
 		}

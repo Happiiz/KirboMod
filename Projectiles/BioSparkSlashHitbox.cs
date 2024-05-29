@@ -71,7 +71,7 @@ namespace KirboMod.Projectiles
 
 			for (int i = 0; i < Projectile.oldPos.Length; i++)
 			{
-				offset = Helper.RemapEased(Projectile.timeLeft + (i * .25f + .25f), 30, 10, MathF.PI / 1.5f, -MathF.PI / 1.1f, Easing, false).ToRotationVector2() * 80;
+				offset = Helper.RemapEased(Projectile.timeLeft + (i * .25f + .25f), 30, 10, MathF.PI / 1.5f, -MathF.PI / 1.1f, Easing, false).ToRotationVector2() * 60;
 				offset.Y *= .6f;
 				offset.X *= originNPC.direction;
 				Projectile.oldRot[i] = offset.ToRotation() + MathF.PI / 2;

@@ -48,11 +48,11 @@ namespace KirboMod.Items.Weapons
 
         public override void AddRecipes()
         {
-			Recipe chainbombrecipe = CreateRecipe(300);//the result is chain bomb
-			chainbombrecipe.AddIngredient(ModContent.ItemType<Items.Weapons.Bomb>()); 
+			Recipe chainbombrecipe = CreateRecipe(600);//the result is chain bomb
+			chainbombrecipe.AddIngredient(ModContent.ItemType<Items.Weapons.Bomb>(), 100); 
 			chainbombrecipe.AddIngredient(ItemID.Wire, 10); //Wire
 			chainbombrecipe.AddIngredient(ModContent.ItemType<Items.Starbit>(), 15);
-			chainbombrecipe.AddIngredient(ModContent.ItemType<Items.RareStone>(), 1); //1 rare stones
+			chainbombrecipe.AddIngredient(ModContent.ItemType<Items.RareStone>(), 1); //1 rare stone
 			chainbombrecipe.AddTile(TileID.Anvils); //crafted at anvil
 			chainbombrecipe.Register(); //adds this recipe to the game
 		}

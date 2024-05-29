@@ -8,6 +8,7 @@ using Terraria.ModLoader;
 using Terraria.Audio;
 using SoundEngine = Terraria.Audio.SoundEngine;
 using Terraria.GameContent.Creative;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace KirboMod.Items.Weapons
 {
@@ -23,7 +24,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults() 
 		{
-			Item.damage = 10;
+			Item.damage = 15;
 			Item.DamageType = DamageClass.Melee/* tModPorter Suggestion: Consider MeleeNoSpeed for no attack speed scaling */;
 			Item.width = 20;
 			Item.height = 20;
@@ -36,7 +37,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.CleaningBroomDustCloud>();
-			Item.shootSpeed = 3f;
+			Item.shootSpeed = 5f;
 		}
 
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
@@ -47,10 +48,16 @@ namespace KirboMod.Items.Weapons
 		public override void HoldItem(Player player)
 		{
             //swing only at last quarter while on ground and using item
-            if (player.itemTime == player.itemTimeMax / 4 && player.velocity.Y == 0 && !player.ItemTimeIsZero) 
+            if (player.itemTime == player.itemTimeMax / 4 && player.velocity.Y == 0 && !player.ItemTimeIsZero && Main.myPlayer == player.whoAmI) 
 			{
-                Projectile.NewProjectile(new EntitySource_ItemOpen(Main.player[player.whoAmI], Item.type), player.Center.X + (10 * player.direction), player.Center.Y - 10, player.direction * 3, 0,
-                    Item.shoot, Item.damage, 2, player.whoAmI);
+				Vector2 velocity = Main.MouseWorld - player.Center;
+                velocity.Normalize();
+                velocity *= Item.shootSpeed;
+
+				Vector2 position = new Vector2(player.Center.X + (20 * player.direction), player.Center.Y + 10);
+
+                Projectile.NewProjectile(new EntitySource_ItemUse(Main.player[player.whoAmI], player.HeldItem), position, 
+					velocity, Item.shoot, Item.damage, 2, player.whoAmI);
 				SoundEngine.PlaySound(SoundID.Grass, player.Center);
             }
         }

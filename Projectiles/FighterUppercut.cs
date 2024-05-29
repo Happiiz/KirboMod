@@ -59,5 +59,10 @@ namespace KirboMod.Projectiles
                 Projectile.frame = 5;
             }
         }
+
+        public override Color? GetAlpha(Color lightColor)
+        {
+            return Color.White * Projectile.Opacity; //independent from light level while still being affected by opacity
+        }
     }
 }

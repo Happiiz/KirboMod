@@ -52,14 +52,6 @@ namespace KirboMod.Projectiles
 
 			Projectile.ai[0]++;
 
-			if (Projectile.ai[0] == 1)
-            {
-				Vector2 speed = Main.MouseWorld - Projectile.Center;
-				speed.Normalize();
-				speed *= 30;
-				Projectile.velocity.X = speed.X;
-            }
-
 
 			Player player = Main.player[Projectile.owner];
 			//below player

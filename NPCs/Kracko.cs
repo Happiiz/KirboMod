@@ -29,26 +29,18 @@ namespace KirboMod.NPCs
 
         public override void AI() //constantly cycles each time
         {
-
-
-            if (NPC.ai[1] <= 60 || (NPC.ai[0] >= 60 && NPC.ai[0] < 90 && frenzy)) //be harmless upon spawn (or when moving during frenzy
+            if (NPC.ai[0] >= 60 && NPC.ai[0] < 90 && frenzy) //be harmless upon spawn (or when moving during frenzy)
             {
                 NPC.damage = 0;
             }
             else
             {
-                if (Main.expertMode == false)
-                {
-                    NPC.damage = 30;
-                }
-                else
-                {
-                    NPC.damage = 60;
-                }
+                NPC.damage = NPC.defDamage;
             }
-            NPC.ai[1]++;
 
-            if (NPC.life <= NPC.lifeMax * 0.5 && Main.expertMode) //transition
+            NPC.ai[1]++; //keeps track of delay before attacking
+
+            if (NPC.GetLifePercent() <= 0.5f && Main.expertMode) //transition
             {
                 transitioning = true;
             }
@@ -65,6 +57,11 @@ namespace KirboMod.NPCs
                     NPC.timeLeft = 60;
                     return;
                 }
+            }
+            else if (NPC.ai[1] <= 60) //attack delay
+            {
+                NPC.damage = 0;
+                NPC.velocity *= 0.01f;
             }
             else if (transitioning == true && NPC.ai[2] <= 180) //TRANSITION TO PHASE 2
             {
@@ -455,7 +452,7 @@ namespace KirboMod.NPCs
                 {                 
                     for (float j = 0; j < numberOfSpirals; j++)
                     {
-                       Projectile.NewProjectileDirect(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<BeamBig>(), 40, 8f, Main.myPlayer, NPC.whoAmI, j * (MathF.Tau / numberOfSpirals) - i * beamCurvingAngleMultiplier, i * 70 + 100);
+                       Projectile.NewProjectileDirect(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<BeamBig>(), 40 / 2, 8f, Main.myPlayer, NPC.whoAmI, j * (MathF.Tau / numberOfSpirals) - i * beamCurvingAngleMultiplier, i * 70 + 100);
                     }
                 }
             }

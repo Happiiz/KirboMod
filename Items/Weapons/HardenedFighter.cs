@@ -36,7 +36,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.HardenedFistProj>();
-			Item.shootSpeed = 30f;
+			Item.shootSpeed = 35f;
 		}
 
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
@@ -70,7 +70,7 @@ namespace KirboMod.Items.Weapons
 				Item.useTime = 5;
 				Item.useAnimation = 5;
 				Item.shoot = ModContent.ProjectileType<Projectiles.HardenedFistProj>();
-				Item.shootSpeed = 30f;
+				Item.shootSpeed = 35f;
             }
 			return player.ownedProjectileCounts[ModContent.ProjectileType<Projectiles.HardenedSlam>()] < 1;
 		}
@@ -81,7 +81,7 @@ namespace KirboMod.Items.Weapons
 			hardenedgloverecipe.AddIngredient(ModContent.ItemType<Items.Weapons.FighterGlove>()); //Fighter Glove
 			hardenedgloverecipe.AddIngredient(ItemID.Pwnhammer); //Pwnhammer
 			hardenedgloverecipe.AddIngredient(ModContent.ItemType<Items.Starbit>(), 50); //50 starbits
-			hardenedgloverecipe.AddIngredient(ModContent.ItemType<Items.RareStone>(), 2); //2 rare stones
+			hardenedgloverecipe.AddIngredient(ModContent.ItemType<RareStone>(), 1); //1 rare stone
 			hardenedgloverecipe.AddTile(TileID.Anvils); //crafted at anvil
 			hardenedgloverecipe.Register(); //adds this recipe to the game
 		}

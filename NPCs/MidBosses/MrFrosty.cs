@@ -11,6 +11,7 @@ using Terraria.GameContent.ItemDropRules;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using KirboMod.Projectiles;
+using KirboMod.ItemDropRules.DropConditions;
 
 namespace KirboMod.NPCs.MidBosses
 {
@@ -33,19 +34,21 @@ namespace KirboMod.NPCs.MidBosses
                 Position = new Vector2(20, 80),
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
+
+            NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true; //immune because of boss-like behavior
         }
 
 		public override void SetDefaults()
 		{
 			NPC.width = 100;
 			NPC.height = 136;
-			NPC.damage = Main.hardMode ? 80 : 40;
-			NPC.defense = 20;
-            NPC.lifeMax = Main.hardMode ? 2500 : 800;
+            NPC.damage = Main.hardMode ? (NPC.downedGolemBoss ? 120 : 80) : 40;
+            NPC.defense = Main.hardMode ? 30 : 15;
+            NPC.lifeMax = Main.hardMode ? (NPC.downedGolemBoss ? 32000 : 16000) : 800;
             NPC.HitSound = SoundID.NPCHit14; //fishron squeal
 			NPC.DeathSound = SoundID.NPCDeath8; //grunt
-			NPC.value = Item.buyPrice(0, 0, 50, 0); // money it drops
-			NPC.knockBackResist = 0f; //how much knockback applies
+			NPC.value = Main.hardMode ? (NPC.downedGolemBoss ? 200000 : 50000) : 5000; // money it drops (20 gold / 5 gold / 50 silver)
+            NPC.knockBackResist = 0f; //how much knockback applies
             Banner = NPC.type;
             BannerItem = ModContent.ItemType<Items.Banners.MrFrostyBanner>();
             NPC.aiStyle = -1; 
@@ -74,61 +77,63 @@ namespace KirboMod.NPCs.MidBosses
             bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
             {
 				// Sets the spawning conditions of this NPC that is listed in the bestiary.
-				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.UndergroundSnow,
+				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Snow,
 
 				// Sets the description of this NPC that is listed in the bestiary.
-				new FlavorTextBestiaryInfoElement("An icy beast that appeared in the tuntra from a strange star shaped rift. Does its best to stamp out any threats with its grace and style, or lack thereof.")
+				new FlavorTextBestiaryInfoElement("An icy beast that appeared in the tundra from a strange star shaped rift. Does its best to stamp out any threats with style and grace, or lack thereof.")
             });
         }
         public override void AI() //constantly cycles each time
 		{
 			NPC.spriteDirection = NPC.direction;
 			Player player = Main.player[NPC.target];
-			Vector2 distance = player.Center - NPC.Center;
-
-            if (NPC.ai[0] == 0) //not attacking
-            {
-                attacktype = 0; //standing
-                NPC.ai[3]++; //attack timer
-            }
-            else
-            {
-                NPC.ai[3] = 0; //restart attack timer
-            }
-
-            if (NPC.ai[3] >= (Main.expertMode ? 30 : 60)) //times up! (50 if in expertmode)
-            {
-                if (attacktype == 0)
-                {
-                    NPC.ai[0] += 1; //attack!
-                    NPC.ai[3] = 0;
-                }
-            }
-
-            if (NPC.ai[0] == 1) //stancing or 
-            {
-                if (lastattack == 2) //ice
-                {
-                    attacktype = 1; //dash
-                    lastattack = 1; //also ddash
-                }
-                else
-                {
-                    attacktype = 2; //ice
-                    lastattack = 2; //also ice
-                }
-
-            }
 
             if (player.dead) //player has died
             {
                 attacktype = 1; //dive dash
+                NPC.timeLeft = 40;
+            }
+            else
+            {
+                if (NPC.ai[0] == 0) //not attacking
+                {
+                    attacktype = 0; //standing
+                    NPC.ai[3]++; //attack timer
+                }
+                else
+                {
+                    NPC.ai[3] = 0; //restart attack timer
+                }
+
+                if (NPC.ai[3] >= (Main.expertMode ? 30 : 60)) //times up! (50 if in expertmode)
+                {
+                    if (attacktype == 0)
+                    {
+                        NPC.ai[0] += 1; //attack!
+                        NPC.ai[3] = 0;
+                    }
+                }
+
+                if (NPC.ai[0] == 1) //stancing or 
+                {
+                    if (lastattack == 2) //ice
+                    {
+                        attacktype = 1; //dash
+                        lastattack = 1; //also ddash
+                    }
+                    else
+                    {
+                        attacktype = 2; //ice
+                        lastattack = 2; //also ice
+                    }
+
+                }
             }
 
             //declaring attacktype values
             if (attacktype == 0)
             {
-                Stance();
+                Stance(player);
             }
             if (attacktype == 1)
             {
@@ -198,9 +203,8 @@ namespace KirboMod.NPCs.MidBosses
 			}
 		}
 
-        private void Stance() //stand up straight
+        private void Stance(Player player) //stand up straight
 		{
-			Player player = Main.player[NPC.target];
 			NPC.TargetClosest(true); //face player
 
             NPC.velocity.X *= 0.5f; //slow
@@ -227,6 +231,7 @@ namespace KirboMod.NPCs.MidBosses
                     CheckPlatform(player); //go down platforms when player is low
 
                     float speed = Main.expertMode ? 15f : 10f; //top speed (15 in expertmode)
+                    speed *= Main.hardMode ? 1.5f : 1;
 					float inertia = 20f; //acceleration and decceleration speed
 
                     ClimbTiles(player);
@@ -235,17 +240,30 @@ namespace KirboMod.NPCs.MidBosses
 
                     Vector2 distance = player.Center - NPC.Center;
 
-					bool pastPlayer = distance.X < 5; //checks if past the player because it doesn't turn
+                    bool inRangeX = MathF.Abs(distance.X) < (Main.hardMode ? 400 : 10);
 
-					if (NPC.direction == -1)
-					{
-                        pastPlayer = distance.X > -5; //check for if facing left
-                    }
+                    bool inRangeY = distance.Y > (Main.hardMode ? -600 : -200) &&  distance.Y < 100;
 
-                    bool inRangeY = distance.Y > -200 &&  distance.Y < 100;
-
-                    if (MathF.Abs(distance.X) < 10 && inRangeY && player.dead == false) //past the player, near player and player not dead
+                    if (inRangeX && inRangeY && player.dead == false) //past the player, near player and player not dead
                     {
+                        if (Main.hardMode) //launch toward player
+                        {
+                            Vector2 targetPos = player.Bottom;
+
+                            Vector2 vel = new Vector2(Math.Clamp((targetPos.X - NPC.Bottom.X) / 10, -20, 20),
+                            Math.Clamp((targetPos.Y - NPC.Bottom.Y) / 10, -20f, 10f));
+
+                            if (NPC.downedGolemBoss) //post-Golem
+                            {
+                                //predict player position based on velocity
+                                Utils.ChaseResults results = Utils.GetChaseResults(NPC.Bottom, vel.Length(), targetPos, player.velocity);
+                                targetPos = results.InterceptionPosition;
+                                vel = results.ChaserVelocity;
+                            }
+
+                            NPC.velocity = vel;
+                        }
+
 						NPC.ai[0] = 180; //dive
                     }
 
@@ -260,14 +278,14 @@ namespace KirboMod.NPCs.MidBosses
 
                     NPC.noTileCollide = false;
 
-					NPC.ai[0]++;
-					
-					NPC.velocity.X *= 0.95f; //slow 
-					
-					if (NPC.ai[0] == 180) //dive bomb
+                    if (!Main.hardMode)
+                        NPC.velocity.X *= 0.95f; //slow 
+
+                    if (NPC.ai[0] == 180) //dive bomb
 					{
 						SoundEngine.PlaySound(SoundID.Item1, NPC.Center); 
 					}
+
 					if (NPC.ai[0] >= 240) //restart after 1 second
 					{
                         NPC.ai[0] = 0;
@@ -308,11 +326,11 @@ namespace KirboMod.NPCs.MidBosses
                     float velY = Main.hardMode ? -8 : -5;
 
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + offset.X, NPC.Center.Y + offset.Y, velX, velY, 
-                        ModContent.ProjectileType<BadIceChunk>(), (Main.hardMode ? 80 : 40) / 2, 5f, Main.myPlayer, 0, 0);
+                        ModContent.ProjectileType<BadIceChunk>(), (Main.hardMode ? (NPC.downedGolemBoss ? 120 : 80) : 40) / 2, 5f, Main.myPlayer, 0, 0);
                     if (Main.hardMode)
                     {
                         Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + offset.X, NPC.Center.Y + offset.Y, -velX, velY,
-                        ModContent.ProjectileType<BadIceChunk>(), (Main.hardMode ? 80 : 40) / 2, 5f, Main.myPlayer, 0, 0);
+                        ModContent.ProjectileType<BadIceChunk>(), (Main.hardMode ? (NPC.downedGolemBoss ? 120 : 80) : 40) / 2, 5f, Main.myPlayer, 0, 0);
                     }
                 }
                 SoundEngine.PlaySound(SoundID.Item1 with { Volume = 2 }, NPC.Center);
@@ -389,9 +407,25 @@ namespace KirboMod.NPCs.MidBosses
 
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
-            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<Items.Weapons.Ice>(), 1, 1)); // Guaranteed in all difficulties
+            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Items.Weapons.Ice>())); // Guaranteed
             npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Starbit>(), 1, 24, 24));
-            npcLoot.Add(ItemDropRule.ByCondition(new Conditions.IsHardmode(), ModContent.ItemType<Items.RareStone>(), 1, 1, 1));
+
+            //1 for pre-Golem, 1 for post-Golem. Both in Hardmode
+            
+            PreGolemHardmodeCondition PreGolemCondition = new PreGolemHardmodeCondition();
+            IItemDropRule HardmodePreGolem = new LeadingConditionRule(PreGolemCondition);
+
+            PostGolemHardmodeCondition PostGolemCondition = new PostGolemHardmodeCondition();
+            IItemDropRule HardmodePostGolem = new LeadingConditionRule(PostGolemCondition);
+
+            //Drop two Rare Stones if post-Golem
+
+            HardmodePreGolem.OnSuccess(ItemDropRule.Common(ModContent.ItemType<RareStone>()));
+
+            HardmodePostGolem.OnSuccess(ItemDropRule.Common(ModContent.ItemType<RareStone>(), 1, 2, 2));
+
+            npcLoot.Add(HardmodePreGolem);
+            npcLoot.Add(HardmodePostGolem);
         }
 
         public override void HitEffect(NPC.HitInfo hit)

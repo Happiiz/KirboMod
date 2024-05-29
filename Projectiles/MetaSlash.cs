@@ -20,7 +20,7 @@ namespace KirboMod.Projectiles
 			Projectile.DamageType = DamageClass.Melee;
 			Projectile.timeLeft = 36;
 			Projectile.tileCollide = false;
-			Projectile.penetrate = 99;
+			Projectile.penetrate = -1;
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = 36; //wait 12 frames before dealing damage again, but it will be dead so it can only hit once per npc
 		}

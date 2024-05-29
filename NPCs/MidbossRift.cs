@@ -1,5 +1,6 @@
 using KirboMod.Items.Weapons;
 using KirboMod.NPCs.MidBosses;
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -57,11 +58,13 @@ namespace KirboMod.NPCs
             NPC.hide = true; //for drawing behind things
         }
 
-        public override float SpawnChance(NPCSpawnInfo spawnInfo)
+        /*public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
             bool noOtherMidbosses = !NPC.AnyNPCs(Type) && !NPC.AnyNPCs(ModContent.NPCType<Bonkers>()) && !NPC.AnyNPCs(ModContent.NPCType<MrFrosty>());
 
-            if (!spawnInfo.Invasion && !spawnInfo.Water && noOtherMidbosses) //no invasion, water, or other midbosses
+            //no invasion, water, or other minibosses, and either evil boss, Kracko, Skeletron, or WOF downed
+            if (!spawnInfo.Invasion && !spawnInfo.Water && noOtherMidbosses && (NPC.downedBoss2 || DownedBossSystem.downedKrackoBoss 
+                || NPC.downedBoss3 || Main.hardMode))
             {
                 if (spawnInfo.Player.ZoneSnow)
                 {
@@ -69,14 +72,14 @@ namespace KirboMod.NPCs
                 }
                 else
                 {
-                    return SpawnCondition.GoblinScout.Chance * 0.1f; //spawn in outer sixths of world with the same chance of spawning as a goblin scout
+                    return SpawnCondition.GoblinScout.Chance * 0.1f; //spawn in outer sixths of world with 1/10th the chance of a goblin scout
                 }
             }
             else
             {
                 return 0f; //too far
             }
-        }
+        }*/
 
         public override void OnSpawn(IEntitySource source)
         {

@@ -82,13 +82,21 @@ namespace KirboMod.Items.Weapons
 
 		public override void AddRecipes()
 		{
-			Recipe recipe1 = CreateRecipe();//the result is tri-kill bow
-			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.ArcherBow>()); //Archer Bow
-			recipe1.AddIngredient(ItemID.Marrow); //Marrow
-			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 50); //50 starbits
-			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 2); //2 rare stones
-			recipe1.AddTile(TileID.Anvils); //crafted at anvil
-			recipe1.Register(); //adds this recipe to the game
-		}
+			Recipe hunterArcherBow1 = CreateRecipe();//the result is tri-kill bow
+            hunterArcherBow1.AddIngredient(ModContent.ItemType<Items.Weapons.ArcherBow>()); //Archer Bow
+            hunterArcherBow1.AddIngredient(ItemID.TitaniumRepeater); //Titanium Repeater
+            hunterArcherBow1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 50); //50 starbits
+            hunterArcherBow1.AddIngredient(ModContent.ItemType<RareStone>(), 1); //1 rare stone
+            hunterArcherBow1.AddTile(TileID.Anvils); //crafted at anvil
+            hunterArcherBow1.Register(); //adds this recipe to the game
+
+            Recipe hunterArcherBow2 = CreateRecipe();//the result is tri-kill bow
+            hunterArcherBow2.AddIngredient(ModContent.ItemType<Items.Weapons.ArcherBow>()); //Archer Bow
+            hunterArcherBow2.AddIngredient(ItemID.AdamantiteRepeater); //Adamantite Repeater
+            hunterArcherBow2.AddIngredient(ModContent.ItemType<Items.Starbit>(), 50); //50 starbits
+            hunterArcherBow2.AddIngredient(ModContent.ItemType<RareStone>(), 1); //1 rare stone
+            hunterArcherBow2.AddTile(TileID.Anvils); //crafted at anvil
+            hunterArcherBow2.Register(); //adds this recipe to the game
+        }
 	}
 }

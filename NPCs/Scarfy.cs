@@ -48,6 +48,10 @@ namespace KirboMod.NPCs
             NPC.noTileCollide = false;
             NPC.direction = Main.rand.Next(0, 1 + 1) == 1 ? 1 : -1; //determines whether to go left or right initally
             NPC.chaseable = false; //initally
+
+            //Prevent becoming angry due to flying in lava, but also be able to easily travel through lava when angry
+            NPC.lavaImmune = true;
+            NPC.GravityIgnoresLiquid = true;
         }
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)

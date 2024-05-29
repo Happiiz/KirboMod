@@ -23,7 +23,7 @@ namespace KirboMod.Projectiles
 			Projectile.friendly = true;
 			Projectile.timeLeft = 240;
 			Projectile.tileCollide = false;
-			Projectile.penetrate = 999;
+			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = -1;
@@ -128,5 +128,10 @@ namespace KirboMod.Projectiles
             VFX.DrawProjWithStarryTrail(Projectile, new Color(173, 245, 255) * .15f, Color.White * .35f * Projectile.Opacity, default, Projectile.Opacity);
             return true;
 		}
-	}
+
+        public override bool? CanCutTiles()
+        {
+			return false;
+        }
+    }
 }
