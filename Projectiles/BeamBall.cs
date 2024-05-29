@@ -15,12 +15,12 @@ namespace KirboMod.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 15;
-			Projectile.height = 15;
+			Projectile.width = 30;
+			Projectile.height = 30;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Magic;
 			Projectile.timeLeft = 3000;
-			Projectile.tileCollide = true;
+			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 			
 		}
@@ -41,12 +41,6 @@ namespace KirboMod.Projectiles
 			VFX.DrawElectricOrb(Projectile.Center, new Vector2(1.2f), Projectile.Opacity, Projectile.rotation);
 			return false;
         }
-
-        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
-        {
-			return Utils.CenteredRectangle(Projectile.Center, Projectile.Size * 2).Intersects(targetHitbox);
-        }
-
         public override Color? GetAlpha(Color lightColor)
 		{
 			return Color.White; // Makes it uneffected by light
