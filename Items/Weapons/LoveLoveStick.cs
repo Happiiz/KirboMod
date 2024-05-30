@@ -33,7 +33,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item8; //magic cast
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.LoveLoves>();
-			Item.shootSpeed = 24f;
+			Item.shootSpeed = 12f;
 			Item.noMelee = true;
 		}
 
