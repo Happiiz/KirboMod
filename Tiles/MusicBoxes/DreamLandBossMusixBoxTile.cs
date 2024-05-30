@@ -9,7 +9,7 @@ using Terraria.ObjectData;
 
 namespace KirboMod.Tiles.MusicBoxes
 {
-	public class DededeMusicBoxTile : ModTile
+	public class DreamLandBossMusicBoxTile : ModTile
 	{
 		public override void SetStaticDefaults() {
 			Main.tileFrameImportant[Type] = true;
@@ -22,14 +22,14 @@ namespace KirboMod.Tiles.MusicBoxes
 			TileObjectData.addTile(Type);
 
             LocalizedText name = CreateMapEntryName();
-			AddMapEntry(new Color(255, 250, 0), name);
+			AddMapEntry(new Color(157, 193, 48), name);
 		}
 
 		public override void MouseOver(int i, int j) {
 			Player player = Main.LocalPlayer;
 			player.noThrow = 2;
 			player.cursorItemIconEnabled = true;
-			player.cursorItemIconID = ModContent.ItemType<DededeMusicBox>();
+			player.cursorItemIconID = ModContent.ItemType<DreamLandBossMusicBox>();
 		}
 	}
 }

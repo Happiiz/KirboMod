@@ -4,6 +4,7 @@ Mods: {
 			DefenseVariesDamage: Damage varies with the amount of defense you have
 			DefensePenetration: Ignores {0} points of enemy defense
 			IgnoresDefense: Ignores enemy defense completely
+			MusicBoxTitle: Music Box
 		}
 
 		ProgressionDescription: {
@@ -1195,12 +1196,17 @@ Mods: {
 			}
 
 			DededeMusicBox: {
-				DisplayName: Music Box (King Dedede)
+				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (King Dedede)"
 				Tooltip: ""
 			}
 
 			DarkMatterMusicBox: {
-				DisplayName: Music Box (Dark Matter Swordsman)
+				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Dark Matter Swordsman)"
+				Tooltip: ""
+			}
+
+			DreamLandBossMusicBox: {
+				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Dream Land Boss)"
 				Tooltip: ""
 			}
 		}
@@ -1525,8 +1531,9 @@ Mods: {
 			EnemyBanner.MapEntry: Banner
 			FountainOfDreams.MapEntry: Fountain of Dreams
 			RareStone.MapEntry: Rare Stone
-			DededeMusicBoxTile.MapEntry: Dedede Music Box Tile
-			DarkMatterMusicBoxTile.MapEntry: Dark Matter Music Box Tile
+			DededeMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
+			DarkMatterMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
+			DreamLandBossMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
 		}
 
 		Configs: {

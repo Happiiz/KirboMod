@@ -23,7 +23,7 @@ namespace KirboMod.Tiles.MusicBoxes
 			TileObjectData.addTile(Type);
 
             LocalizedText name = CreateMapEntryName();
-			AddMapEntry(new Color(200, 200, 200), name);
+			AddMapEntry(new Color(131, 54, 210), name);
 		}
 
 		public override void MouseOver(int i, int j) {
