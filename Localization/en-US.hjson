@@ -1542,7 +1542,7 @@ Mods: {
 
 				HyperzoneClouds: {
 					Label: Enable Hyperzone Clouds
-					Tooltip: Enable or disable the clouds in the background of the Dark matter refight and Zero fight
+					Tooltip: Enable or disable the clouds present during the Zero fight
 				}
 			}
 		}

@@ -414,14 +414,12 @@ namespace KirboMod.Projectiles
                 }
             }
 
-            direction.Normalize();
-            direction *= 10f;
+            Player player = Main.player[Projectile.owner];
 
             attack++;
-			if (attack % 20 == 0)
+			if (attack % 20 == 0 && player.ownedProjectileCounts[ModContent.ProjectileType<MinionFireSpread>()] == 0)
 			{
-                Player player = Main.player[Projectile.owner];
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, direction.RotatedByRandom(MathHelper.ToRadians(50)),
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero,
                     ModContent.ProjectileType<MinionFireSpread>(), Projectile.damage, 1, player.whoAmI, Projectile.whoAmI, fireType);
             }
 

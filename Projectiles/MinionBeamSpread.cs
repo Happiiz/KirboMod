@@ -25,10 +25,9 @@ namespace KirboMod.Projectiles
 			Projectile.DamageType = DamageClass.Summon;
 			Projectile.timeLeft = 2;
 			Projectile.tileCollide = false;
-			Projectile.penetrate = 5;
+			Projectile.penetrate = -1;
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = 15;
-			Projectile.stopsDealingDamageAfterPenetrateHits = true; //cancels out damage without killing projectile
 		}
 
 		public override void AI()

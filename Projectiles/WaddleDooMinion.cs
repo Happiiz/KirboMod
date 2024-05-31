@@ -423,13 +423,12 @@ namespace KirboMod.Projectiles
                     attack = 0;
                 }
             }
-            if (attack % 15 == 0)
-			{
-				direction.Normalize();
-				direction *= 15;
 
-                Player player = Main.player[Projectile.owner];
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, direction, 
+            Player player = Main.player[Projectile.owner];
+
+            if (attack % 15 == 0 && player.ownedProjectileCounts[ModContent.ProjectileType<MinionBeamSpread>()] == 0)
+			{
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, 
                     ModContent.ProjectileType<MinionBeamSpread>(), Projectile.damage, 0, player.whoAmI, Projectile.whoAmI);
 			}
 
