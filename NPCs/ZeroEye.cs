@@ -249,7 +249,7 @@ namespace KirboMod.NPCs
 
             npcLoot.Add(ItemDropRule.MasterModeCommonDrop(ModContent.ItemType<Items.Placeables.BossRelics.ZeroRelic>()));
 
-			masterMode.OnSuccess(ItemDropRule.Common(ModContent.ItemType<Items.Kracko.KrackoPetItem>(), 4));
+			masterMode.OnSuccess(ItemDropRule.Common(ModContent.ItemType<Items.Zero.ZeroPetItem>(), 4));
 
             // add the rules
             npcLoot.Add(notExpertRule);
