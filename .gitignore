@@ -109,3 +109,10 @@ obj/project.nuget.cache
 *.cache
 *.bin
 *.dll
+*.v2
+*.v2
+*.vsidx
+*.lock
+*.json
+*.bin
+*.2
