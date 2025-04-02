@@ -5,7 +5,6 @@ using KirboMod.Projectiles.ZeroDashHitbox;
 using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +12,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.Chat;
 using Terraria.DataStructures;
+using Terraria.GameContent;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
@@ -34,14 +34,21 @@ namespace KirboMod.NPCs
             ThornTail,//5
             BackgroundShots,//6
         }
-
-        private int animation = 1; //frame cycles
+        public static bool calamityEnabled;
+        static int AttackCooldown => Main.expertMode ? 20 : 100;
+        private short animation = 1; //frame cycles
 
         private ZeroAttackType lastattacktype = ZeroAttackType.DecideNext; //sets last attack type
         public ZeroAttackType attacktype = ZeroAttackType.DecideNext; //decides the attack
                                                                       //public to check zero's dash
         private float backupoffset = 0; //offset goto position when backing up
 
+        static int BloodDamage => (calamityEnabled ? 180 : 100) / 2;
+        static int DarkMatterDamage => (calamityEnabled ? 180 : 100) / 2;
+        public static int SparkDamage => (calamityEnabled ? 180 : 100) / 2;
+        static int ThornDamage => (calamityEnabled ? 180 : 100) / 2;
+        public static int BGShotDamage => (calamityEnabled ? 180 : 100) / 2;
+        static int DashDamage => (calamityEnabled ? 180 : 100) / 2;
 
         private int deathcounter = 0; //for death animation
 
@@ -49,14 +56,16 @@ namespace KirboMod.NPCs
 
         private int animationXframeOffset = 0; //changes the sprite column depending on what animation is playing
 
-
+        public override void Load()
+        {
+            calamityEnabled = ModLoader.TryGetMod("CalamityMod", out _);
+        }
         public override void SetStaticDefaults()
         {
             // DisplayName.SetDefault("Zero");
             Main.npcFrameCount[NPC.type] = 8; //kinda pointless as the drawing is done manually
 
-
-            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
+            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new(0)
             {
                 CustomTexturePath = "KirboMod/NPCs/BestiaryTextures/ZeroPortrait",
                 PortraitScale = 1f, // Portrait refers to the full picture when clicking on the icon in the bestiary
@@ -68,10 +77,11 @@ namespace KirboMod.NPCs
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
 
-            NPCDebuffImmunityData debuffData = new NPCDebuffImmunityData
+            NPCDebuffImmunityData debuffData = new()
             {
                 ImmuneToAllBuffsThatAreNotWhips = true,
             };
+
         }
 
         public override void SetDefaults()
@@ -79,10 +89,19 @@ namespace KirboMod.NPCs
             NPC.width = 398;
             NPC.height = 398;
             DrawOffsetY = 193;
-            //NPC.damage = 150; //damage in projectile
+            NPC.damage = 1; //dash damage in dash projectile. Needs to be >0 damage or else ApplyDifficultyAndPlayerScaling won't be called
             NPC.noTileCollide = true;
-            NPC.defense = 60;
-            NPC.lifeMax = 280000;
+            if (!calamityEnabled)
+            {
+                //regular stats
+                NPC.defense = 86;
+                NPC.lifeMax = 280000;
+            }
+            else
+            {
+                NPC.defense = 200;
+                NPC.lifeMax = 4_000_000;
+            }
             NPC.HitSound = SoundID.NPCHit1; //slime
             NPC.DeathSound = SoundID.NPCDeath1;
             NPC.value = Item.buyPrice(0, 38, 18, 10); // money it drops
@@ -93,7 +112,6 @@ namespace KirboMod.NPCs
             NPC.noGravity = true;
             NPC.lavaImmune = true;
             NPC.dontTakeDamage = true; //only initally
-
             /*Music = MusicID.Boss2;*/
             if (!Main.dedServ)
             {
@@ -108,7 +126,7 @@ namespace KirboMod.NPCs
         public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */ //damage is automatically doubled in expert, use this to reduce it
         {
             Helper.BossHpScalingForHigherDifficulty(ref NPC.lifeMax, balance);
-            //NPC.damage = (int)(NPC.damage * 1); //2x damage
+
         }
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
@@ -126,22 +144,16 @@ namespace KirboMod.NPCs
         public override void SendExtraAI(BinaryWriter writer) //for syncing non NPC.ai[] stuff
         {
             writer.Write(animation);
-
             writer.Write((byte)lastattacktype);
             writer.Write((byte)attacktype);
-
             writer.Write(backupoffset);
-
-
             writer.Write(deathcounter);
-
             writer.Write(backgroundAttackCountDown);
-
             writer.Write(animationXframeOffset);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
-            animation = reader.ReadInt32();
+            animation = reader.ReadInt16();
 
             lastattacktype = (ZeroAttackType)reader.ReadByte();
             attacktype = (ZeroAttackType)reader.ReadByte();
@@ -156,6 +168,7 @@ namespace KirboMod.NPCs
 
         public override void AI() //constantly cycles each time
         {
+            NPC.damage = 0;//set to 0 because can't set in SetDefaults
             Player playerstate = Main.player[NPC.target];
 
             NPC.spriteDirection = NPC.direction;
@@ -191,6 +204,7 @@ namespace KirboMod.NPCs
                 {
                     NPC.velocity *= 0;
                 }
+                NPC.life = (int)Utils.Remap(NPC.ai[1], 0, 380, 1, NPC.lifeMax);
 
                 if (NPC.ai[1] == 389) //fight start effect
                 {
@@ -204,6 +218,7 @@ namespace KirboMod.NPCs
             }
             else //regular attack
             {
+
                 AttackPattern();
             }
         }
@@ -211,12 +226,11 @@ namespace KirboMod.NPCs
         {
             Player player = Main.player[NPC.target];
             Vector2 playerDistance = player.Center - NPC.Center;
-            float playerSineDistanceExtra = attacktype == ZeroAttackType.BloodShots && NPC.ai[0] > 120 ?
-                MathF.Sin((NPC.ai[0] / 60 % 3600) * 2) * 600 : 0;
 
-            Vector2 playerRightDistance = player.Center + new Vector2(500 + backupoffset, playerSineDistanceExtra) - NPC.Center;
-            Vector2 playerLeftDistance = player.Center + new Vector2(-500 - backupoffset, playerSineDistanceExtra) - NPC.Center;
-            Vector2 playerAboveDistance = player.Center + new Vector2(0, -1000) - NPC.Center;
+            bool bloodShots = attacktype == ZeroAttackType.BloodShots;
+            Vector2 playerRightDistance = player.Center + new Vector2((bloodShots ? 1000 : 500) + backupoffset, 0) - NPC.Center;
+            Vector2 playerLeftDistance = player.Center + new Vector2((bloodShots ? -1000 : -500) - backupoffset, 0) - NPC.Center;
+            Vector2 playerAboveDistance = player.Center + new Vector2(0, -700) - NPC.Center;
 
             if (NPC.ai[0] == 0) //restart stats
             {
@@ -230,7 +244,7 @@ namespace KirboMod.NPCs
 
             NPC.ai[0]++;
 
-            float timer = NPC.GetLifePercent() > 0.5 ? NPC.ai[0] : NPC.ai[0] + 60;
+            // float timer = NPC.GetLifePercent() > 0.5 ? NPC.ai[0] : NPC.ai[0] + 60;
 
             float speed = 16;
             float inertia = 20;
@@ -243,15 +257,16 @@ namespace KirboMod.NPCs
                     speed = 100;
             }
 
-            if (NPC.ai[0] <= 120)
+
+            if (NPC.ai[0] <= AttackCooldown)
             {
                 NPC.TargetClosest(true); //face player before attacking
 
                 DefaultMovement(playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
 
-                if (NPC.ai[0] == 120)
+                if (NPC.ai[0] == AttackCooldown)
                 {
-                    if (NPC.GetLifePercent() <= 0.25) //25%
+                    if (NPC.GetLifePercent() <= 0.55) //50%
                     {
                         //background attack is done every 3 attacks when zero's health gets low enough
                         //(does it the next cycle upon initally dropping low enough)
@@ -276,288 +291,359 @@ namespace KirboMod.NPCs
             }
             else //attacking
             {
-                if (attacktype == ZeroAttackType.BloodShots) //blood shots
+                switch (attacktype) //blood shots
                 {
-                    NPC.TargetClosest(true); //face player during attack
-
-                    speed += 8;
-
-                    //blood effect for attack
-                    if (NPC.ai[0] % 5 == 0) //every 5
-                    {
-                        int d = Dust.NewDust(NPC.position + new Vector2(NPC.direction == 1 ? NPC.width - 200 : 0, NPC.height / 4), 200, 200, ModContent.DustType<Dusts.Redsidue>());
-                        Main.dust[d].velocity *= 0;
-                    }
-
-                    if (NPC.ai[0] % 10 == 0) //every 10 ticks
-                    {
-                        Vector2 bloodlocation = new Vector2(NPC.Center.X + NPC.width / 2 * NPC.direction, NPC.Center.Y);
-
-                        for (int i = 0; i < 5; i++)
-                        {
-                            Vector2 spread = Main.rand.NextVector2Circular(10f, 10f); //circle
-                            Dust.NewDustPerfect(bloodlocation, ModContent.DustType<Dusts.Redsidue>(), spread, Scale: 1f); //Makes dust in a messy circle
-                        }
-
-                        if (Main.netMode != NetmodeID.MultiplayerClient)
-                        {
-
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), bloodlocation, new Vector2(NPC.direction * 20, 0), ModContent.ProjectileType<ZeroBloodShot>(), 60 / 2, 6f, Main.myPlayer, NPC.whoAmI, 0);
-                        }
-                        SoundStyle SkinTear = new SoundStyle("KirboMod/Sounds/Item/SkinTear");
-                        SoundEngine.PlaySound(SkinTear, NPC.Center);
-                    }
-
-                    DefaultMovement(playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
-
-                    if (NPC.ai[0] >= 440)
-                    {
-                        NPC.ai[0] = 0;
-                    }
-                }
-
-
-                if (attacktype == ZeroAttackType.Dash) //dash
-                {
-                    NPC.TargetClosest(false); //don't face player during attack
-                   
-                    if (NPC.ai[0] <= 160) //backup
-                    {
-                        if (NPC.ai[0] == 121)
-                        {
-                            int dmgHitboxType = ModContent.ProjectileType<ZeroDamageHitbox>();
-                            bool shouldSpawnDamageHitbox = true;
-                            for (int i = 0; i < Main.maxProjectiles; i++)
-                            {
-                                Projectile compare = Main.projectile[i];
-                                if(compare.active && compare.type == dmgHitboxType && compare.ai[0] == NPC.whoAmI)
-                                {
-                                    shouldSpawnDamageHitbox = false;
-                                    break;
-                                }
-                            }
-                            if (shouldSpawnDamageHitbox)
-                            {
-                                int dashDamage = NPC.GetAttackDamage_ForProjectiles(150, 220) / 2;
-                                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, default, dmgHitboxType, dashDamage, 0, Main.myPlayer, NPC.whoAmI); 
-                            }
-                            NPC.velocity *= 0.01f; //freeze to warn player (but not too much else it might disappear)
-                        }
-                        else
-                        {
-                            NPC.velocity.X -= NPC.direction * 0.5f; //back up
-                        }
-                    }
-                    else if (NPC.ai[0] <= 300) //dash
-                    {
-                        NPC.velocity.X += NPC.direction * 0.6f;
-                    }//IF YOU CHANGE THE DURATION OF THE DASH REMEMBER TO CHANGE IT IN THE ZERODAMAGEHITBOX PROJECTILE!!
-                    else //reset
-                    {
-                        NPC.ai[0] = 0;
-                        backupoffset = 0;
-                    }
-
-                    //go up or down
-                    if (player.Center.Y < NPC.Center.Y)
-                    {
-                        NPC.velocity.Y -= 0.35f;
-                    }
-                    else
-                    {
-                        NPC.velocity.Y += 0.35f;
-                    }
-
-                    //cap
-                    NPC.velocity.Y = MathHelper.Clamp(NPC.velocity.Y, -7.5f, 7.5f);
-
-               
-                }
-
-                if (attacktype == ZeroAttackType.DarkMatterShots) //dark matter shot
-                {
-                    NPC.TargetClosest(true); //face player during attack
-
-                    if (NPC.ai[0] % 80 == 0) //on multiples of 80
-                    {
-                        CreateDarkMatterFloorAndCeiling();
-
-                        SoundEngine.PlaySound(SoundID.Item104, NPC.Center);
-                    }
-
-                    DefaultMovement(playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
-
-                    if (NPC.ai[0] >= 520)
-                    {
-                        NPC.ai[0] = 0;
-                    }
-                }
-
-                if (attacktype == ZeroAttackType.Sparks) //sparks
-                {
-                    NPC.TargetClosest(true); //face player during attack
-
-                    int burstInterval = 3;
-                    if (NPC.ai[0] % burstInterval == 0)
-                    {
-                        for (int i = 0; i < 2 * burstInterval; i++)
-                        {
-                            if (Main.netMode != NetmodeID.MultiplayerClient)
-                            {
-                                Vector2 velocity = Main.rand.NextVector2Unit();
-                                float range = Utils.GetLerpValue(0, 60, (NPC.ai[0] / burstInterval) % 60);
-                                if (i % 2 == 0)
-                                {
-                                    range = 1 - range;
-                                }
-                                range = MathF.Sqrt(range);
-
-                                float deviation = range;
-                                deviation *= 1300;
-                                Vector2 from = NPC.Center + new Vector2(NPC.direction * 150, 0);
-                                //0.043f is what made it behave right
-                                velocity *= deviation;
-                                velocity = (ZeroSpark.AccountForVelocity(player.Center + velocity, player.velocity) - from) * .043f;
-
-                                Projectile.NewProjectile(NPC.GetSource_FromAI(), from,
-                                    velocity,
-                                    ModContent.ProjectileType<ZeroSpark>(), 0, 0, Main.myPlayer, 0, 0);
-                            }
-                        }
-                    }
-                    if (NPC.ai[0] % 5 == 0)
-                    {
-                        SoundEngine.PlaySound(SoundID.Item39.WithVolumeScale(1.4f), NPC.Center);
-                    }
-
-                    backupoffset = 500;
-
-                    DefaultMovement(playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
-
-                    if (NPC.ai[0] >= 360)
-                    {
-                        NPC.ai[0] = 0;
-                    }
-                }
-
-                if (attacktype == ZeroAttackType.ThornTail) //thorns
-                {
-                    if (NPC.ai[0] < 180)
-                    {
-                        animation = 2;
-                        NPC.velocity *= 0;
-
-                        if (NPC.ai[0] == 130)
-                        {
-                            SoundEngine.PlaySound(SoundID.Item56.WithVolumeScale(1.6f).WithPitchOffset(-0.1f), NPC.Center);
-                        }
-                    }
-                    else if (NPC.ai[0] < 480)
-                    {
-                        animation = 3;
-
-                        speed += 8; //go slightly faster
-
-                        playerAboveDistance.Normalize();
-                        playerAboveDistance *= speed;
-                        NPC.velocity = (NPC.velocity * (inertia - 1) + playerAboveDistance) / inertia; //fly towards player
-
-                        if (NPC.ai[0] % 3 == 0 && Main.netMode != NetmodeID.MultiplayerClient)
-                        {
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(0, 290),
-                                new Vector2(Main.rand.Next(-20, 20), 15), ModContent.ProjectileType<ZeroThornJuice>(), 60 / 2, 1f, Main.myPlayer, 0);
-                        }
-                        if (NPC.ai[0] % 10 == 0)
-                        {
-                            SoundEngine.PlaySound(SoundID.Item17.WithVolumeScale(1.2f), NPC.Center); //stinger
-                        }
-                    }
-                    else if (NPC.ai[0] < 510)
-                    {
-                        if (NPC.ai[0] == 480)
-                        {
-                            NPC.frameCounter = 0; //reset animation
-                        }
-                        animation = 4;
-                        NPC.velocity *= 0;
-                    }
-                    else
-                    {
-                        NPC.ai[0] = 0;
-                    }
-                }
-                if (attacktype == ZeroAttackType.BackgroundShots) //background attack
-                {
-                    NPC.velocity.Y *= 0.98f;
-
-                    if (NPC.ai[0] <= 180) //backup
-                    {
-                        NPC.TargetClosest(false); //don't face player during attack
-
-                        NPC.scale = 1 - ((float)Utils.GetLerpValue(120, 180, NPC.ai[0]) * 0.6f); //get smaller
-
-                        NPC.behindTiles = true;
-                        NPC.damage = 0;
-                        NPC.dontTakeDamage = true;
-
-                        if (NPC.ai[0] == 121)
-                        {
-                            NPC.velocity.X *= 0; //reset momentum
-                        }
-                        else
-                        {
-                            NPC.velocity.X -= NPC.direction * 0.2f; //back up
-                        }
-
-                        animation = 5;
-                    }
-                    else if (NPC.ai[0] <= 480) //zoom
-                    {
-                        NPC.TargetClosest(false);
-
-                        if (NPC.ai[0] % 9 == 0 && NPC.ai[0] < 420) //shoot projectiles before getting big again
-                        {
-                            Vector2 BackgroundplayerDistance = player.Center + (player.velocity * 5) - NPC.Center;
-
-                            if (Main.netMode != NetmodeID.MultiplayerClient)
-                            {
-                                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, BackgroundplayerDistance / 60, ModContent.ProjectileType<ZeroScreenBlood>(), 60 / 2, 1f, Main.myPlayer, 0, NPC.ai[0] % 2 == 0 ? 0 : 1);
-                            }
-                            SoundEngine.PlaySound(SoundID.NPCHit9.WithVolumeScale(0.8f), NPC.Center); //leech hit
-
-                        }
-
-                        NPC.velocity.X += NPC.direction * 0.2f;
-
-                        if (NPC.velocity.X > 10)
-                        {
-                            NPC.velocity.X = 10;
-                        }
-                        if (NPC.velocity.X < -10)
-                        {
-                            NPC.velocity.X = -10;
-                        }
-
-                        if (NPC.ai[0] >= 420)
-                        {
-                            NPC.scale += 0.01f; //get bigger
-                        }
-                    }
-                    else //reset
-                    {
-                        NPC.TargetClosest(true);
-                        NPC.ai[0] = 0;
-                        backupoffset = 0;
-                        NPC.scale = 1; //just in case
-                        NPC.behindTiles = false;
-                    }
+                    case ZeroAttackType.BloodShots:
+                        Attack_BloodShots(player, playerRightDistance, playerLeftDistance, speed);
+                        break;
+                    case ZeroAttackType.Dash:
+                        Attack_Dash(player);
+                        break;
+                    case ZeroAttackType.DarkMatterShots:
+                        Attack_DarkMatterShots(playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
+                        break;
+                    case ZeroAttackType.Sparks:
+                        Attack_Sparks(player, playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
+                        break;
+                    case ZeroAttackType.ThornTail:
+                        Attack_ThornTail(ref playerAboveDistance, ref speed, inertia);
+                        break;
+                    case ZeroAttackType.BackgroundShots:
+                        Attack_BGShots(player);
+                        break;
                 }
             }
         }
+
+        private void Attack_BGShots(Player player)
+        {
+            NPC.velocity.Y *= 0.98f;
+
+            if (NPC.ai[0] <= AttackCooldown + 60) //backup
+            {
+                NPC.TargetClosest(false); //don't face player during attack
+
+                NPC.scale = 1 - (Utils.GetLerpValue(AttackCooldown, AttackCooldown + 60, NPC.ai[0]) * 0.6f); //get smaller
+
+                NPC.behindTiles = true;
+                NPC.damage = 0;
+                NPC.dontTakeDamage = true;
+
+                if (NPC.ai[0] == AttackCooldown + 1)
+                {
+                    NPC.velocity.X *= 0; //reset momentum
+                }
+                else
+                {
+                    NPC.velocity.X -= NPC.direction * 0.2f; //back up
+                }
+
+                animation = 5;
+            }
+            else if (NPC.ai[0] <= AttackCooldown + 360) //zoom
+            {
+                NPC.TargetClosest(false);
+
+                if (NPC.ai[0] % 9 == 0 && NPC.ai[0] < AttackCooldown + 360) //shoot projectiles before getting big again
+                {
+                    Vector2 BackgroundplayerDistance = player.Center + (player.velocity * 5) - NPC.Center;
+
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, BackgroundplayerDistance / 60, ModContent.ProjectileType<ZeroScreenBlood>(), BGShotDamage, 1f, Main.myPlayer, 0, NPC.ai[0] % 2 == 0 ? 0 : 1);
+                    }
+                    SoundEngine.PlaySound(SoundID.NPCHit9.WithVolumeScale(0.8f), NPC.Center); //leech hit
+
+                }
+
+                NPC.velocity.X += NPC.direction * 0.2f;
+
+                if (NPC.velocity.X > 10)
+                {
+                    NPC.velocity.X = 10;
+                }
+                if (NPC.velocity.X < -10)
+                {
+                    NPC.velocity.X = -10;
+                }
+
+                if (NPC.ai[0] >= 420)
+                {
+                    NPC.scale += 0.01f; //get bigger
+                }
+            }
+            else //reset
+            {
+                NPC.TargetClosest(true);
+                NPC.ai[0] = 0;
+                backupoffset = 0;
+                NPC.scale = 1; //just in case
+                NPC.behindTiles = false;
+            }
+        }
+
+        private void Attack_ThornTail(ref Vector2 playerAboveDistance, ref float speed, float inertia)
+        {
+            if (NPC.ai[0] < AttackCooldown + 20)
+            {
+                animation = 2;
+                NPC.velocity *= 0;
+
+                if (NPC.ai[0] == AttackCooldown + 10)
+                {
+                    SoundEngine.PlaySound(SoundID.Item56.WithVolumeScale(1.6f).WithPitchOffset(-0.1f), NPC.Center);
+                }
+            }
+            else if (NPC.ai[0] < AttackCooldown + 300)
+            {
+                animation = 3;
+
+                speed += 8; //go slightly faster
+
+                playerAboveDistance.Normalize();
+                playerAboveDistance *= speed;
+                NPC.velocity = (NPC.velocity * (inertia - 1) + playerAboveDistance) / inertia; //fly towards player
+                int projRate = 25;
+                if ((NPC.ai[0] - AttackCooldown) % projRate == 0 && Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    int count = 15;
+                    int index = (int)(NPC.ai[0] - AttackCooldown) / projRate;
+                    if (index % 3 == 1)
+                        count++;
+                    for (int i = 0; i < count; i++)
+                    {
+
+                        float horizontalVelocity;
+                        float verticalVelocity;
+                        switch (index % 3)
+                        {
+                            case 0:
+                                horizontalVelocity = Utils.Remap(i, 0, count - 1, -30, 30);
+                                verticalVelocity = Utils.GetLerpValue(0, (count - 1) / 2f, i, true) * Utils.GetLerpValue(count - 1, (count - 1) / 2f, i, true) * -10 + 15;
+                                break;
+                            case 1:
+                                Vector2 vel = new Vector2(0, 15).RotatedBy(Utils.Remap(i, 0, count - 1, -2, 2));
+                                horizontalVelocity = vel.X;
+                                verticalVelocity = vel.Y;
+                                break;
+                            default:
+                                horizontalVelocity = Utils.Remap(i, 0, count - 1, -20, 20);
+                                verticalVelocity = 10;
+                                break;
+                        }
+
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(0, 290),
+                      new Vector2(horizontalVelocity, verticalVelocity), ModContent.ProjectileType<ZeroThornJuice>(), ThornDamage, 1f, Main.myPlayer, 0);
+                    }
+
+                }
+                if (NPC.ai[0] % 25 == 0)
+                {
+                    SoundEngine.PlaySound(SoundID.Item17.WithVolumeScale(1.2f), NPC.Center); //stinger
+                }
+            }
+            else if (NPC.ai[0] < AttackCooldown + 320)
+            {
+                if (NPC.ai[0] == AttackCooldown + 300)
+                {
+                    NPC.frameCounter = 0; //reset animation
+                }
+                animation = 4;
+                NPC.velocity *= 0;
+            }
+            else
+            {
+                NPC.ai[0] = 0;
+            }
+        }
+
+        private void Attack_Sparks(Player player, Vector2 playerDistance, Vector2 playerRightDistance, Vector2 playerLeftDistance, float speed, float inertia)
+        {
+            NPC.TargetClosest(true); //face player during attack
+
+            int burstInterval = 3;
+            int burstIndex = (int)((NPC.ai[0] - AttackCooldown) / burstInterval);
+
+            if (Main.netMode != NetmodeID.MultiplayerClient && (NPC.ai[0] - AttackCooldown) % burstInterval == 0)
+            {
+                List<Player> players = new(8);
+                foreach (Player plr in Main.ActivePlayers)//need to index this and count length
+                {
+                    players.Add(plr);
+                }
+                player = players[burstIndex % players.Count];
+                for (int i = 0; i < 2 * burstInterval; i++)
+                {
+
+                    Vector2 velocity = Main.rand.NextVector2Unit();
+                    float range = Utils.GetLerpValue(0, 60, (NPC.ai[0] / burstInterval) % 60);
+                    if (i % 2 == 0)
+                    {
+                        range = 1 - range;
+                    }
+                    range = MathF.Sqrt(range);
+
+                    float deviation = range;
+                    deviation *= 1000;
+                    Vector2 from = NPC.Center + new Vector2(NPC.direction * 150, 0);
+                    //0.043f is what made it behave right
+                    velocity *= deviation;
+                    velocity = (ZeroSpark.AccountForVelocity(player.Center + velocity, player.velocity) - from) * .043f;
+
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), from,
+                        velocity,
+                        ModContent.ProjectileType<ZeroSpark>(), SparkDamage, 0, Main.myPlayer, 0, 0);
+                }
+            }
+            if ((NPC.ai[0] - AttackCooldown) % 5 == 0)
+            {
+                SoundEngine.PlaySound(SoundID.Item39.WithVolumeScale(1.4f), NPC.Center);
+            }
+
+            backupoffset = 500;
+
+            DefaultMovement(playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
+
+            if ((NPC.ai[0] - AttackCooldown) >= 240)
+            {
+                NPC.ai[0] = 0;
+            }
+        }
+
+        private void Attack_DarkMatterShots(Vector2 playerDistance, Vector2 playerRightDistance, Vector2 playerLeftDistance, float speed, float inertia)
+        {
+            NPC.TargetClosest(true); //face player during attack
+
+            if ((NPC.ai[0] - AttackCooldown) % 80 == 0 && NPC.ai[0] < AttackCooldown + 300) //on multiples of 80
+            {
+                CreateDarkMatterFloorAndCeiling();
+
+                SoundEngine.PlaySound(SoundID.Item104, NPC.Center);
+            }
+            DefaultMovement(playerDistance * 2, playerRightDistance, playerLeftDistance, speed, inertia);
+
+            if (NPC.ai[0] >= AttackCooldown + 360)
+            {
+                NPC.ai[0] = 0;
+            }
+        }
+
+        private void Attack_Dash(Player player)
+        {
+            NPC.TargetClosest(false); //don't face player during attack
+
+            if (NPC.ai[0] <= AttackCooldown + 40) //backup
+            {
+                if (NPC.ai[0] == AttackCooldown + 1)
+                {
+                    int dmgHitboxType = ModContent.ProjectileType<ZeroDamageHitbox>();
+                    bool shouldSpawnDamageHitbox = true;
+                    for (int i = 0; i < Main.maxProjectiles; i++)
+                    {
+                        Projectile compare = Main.projectile[i];
+                        if (compare.active && compare.type == dmgHitboxType && compare.ai[0] == NPC.whoAmI)
+                        {
+                            shouldSpawnDamageHitbox = false;
+                            break;
+                        }
+                    }
+                    if (shouldSpawnDamageHitbox)
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, default, dmgHitboxType, DashDamage, 0, Main.myPlayer, NPC.whoAmI);
+                    }
+                    NPC.velocity *= 0.01f; //freeze to warn player (but not too much else it might disappear)
+                }
+                else
+                {
+                    NPC.velocity.X -= NPC.direction * 0.5f; //back up
+                }
+            }
+            else if (NPC.ai[0] <= AttackCooldown + 180) //dash
+            {
+                NPC.velocity.X += NPC.direction * 0.6f;
+            }//IF YOU CHANGE THE DURATION OF THE DASH REMEMBER TO CHANGE IT IN THE ZERODAMAGEHITBOX PROJECTILE!!
+            else //reset
+            {
+                NPC.ai[0] = 0;
+                backupoffset = 0;
+            }
+
+            //go up or down
+            if (player.Center.Y < NPC.Center.Y)
+            {
+                NPC.velocity.Y -= 0.35f;
+            }
+            else
+            {
+                NPC.velocity.Y += 0.35f;
+            }
+
+            //cap
+            NPC.velocity.Y = MathHelper.Clamp(NPC.velocity.Y, -7.5f, 7.5f);
+        }
+
+        private void Attack_BloodShots(Player player, Vector2 playerRightDistance, Vector2 playerLeftDistance, float speed)
+        {
+            NPC.TargetClosest(true); //face player during attack
+            speed += 8;
+
+            if (NPC.ai[0] > AttackCooldown + 30)
+            {
+                //blood effect for attack
+                if (NPC.ai[0] % 5 == 0) //every 5
+                {
+                    int d = Dust.NewDust(NPC.position + new Vector2(NPC.direction == 1 ? NPC.width - 200 : 0, NPC.height / 4), 200, 200, ModContent.DustType<Dusts.Redsidue>());
+                    Main.dust[d].velocity *= 0;
+                }
+
+                if (NPC.ai[0] % 10 == 0) //every 10 ticks
+                {
+                    Vector2 bloodlocation = new(NPC.Center.X + NPC.width / 3 * NPC.direction, NPC.Center.Y + Main.rand.Next(-150, 150));
+
+                    for (int i = 0; i < 5; i++)
+                    {
+                        Vector2 spread = Main.rand.BetterNextVector2Circular(10f); //circle
+                        Dust.NewDustPerfect(bloodlocation, ModContent.DustType<Dusts.Redsidue>(), spread, Scale: 1f); //Makes dust in a messy circle
+                    }
+
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        for (int i = 0; i < Main.maxPlayers; i++)
+                        {
+                            Player target = Main.player[i];
+                            if (target.dead || !target.active)
+                                continue;
+                            if (NPC.direction * (target.Center.X - NPC.Center.X) > 0 && target.Distance(NPC.Center) < 16 * 100)
+                            {
+                                ZeroBloodShot.GetAIValues(i, out float ai0);
+                                Projectile.NewProjectile(NPC.GetSource_FromAI(), bloodlocation, new Vector2(NPC.direction, 0), ModContent.ProjectileType<ZeroBloodShot>(), BloodDamage, 6f, Main.myPlayer, ai0);
+                            }
+                        }
+                    }
+                    SoundStyle SkinTear = new("KirboMod/Sounds/Item/SkinTear");
+                    SoundEngine.PlaySound(SkinTear, NPC.Center);
+                }
+            }
+
+            Vector2 dist = playerRightDistance;
+            if (NPC.direction == 1)
+            {
+                dist = playerLeftDistance;
+            }
+            NPC.velocity = Vector2.Lerp(NPC.velocity, NPC.DirectionTo(player.Center + dist * 1000) * speed, 0.1f);
+            if (NPC.ai[0] >= AttackCooldown + 90 + 30)
+            {
+                NPC.ai[0] = 0;
+            }
+
+        }
+
         //call this on the frame you want to create the setup
         //probably snaps to the position too quickly, but idk how to calculate the numbers to fix it so it gets there in fewer frames
         void CreateDarkMatterFloorAndCeiling()
         {
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+                return;
             Player player = Main.player[NPC.target];
             //tweak these parameters to your liking for balancing
             float ySpacing = 1000;
@@ -571,10 +657,10 @@ namespace KirboMod.NPCs
                 int directionY = i % 2 * 2 - 1;
                 Vector2 offset = default;
                 offset.Y = directionY * ySpacing / 2;
-                offset.X = Utils.Remap(i, 0, mattersInWall - 1, -xSpacing * mattersInWall / 2, xSpacing * mattersInWall / 2);
+                offset.X = Utils.Remap(i, 0, mattersInWall - 1, -xSpacing * mattersInWall / 2, xSpacing * mattersInWall / 2) - NPC.direction * 64;
                 DarkMatterShot.AccountForSpeed(ref offset, player);
                 Vector2 from = NPC.Center + Main.rand.NextVector2Circular(NPC.width, NPC.height) / 3f;
-                DarkMatterShot.NewDarkMatterShot(NPC, offset + player.Center, from, 80 / 2, directionY);
+                DarkMatterShot.NewDarkMatterShot(NPC, offset + player.Center, from, DarkMatterDamage, directionY);
             }
         }
 
@@ -584,7 +670,7 @@ namespace KirboMod.NPCs
 
             possibleAttacks.Remove(lastattacktype);
 
-            if (NPC.GetLifePercent() >= 0.95f)
+            if (NPC.GetLifePercent() >= 0.97f)
             {
                 attacktype = ZeroAttackType.BloodShots;
             }
@@ -595,7 +681,6 @@ namespace KirboMod.NPCs
             }
             lastattacktype = attacktype;
         }
-
         void DefaultMovement(Vector2 playerDistance, Vector2 playerRightDistance, Vector2 playerLeftDistance, float speed, float inertia)
         {
             if (playerDistance.X <= 0)
@@ -651,14 +736,7 @@ namespace KirboMod.NPCs
 
         public override bool PreKill()
         {
-            if (Main.expertMode == false)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return !Main.expertMode;
         }
 
         private void DoDeathAnimation()
@@ -725,14 +803,18 @@ namespace KirboMod.NPCs
                     }
 
                     Dust.NewDustPerfect(NPC.position + new Vector2(-200, -200), ModContent.DustType<Dusts.ZeroEyeless>(), new Vector2(0, 5), 0);
-
+                    //sometimes this works, sometimes it doesn't???
                     if (Main.netMode != NetmodeID.MultiplayerClient) //don't use SpawnBoss() as we need the special status message
                     {
-                        int index = NPC.NewNPC(NPC.GetSource_FromThis(), (int)NPC.Center.X, (int)NPC.Center.Y - 15, ModContent.NPCType<ZeroEye>());
-
-                        if (Main.netMode == NetmodeID.Server && index < Main.maxNPCs)
+                        ZeroEye.GetAIValues(out float[] ai2s);
+                        for (int i = 0; i < ai2s.Length; i++)
                         {
-                            NetMessage.SendData(MessageID.SyncNPC, number: index);
+                            int index = NPC.NewNPC(NPC.GetSource_FromThis(), (int)NPC.Center.X, (int)NPC.Center.Y - 15, ModContent.NPCType<ZeroEye>(), ai2: ai2s[i]);
+
+                            if (Main.netMode == NetmodeID.Server && index < Main.maxNPCs)
+                            {
+                                NetMessage.SendData(MessageID.SyncNPC, number: index);
+                            }
                         }
 
                         if (Main.netMode == NetmodeID.SinglePlayer)
@@ -788,8 +870,8 @@ namespace KirboMod.NPCs
         {
             npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<ZeroBag>())); //only drops in expert
 
-            LeadingConditionRule notExpertRule = new LeadingConditionRule(new Conditions.NotExpert()); //checks if not expert
-            LeadingConditionRule masterMode = new LeadingConditionRule(new Conditions.IsMasterMode()); //checks if master mode
+            LeadingConditionRule notExpertRule = new(new Conditions.NotExpert()); //checks if not expert
+            LeadingConditionRule masterMode = new(new Conditions.IsMasterMode()); //checks if master mode
 
             notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<ZeroMask>(), 7));
             notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<Items.MiracleMatter>(), 1, 2, 2));
@@ -828,15 +910,10 @@ namespace KirboMod.NPCs
         //MANUAL DRAWING INBOUND!
 
 
-
-
-        public static Asset<Texture2D> ZeroSprite;
-
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            ZeroSprite = ModContent.Request<Texture2D>("KirboMod/NPCs/Zero"); //get the texture
 
-            Texture2D Zero = ZeroSprite.Value; //get the texture but actually
+            Texture2D zero = TextureAssets.Npc[Type].Value; //get the texture but actually
 
             //fade in stuff (fades in from black but it looks cool so I'm keeping it)
             int r;
@@ -853,7 +930,7 @@ namespace KirboMod.NPCs
             }
 
             //draw!
-            spriteBatch.Draw(Zero, NPC.Center - Main.screenPosition, Animation(), new Color(r, g, b), NPC.rotation,
+            spriteBatch.Draw(zero, NPC.Center - Main.screenPosition, Animation(), new Color(r, g, b), NPC.rotation,
                 new Vector2(400, 400), NPC.scale, direction, 0f);
             if (attacktype == ZeroAttackType.Dash)
             {
@@ -867,7 +944,6 @@ namespace KirboMod.NPCs
             }
             return false;
         }
-
         private Rectangle Animation() //make the dimensions for the frames
         {
             //inital

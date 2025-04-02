@@ -31,7 +31,7 @@ namespace KirboMod.Items.RainbowDrops
 		public override void AddRecipes()
 		{
 			Recipe recipe = CreateRecipe();
-			recipe.AddIngredient(ModContent.ItemType<Starbit>(), 40);
+			recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
 			recipe.AddIngredient(ModContent.ItemType<NightCloth>(), 5);
 			recipe.AddIngredient(ItemID.Deathweed, 3);
 			recipe.AddIngredient(ItemID.SoulofNight, 10);
@@ -40,7 +40,7 @@ namespace KirboMod.Items.RainbowDrops
 			recipe.Register();
 
 			Recipe recipe2 = CreateRecipe();
-			recipe2.AddIngredient(ModContent.ItemType<Starbit>(), 40);
+			recipe2.AddIngredient(ModContent.ItemType<Starbit>(), 20);
 			recipe2.AddIngredient(ModContent.ItemType<NightCloth>(), 5);
 			recipe2.AddIngredient(ItemID.Deathweed, 3);
 			recipe2.AddIngredient(ItemID.SoulofNight, 10);

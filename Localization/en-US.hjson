@@ -135,7 +135,15 @@ Mods: {
 
 			NightCloak: {
 				DisplayName: Night Cloak
-				Tooltip: Shoots multiple stars that home in on enemies when hit
+				Tooltip:
+					'''
+					Summons homing stars when hit
+					The stars have a combined damage value of 3x the damage taken
+					The stars ignore 40 defense each
+					In PVP, all stars spawn with 3x damage taken.
+					Stars spawned from PVP cannot hit enemies and vice-versa.
+					Does not activate from damage taken from spikes, lava, and using a regular bug net in hell critters.
+					'''
 			}
 
 			PeeWeePole: {
@@ -571,7 +579,8 @@ Mods: {
 				DisplayName: One Shot Bow
 				Tooltip:
 					'''
-					Converts star arrows into magic-star arrows
+					Converts star arrows into charged star arrows
+					Charged star arrows have a small homing range, deal 1.15x damage, and travel faster
 					Converts all other arrows into jester's arrows
 					'''
 			}
@@ -958,11 +967,7 @@ Mods: {
 
 			RainbowSword: {
 				DisplayName: Rainbow Sword
-				Tooltip:
-					'''
-					Holds the light to light up everyone's worlds
-					Reflects small enemy projectiles
-					'''
+				Tooltip: Holds the light to light up everyone's worlds
 			}
 
 			RangerGun: {
@@ -1000,7 +1005,7 @@ Mods: {
 
 			StarRod: {
 				DisplayName: Star Rod
-				Tooltip: ""
+				Tooltip: Ignores 60 defense
 			}
 
 			StormTornado: {
@@ -1048,12 +1053,14 @@ Mods: {
 			}
 
 			TripleStar: {
-				DisplayName: Triple Star Rod
+				DisplayName: Triple Star
 				Tooltip:
 					'''
+					Ignores 60 defense
 					Shoots out a maximum of three ricocheting stars that hit any enemies in their paths
 					Right click to shoot all three stars out at once at the cost of more mana
 					Stars not shot out will rotate around the player and deal damage to nearby enemies
+					Except in multiplayer because brother in christ this functionality does not like multiplayer, so I opted to make a damaging aura instead
 					'''
 			}
 
@@ -1094,7 +1101,7 @@ Mods: {
 				DisplayName: Suspicious Looking Seed
 				Tooltip:
 					'''
-					Summons Whispy Woods
+					Right click on the placed tile to summon Whispy Woods
 					'Plant on wide flat ground for better results!' 
 					'''
 			}
@@ -1191,7 +1198,7 @@ Mods: {
 					'''
 					Summons a dimensional rift containing a powerful enemy at the cursor's position
 					Enemy summoned depends on the biome you're in
-					Consumes 50 starbits per use
+					Consumes 25 starbits per use
 					'''
 			}
 
@@ -1433,6 +1440,19 @@ Mods: {
 			ToyHammerSwing.DisplayName: Toy Hammer Swing
 			WildHammerSwing.DisplayName: Wild Hammer Swing
 			StormTornadoLightning.DisplayName: Storm Tornado Lightning
+			MidbossRift.DisplayName: Midboss Rift
+			TripleStarStarForMultiplayer.DisplayName: Triple Star Star For Multiplayer
+			FireApple.DisplayName: Fire Apple
+			NewWhispyBlado.DisplayName: Blado
+			NewWhispyFireApple.DisplayName: Fire Apple
+			NewWhispyGordo.DisplayName: Gordo
+			NewWhispyTornado.DisplayName: Tornado
+			NewWhispyWind.DisplayName: Wind
+			NewWhispySpike.DisplayName: Spike
+			NewWhispySpiralingWind.DisplayName: Wind
+			NewWhispySplittingWind.DisplayName: Wind
+			NewWhispySummonTileDustGenerator.DisplayName: New Whispy Summon Tile Dust Generator
+			NewWhispyAppleMedium.DisplayName: New Whispy Apple Medium
 		}
 
 		NPCs: {
@@ -1524,6 +1544,7 @@ Mods: {
 			ZeroEye.DisplayName: Eye of Zero
 			MidbossRift.DisplayName: Dimensional Rift
 			SuperDummy.DisplayName: Super Dummy
+			NewWhispyBoss.DisplayName: Whispy Woods
 		}
 
 		Tiles: {

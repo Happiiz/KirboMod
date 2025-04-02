@@ -20,6 +20,7 @@ namespace KirboMod.Projectiles.ZeroDashHitbox
             Projectile.ignoreWater = true;
             Projectile.timeLeft = 300; //duration of zero's dash
             Projectile.hostile = true;
+            Helper.DealDefenseDamageInCalamity(Projectile);
         }
         public override void AI()
         {

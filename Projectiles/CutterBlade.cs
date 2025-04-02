@@ -23,7 +23,7 @@ namespace KirboMod.Projectiles
 			Projectile.timeLeft = 300;
 			Projectile.tileCollide = true;
 			Projectile.penetrate = -1;
-            Projectile.extraUpdates = 2;
+            Projectile.extraUpdates = 1;
 			Projectile.usesLocalNPCImmunity = true; //allows to have npc immunity frames on its own accord
 			Projectile.localNPCHitCooldown = 40; //time until it can damage again regardless if a projectile just struck the target
         }

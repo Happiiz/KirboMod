@@ -25,10 +25,10 @@ namespace KirboMod.Projectiles
             DrawOriginOffsetY = -8;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Melee;
-			Projectile.timeLeft = 900;
+			Projectile.timeLeft = 110;
 			Projectile.tileCollide = true;
 			Projectile.penetrate = 3;
-            Projectile.extraUpdates = 3;
+            Projectile.extraUpdates = 2;
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = -1; 
 		}
@@ -42,6 +42,7 @@ namespace KirboMod.Projectiles
                 dust.velocity *= 0.5f;
                 dust.velocity += Projectile.velocity;
             }
+            Projectile.Opacity = Utils.GetLerpValue(0, Projectile.MaxUpdates * 10, Projectile.timeLeft, true);
 		}
 
         public override Color? GetAlpha(Color lightColor)

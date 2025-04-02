@@ -8,6 +8,7 @@ namespace KirboMod.Projectiles
 {
 	public class BeamBad : ModProjectile
 	{
+		const int Duration = 9;
 		public override void SetStaticDefaults()
 		{
 			Main.projFrames[Projectile.type] = 2;
@@ -20,17 +21,19 @@ namespace KirboMod.Projectiles
 			Projectile.friendly = false;
 			Projectile.hostile = true;
 			Projectile.DamageType = DamageClass.Magic;
-			Projectile.timeLeft = 9;
+			Projectile.timeLeft = Duration;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 		}
         public override bool PreDraw(ref Color lightColor)
         {
-			VFX.DrawElectricOrb(Projectile.Center, new Vector2(1), Projectile.Opacity,Projectile.rotation);
+			VFX.DrawWaddleDooBeam(Projectile.Center, Utils.Remap(Projectile.localAI[0], 0, Duration - 1, 0.2f, 1.5f), Projectile.Opacity);
+			//VFX.DrawElectricOrb(Projectile.Center, new Vector2(1), Projectile.Opacity,Projectile.rotation);
 			return false;
         }
         public override void AI()
 		{
+			Projectile.localAI[0]++;
 			if (Projectile.damage > 24)
             {
 				Projectile.damage = 24;

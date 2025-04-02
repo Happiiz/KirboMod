@@ -19,14 +19,14 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 15;
+			Item.damage = 9;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 40;
 			Item.height = 40;
-			Item.useTime = 4; //lower than use animation to repeat projectiles
+			Item.useTime = 5; //lower than use animation to repeat projectiles
 			Item.useAnimation = 40;
-			Item.reuseDelay = 40;
+			Item.reuseDelay = 60;
 			Item.useStyle = ItemUseStyleID.Shoot;
 			Item.knockBack = -3;
 			Item.value = Item.buyPrice(0, 0, 0, 20);
@@ -41,7 +41,7 @@ namespace KirboMod.Items.Weapons
 		public override void AddRecipes()
 		{
 			Recipe beamstaff = CreateRecipe();//the result is staff
-            beamstaff.AddIngredient(ModContent.ItemType<Starbit>(), 20); //20 starbits
+            beamstaff.AddIngredient(ModContent.ItemType<Starbit>(), 10); //10 starbits
             beamstaff.AddRecipeGroup(RecipeGroupID.IronBar, 10); //10 iron/lead bars
             beamstaff.AddTile(TileID.Anvils); //crafted at anvil
             beamstaff.Register(); //adds this recipe to the game
@@ -49,7 +49,7 @@ namespace KirboMod.Items.Weapons
 
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
 		{
-            position = player.Center + (velocity * 1.5f);
+            position = player.Center + Vector2.Normalize(velocity) * 25;
         }
     }
 }

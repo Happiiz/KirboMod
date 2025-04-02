@@ -19,7 +19,7 @@ namespace KirboMod.NPCs
 
         private static int bgOffset = 0;
         static float fgOffset = 0;
-        const int slideSpeed = 7;
+        const int slideSpeed = 5;
         public override void Update(GameTime gameTime)
         {
             if (Main.gamePaused || !Main.hasFocus)

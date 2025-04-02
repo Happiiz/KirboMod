@@ -10,80 +10,27 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.Chat;
 using Terraria.DataStructures;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
-using Terraria.ModLoader.Utilities;
-using XPT.Core.Audio.MP3Sharp.Decoding.Decoders.LayerIII;
 
 namespace KirboMod.NPCs
 {
-    public class MidbossRift : ModNPC
+    public class MidbossRift : ModProjectile
     {
         public override void SetStaticDefaults()
         {
-            Main.projFrames[NPC.type] = 1;
-
-            NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
-            {
-                Hide = true // Hides this NPC from the Bestiary, useful for multi-part NPCs whom you only want one entry.
-            };
-            NPCID.Sets.NPCBestiaryDrawOffset.Add(NPC.type, value);
-
-            NPCDebuffImmunityData debuffData = new NPCDebuffImmunityData
-            {
-                ImmuneToAllBuffsThatAreNotWhips = true,
-                ImmuneToWhips = true
-            };
-
-            Main.npcFrameCount[NPC.type] = 5;
+            Main.projFrames[Projectile.type] = 5;
         }
 
         public override void SetDefaults()
         {
-            NPC.width = 104;
-            NPC.height = 142;
-            NPC.life = 5;
-            NPC.lifeMax = 5;
-            NPC.defense = 0;
-            NPC.knockBackResist = 0.00f; //recieves 0% of knockback
-            NPC.friendly = false;
-            NPC.dontTakeDamage = true;
-            NPC.noTileCollide = true;
-            NPC.noGravity = true;
-            NPC.damage = 0;
-            NPC.HitSound = SoundID.Dig;
-            NPC.DeathSound = SoundID.Dig;
-            NPC.dontCountMe = true; //I guess don't count towards npc total
-            NPC.hide = true; //for drawing behind things
+            Projectile.tileCollide = false;
         }
-
-        /*public override float SpawnChance(NPCSpawnInfo spawnInfo)
-        {
-            bool noOtherMidbosses = !NPC.AnyNPCs(Type) && !NPC.AnyNPCs(ModContent.NPCType<Bonkers>()) && !NPC.AnyNPCs(ModContent.NPCType<MrFrosty>());
-
-            //no invasion, water, or other minibosses, and either evil boss, Kracko, Skeletron, or WOF downed
-            if (!spawnInfo.Invasion && !spawnInfo.Water && noOtherMidbosses && (NPC.downedBoss2 || DownedBossSystem.downedKrackoBoss 
-                || NPC.downedBoss3 || Main.hardMode))
-            {
-                if (spawnInfo.Player.ZoneSnow)
-                {
-                    return 0.01f; //spawn in snow biome with rare chance
-                }
-                else
-                {
-                    return SpawnCondition.GoblinScout.Chance * 0.1f; //spawn in outer sixths of world with 1/10th the chance of a goblin scout
-                }
-            }
-            else
-            {
-                return 0f; //too far
-            }
-        }*/
-
         public override void OnSpawn(IEntitySource source)
         {
-            if (NPC.ai[1] != 1) //spawned naturally instead of with DD
+            if (Projectile.ai[1] != 1) //spawned naturally instead of with DD
             {
                 string text = "A dimensional rift has appeared with a challenging foe!";
 
@@ -97,40 +44,37 @@ namespace KirboMod.NPCs
                 }
             }
 
-            SoundEngine.PlaySound(SoundID.DD2_EtherianPortalOpen, NPC.Center);
+            SoundEngine.PlaySound(SoundID.DD2_EtherianPortalOpen, Projectile.Center);
         }
 
         public override void AI()
         {
-            NPC.ai[0]++;
+            Projectile.ai[0]++;
+            Player player = Main.player[Projectile.owner];
 
-            NPC.TargetClosest(true); //target
-
-            Player player = Main.player[NPC.target];
-
-            if (NPC.ai[0] == 180) //summon
+            if (Projectile.ai[0] == 180) //summon
             {
                 int index;
 
-                SoundEngine.PlaySound(SoundID.DD2_EtherianPortalSpawnEnemy, NPC.Center);
+                SoundEngine.PlaySound(SoundID.DD2_EtherianPortalSpawnEnemy, Projectile.Center);
 
-                if (Main.netMode != NetmodeID.MultiplayerClient) //multiplayer stuff
+                if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
                     if (player.ZoneSnow) //Mr. Frosty
                     {
-                        index = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y,
-                            ModContent.NPCType<MrFrosty>(), Target: NPC.target);
+                        index = NPC.NewNPC(Projectile.GetSource_FromThis(), (int)Projectile.Center.X, (int)Projectile.Center.Y,
+                            ModContent.NPCType<MrFrosty>(), Target: Projectile.owner);
                     }
                     else //Bonkers
                     {
-                        index = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y,
-                            ModContent.NPCType<Bonkers>(), Target: NPC.target);
+                        index = NPC.NewNPC(Projectile.GetSource_FromThis(), (int)Projectile.Center.X, (int)Projectile.Center.Y,
+                            ModContent.NPCType<Bonkers>(), Target: Projectile.owner);
                     }
 
-                    if (Main.netMode == NetmodeID.Server && index < Main.maxNPCs)
-                    {
-                        NetMessage.SendData(MessageID.SyncNPC, number: index);
-                    }
+                    //if (index < Main.maxNPCs && index >= 0)
+                    //{
+                    //    NetMessage.SendData(MessageID.SyncNPC, number: index);
+                    //}
                 }
 
                 for (int i = 0; i < 30; i++)
@@ -139,72 +83,62 @@ namespace KirboMod.NPCs
 
                     Vector2 yOffset = new Vector2(0, -20);
 
-                    Dust.NewDustPerfect(NPC.Center + yOffset, 15, speed, Scale: 1.5f); //fallen star dust
+                    Dust.NewDustPerfect(Projectile.Center + yOffset, 15, speed, Scale: 1.5f); //fallen star dust
                 }
             }
-
-            if (NPC.ai[0] >= 240) //disappear
+            Projectile.frameCounter++;
+            if (Projectile.frameCounter < 6)
             {
-                NPC.life = 0; //kill
+                Projectile.frame = 0;
+            }
+            else if (Projectile.frameCounter < 12)
+            {
+                Projectile.frame = 1;
+            }
+            else if (Projectile.frameCounter < 18)
+            {
+                Projectile.frame = 2;
+            }
+            else if (Projectile.frameCounter < 24)
+            {
+                Projectile.frame = 3;
+            }
+            else if (Projectile.frameCounter < 30)
+            {
+                Projectile.frame = 4;
+            }
+            else
+            {
+                Projectile.frameCounter = 0;
+            }
+            if (Projectile.ai[0] >= 240) //disappear
+            {
+                Projectile.Kill();
             }
         }
-        public override void DrawBehind(int index)
+        public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
         {
-            Main.instance.DrawCacheNPCsBehindNonSolidTiles.Add(index); //draw under tiles
-        }
-
-        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
-        {
-            return false;
+            behindNPCsAndTiles.Add(index);
         }
 
         public static Asset<Texture2D> Rift;
 
-        public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+        public override bool PreDraw(ref Color drawColor)
         {
-            Rift = ModContent.Request<Texture2D>(Texture);
 
-            Texture2D rift = Rift.Value;
+            Texture2D rift = TextureAssets.Projectile[Type].Value;
 
             Vector2 yOffset = new Vector2(0, -20); //move down with scale to match up with center
 
-            float Xscale = Utils.GetLerpValue(0, 40, NPC.ai[0], true) * Utils.GetLerpValue(240, 200, NPC.ai[0], true);
+            float Xscale = Utils.GetLerpValue(0, 40, Projectile.ai[0], true) * Utils.GetLerpValue(240, 200, Projectile.ai[0], true);
 
-            VFX.DrawGlowBallAdditive(NPC.Center + yOffset, Xscale * 1.5f, Color.DeepSkyBlue, Color.White);
+            VFX.DrawGlowBallAdditive(Projectile.Center + yOffset, Xscale * 1.5f, Color.DeepSkyBlue, Color.White);
 
             Vector2 scale = new Vector2(Xscale, 1);
-
-            Main.EntitySpriteDraw(rift, NPC.Center - Main.screenPosition, NPC.frame, Color.White, 0, NPC.frame.Size() / 2, scale, SpriteEffects.None);
+            Rectangle frame = rift.Frame(1, Main.projFrames[Type], 0, Projectile.frame);
+            Main.EntitySpriteDraw(rift, Projectile.Center - Main.screenPosition, frame, Color.White, 0, frame.Size() / 2, scale, SpriteEffects.None);
 
             return false;
-        }
-        public override void FindFrame(int frameHeight) // animation
-        {
-            NPC.frameCounter++;
-            if (NPC.frameCounter < 6)
-            {
-                NPC.frame.Y = 0;
-            }
-            else if (NPC.frameCounter < 12)
-            {
-                NPC.frame.Y = frameHeight;
-            }
-            else if (NPC.frameCounter < 18)
-            {
-                NPC.frame.Y = frameHeight * 2;
-            }
-            else if (NPC.frameCounter < 24)
-            {
-                NPC.frame.Y = frameHeight * 3;
-            }
-            else if (NPC.frameCounter < 30)
-            {
-                NPC.frame.Y = frameHeight * 4;
-            }
-            else
-            {
-                NPC.frameCounter = 0;
-            }
         }
     }
 }

@@ -19,7 +19,7 @@ namespace KirboMod.NPCs
         private KrackoAttackType attacktype = KrackoAttackType.DecideNext; //decides the attack
         private int doodelay = 0;
         const float beamCurvingAngleMultiplier = 0.05f;
-        const int numberOfBeamsPerSpiral = 70;
+        const int numberOfBeamsPerSpiral = 30;
         bool attackDirection = false;
         private int AttackDirection { get => attackDirection ? 1 : -1; set => attackDirection = value <= 1; }
         private KrackoAttackType nextAttackType = KrackoAttackType.Dash; //sets last attack type

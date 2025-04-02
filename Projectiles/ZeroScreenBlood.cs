@@ -50,39 +50,41 @@ namespace KirboMod.Projectiles
 			}
 
 			//summon projectiles in 8 directions
-
-			if (Projectile.ai[1] == 0) //normal circle
+			if (Main.netMode != NetmodeID.MultiplayerClient)
 			{
-                for (int i = 0; i < 8; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-                {
-                    float rotationalOffset = MathHelper.ToRadians(i * 45f); //convert degrees to radians
+				if (Projectile.ai[1] == 0) //normal circle
+				{
+					for (int i = 0; i < 8; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+					{
+						float rotationalOffset = MathHelper.ToRadians(i * 45f); //convert degrees to radians
 
-                    float projX = Projectile.Center.X + (float)Math.Cos(rotationalOffset) * 2;
-                    float projY = Projectile.Center.Y + (float)Math.Sin(rotationalOffset) * 2;
-                    Vector2 direction = new Vector2(projX, projY) - Projectile.Center;
-                    direction.Normalize(); //unit of 1
-                    direction *= 35; //speed of 35
-                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), projX, projY, direction.X, direction.Y, ModContent.ProjectileType<ZeroBloodPellet>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+						float projX = Projectile.Center.X + (float)Math.Cos(rotationalOffset) * 2;
+						float projY = Projectile.Center.Y + (float)Math.Sin(rotationalOffset) * 2;
+						Vector2 direction = new Vector2(projX, projY) - Projectile.Center;
+						direction.Normalize(); //unit of 1
+						direction *= 35; //speed of 35
+						Projectile.NewProjectile(Projectile.GetSource_FromThis(), projX, projY, direction.X, direction.Y, ModContent.ProjectileType<ZeroBloodPellet>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
 
-                }
-            }
-			else //offset circle
-			{
-                for (int i = 0; i < 8; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-                {
-                    float rotationalOffset = MathHelper.ToRadians((i * 45f) + 22.5f); //convert degrees to radians
+					}
+				}
+				else //offset circle
+				{
+					for (int i = 0; i < 8; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+					{
+						float rotationalOffset = MathHelper.ToRadians((i * 45f) + 22.5f); //convert degrees to radians
 
-                    float projX = Projectile.Center.X + (float)Math.Cos(rotationalOffset) * 2;
-                    float projY = Projectile.Center.Y + (float)Math.Sin(rotationalOffset) * 2;
+						float projX = Projectile.Center.X + (float)Math.Cos(rotationalOffset) * 2;
+						float projY = Projectile.Center.Y + (float)Math.Sin(rotationalOffset) * 2;
 
-                    Vector2 direction = new Vector2(projX, projY) - Projectile.Center;
-                    direction.Normalize(); //unit of 1
-                    direction *= 35; //speed of 35
-                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), projX, projY, direction.X, direction.Y, ModContent.ProjectileType<ZeroBloodPellet>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+						Vector2 direction = new Vector2(projX, projY) - Projectile.Center;
+						direction.Normalize(); //unit of 1
+						direction *= 35; //speed of 35
+						Projectile.NewProjectile(Projectile.GetSource_FromThis(), projX, projY, direction.X, direction.Y, ModContent.ProjectileType<ZeroBloodPellet>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
 
 
-                }
-            }
+					}
+				}
+			}
 		}
 
         public override Color? GetAlpha(Color lightColor)

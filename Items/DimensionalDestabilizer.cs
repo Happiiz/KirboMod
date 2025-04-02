@@ -7,6 +7,7 @@ using Terraria.Audio;
 using Microsoft.Xna.Framework;
 using Terraria.GameContent.NetModules;
 using Microsoft.Xna.Framework.Input;
+using KirboMod.NPCs;
 
 namespace KirboMod.Items
 {
@@ -31,14 +32,22 @@ namespace KirboMod.Items
 			Item.UseSound = SoundID.Item1;
 			Item.useStyle = ItemUseStyleID.Shoot;
 		}
-
+		static bool AnyProjs(int type)
+		{
+			for (int i = 0; i < Main.maxProjectiles; i++)
+			{
+				if (Main.projectile[i].type == type)
+					return true;
+			}
+			return false;
+		}
         public override bool CanUseItem(Player player)
         {
             Point mouselocation = Main.MouseWorld.ToTileCoordinates();
 
-            if (NPC.AnyNPCs(ModContent.NPCType<NPCs.MidbossRift>()) || NPC.AnyNPCs(ModContent.NPCType<NPCs.MidBosses.Bonkers>()) ||
+            if (AnyProjs(ModContent.ProjectileType<MidbossRift>()) || NPC.AnyNPCs(ModContent.NPCType<NPCs.MidBosses.Bonkers>()) ||
                 NPC.AnyNPCs(ModContent.NPCType<NPCs.MidBosses.MrFrosty>())
-                 || player.CountItem(ModContent.ItemType<Starbit>()) < 50
+                 || player.CountItem(ModContent.ItemType<Starbit>()) < 25
 				 || WorldGen.SolidOrSlopedTile(Main.tile[mouselocation.X, mouselocation.Y]))
 			{
 				return false;
@@ -48,19 +57,15 @@ namespace KirboMod.Items
         }
         public override bool? UseItem(Player player)
         {
-            for (int i = 0; i < 50; i++)
+
+            for (int i = 0; i < 25; i++)
             {
                 player.ConsumeItem(ModContent.ItemType<Starbit>());
             }
 
-            if (Main.netMode != NetmodeID.MultiplayerClient)
+            if (player.whoAmI == Main.myPlayer)
             {
-                int rift = NPC.NewNPC(Item.GetSource_FromThis(), (int)Main.MouseWorld.X, (int)Main.MouseWorld.Y, ModContent.NPCType<NPCs.MidbossRift>(), ai1: 1);
-
-                if (Main.netMode == NetmodeID.Server) //sync to server
-                {
-                    NetMessage.SendData(MessageID.SyncNPC, number: rift);
-                }
+                Projectile.NewProjectile(Item.GetSource_FromThis(), Main.MouseWorld, default, ModContent.ProjectileType<MidbossRift>(), -1, 0, player.whoAmI, ai1: 1);
             }
             return true;
         }

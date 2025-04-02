@@ -82,6 +82,14 @@ namespace KirboMod.NPCs
             NPC.lavaImmune = true;
             NPC.friendly = false;
             NPC.rarity = 2; //groom/pinky rarity
+            NPC.boss = true;
+            if (!Main.dedServ)//if not dedicated server
+            {
+                int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Evobyte_KrackoJr");
+                Music = musicSlot;
+                Main.musicFade[musicSlot] = 1;
+                Main.musicNoCrossFade[musicSlot] = true;
+            }
         }
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
@@ -89,7 +97,7 @@ namespace KirboMod.NPCs
             //if player is within space height, not in hardmode, defeated evil boss but not Kracko
             if (spawnInfo.Player.ZoneSkyHeight && NPC.downedBoss2 && !DownedBossSystem.downedKrackoBoss && !Main.hardMode) 
             {
-                return !NPC.AnyNPCs(ModContent.NPCType<NPCs.Kracko>()) ? 0.15f : 0; //return spawn rate if kracko isn't here
+                return (NPC.AnyNPCs(ModContent.NPCType<KrackoJr>()) || NPC.AnyNPCs(ModContent.NPCType<NPCs.Kracko>())) ? 0 : 0.01f; //return spawn rate if kracko isn't here
             }
             else
             {

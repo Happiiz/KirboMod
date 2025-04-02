@@ -11,12 +11,10 @@ namespace KirboMod.NPCs
 {
     public class Birdon : ModNPC
     {
-        private int frame = 0;
-        private double counting;
         public override void SetStaticDefaults()
         {
             // DisplayName.SetDefault("Birdon");
-            Main.npcFrameCount[NPC.type] = 3;
+            Main.npcFrameCount[NPC.type] = 4;
         }
 
         public override void SetDefaults()
@@ -25,7 +23,7 @@ namespace KirboMod.NPCs
             NPC.height = 36;
             //drawOffsetY = -18; //make sprite line up with hitbox
             NPC.damage = 40;
-            NPC.lifeMax = 300;
+            NPC.lifeMax = 360;
             NPC.defense = 18;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath1;
@@ -41,7 +39,7 @@ namespace KirboMod.NPCs
         {
             if (spawnInfo.Player.ZoneSkyHeight & Main.hardMode) //if player is within space height and world is in hardmode
             {
-                return 0.5f; //return spawn rate
+                return 0.4f; //return spawn rate
             }
             else
             {
@@ -78,7 +76,7 @@ namespace KirboMod.NPCs
             if (NPC.ai[0] % fireRate == 0)
             {
                 Vector2 shootVel = Vector2.Normalize(player.Center - NPC.Center);
-                shootVel *= 5;
+                shootVel *= 7;
                 if (Main.expertMode)
                 {
                     shootVel *= 1.33f;
@@ -116,30 +114,29 @@ namespace KirboMod.NPCs
         }
         public override void FindFrame(int frameHeight) // animation
         {
-            if (frame == 0)
-            {
-                counting += 1.0;
-                if (counting < 10.0)
+            
+                NPC.frameCounter += 1.0;
+                if (NPC.frameCounter < 10.0)
                 {
                     NPC.frame.Y = 0;
                 }
-                else if (counting < 20.0)
+                else if (NPC.frameCounter < 20.0)
                 {
                     NPC.frame.Y = frameHeight;
                 }
-                else if (counting < 30.0)
+                else if (NPC.frameCounter < 30.0)
                 {
                     NPC.frame.Y = frameHeight * 2;
                 }
-                else if (counting < 40.0)
+                else if (NPC.frameCounter < 40.0)
                 {
                     NPC.frame.Y = frameHeight;
                 }
                 else
                 {
-                    counting = 0.0;
+                    NPC.frameCounter = 0.0;
                 }
-            }
+            
         }
 
         public override void HitEffect(NPC.HitInfo hit)
@@ -166,7 +163,7 @@ namespace KirboMod.NPCs
         {
             npcLoot.Add(ItemDropRule.NormalvsExpert(ItemID.SoulofFlight, 10, 5)); // 1 in 10 (10%) chance in Normal. 1 in 5 (20%) chance in Expert
 
-            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<DreamEssence>(), 1, 2, 4));
+            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<DreamEssence>(), 1, 4, 8));
 
             //more common in normal mode
             new DropBasedOnExpertMode(ItemDropRule.ByCondition(new Conditions.IsCrimsonAndNotExpert(), ModContent.ItemType<SkyBlanket>(), 100, 1, 1),

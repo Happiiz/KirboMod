@@ -41,8 +41,9 @@ namespace KirboMod.Items.Weapons
             if (type == ModContent.ProjectileType<Projectiles.StarArrowProj>())
             {
                 type = ModContent.ProjectileType<Projectiles.ChargedArrowProj>();
-                damage *= 2;
-				velocity *= 2;
+				damage = (int)(damage * 1.15);
+				//changed projectile to have 1 extraupdates, so it already has 2x velocity
+				//velocity *= 2;
             }
 			else
 			{

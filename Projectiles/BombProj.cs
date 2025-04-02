@@ -18,7 +18,6 @@ namespace KirboMod.Projectiles
 		{
 			Projectile.width = 38;
 			Projectile.height = 38;
-			DrawOriginOffsetY = -12;
 			Projectile.friendly = false;
             Projectile.hostile = false;
             Projectile.DamageType = DamageClass.Ranged;
@@ -26,10 +25,11 @@ namespace KirboMod.Projectiles
 			Projectile.tileCollide = true;
 			Projectile.penetrate = 1;
 		}
+       
 		public override void AI()
 		{
 			Projectile.rotation += Projectile.velocity.X * 0.02f;
-
+            Projectile.localAI[0]++;
             //slow
             if (Projectile.velocity.Y == 0)
             {
@@ -55,7 +55,7 @@ namespace KirboMod.Projectiles
                 }
             }
 
-			//player here too incase pvp
+            //player here too incase pvp
             for (int i = 0; i < Main.maxPlayers; i++) //loop statement that cycles completely every tick
             {
                 Player player = Main.player[i]; //any player
@@ -66,7 +66,11 @@ namespace KirboMod.Projectiles
                     Projectile.Kill();
                 }
             }
-
+            Dust dust = Dust.NewDustPerfect(Projectile.Center + (Projectile.rotation - MathF.PI / 2).ToRotationVector2() * 26, DustID.Torch);
+            dust.noGravity = true;
+            dust.velocity *= .5f;
+            dust.scale *= 2;
+            dust.velocity += Projectile.velocity;
             //Step up half tiles
             Collision.StepUp(ref Projectile.position, ref Projectile.velocity, Projectile.width, Projectile.height, ref Projectile.stepSpeed, ref Projectile.gfxOffY);
 		}
@@ -84,10 +88,15 @@ namespace KirboMod.Projectiles
         {
 			return false;
         }
-
+        public override bool PreDraw(ref Color lightColor)
+        {
+            return Projectile.DrawSelf();
+        }
         public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
         {
-            fallThrough = false; //don't fall through platforms
+            //ai0 is the value of player.altfunctionuse. if used with right click it will fall through platforms
+            fallThrough = Projectile.ai[0] == 2; //don't fall through platforms if ai0 is 1
+         
             return true;
         }
     }

@@ -27,11 +27,11 @@ namespace KirboMod.Projectiles.Flames
             whiteInsideOpacity = 1.5f;
             debuffID = ModContent.BuffType<DragonFireDebuff>();
             debuffDuration = 600;
-            Projectile.extraUpdates = 6;
+            Projectile.extraUpdates = 2;
             whiteInsideSizeMultiplier = 1.4f;
-            TotalDuration = (int)(TotalDuration * 3);
             hueshiftType = HueshiftType.DontDarken;
             dustChance /= Projectile.extraUpdates;
+            trailLengthMultiplier = 0.3333f;
         }
         /*
         //      public override void AI()

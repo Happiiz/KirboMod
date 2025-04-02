@@ -60,7 +60,7 @@ namespace KirboMod.NPCs
 			else if (spawnInfo.Player.ZoneJungle && (Main.dayTime || spawnInfo.Player.ZoneRockLayerHeight) && !spawnInfo.Water && !spawnInfo.Sky
 				&& !Main.eclipse) 
 			{
-				return spawnInfo.SpawnTileType == TileID.JungleGrass || spawnInfo.SpawnTileType == TileID.Mud ? .4f : 0f; //functions like a mini if else statement
+				return spawnInfo.SpawnTileType == TileID.JungleGrass || spawnInfo.SpawnTileType == TileID.Mud ? .1f : 0f; //functions like a mini if else statement
 			}
 			else
 			{

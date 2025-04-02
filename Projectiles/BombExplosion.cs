@@ -43,19 +43,12 @@ namespace KirboMod.Projectiles
 
                     int dustID = Main.rand.Next(130, 134);
 
-                    for (int i = 0; i < 16; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+                    for (int i = 0; i < 22; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
                     {
-                        float rotationalOffset = MathHelper.ToRadians(i * 22.5f); //convert degrees to radians
-
-                        float dustX = Projectile.Center.X + positionOffset.X + (float)Math.Cos(rotationalOffset) * 5;
-                        float dustY = Projectile.Center.Y + positionOffset.Y + (float)Math.Sin(rotationalOffset) * 5;
-
-                        Dust d = Dust.NewDustPerfect(new Vector2(dustX, dustY), dustID, Vector2.Zero); //Makes dust in a messy circle
+						float rotationalOffset = (i * MathF.Tau) / 22f;
+                        Dust d = Dust.NewDustPerfect(positionOffset + rotationalOffset.ToRotationVector2() * 5 + Projectile.Center, dustID, Vector2.Zero); //Makes dust in a circle
                         d.noGravity = true;
-                        Vector2 direction = d.position - (Projectile.Center + positionOffset);
-                        direction.Normalize();
-                        direction *= 5;
-                        d.velocity = direction;
+						d.velocity = rotationalOffset.ToRotationVector2() * 5;
                     }
                 }
             }

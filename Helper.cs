@@ -12,6 +12,20 @@ namespace KirboMod
         /// the golden ratio constant, phi, defined as (1 + sqrt(5))/2
         /// </summary>
         public const float Phi = 1.61803398875f;
+        public static void DealDefenseDamageInCalamity(Projectile proj)
+        {
+            if(proj.hostile && !proj.friendly && ModLoader.TryGetMod("CalamityMod", out Mod cal))
+            {
+                cal.Call("SetDefenseDamageProjectile", proj, true);
+            }
+        }
+        public static void DealDefenseDamageInCalamity(NPC npc)
+        {
+            if (ModLoader.TryGetMod("CalamityMod", out Mod cal))
+            {
+                cal.Call("SetDefenseDamageNPC", npc, true);
+            }
+        }
         public static void BossHpScalingForHigherDifficulty(ref int lifemax, float balance)
         {
             const float expertMultiplier = 1.5f;
@@ -20,13 +34,40 @@ namespace KirboMod
             {
                 lifemax /= 3;
                 lifemax = (int)(lifemax * masterMultiplier * balance);
-
                 return;
             }
             if(Main.expertMode)
             {
                 lifemax /= 2;
                 lifemax = (int)(lifemax * expertMultiplier * balance);
+            }
+        }
+        public static void Homing(Projectile proj, float maxVel, ref float targetIndex, ref float homingTimer, float maxHomingStrength = .1f, float range = 1500)
+        {
+            float rangeSQ = range * range;
+            if (!ValidIndexedTarget((int)targetIndex, proj, out _))
+            {
+                proj.velocity = Vector2.Lerp(proj.velocity, Vector2.Normalize(proj.velocity) * maxVel, 0.1f);
+                int closestNPC = -1;
+                Vector2 center = proj.Center;
+                for (int i = 0; i < Main.maxNPCs; i++)
+                {
+                    NPC potentialTarget = Main.npc[i];
+                    float distToClosestPointInPotentialTargetHitbox = center.DistanceSQ(potentialTarget.Hitbox.ClosestPointInRect(center));
+                    bool notValidTarget = !Helper.ValidHomingTarget(potentialTarget, proj);
+                    if (notValidTarget || distToClosestPointInPotentialTargetHitbox > rangeSQ)
+                        continue;
+                    if (!Main.npc.IndexInRange(closestNPC) || center.DistanceSQ(potentialTarget.Hitbox.ClosestPointInRect(center)) < center.DistanceSQ(Main.npc[closestNPC].Hitbox.ClosestPointInRect(center)))
+                        closestNPC = i;
+                }
+                targetIndex = closestNPC;
+                homingTimer = 1;
+            }
+            if (ValidIndexedTarget((int)targetIndex, proj, out NPC target))
+            {
+                homingTimer++;
+                float homingStrength = Helper.RemapEased(homingTimer, 1, 20, 0, maxHomingStrength, Easings.EaseInOutSine);
+                proj.velocity = Vector2.Lerp(proj.velocity, Vector2.Normalize(target.Center - proj.Center) * maxVel, homingStrength);
             }
         }
         public static bool SpawnInfoNotInAnySpecialBiome(NPCSpawnInfo info)
@@ -108,9 +149,29 @@ namespace KirboMod
             }
             return target;
         }
+        public static bool ValidIndexedTargetPlayer(int targetIndex, out Player target, Player attacker)
+        {
+            target = null;
+            if (targetIndex < 0)
+                return false;
+            if (targetIndex >= Main.maxPlayers)
+                return false;
+            target = Main.player[targetIndex];
+            return !target.dead && target.active && attacker.InOpposingTeam(target);
+        }
         public static bool ValidIndexedTarget(int targetIndex, Projectile proj, out NPC target, bool includeImmuneNPCs = true)
         {
-            bool invalid = !Main.npc.IndexInRange(targetIndex) || !ValidHomingTarget(Main.npc[targetIndex], proj, includeImmuneNPCs);
+            if (targetIndex < 0)
+            {
+                target = null;
+                return false;
+            }
+            if (targetIndex >= Main.maxNPCs)
+            {
+                target = null;
+                return false;
+            }
+            bool invalid = !ValidHomingTarget(Main.npc[targetIndex], proj, includeImmuneNPCs);
             target = invalid ? null : Main.npc[targetIndex];
             return !invalid;
 
@@ -123,6 +184,7 @@ namespace KirboMod
                 if (proj.usesLocalNPCImmunity)
                 {
                     npcImmuneToProj = proj.localNPCImmunity[npc.whoAmI] != 0;
+                
                 }
                 else if (proj.usesIDStaticNPCImmunity)
                 {

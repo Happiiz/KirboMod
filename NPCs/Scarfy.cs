@@ -59,7 +59,7 @@ namespace KirboMod.NPCs
             //if player is within underworld height and spawn is not outside of the world
             if (spawnInfo.Player.ZoneUnderworldHeight && spawnInfo.SpawnTileY < Main.maxTilesY && spawnInfo.SpawnTileX < Main.maxTilesX && spawnInfo.SpawnTileX > 0)
             {
-                return .3f; //returns spawn rate
+                return .15f; //returns spawn rate
             }
             else
             {

@@ -1,10 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\tModLoader.targets" />
   <PropertyGroup>
     <AssemblyName>KirboMod</AssemblyName>
-    <TargetFramework>net6.0</TargetFramework>
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
@@ -12,6 +10,8 @@
     <None Remove="Dusts\DragonFireDust.png" />
     <None Remove="ExtraTextures\GlowOutlinePremultiplied.png" />
     <None Remove="ExtraTextures\RingShinePremultiplied.png" />
+    <None Remove="ExtraTextures\WaddleDooBeam0.png" />
+    <None Remove="ExtraTextures\WaddleDooBeam1.png" />
     <None Remove="Items\DarkSword\DarkSwordBeam.png" />
     <None Remove="Items\RainbowSword\RainbowSword.png" />
     <None Remove="Items\RainbowSword\RainbowSwordHeld (1).png" />
@@ -19,6 +19,8 @@
     <None Remove="Items\RainbowSword\RainbowSwordHeldGlow.png" />
     <None Remove="Items\RainbowSword\RainbowSwordMask.png" />
     <None Remove="Items\Weapons\MaskedHammerHeld.png" />
+    <None Remove="NPCs\NewWhispy\NewWhispyBase_Placeholder.png" />
+    <None Remove="NPCs\Nightmare\StarryStrip.png" />
     <None Remove="NPCs\PlasmaWisp\fire_01.png" />
     <None Remove="NPCs\PlasmaWisp\fire_02.png" />
     <None Remove="NPCs\PlasmaWisp\flame_01.png" />
@@ -27,9 +29,13 @@
     <None Remove="NPCs\PlasmaWisp\flame_04.png" />
     <None Remove="NPCs\PlasmaWisp\PlasmaWispEyes.png" />
     <None Remove="NPCs\PlasmaWisp\PlasmaWispHand.png" />
+    <None Remove="Projectiles\Flames\FlamesSprite.png" />
     <None Remove="Projectiles\KrackoJrBomb\KrackoJrBomb.png" />
     <None Remove="Projectiles\KrackoJrCannonball\KrackoJrCannonball.png" />
     <None Remove="Projectiles\Lightnings\twirl_03.png" />
+    <None Remove="Projectiles\NewWhispy\FireApple.png" />
+    <None Remove="Projectiles\NewWhispy\NewWhispySpikes\NewWhispySpike.png" />
+    <None Remove="Projectiles\NewWhispy\NewWhispySpikes\NewWhispySpikeTip.png" />
     <None Remove="Projectiles\NightmareLightningOrb\NightmareLightningOrb.png" />
     <None Remove="Projectiles\NightmareLightningOrb\smoke_00.png" />
     <None Remove="Projectiles\NightmareLightningOrb\smoke_01.png" />
@@ -45,9 +51,9 @@
     <None Remove="Projectiles\Tornadoes\tornado_2.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="tModLoader.CodeAssist" Version="0.1.*" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="NPCs\DarkMatter\NovaPasta\" />
+    <Folder Include="Projectiles\NewWhispy\NewWhispyAppleBig\" />
   </ItemGroup>
 </Project>

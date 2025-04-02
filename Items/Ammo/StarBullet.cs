@@ -30,8 +30,8 @@ namespace KirboMod.Items.Ammo
 		}
 		public override void AddRecipes()
 		{
-			Recipe recipe = CreateRecipe(5);
-			recipe.AddIngredient(ModContent.ItemType<Items.Starbit>(), 20);
+			Recipe recipe = CreateRecipe(10);
+			recipe.AddIngredient(ModContent.ItemType<Items.Starbit>(), 15);
 			recipe.AddIngredient(ItemID.MusketBall, 10);
 			recipe.AddTile(TileID.Anvils);
 			recipe.Register();

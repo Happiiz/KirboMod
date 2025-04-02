@@ -28,7 +28,6 @@ namespace KirboMod.Projectiles
 			Projectile.tileCollide = true;
 			Projectile.penetrate = 1;
 			Projectile.scale = 1f;
-			Projectile.extraUpdates = 3;
 			Projectile.usesLocalNPCImmunity = true; //uses own immunity frames
 			Projectile.localNPCHitCooldown = 20; //time before hit again
 			Projectile.ignoreWater = true; //it looks ugly when in water
@@ -45,6 +44,8 @@ namespace KirboMod.Projectiles
 					Projectile.frame = 0;
 				}
 			}
+			Helper.Homing(Projectile, 50, ref Projectile.ai[0], ref Projectile.localAI[0]);
+			Projectile.rotation = Projectile.velocity.ToRotation();
 		}
 		static List<Vector2> Heart()
 		{

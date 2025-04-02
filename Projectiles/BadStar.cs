@@ -28,6 +28,7 @@ namespace KirboMod.Projectiles
 			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
 			Projectile.alpha = 255;
+			Helper.DealDefenseDamageInCalamity(Projectile);
 		}
 		public override void AI()
 		{

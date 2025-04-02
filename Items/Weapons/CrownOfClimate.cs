@@ -65,7 +65,7 @@ namespace KirboMod.Items.Weapons
         public override void AddRecipes()
 		{
 			Recipe recipe = CreateRecipe();
-			recipe.AddIngredient(ModContent.ItemType<Starbit>(), 40);
+			recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
             recipe.AddIngredient(ModContent.ItemType<DreamEssence>(), 20);
 			recipe.AddIngredient(ModContent.ItemType<CrownOfFire>());
             recipe.AddIngredient(ModContent.ItemType<CrownOfIce>());

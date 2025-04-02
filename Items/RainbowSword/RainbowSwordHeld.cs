@@ -44,10 +44,7 @@ namespace KirboMod.Items.RainbowSword
         public override void OnSpawn(IEntitySource source)
         {
             LoadShaderIfNeeded();
-            Projectile.scale *= Main.player[Projectile.owner].GetAdjustedItemScale(Main.player[Projectile.owner].HeldItem);
-            UseTime *= Projectile.MaxUpdates;
-            Projectile.velocity.Normalize();
-            Main.instance.LoadProjectile(Type);
+
         }
         static Effect rainbowEffect;
         static float EaseBackOut(float progress)
@@ -93,6 +90,14 @@ namespace KirboMod.Items.RainbowSword
         public override void AI()
         {
             Player player = Main.player[Projectile.owner];
+            if (Projectile.localAI[2] == 0)
+            {
+                Projectile.scale *= Main.player[Projectile.owner].GetAdjustedItemScale(Main.player[Projectile.owner].HeldItem);
+                UseTime *= Projectile.MaxUpdates;
+                Projectile.velocity.Normalize();
+                Main.instance.LoadProjectile(Type);
+                Projectile.localAI[2] = 1;
+            }
             if (Dead)
             {
                 Projectile.timeLeft = 100;
@@ -147,8 +152,8 @@ namespace KirboMod.Items.RainbowSword
         }
         public override bool PreDraw(ref Color lightColor)
         {
-           
 
+            LoadShaderIfNeeded();
             if (Dead)
                 return false;
             float timeLeft = UseTime - Timer;
@@ -259,11 +264,11 @@ namespace KirboMod.Items.RainbowSword
             if (!HeldProjTrailSystem.IsDarkEnvironment(Main.player[Projectile.owner], out byte spaceAlpha))
             {
                 Color color = Main.DiscoColor with { A = spaceAlpha };
-                HeldProjTrailSystem.Trail.AddAlphaBlend(Projectile, 300, color * fade, color * fade);
+                HeldProjTrailSystem.Trail.AddAlphaBlend(Projectile, 270, color * fade, color * fade);
             }
             else
             {
-                HeldProjTrailSystem.Trail.AddAdditive(Projectile, 300, Main.DiscoColor * fade, Main.DiscoColor * fade);
+                HeldProjTrailSystem.Trail.AddAdditive(Projectile, 270, Main.DiscoColor * fade, Main.DiscoColor * fade);
             }
         }
     }

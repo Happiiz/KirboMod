@@ -130,72 +130,13 @@ namespace KirboMod.Projectiles
             Vector2 vectorToIdlePosition = IdlePosition - Projectile.Center; //distance from idle
             float distanceToIdlePosition = vectorToIdlePosition.Length(); //aboslute distance from idle
 
-            if (player.HasMinionAttackTargetNPC)
+            int targetIndex = -1;
+            Projectile.Minion_FindTargetInRange(1000, ref targetIndex, true, null);
+            aggroTarget = targetIndex == -1 ? null : Main.npc[targetIndex];
+            if (distanceToIdlePosition > 1000f)
             {
-                NPC npc = Main.npc[player.MinionAttackTargetNPC];
-                float distance = Vector2.Distance(npc.Center, Projectile.Center);
-                // Reasonable distance away so it doesn't target across multiple screens
-                if (distance < distanceFromTarget)
-                {
-                    aggroTarget = npc;
-                }
-            }
-
-            if (aggroTarget == null || !aggroTarget.active || aggroTarget.dontTakeDamage) //search target
-            {
-                //start each number with a very big number so they can't be targeted if their npc doesn't exist
-                Targetdistances = Enumerable.Repeat(999999f, Main.maxNPCs).ToList();
-
-                for (int i = 0; i < Main.maxNPCs; i++)
-                {
-                    NPC npc = Main.npc[i];
-
-                    float distance = Vector2.Distance(Projectile.Center, npc.Center);
-
-                    if (npc.CanBeChasedBy()) //checks if targetable
-                    {
-                        Vector2 positionOffset = new Vector2(0, -5);
-                        bool inView = Collision.CanHitLine(Projectile.position + positionOffset, Projectile.width, Projectile.height, npc.position, npc.width, npc.height);
-
-                        //close, hittable, hostile and can see target
-                        if (inView && !npc.friendly && !npc.dontTakeDamage && !npc.dontCountMe && distance < distanceFromTarget && npc.active && spaceJumping == false)
-                        {
-                            Targetdistances.Insert(npc.whoAmI, (int)distance); //add to list of potential targets
-                        }
-                    }
-
-                    if (i == Main.maxNPCs - 1)
-                    {
-                        int theTarget = -1;
-
-                        //count up 'til reached maximum distance
-                        for (float j = 0; j < distanceFromTarget; j++)
-                        {
-                            int Aha = Targetdistances.FindIndex(a => a == j); //count up 'til a target is found in that range
-
-                            if (Aha > -1) //found target
-                            {
-                                theTarget = Aha;
-
-                                break;
-                            }
-                        }
-
-                        if (theTarget > -1) //exists
-                        {
-                            NPC npc2 = Main.npc[theTarget];
-
-                            if (npc2 != null) //exists
-                            {
-                                aggroTarget = npc2;
-                            }
-                        }
-                        else
-                        {
-                            break; //just in case
-                        }
-                    }
-                }
+                spaceJumping = true;
+                attacking = false;
             }
             if (attacking == true) //checks if attacking
             {

@@ -43,7 +43,7 @@ namespace KirboMod.NPCs
             //if player is within surface height, daytime, not raining, no invasions, and in forest/purity
             if (spawnInfo.Player.ZoneOverworldHeight && Main.dayTime && !Main.raining && spawnInfo.Player.ZoneForest && !spawnInfo.Invasion && !Main.eclipse)
             {
-                return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? .5f : 0f; //functions like a mini if else statement
+                return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? .15f : 0f; //functions like a mini if else statement
 			}
 			else
 			{

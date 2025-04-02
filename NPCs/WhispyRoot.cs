@@ -45,6 +45,8 @@ namespace KirboMod.NPCs
 
 		private int TileDetection(int missedTiles)
 		{
+			if (NPC.IsABestiaryIconDummy)
+				return 0;
             missedTiles = 0;
 
             int max = NPC.width / 16;

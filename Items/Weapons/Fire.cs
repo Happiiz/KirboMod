@@ -22,7 +22,7 @@ namespace KirboMod.Items.Weapons
 
         public override void SetDefaults()
 		{
-			Item.damage = 8;
+			Item.damage = 13;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 32;

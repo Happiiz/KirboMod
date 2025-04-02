@@ -14,10 +14,13 @@ namespace KirboMod.NPCs
 {
 	public class WaddleDoo : ModNPC
 	{
+        static int BeamStart => 60;
+        static int BeamDuration => 120;
 		private bool attacking = false; //controls if in attacking state
 
         private bool jumped = false;
-
+        //public static so I can reference this in other parts of the code.
+        public static SoundStyle BeamAttackSound => new SoundStyle("KirboMod/Sounds/Projectiles/BeamAttack");
         public override void SetStaticDefaults() 
 		{
 			// DisplayName.SetDefault("Waddle Doo");
@@ -49,15 +52,15 @@ namespace KirboMod.NPCs
             {
                 if (spawnInfo.Player.ZoneJungle)
                 {
-                    return spawnInfo.SpawnTileType == TileID.JungleGrass || spawnInfo.SpawnTileType == TileID.Mud ? .15f : 0f;
+                    return spawnInfo.SpawnTileType == TileID.JungleGrass || spawnInfo.SpawnTileType == TileID.Mud ? 0.075f : 0f;
                 }
                 else if (spawnInfo.Player.ZoneSnow)
                 {
-                    return spawnInfo.SpawnTileType == TileID.SnowBlock ? .15f : 0f;
+                    return spawnInfo.SpawnTileType == TileID.SnowBlock ? 0.075f : 0f;
                 }
                 else if (spawnInfo.Player.ZoneForest) //if forest
                 {
-                    return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? .3f : 0f;
+                    return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? .15f : 0f;
                 }
                 else
                 {
@@ -166,7 +169,7 @@ namespace KirboMod.NPCs
             }
 			else //BeAm AttAck
             {
-                if (NPC.ai[0] < 60) //charge
+                if (NPC.ai[0] < BeamStart) //charge
                 {
                     NPC.frameCounter += 1.0;
 
@@ -212,9 +215,10 @@ namespace KirboMod.NPCs
 
 		private void Beam()
         {
-			Player player = Main.player[NPC.target];
 
-			if (NPC.ai[0] < 60) //target before attacking
+            Player player = Main.player[NPC.target];
+
+			if (NPC.ai[0] < BeamStart) //target before attacking
 			{
 				NPC.TargetClosest(true);
 			}
@@ -227,10 +231,11 @@ namespace KirboMod.NPCs
 				beamRange *= 1.2f;
 			if (SpawnedFromKracko)
 				beamRange *= 1.2f;
-			Vector2 projshoot = new Vector2(NPC.direction * beamRange, 0).RotatedBy(MathF.Sin((NPC.ai[0]  - 60) / 15f));
+            Vector2 projshoot = MathF.Sin((NPC.ai[0] - BeamStart) / 20f - MathF.PI / 2).ToRotationVector2() * beamRange;
+            projshoot.X *= NPC.direction;
 			Vector2 startOffset = new Vector2(NPC.direction * 8, 0);
 
-            if (NPC.ai[0] >= 60 & NPC.ai[0] <= 180) //attack window
+            if (NPC.ai[0] >= BeamStart & NPC.ai[0] <= BeamStart + BeamDuration) //attack window
 			{
 				if (NPC.ai[0] % 3 == 0) //every multiple of 3
 				{
@@ -239,10 +244,10 @@ namespace KirboMod.NPCs
 						Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + startOffset, projshoot, ModContent.ProjectileType<Projectiles.BeamBad>(), NPC.damage / 2, 1, Main.myPlayer, 0, 0);
 					}
                 }
-
-                if (NPC.ai[0] == 60) //sound
+                if (NPC.ai[0] % 4 == 0)
                 {
-                    SoundEngine.PlaySound(SoundID.Item93, NPC.Center); //plays electro zap
+                    SoundEngine.PlaySound(BeamAttackSound, NPC.Center);
+
                 }
             }
 			if (NPC.ai[0] >= 240)

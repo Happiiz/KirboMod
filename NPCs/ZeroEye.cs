@@ -13,6 +13,7 @@ using KirboMod.Bestiary;
 using System.Collections.Specialized;
 using System.IO;
 using KirboMod.Projectiles;
+using System.Collections.Generic;
 
 namespace KirboMod.NPCs
 {
@@ -46,6 +47,10 @@ namespace KirboMod.NPCs
             NPC.defense = 60;
             NPC.lifeMax = 40000;
 			NPC.damage = 200;
+			if (Zero.calamityEnabled)
+			{
+				NPC.lifeMax *= 2;
+			}
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
 			NPC.value = Item.buyPrice(0, 38, 18, 10); // money it drops
@@ -64,7 +69,7 @@ namespace KirboMod.NPCs
 
         public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */
 		{
-            Helper.BossHpScalingForHigherDifficulty(ref NPC.lifeMax, balance);
+            Helper.BossHpScalingForHigherDifficulty(ref NPC.lifeMax, 1);//spawn 1 eyeball for every player
 		}
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
@@ -88,11 +93,20 @@ namespace KirboMod.NPCs
         {
 			deathcounter = reader.ReadInt32();
         }
-
+		public static void GetAIValues(out float[] ai2s)
+		{
+			List<float> targets = new List<float>();
+			foreach (var item in Main.ActivePlayers)
+			{
+				targets.Add(item.whoAmI);
+			}
+			ai2s = targets.ToArray();
+		}
         public override void AI() //constantly cycles each time
 		{
+			NPC.target = (int)NPC.ai[2];
 			Player player = Main.player[NPC.target];
-            NPC.TargetClosest(true);
+            
 
             if (NPC.ai[1] <= 60) //rise
             {
@@ -232,6 +246,7 @@ namespace KirboMod.NPCs
 
         public override void OnKill()
         {
+			if(!NPC.AnyNPCs(ModContent.NPCType<ZeroEye>()))
             NPC.SetEventFlagCleared(ref DownedBossSystem.downedZeroBoss, -1);
         }
 
@@ -261,17 +276,39 @@ namespace KirboMod.NPCs
 			return Color.White; //make it unaffected by light
 		}
 		public override bool CheckDead()
-		{
-			if (deathcounter < 300)
+        {
+            if (deathcounter < 300)
 			{
 				NPC.active = true;
 				NPC.life = 1;
 				deathcounter += 1; //go up
 				return false;
 			}
+			if (AnyZeroEyesAsideMe())
+			{
+                for (int i = 0; i < 60; i++)
+                {
+                    Vector2 speed = Main.rand.NextVector2Circular(40f, 40f);
+                    Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.Redsidue>(), speed, Scale: 3); //Makes dust in a messy circle
+                    d.noGravity = true;
+                }
+				NPC.active = false;//kinda die but do not drop loot or anything like that
+                return false;
+			}
 			return true;
 		}
-
+		bool AnyZeroEyesAsideMe()
+		{
+			for (int i = 0; i < Main.maxNPCs; i++)
+			{
+				NPC compare = Main.npc[i];
+				if(compare.active && compare.type == ModContent.NPCType<ZeroEye>() && i != NPC.whoAmI)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
 		private void DoDeathAnimation()
 		{
 			if (deathcounter > 0 && deathcounter < 300)
@@ -301,7 +338,6 @@ namespace KirboMod.NPCs
 			}
 			else if (deathcounter > 0) //death
 			{
-				NPC.dontTakeDamage = false;
                 NPC.HideStrikeDamage = true;
                 NPC.SimpleStrikeNPC(999999, 1, false, 0, null, false, 0, false);
                 for (int i = 0; i < 60; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop

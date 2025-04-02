@@ -10,6 +10,7 @@ using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static KirboMod.Projectiles.TripleStarStar;
 
 namespace KirboMod.Items.Weapons
 {
@@ -48,11 +49,13 @@ namespace KirboMod.Items.Weapons
 
         public override bool AltFunctionUse(Player player)
         {
-            return true; //can right click
+            return Main.netMode == NetmodeID.SinglePlayer; //can right click
         }
 		
         public override bool CanUseItem(Player player)
         {
+			if (Main.netMode != NetmodeID.SinglePlayer)
+				return true;
 			KirbPlayer kirbPlayer = player.GetModPlayer<KirbPlayer>();
 			List<TripleStarStar> stars = new();
 			if (player.altFunctionUse == 2) //right click
@@ -88,25 +91,38 @@ namespace KirboMod.Items.Weapons
         {
 			if (Main.myPlayer != player.whoAmI)
 				return false;
-			TripleStarStar star;
-			KirbPlayer kirbPlayer = player.GetModPlayer<KirbPlayer>();
-            if (player.altFunctionUse == 2) //right click
-            {
-                for (int i = 0; i < 3; i++)
-                {
-					 star = kirbPlayer.GetAvailableTripleStarStar();
-					if(star != null)
-                    {
-						star.Shoot();
+			if (Main.netMode == NetmodeID.SinglePlayer)
+			{
+				TripleStarStar star;
+				KirbPlayer kirbPlayer = player.GetModPlayer<KirbPlayer>();
+				if (player.altFunctionUse == 2) //right click
+				{
+					for (int i = 0; i < 3; i++)
+					{
+						star = kirbPlayer.GetAvailableTripleStarStar();
+						if (star != null)
+						{
+							star.Shoot();
 
-                    }
+						}
+					}
+					return false;
 				}
+				star = kirbPlayer.GetAvailableTripleStarStar();
+				if (star != null)
+					star.Shoot();
 				return false;
-            }       
-			 star = kirbPlayer.GetAvailableTripleStarStar();
-			if (star != null)
-				star.Shoot();     
-            return false;
+			}
+			int loops = player.altFunctionUse == 2 ? 3 : 1;
+			for (int i = 0; i < loops; i++)
+			{
+				Vector2 randomOffset = Main.rand.BetterNextVector2Circular(100);
+				Vector2 spawnPos = player.Center + randomOffset;
+				velocity = spawnPos.DirectionTo(Main.MouseWorld) * velocity.Length();
+				Projectile.NewProjectile(source, spawnPos, velocity, ModContent.ProjectileType<TripleStarStarForMultiplayer>(), damage, knockback);
+			}
+			return false;
+			
         }
 
         public override Color? GetAlpha(Color lightColor)

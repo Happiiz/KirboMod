@@ -86,7 +86,7 @@ namespace KirboMod
         {
             ModPacket packet = KirboMod.instance.GetPacket();
             packet.Write((byte)ModPacketType.PlayerPositionAndVelocity);
-            packet.Write((byte)plr.whoAmI);
+            packet.Write((byte)plr.whoAmI); 
             packet.WriteVector2(plr.position);
             packet.WriteVector2(plr.velocity);
             packet.Send(-1, plr.whoAmI);

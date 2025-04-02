@@ -19,10 +19,11 @@ namespace KirboMod.Projectiles
 			Projectile.height = 30;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Magic;
-			Projectile.timeLeft = 3000;
+			Projectile.timeLeft = 45;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
-			
+			Projectile.usesLocalNPCImmunity = true;
+			Projectile.localNPCHitCooldown = -1;
 		}
 		public override void AI()
 		{
@@ -35,10 +36,14 @@ namespace KirboMod.Projectiles
 					Projectile.frame = 0;
 				}
 			}
+			if (Main.rand.NextBool(3))
+			{
+				Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.Electric, Projectile.velocity.X * .5f, Projectile.velocity.Y * .5f).noGravity = true;
+			}
 		}
         public override bool PreDraw(ref Color lightColor)
         {
-			VFX.DrawElectricOrb(Projectile.Center, new Vector2(1.2f), Projectile.Opacity, Projectile.rotation);
+			VFX.DrawWaddleDooBeam(Projectile.Center, 1.2f, Projectile.Opacity);
 			return false;
         }
         public override Color? GetAlpha(Color lightColor)

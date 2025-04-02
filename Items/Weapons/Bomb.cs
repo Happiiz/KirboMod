@@ -44,7 +44,18 @@ namespace KirboMod.Items.Weapons
             position.X = player.Center.X;
             position.Y = player.Center.Y - 25f;
         }
-
+        public override bool AltFunctionUse(Player player)
+        {
+			return player.ItemTimeIsZero;
+        }
+        public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+        {
+			if(player.whoAmI == Main.myPlayer)
+			{
+				Projectile.NewProjectile(source, position, velocity, type, damage, knockback, Main.myPlayer, player.altFunctionUse);
+			}
+            return false;
+        }
         public override void AddRecipes()
         {
             Recipe bombrecipe = CreateRecipe(10);

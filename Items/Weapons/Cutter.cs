@@ -35,7 +35,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.CutterBlade>();
-			Item.shootSpeed = 10;
+			Item.shootSpeed = 8;
 			Item.noUseGraphic = true;
 		}
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
@@ -55,7 +55,7 @@ namespace KirboMod.Items.Weapons
         public override void AddRecipes()
 		{
 			Recipe cutter = CreateRecipe();//the result is cutter
-            cutter.AddIngredient(ModContent.ItemType<Starbit>(), 20); //20 starbits
+            cutter.AddIngredient(ModContent.ItemType<Starbit>(), 10); //10 starbits
             cutter.AddIngredient(ItemID.WoodenBoomerang);
             cutter.AddTile(TileID.Anvils); //crafted at anvil
             cutter.Register(); //adds this recipe to the game

@@ -43,6 +43,7 @@ namespace KirboMod
         }
         public static void LoadTextures()
         {
+
             circle = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/CirclePremultiplied");
             ring = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/RingPremultiplied");
             glowBall = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowBallPremultiplied");
@@ -50,6 +51,8 @@ namespace KirboMod
             glowLineCap = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowLineCapPremultiplied");
             ringShine = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/RingShinePremultiplied");
             circleOutline = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/GlowOutlinePremultiplied");
+            waddleDooBeam0 = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/WaddleDooBeam0");
+            waddleDooBeam1 = ModContent.Request<Texture2D>("KirboMod/ExtraTextures/WaddleDooBeam1");
         }
         public static Asset<Texture2D> glowLine;
         public static Asset<Texture2D> glowLineCap;
@@ -58,6 +61,8 @@ namespace KirboMod
         public static Asset<Texture2D> glowBall;
         public static Asset<Texture2D> ring;
         public static Asset<Texture2D> circleOutline;
+        public static Asset<Texture2D> waddleDooBeam0;
+        public static Asset<Texture2D> waddleDooBeam1;
         public static Texture2D GlowLine { get => glowLine.Value; }
         public static Texture2D GlowLineCap { get => glowLineCap.Value; }
         public static Texture2D Circle { get => circle.Value; }
@@ -65,6 +70,8 @@ namespace KirboMod
         public static Texture2D Ring { get => ring.Value; }
         public static Texture2D GlowBall { get => glowBall.Value; }
         public static Texture2D CircleOutline => circleOutline.Value;
+        public static Texture2D WaddleDooBeam0 => waddleDooBeam0.Value;
+        public static Texture2D WaddleDooBeam1 => waddleDooBeam1.Value;
         public override void OnWorldLoad()
         {
             LoadTextures();//hopefully this fixes the textures not being loaded??
@@ -131,7 +138,22 @@ namespace KirboMod
             Main.EntitySpriteDraw(Circle, pos - Main.screenPosition, null, RndElectricCol with { A = 0 } * 0.25f * opacity, randRot, Circle.Size() / 2, randScale * 1.8f, SpriteEffects.None);
             DrawPrettyStarSparkle(opacity, pos - Main.screenPosition + randomOffset, new Color(255, 255, 255, 0), RndElectricCol, 1, 0, 1, 1, 2, rotation, sparkleScale, fatness);
         }
-
+        public static void DrawWaddleDooBeam(Vector2 pos, float scale, float opacity)
+        {
+            pos -= Main.screenPosition;
+            bool beam0Primary = Main.rand.NextBool();
+            Texture2D primaryTex = beam0Primary ? WaddleDooBeam0 : WaddleDooBeam1;
+            Texture2D secondaryTex = beam0Primary ? WaddleDooBeam1 : WaddleDooBeam0;
+            Color beamOrange = new Color(255, 179, 56, 128);
+            Color beamPink = new Color(255, 125, 233, 128);
+            bool orangePrimary = Main.rand.NextBool();
+            Color primary = orangePrimary ? beamOrange : beamPink;
+            Color secondary = orangePrimary ? beamPink : beamOrange;
+            Vector2 drawPos = pos + Main.rand.BetterNextVector2Circular(16f * scale);
+            Main.EntitySpriteDraw(primaryTex, drawPos, null, primary, Main.rand.NextFloat() * MathF.Tau, primaryTex.Size() / 2f, 1f * scale, SpriteEffects.None);
+            drawPos += Main.rand.BetterNextVector2Circular(8f * scale);
+            Main.EntitySpriteDraw(secondaryTex, drawPos, null, secondary, Main.rand.NextFloat() * MathF.Tau, secondaryTex.Size() / 2f, 0.75f * scale, SpriteEffects.None);
+        }
         public override void Unload()
         {
             //annoying thing we need to do to static fields, free up the memory they are using.
@@ -141,6 +163,8 @@ namespace KirboMod
             ringShine = null;
             glowLine = null;
             glowLineCap = null;
+            waddleDooBeam0 = null;
+            waddleDooBeam1 = null;
         }
 
         public static void DrawProjWithStarryTrail(Projectile proj, Color drawColorMainTrail, Color drawColorSmallInnerTrail, Color drawColorStar, float drawColorMult = 0.2f, byte innerTrailAlpha = 0, byte trailAlpha = 0, byte starAlpha = 0)

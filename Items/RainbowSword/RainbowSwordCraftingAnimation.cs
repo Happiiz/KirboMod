@@ -10,6 +10,7 @@ using ReLogic.Content;
 using Terraria.ID;
 using System.Linq;
 using Terraria.Audio;
+using Terraria.DataStructures;
 
 namespace KirboMod.Items.RainbowSword
 {
@@ -18,7 +19,8 @@ namespace KirboMod.Items.RainbowSword
         public override string Texture => "KirboMod/Items/RainbowSword/RainbowSword";
         public override void SetDefaults()
         {
-            
+            Projectile.tileCollide = false;
+            Projectile.ignoreWater = true;
         }
         static float Easing(float progress)
         {
@@ -129,6 +131,7 @@ namespace KirboMod.Items.RainbowSword
             int[] rainbowDrops = new int[6] { ModContent.ItemType<DesertDrop>(), ModContent.ItemType<EvilDrop>(), ModContent.ItemType<HellDrop>(), ModContent.ItemType<JungleDrop>(), ModContent.ItemType<OceanDrop>(), ModContent.ItemType<SnowDrop>() };
             return rainbowDrops.Contains(id);
         }
+        //todo: fix this how the fuck is it not working???????????
         private void SpawnRainbowSwordCraftAnimation(On_Main.orig_CraftItem orig, Recipe r)
         {
             if(r.TryGetResult(Type, out _))
@@ -158,10 +161,14 @@ namespace KirboMod.Items.RainbowSword
                 SoundEngine.PlaySound(SoundID.Item4);
                 SoundEngine.PlaySound(SoundID.DD2_WinScene);
                 Recipe.FindRecipes();
-                Projectile.NewProjectile(Item.GetSource_ReleaseEntity(), Main.LocalPlayer.Center - new Vector2(0, 150), Vector2.Zero, ModContent.ProjectileType<RainbowSwordCraftingAnimation>(), -1, 0, 255);
+                Projectile.NewProjectile(new TestSource(), Main.LocalPlayer.Center - new Vector2(0, 150), Vector2.Zero, ModContent.ProjectileType<RainbowSwordCraftingAnimation>(), -1, 0, 255);
                 return;
             }
             orig(r);
+        }
+        private class TestSource : IEntitySource
+        {
+            public string Context => "aeoufabvou";//awesome!!
         }
     }
 }

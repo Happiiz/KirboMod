@@ -37,16 +37,16 @@ namespace KirboMod.Projectiles
 
 				for (int i = 0; i < 30; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 				{
-					Vector2 speed = Main.rand.NextVector2Circular(20f, 20f); //circle
-					Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.Enchanted_Gold, speed, Scale: 2f); //Makes dust in a messy circle
+					Vector2 speed = Main.rand.BetterNextVector2Circular(20f); //circle
+					Dust d = Dust.NewDustPerfect(Projectile.Center + speed, DustID.Enchanted_Gold, speed, Scale: 2f); //Makes dust in a messy circle
 					d.noGravity = true;
 
 				}
 
 				for (int i = 0; i < 20; i++)
 				{
-                    Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
-					Gore.NewGorePerfect(Projectile.GetSource_FromAI(), Projectile.Center, speed, Main.rand.Next(16, 18), 3);
+                    Vector2 speed = Main.rand.BetterNextVector2Circular(10); //circle
+                    Gore.NewGorePerfect(Projectile.GetSource_FromAI(), Projectile.Center + speed, speed, Main.rand.Next(16, 18), 3);
                 }
 			}
 		}

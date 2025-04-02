@@ -38,7 +38,11 @@ namespace KirboMod.NPCs
 			NPC.aiStyle = -1;
 			NPC.noGravity = true;
 			NPC.noTileCollide = false;
-			NPC.direction = Main.rand.Next(0, 1 + 1) == 1 ? 1: -1; //determines whether to go left or right initally
+
+			//bad idea, will desync in multiplayer. -Photonic0
+			//NPC.direction = Main.rand.Next(0, 1 + 1) == 1 ? 1: -1; //determines whether to go left or right initally
+			//will just make it initially have the direction towards the player target.
+
         }
 
 		public override float SpawnChance(NPCSpawnInfo spawnInfo) 
@@ -46,7 +50,7 @@ namespace KirboMod.NPCs
             //if player is within surface height, daytime, not raining, no invasions, and in forest/purity
             if (spawnInfo.Player.ZoneOverworldHeight && Main.dayTime && !Main.raining && spawnInfo.Player.ZoneForest && !spawnInfo.Invasion && !Main.eclipse)
             {
-                return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? .5f : 0f;
+                return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? .15f : 0f;
 			}
 			else
 			{
@@ -69,6 +73,11 @@ namespace KirboMod.NPCs
 
         public override void AI() //constantly cycles each time
         {
+			NPC.TargetClosest(false);
+			if (NPC.localAI[0] == 0)
+			{
+				NPC.direction = MathF.Sign(Main.player[NPC.target].Center.X - NPC.Center.X); 
+			}
 			NPC.spriteDirection = NPC.direction;
 			CheckPlatform();
 

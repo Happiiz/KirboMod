@@ -42,9 +42,9 @@ namespace KirboMod.NPCs.MidBosses
 		{
 			NPC.width = 100;
 			NPC.height = 136;
-            NPC.damage = Main.hardMode ? (NPC.downedGolemBoss ? 120 : 80) : 40;
+            NPC.damage = Main.hardMode ? (NPC.downedGolemBoss ? 150 : 100) : 50;
             NPC.defense = Main.hardMode ? 30 : 15;
-            NPC.lifeMax = Main.hardMode ? (NPC.downedGolemBoss ? 32000 : 16000) : 800;
+            NPC.lifeMax = Main.hardMode ? (NPC.downedGolemBoss ? 32000 : 10000) : 1000;
             NPC.HitSound = SoundID.NPCHit14; //fishron squeal
 			NPC.DeathSound = SoundID.NPCDeath8; //grunt
 			NPC.value = Main.hardMode ? (NPC.downedGolemBoss ? 200000 : 50000) : 5000; // money it drops (20 gold / 5 gold / 50 silver)

@@ -17,8 +17,8 @@ namespace KirboMod.Projectiles
 
         public override void SetDefaults()
         {
-            Projectile.width = 86; //not actual size just hitbox
-            Projectile.height = 86;
+            Projectile.width = 80; //not actual size just hitbox
+            Projectile.height = 80;
             DrawOriginOffsetY = -3;
             DrawOffsetX = -28;
             Projectile.friendly = false;

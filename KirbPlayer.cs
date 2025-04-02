@@ -165,7 +165,7 @@ namespace KirboMod
         public override void PostUpdate()
         {
             Player player = Main.player[Main.myPlayer];
-            UpdateRightClicksArray();
+            //UpdateRightClicksArray();
             if (darkDashDelay < 0) //dashing
             {
                 player.armorEffectDrawShadow = true; //afterimages
@@ -187,35 +187,56 @@ namespace KirboMod
             tripleStarRotationCounter += 1;
 
             int tripleStarID = ModContent.ItemType<TripleStar>();
-            if (player.HeldItem.type == tripleStarID && !player.dead && player.active)
+            if (Main.netMode == NetmodeID.SinglePlayer)
             {
-                float finalDamage = player.GetTotalDamage(Player.HeldItem.DamageType).ApplyTo(Player.HeldItem.damage); //final damage calculated
-                for (int i = 0; i < tripleStarIndexes.Length; i++)
+                if (player.HeldItem.type == tripleStarID && !player.dead && player.active)
                 {
-                    if (tripleStarIndexes[i] == -1 || !Main.projectile[tripleStarIndexes[i]].active)
+                    float finalDamage = player.GetTotalDamage(Player.HeldItem.DamageType).ApplyTo(Player.HeldItem.damage); //final damage calculated
+                    for (int i = 0; i < tripleStarIndexes.Length; i++)
                     {
-                        tripleStarIndexes[i] = Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, Vector2.Zero,
-                                ModContent.ProjectileType<TripleStarStar>(), (int)finalDamage, 0, player.whoAmI, 0, 0);
+                        if (tripleStarIndexes[i] == -1 || !Main.projectile[tripleStarIndexes[i]].active)
+                        {
+                            tripleStarIndexes[i] = Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, Vector2.Zero,
+                                    ModContent.ProjectileType<TripleStarStar>(), (int)finalDamage, 0, player.whoAmI, 0, 0);
+                        }
+                        else
+                        {
+                            Projectile tripleStar = Main.projectile[tripleStarIndexes[i]];
+                            tripleStar.timeLeft = 2;
+                        }
                     }
-                    else
+                }
+                else
+                {
+                    for (int i = 0; i < tripleStarIndexes.Length; i++)
                     {
-                        Projectile tripleStar = Main.projectile[tripleStarIndexes[i]];
-                        tripleStar.timeLeft = 2;
+                        if (tripleStarIndexes[i] != -1)
+                        {
+                            Main.projectile[tripleStarIndexes[i]].Kill();
+                            tripleStarIndexes[i] = -1;
+                        }
                     }
                 }
             }
-            else
+            else if(player.HeldItem.type == tripleStarID && !player.dead && player.active)
             {
-                for (int i = 0; i < tripleStarIndexes.Length; i++)
+                if((int)Main.timeForVisualEffects % 20 == 0 && player.whoAmI == Main.myPlayer)//hits are local anyway so
                 {
-                    if (tripleStarIndexes[i] != -1)
+                    int finalDamage = (int)player.GetTotalDamage(Player.HeldItem.DamageType).ApplyTo(Player.HeldItem.damage);
+                    bool crit = Main.rand.Next(100) < player.GetCritChance(Player.HeldItem.DamageType) + Player.HeldItem.crit;
+                    float kb = player.GetKnockback(player.HeldItem.DamageType).ApplyTo(player.HeldItem.knockBack);
+                    for (int i = 0; i < Main.maxNPCs; i++)
                     {
-                        Main.projectile[tripleStarIndexes[i]].Kill();
-                        tripleStarIndexes[i] = -1;
+                        NPC npc = Main.npc[i];    
+                        if (Helper.CheckCircleCollision(npc.Hitbox, player.Center, 100))
+                        {
+                            npc.SimpleStrikeNPC(finalDamage, MathF.Sign(npc.Center.X - Player.Center.X), crit, kb, player.HeldItem.DamageType, false, player.luck);
+                        }
                     }
                 }
+                Dust d = Dust.NewDustPerfect(player.Center + Main.rand.NextFloat(MathF.Tau).ToRotationVector2() * 100, DustID.BlueTorch, player.velocity, 0, default, 2);
+                d.noGravity = true;
             }
-
             //Plasma
 
             UpdatePlasmaCharge();
@@ -267,23 +288,23 @@ namespace KirboMod
                     }
                 }
 
-                //disable personal cloud if die
-                if (personalcloud == true && (player.dead || !player.active))
+            
+            }
+            //disable personal cloud if die
+            if (personalcloud && (player.dead || !player.active))
+            {
+                personalcloud = false;
+            }
+            //Personal Cloud
+            
+            if (personalcloud && !player.dead && player.active && player.ownedProjectileCounts[ModContent.ProjectileType<PersonalCloud>()] == 0)
+            {
+                if (Main.myPlayer == Player.whoAmI)
                 {
-                    personalcloud = false;
+                    Projectile.NewProjectile(player.GetSource_FromThis(), player.Center + new Vector2(0, -50), player.velocity * 0, ModContent.ProjectileType<PersonalCloud>(), 0, 0, player.whoAmI);
                 }
             }
-
-            //Personal Cloud
-            if (personalcloud == true && personalcloudalive == false && !player.dead && player.active)
-            {
-                Projectile.NewProjectile(player.GetSource_FromThis(), player.Center + new Vector2(0, -50), player.velocity * 0, ModContent.ProjectileType<PersonalCloud>(), 0, 0, player.whoAmI);
-                personalcloudalive = true; //no more spawning
-            }
-            if (personalcloud == false)
-            {
-                player.GetModPlayer<KirbPlayer>().personalcloudalive = false; //can spawn again
-            }
+           
 
             // NIGHTMARE EFFECT
             if (player.HasBuff(ModContent.BuffType<Buffs.Nightmare>()))
@@ -292,7 +313,7 @@ namespace KirboMod
             }
 
             // NIGHTMARE CROWN
-            if (nightcrown == true)
+            if (nightcrown)
             {
                 Point mouselocation = Main.MouseWorld.ToTileCoordinates();
 
@@ -607,7 +628,7 @@ namespace KirboMod
                 plasmaChargeAmount++;
             if (Main.myPlayer == Player.whoAmI && Main.netMode == NetmodeID.MultiplayerClient && plasmaChargeAmount > 0)
             {
-                NetMethods.SyncPlasmaChargeChange(Player, plasmaChargeAmount, true);
+                NetMethods.SyncPlasmaChargeChange(Player, plasmaChargeAmount, false);
                 plasmaCharge += plasmaChargeAmount;
             }
             else if (Main.netMode == NetmodeID.SinglePlayer)
@@ -817,6 +838,10 @@ namespace KirboMod
                 }
             }
         }
+        public override void OnHitByProjectile(Projectile proj, Player.HurtInfo hurtInfo)
+        {
+           
+        }
         public override void OnHurt(Player.HurtInfo info)
         {
             if (whispbush)
@@ -832,43 +857,62 @@ namespace KirboMod
             //NIGHT CLOAK
             if (nightcloak)
             {
-                NightCloakEffect(info);
-            }
-        }
-
-        private void NightCloakEffect(Player.HurtInfo info)
-        {
-            int damage = 40;
-            int hitDamage = info.SourceDamage;
-            if (Main.masterMode)
-            {
-                hitDamage /= 3;
-            }
-            else if (Main.expertMode)
-            {
-                hitDamage /= 2;
-            }
-            int numStars = (hitDamage * 3) / damage + 4;
-            if (Main.masterMode)
-            {
-                damage = (int)(damage * 1.5);
-            }
-            float starShootSpeed = 20;
-            int type = ModContent.ProjectileType<GoodNightStar>();
-            for (int i = 0; i < numStars; i++)
-            {
-                float rotation = Utils.Remap(i, 0, numStars - 1, 0, MathF.Tau);
-                Vector2 vel = rotation.ToRotationVector2() * starShootSpeed;
-                if (Main.netMode != NetmodeID.MultiplayerClient)
+                if (info.PvP)
                 {
-                    Projectile.NewProjectile(Player.GetSource_FromThis(), Player.MountedCenter - vel, vel, type, damage, 7f, Player.whoAmI, -1, vel.Length());
-                    if (Main.expertMode)
-                    {
-                        vel = vel.RotatedBy(rotation / 2f) * 2;
-                        Projectile.NewProjectile(Player.GetSource_FromThis(), Player.MountedCenter - vel, vel, type, damage, 7f, Player.whoAmI, -1, vel.Length());
-                    }
+                    NightCloakEffect_Pvp(info);
+                }
+                else
+                {
+                    NightCloakEffect_Normal(info);
                 }
             }
+        }
+        private void NightCloakEffect_Pvp(Player.HurtInfo info)
+        {
+            if (info.CooldownCounter == ImmunityCooldownID.Lava || info.CooldownCounter == ImmunityCooldownID.TileContactDamage || info.CooldownCounter == ImmunityCooldownID.WrongBugNet)
+                return;
+            if (Player.whoAmI == Main.myPlayer)
+            {
+                GetNightCloakValues(info, out int damage, out float numStars, out float starShootSpeed, out int type, out int numStarsCeil, out float ai2);
+                for (int i = 0; i < numStarsCeil; i++)
+                {
+                    float rotation = Utils.Remap(i, 0, numStarsCeil, 0, MathF.Tau);
+                    Vector2 vel = rotation.ToRotationVector2() * starShootSpeed;
+                    if (i == numStarsCeil - 1)
+                    {
+                        damage = (int)(damage * (numStars % 1));
+                    }
+
+                    Projectile.NewProjectile(Player.GetSource_FromThis(), Player.MountedCenter - vel, vel, type, damage, 7f, Main.myPlayer, -1, vel.Length(), ai2);
+
+                }
+            }
+            NightCloakVisual();
+        }
+        private void NightCloakEffect_Normal(Player.HurtInfo info)
+        {
+            if (info.CooldownCounter == ImmunityCooldownID.Lava || info.CooldownCounter == ImmunityCooldownID.TileContactDamage || info.CooldownCounter == ImmunityCooldownID.WrongBugNet)
+                return;
+            if (Player.whoAmI == Main.myPlayer)
+            {
+                GetNightCloakValues(info, out int damage, out float numStars, out float starShootSpeed, out int type, out int numStarsCeil, out float ai2);
+                for (int i = 0; i < numStarsCeil; i++)
+                {
+                    float rotation = Utils.Remap(i, 0, numStarsCeil, 0, MathF.Tau);
+                    Vector2 vel = rotation.ToRotationVector2() * starShootSpeed;
+                    if (i == numStarsCeil - 1)
+                    {
+                        damage = (int)(damage * (numStars % 1));
+                    }
+                    Projectile.NewProjectile(Player.GetSource_FromThis(), Player.MountedCenter - vel, vel, type, damage, 7f, Main.myPlayer, -1, vel.Length(), ai2);
+                    
+                }
+            }
+            NightCloakVisual();
+        }
+        private void NightCloakVisual()
+        {
+            //visual
             float starSize = 200;
             float amountOfDots = Utils.Remap(Main.maxDustToDraw, 0, Main.maxDust, 15f, 45f);
             float extraRotation = MathF.Tau * .2f * Main.rand.NextFloat();
@@ -881,6 +925,25 @@ namespace KirboMod
                 }
             }
             SoundEngine.PlaySound(SoundID.Item4, Player.Center); //life crystal
+        }
+        private static void GetNightCloakValues(Player.HurtInfo info, out int damage, out float numStars, out float starShootSpeed, out int type, out int numStarsCeil, out float starAi2)
+        {
+            damage = 40;
+            starShootSpeed = 20;
+            int hitDamage = info.Damage;
+            numStars = (hitDamage * 3f) / damage;
+            if (info.PvP)
+            {
+                damage = hitDamage * 3;
+                starShootSpeed = 35;
+            }
+            type = ModContent.ProjectileType<GoodNightStar>();
+            numStarsCeil = (int)numStars + 1;
+            starAi2 = info.PvP ? 0 : 1;
+            if (numStars > 50)
+            {
+                numStars = 50;
+            }
         }
     }
 

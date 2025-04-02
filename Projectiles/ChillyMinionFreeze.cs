@@ -2,6 +2,7 @@ using KirboMod.NPCs;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -32,7 +33,12 @@ namespace KirboMod.Projectiles
 
 		public override void AI()
 		{
-			Projectile chillyOwner = Main.projectile[(int)Projectile.ai[1]];
+			Projectile chillyOwner = Main.projectile.FirstOrDefault(i => i.identity == Projectile.identity);
+			if (chillyOwner == null || chillyOwner == default)
+			{
+				Projectile.Kill();
+				return;
+			}
 			Projectile.Center = chillyOwner.Center;
 
             //Animation

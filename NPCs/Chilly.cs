@@ -55,7 +55,7 @@ namespace KirboMod.NPCs
             else if (spawnInfo.Player.ZoneSnow && (Main.dayTime || spawnInfo.Player.ZoneRockLayerHeight) && !spawnInfo.Water && !spawnInfo.Sky
                 && !Main.eclipse)
 			{
-				return spawnInfo.SpawnTileType == TileID.SnowBlock || spawnInfo.SpawnTileType == TileID.IceBlock ? .4f : 0f; //functions like a mini if else statement
+				return spawnInfo.SpawnTileType == TileID.SnowBlock || spawnInfo.SpawnTileType == TileID.IceBlock ? .2f : 0f; //functions like a mini if else statement
 			}
 			else
             {

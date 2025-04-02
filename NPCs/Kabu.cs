@@ -72,7 +72,7 @@ namespace KirboMod.NPCs
 				}
 				else //only forest
 				{
-					return spawnInfo.SpawnTileType == TileID.Stone || spawnInfo.SpawnTileType == TileID.Dirt ? .2f : 0f; //functions like a mini if else statement
+					return spawnInfo.SpawnTileType == TileID.Stone || spawnInfo.SpawnTileType == TileID.Dirt ? .1f : 0f; //functions like a mini if else statement
 				}
 			}
 			else

@@ -38,7 +38,7 @@ namespace KirboMod.NPCs
 			{
 				if (spawnInfo.Player.ZoneJungle)
 				{
-					return spawnInfo.SpawnTileType == TileID.JungleGrass || spawnInfo.SpawnTileType == TileID.Mud ? .25f : 0f; //functions like a mini if else statement
+					return spawnInfo.SpawnTileType == TileID.JungleGrass || spawnInfo.SpawnTileType == TileID.Mud ? 0.1f : 0f; //functions like a mini if else statement
 				}
 				else if (spawnInfo.Player.ZoneSnow)
 				{
@@ -46,7 +46,7 @@ namespace KirboMod.NPCs
 				}
 				else if (spawnInfo.Player.ZoneForest) //if forest
                 {
-                    return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? .5f : 0f; //functions like a mini if else statement
+                    return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? 0.2f : 0f; //functions like a mini if else statement
                 }
 				else
 				{

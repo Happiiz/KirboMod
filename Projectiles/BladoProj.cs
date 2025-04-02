@@ -11,6 +11,9 @@ namespace KirboMod.Projectiles
 	{
 		private bool touchedground = false;
 		private float rotationspeed = 0;
+		static int AccelerationDelay => 5;
+		static float MaxSpeed => 10f;
+		static float Acceleration => 0.2f;
 		public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Blado");
@@ -26,6 +29,8 @@ namespace KirboMod.Projectiles
 			Projectile.timeLeft = 300;
 			Projectile.tileCollide = true;
 			Projectile.penetrate = -1;
+			Projectile.localNPCHitCooldown = 30;
+			Projectile.usesLocalNPCImmunity = true;
 		}
 		public override void AI()
 		{
@@ -49,12 +54,12 @@ namespace KirboMod.Projectiles
 			else //touched ground
             {
 				Projectile.ai[0]++;
-				if (Projectile.ai[0] < 30)
+				if (Projectile.ai[0] < AccelerationDelay)
                 {
 					rotationspeed *= 0.95f;
 					Projectile.velocity.X *= 0.95f;
                 }
-				if (Projectile.ai[0] >= 30)
+				if (Projectile.ai[0] >= AccelerationDelay)
                 {
 					rotationspeed += MathHelper.ToRadians(Projectile.direction * 0.5f);
 
@@ -68,7 +73,7 @@ namespace KirboMod.Projectiles
 
 					}
 
-					if (Projectile.ai[0] == 30)
+					if (Projectile.ai[0] == AccelerationDelay)
                     {
 						SoundEngine.PlaySound(SoundID.Item22, Projectile.Center); //motor loop
                     }
@@ -82,16 +87,16 @@ namespace KirboMod.Projectiles
 					}
 				}
 
-				if (Projectile.ai[0] >= 60)
+				if (Projectile.ai[0] >= AccelerationDelay)
                 {
-					Projectile.velocity.X += Projectile.direction * 0.2f;
-					if (Projectile.velocity.X < -10)
+					Projectile.velocity.X += Projectile.direction * Acceleration;
+					if (Projectile.velocity.X < -MaxSpeed)
                     {
-						Projectile.velocity.X = -10;
+						Projectile.velocity.X = -MaxSpeed;
                     }
-					if (Projectile.velocity.X > 10)
+					if (Projectile.velocity.X > MaxSpeed)
 					{
-						Projectile.velocity.X = 10;
+						Projectile.velocity.X = MaxSpeed;
 					}
 				}
             }

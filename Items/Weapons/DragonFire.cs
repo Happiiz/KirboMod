@@ -17,8 +17,7 @@ namespace KirboMod.Items.Weapons
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research 
         }
 
-        static int ArmPen = 15;
-
+		static int ArmPen = 15;
         public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(ArmPen);
 
         public override void SetDefaults()
@@ -28,7 +27,7 @@ namespace KirboMod.Items.Weapons
 			Item.noMelee = true;
 			Item.width = 25;
 			Item.height = 25;
-			Item.useTime = 7;
+			Item.useTime = 3;
 			Item.useAnimation = Item.useTime * 5;
             Item.useStyle = ItemUseStyleID.Shoot;
 			Item.knockBack = 0.2f;
@@ -37,9 +36,10 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item34;
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.Flames.DragonFireFire>();
-			Item.shootSpeed = 7; //proj has 3 extraupdates
+			Item.shootSpeed = 20; //proj has 2 extraupdates
 			Item.mana = 12;
 			Item.ArmorPenetration = ArmPen;
+			
 		}
 
         public override Vector2? HoldoutOffset()

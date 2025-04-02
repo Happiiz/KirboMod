@@ -44,7 +44,7 @@ namespace KirboMod.Items.Weapons
 
         public override void AddRecipes()
         {
-            Recipe kirbyballrecipe = CreateRecipe(300);
+            Recipe kirbyballrecipe = CreateRecipe(600);
 			kirbyballrecipe.AddIngredient(ModContent.ItemType<Starbit>(), 10);
 			kirbyballrecipe.AddIngredient(ModContent.ItemType<HeartMatter>());
 			kirbyballrecipe.AddTile(TileID.MythrilAnvil);

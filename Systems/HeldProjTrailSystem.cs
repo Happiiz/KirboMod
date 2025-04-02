@@ -66,10 +66,10 @@ namespace KirboMod.Systems
                 trail.rotations = new float[trailLength];
                 for (int i = 1; i < trailLength; i++)
                 {
-                    trail.positions[i] = proj.oldPos[i - 1] + proj.Size / 2;
+                    trail.positions[i] = proj.oldPos[i - 1] + proj.Size / 2 + (proj.oldRot[i - 1] - MathF.PI / 4).ToRotationVector2() * 20;
                     trail.rotations[i] = proj.oldRot[i - 1];
                 }
-                trail.positions[0] = proj.Center;
+                trail.positions[0] = proj.Center - (proj.rotation - MathF.PI / 4).ToRotationVector2() * 20; ;
                 trail.rotations[0] = proj.rotation;
                 trail.width = width;
                 trail.startColor = startColor;
@@ -152,11 +152,6 @@ namespace KirboMod.Systems
         }
         private void On_Main_DrawPlayers_AfterProjectiles(On_Main.orig_DrawPlayers_AfterProjectiles orig, Main self)
         {
-            if (subtractiveTrails == null && additiveTrails == null && alphaBlendTrails == null)
-            {
-                orig(self);
-                return;
-            }
             for (int i = 0; i < Main.maxProjectiles; i++)
             {
                 Projectile proj = Main.projectile[i];
@@ -165,6 +160,11 @@ namespace KirboMod.Systems
                     continue;
                 }
                 ((ITrailedHeldProjectile)proj.ModProjectile).AddTrail();
+            }
+            if (subtractiveTrails == null && additiveTrails == null && alphaBlendTrails == null)
+            {
+                orig(self);
+                return;
             }
             SetupGraphicsDeviceAttributes();
             TryDrawingTrailsInArray(ref subtractiveTrails, GetSubtractiveBlendState());

@@ -18,7 +18,7 @@ namespace KirboMod.Projectiles.Flames
             None,
             DontDarken
         }
-        public override string Texture => "Terraria/Images/Projectile_" + ProjectileID.Flames;
+        public override string Texture => "KirboMod/Projectiles/Flames/FlamesSprite";
         protected HueshiftType hueshiftType = HueshiftType.Hot;
         protected virtual void FlamethrowerStats() {}
         protected Color smokeColor;

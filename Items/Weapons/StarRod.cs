@@ -63,7 +63,7 @@ namespace KirboMod.Items.Weapons
         public override void AddRecipes()
         {
             Recipe recipe = CreateRecipe();//Sets result to this item
-			recipe.AddIngredient(ModContent.ItemType<Starbit>(), 40);
+			recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
 			recipe.AddIngredient(ModContent.ItemType<DreamEssence>(), 20);
             recipe.AddIngredient(ItemID.HallowedBar, 5); //5 hallowed bars
             recipe.AddTile(TileID.MythrilAnvil); //Crafted at hardmode anvil

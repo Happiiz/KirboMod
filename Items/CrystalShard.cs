@@ -30,7 +30,7 @@ namespace KirboMod.Items
 
         public override void AddRecipes()
 		{
-			Recipe crystalshardrecipe = CreateRecipe();
+			Recipe crystalshardrecipe = CreateRecipe(2);
 			crystalshardrecipe.AddIngredient(ModContent.ItemType<Starbit>(), 2);
 			crystalshardrecipe.AddIngredient(ModContent.ItemType<DreamEssence>(), 1);
 			crystalshardrecipe.AddIngredient(ItemID.CrystalShard);

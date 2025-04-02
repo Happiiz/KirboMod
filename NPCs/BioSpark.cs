@@ -249,29 +249,31 @@ namespace KirboMod.NPCs
             Player player = Main.player[NPC.target];
             Vector2 projshoot = player.Center - NPC.Center;
             float shootSpeed = 20;
-            if (Main.getGoodWorld)
-            {
-                Utils.ChaseResults results = Utils.GetChaseResults(NPC.Center, shootSpeed, player.Center, player.velocity);
-                if (results.InterceptionHappens)
-                {
-                    projshoot = results.ChaserVelocity;
-                }
-                else
-                {
-                    projshoot = projshoot.Normalized(shootSpeed);
-                }
-            }
-            else
-            {
-                projshoot.Normalize();
-                projshoot *= shootSpeed;
-            }
+         
             NPC.TargetClosest(true);
 
-            NPC.velocity.X *= 0.5f; //slow
+            NPC.velocity.X *= 0.5f; //slow down
 
             if (AttackTimer % 5 == 0 && AttackTimer > 120 + 30 && AttackTimer <= 120 + 45) //unleash daggers every 5 ticks within 15 ticks
             {
+                if (Main.getGoodWorld)
+                {
+                    Utils.ChaseResults results = Utils.GetChaseResults(NPC.Center, shootSpeed, player.Center, player.velocity);
+                    if (results.InterceptionHappens)
+                    {
+                        projshoot = results.ChaserVelocity;
+                    }
+                    else
+                    {
+                        projshoot = projshoot.Normalized(shootSpeed);
+                    }
+                }
+                else
+                {
+                    projshoot.Normalize();
+                    projshoot *= shootSpeed;
+                }
+
                 for (int i = 0; i < 4; i++)
                 {
                     float velocity = Utils.Remap(i, 0, 3, 2, 7);
@@ -362,7 +364,7 @@ namespace KirboMod.NPCs
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<Items.Weapons.ShinobiScroll>(), 20, 10)); // 1 in 20 (5%) chance in Normal. 1 in 10 (10%) chance in Expert
-            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<DreamEssence>(), 1, 2, 4));
+            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<DreamEssence>(), 1, 4, 8));
         }
         public override void HitEffect(NPC.HitInfo hit)
         {

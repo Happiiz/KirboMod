@@ -6,6 +6,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using KirboMod.Particles;
+using Terraria.DataStructures;
 
 namespace KirboMod.Items
 {
@@ -29,6 +30,19 @@ namespace KirboMod.Items
             Item.useStyle = ItemUseStyleID.HoldUp;
 			Item.UseSound = SoundID.DD2_MonkStaffSwing;
             Item.consumable = false;
+        }
+        public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+        {
+            if(player.altFunctionUse == 2)
+            {
+                Main.getGoodWorld = !Main.getGoodWorld;
+                Main.NewText("for the worthy is now " + Main.getGoodWorld, Color.Yellow);
+            }
+            return false;
+        }
+        public override bool AltFunctionUse(Player player)
+        {
+            return true;
         }
 
         public override bool? UseItem(Player player)

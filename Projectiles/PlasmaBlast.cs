@@ -89,8 +89,8 @@ namespace KirboMod.Projectiles
 
         public void AddTrail()
         {
-            TrailSystem.Trail.AddAdditive(Projectile, 100, Color.Cyan * Projectile.Opacity, Color.LimeGreen * Projectile.Opacity);
-            TrailSystem.Trail.AddAdditive(Projectile, 50, Color.White * Projectile.Opacity, Color.Transparent * Projectile.Opacity);
+            TrailSystem.Trail.AddAdditive(Projectile, 100, Color.LimeGreen * Projectile.Opacity, Color.Cyan * Projectile.Opacity);
+            TrailSystem.Trail.AddAdditive(Projectile, 50,  Color.Transparent * Projectile.Opacity, Color.White * Projectile.Opacity);
         }
 
         ///// <summary>

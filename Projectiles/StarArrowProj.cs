@@ -50,15 +50,19 @@ namespace KirboMod.Projectiles
             }
         }
 
+        public override bool PreDraw(ref Color lightColor)
+        {
+			return Projectile.DrawSelf(Color.White);
+        }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
             SoundEngine.PlaySound(SoundID.Item10, Projectile.position); //impact
             return true; //collision
         }
-
-        public override Color? GetAlpha(Color lightColor)
-		{
-			return Color.White; // Makes it uneffected by light
-		}
+		//not needed if using my DrawSelf function where I can already pass the light color as Color.White
+  //      public override Color? GetAlpha(Color lightColor)
+		//{
+		//	return Color.White; // Makes it uneffected by light
+		//}
 	}
 }

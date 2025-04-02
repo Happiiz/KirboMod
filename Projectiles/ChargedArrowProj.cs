@@ -5,6 +5,7 @@ using ReLogic.Content;
 using System;
 using Terraria;
 using Terraria.Audio;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -35,14 +36,38 @@ namespace KirboMod.Projectiles
 			Projectile.ignoreWater = true;
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = 10;
+            Projectile.extraUpdates = 1;
 		}
+        ref float MaxVel => ref Projectile.localAI[0];
+        ref float HomingTimer => ref Projectile.localAI[1];
+        ref float HomingLockoutTimer => ref Projectile.ai[1];
+        ref float HomingTargetIndex => ref Projectile.ai[0];
 		public override void AI()
 		{
 			Projectile.rotation = Projectile.velocity.ToRotation();
-
+            if(MaxVel == 0)
+            {
+                MaxVel = Projectile.velocity.Length();
+            }
 			int dustnumber = Dust.NewDust(Projectile.position, 18, 18, DustID.IcyMerman, 0f, 0f, 0, default, 1f); //dust
 			Main.dust[dustnumber].velocity *= 0.2f;
 			Main.dust[dustnumber].noGravity = true;
+            Main.dust[dustnumber].scale *= 1.2f;
+            if (HomingLockoutTimer > 0)
+            {
+                HomingLockoutTimer--;
+                Projectile.velocity.Normalize();
+                Projectile.velocity *= MaxVel;
+            }
+            else
+            {
+                float prevAi0 = HomingTargetIndex;
+                Helper.Homing(Projectile, MaxVel, ref HomingTargetIndex, ref HomingTimer, 0.1f, 100f);
+                if (prevAi0 != HomingTargetIndex)// if changed homing target, sync.
+                {
+                    Projectile.netUpdate = true;
+                }
+            }
 		}
 
         public override Color? GetAlpha(Color lightColor)
@@ -87,12 +112,20 @@ namespace KirboMod.Projectiles
                 Vector2 drawOrigin = texture.Size() / 2;
                 Vector2 drawPos = (Projectile.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(-8f, Projectile.gfxOffY);
 
-                Color color = Color.CornflowerBlue * ((Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);
+                Color color = Color.CornflowerBlue;
+                color.A = 128;//make it blend with the background a bit.
+                color *= ((Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);
                 Main.EntitySpriteDraw(texture, drawPos, null, color, Projectile.rotation, drawOrigin, 1, SpriteEffects.None, 0);
             }
-            return true; //draw og
+            
+            return Projectile.DrawSelf(Color.White);
         }
-
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            HomingLockoutTimer = 10;
+            HomingTargetIndex = -1;
+            Projectile.netUpdate = true;
+        }
         public override void PostDraw(Color lightColor)
         {
             //add glow ball at tip of arrow

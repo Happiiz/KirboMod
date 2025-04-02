@@ -57,7 +57,7 @@ namespace KirboMod.Items.Weapons
 		public override void AddRecipes()
 		{
 			Recipe parasol = CreateRecipe();
-            parasol.AddIngredient(ModContent.ItemType<Starbit>(), 20);
+            parasol.AddIngredient(ModContent.ItemType<Starbit>(), 10);
             parasol.AddIngredient(ItemID.Umbrella);
             parasol.AddTile(TileID.Anvils);
             parasol.Register();
