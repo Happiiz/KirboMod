@@ -24,14 +24,14 @@ namespace KirboMod.NPCs.MidBosses
 		public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Mr. Frosty");
-			Main.npcFrameCount[NPC.type] = 8;
+			Main.npcFrameCount[NPC.type] = 15;
 
             NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers()
             {
                 PortraitScale = 1f, // Portrait refers to the full picture when clicking on the icon in the bestiary
                 PortraitPositionYOverride = 20f,
                 PortraitPositionXOverride = 0f,
-                Position = new Vector2(20, 80),
+                Position = new Vector2(20, 40),
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
 
@@ -42,6 +42,10 @@ namespace KirboMod.NPCs.MidBosses
 		{
 			NPC.width = 100;
 			NPC.height = 136;
+            NPC.damage = Main.hardMode ? (NPC.downedGolemBoss ? 150 : 100) : 50;
+			NPC.width = 80;
+			NPC.height = 100;
+            DrawOffsetY = 28;
             NPC.damage = Main.hardMode ? (NPC.downedGolemBoss ? 150 : 100) : 50;
             NPC.defense = Main.hardMode ? 30 : 15;
             NPC.lifeMax = Main.hardMode ? (NPC.downedGolemBoss ? 32000 : 10000) : 1000;
@@ -147,55 +151,97 @@ namespace KirboMod.NPCs.MidBosses
 
 		public override void FindFrame(int frameHeight) // animation
 		{
-			if (attacktype == 0) //stand still
+			if (attacktype == 0) //bobbing
 			{
-				NPC.frame.Y = 0; //stance
+                NPC.frameCounter += 1;
+                
+                if (NPC.frameCounter < 10)
+                {
+                    NPC.frame.Y = 0;
+                }
+                else if (NPC.frameCounter < 20)
+                {
+                    NPC.frame.Y = frameHeight;
+                }
+                else if (NPC.frameCounter < 35)
+                {
+                    NPC.frame.Y = frameHeight * 2;
+                }
+                else
+                {
+                    NPC.frameCounter = 0;
+                }
             }
 			if (attacktype == 1) //dive attack
 			{
 				if (NPC.ai[0] > 180) //the dive
 				{
-                    NPC.frame.Y = frameHeight * 3; //dive
+                    NPC.frame.Y = frameHeight * 7; //dive
                 }
 				else //dashing
 				{
-					NPC.frameCounter += 1;
-					if (NPC.frameCounter < 10)
-					{
-						NPC.frame.Y = frameHeight; //walk 1
-					}
-					else if (NPC.frameCounter <= 20) 
-					{
-						NPC.frame.Y = frameHeight * 2; //walk 2
-					}
-					else
-					{
+                    NPC.frameCounter += 1;
+
+                    if (NPC.frameCounter < 5)
+                    {
+                        NPC.frame.Y = frameHeight * 3;
+                    }
+                    else if (NPC.frameCounter < 10)
+                    {
+                        NPC.frame.Y = frameHeight  * 4;
+                    }
+                    else if (NPC.frameCounter < 15)
+                    {
+                        NPC.frame.Y = frameHeight * 5;
+                    }
+                    else if (NPC.frameCounter < 20)
+                    {
+                        NPC.frame.Y = frameHeight * 6;
+                    }
+                    else
+                    {
                         NPC.frameCounter = 0;
-					}
-				}
+                    }
+                }
 			}
 			if (attacktype == 2) //ice cube
 			{
-				if (NPC.ai[0] >= 90) //attacking
-				{
-                    NPC.frame.Y = frameHeight * 7; //toss
-                }
-                else if (NPC.ai[0] >= 60) //attacking
+				if (NPC.ai[0] >= 100)  //throw 3
                 {
-                    NPC.frame.Y = frameHeight * 6; //prepare ice
+                    NPC.frame.Y = frameHeight * 14;
+                }
+                else if (NPC.ai[0] >= 95)  //throw 2
+                {
+                    NPC.frame.Y = frameHeight * 13;
+                }
+                else if(NPC.ai[0] >= 90)  //throw 1
+                {
+                    NPC.frame.Y = frameHeight * 12;
+                }
+                else if (NPC.ai[0] >= 60)  //prepare ice
+                {
+                    NPC.frame.Y = frameHeight * 11;
                 }
                 else //shake that
 				{
                     NPC.frameCounter += 1;
 					if (NPC.frameCounter < 8)
 					{
-						NPC.frame.Y = frameHeight * 4;
+						NPC.frame.Y = frameHeight * 8;
 					}
 					else if (NPC.frameCounter < 16)
 					{
-						NPC.frame.Y = frameHeight *  5;
+						NPC.frame.Y = frameHeight *  9;
 					}
-					else
+                    else if (NPC.frameCounter < 24)
+                    {
+                        NPC.frame.Y = frameHeight * 8;
+                    }
+                    else if (NPC.frameCounter < 32)
+                    {
+                        NPC.frame.Y = frameHeight * 10;
+                    }
+                    else
 					{
                         NPC.frameCounter = 0;
 					}
