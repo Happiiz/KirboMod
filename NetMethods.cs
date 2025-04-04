@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using KirboMod.Items.NewWhispy;
+using Microsoft.Xna.Framework;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -44,12 +41,27 @@ namespace KirboMod
             /// byte: player whoAmI. Vector2: player position(not center!). Vector2 player velocity.
             /// </summary>
             PlayerPositionAndVelocity = 9,
+            /// <summary>
+            /// spawns whispy woods boss
+            /// byte: player index, int: tileX, int: tileY
+            /// </summary>
+
+            SpawnWhispy = 10
         }
 
 
+        public static void SpawnWhispy(int tileX, int tileY)
+        {
+            ModPacket packet = KirboMod.instance.GetPacket();
+            packet.Write((byte)ModPacketType.SpawnWhispy);
+            packet.Write((byte)Main.myPlayer);
+            packet.Write(tileX);
+            packet.Write(tileY);
+            packet.Send();
+        }
         public static void SyncPlayerRightClick(Player plr)
         {
-            if (plr.whoAmI == Main.myPlayer && Main.netMode == NetmodeID.MultiplayerClient && KirbPlayer.playerRightClicks[plr.whoAmI] != Main.mouseRight)
+            if (plr.whoAmI == Main.myPlayer && Main.netMode == NetmodeID.MultiplayerClient && KirbPlayer.playerRightClicks[plr.whoAmI] != Main.mouseRight && (Main.HoverItem.IsAir))
             {
                 KirbPlayer.playerRightClicks[plr.whoAmI] = Main.mouseRight;
                 ModPacket p = KirboMod.instance.GetPacket();
@@ -70,23 +82,19 @@ namespace KirboMod
         {
             SyncPlayerPosition(Main.player[whoAmI]);
         }
-        public static void SyncPlasmaChargeChange(Player plr, sbyte amountToChange, bool writeDebugMessage = false)
+        public static void SyncPlasmaChargeChange(Player plr, sbyte amountToChange)
         {
             ModPacket p = KirboMod.instance.GetPacket();
             p.Write((byte)ModPacketType.PlasmaChargeChange);
             p.Write((byte)plr.whoAmI);
             p.Write(amountToChange);
             p.Send(-1, plr.whoAmI);
-            if (writeDebugMessage)
-            {
-                Main.NewText("sent packet: sync plasma charge change.");
-            }
         }
         public static void SyncPlayerPositionAndVelocity(Player plr)
         {
             ModPacket packet = KirboMod.instance.GetPacket();
             packet.Write((byte)ModPacketType.PlayerPositionAndVelocity);
-            packet.Write((byte)plr.whoAmI); 
+            packet.Write((byte)plr.whoAmI);
             packet.WriteVector2(plr.position);
             packet.WriteVector2(plr.velocity);
             packet.Send(-1, plr.whoAmI);
@@ -125,30 +133,70 @@ namespace KirboMod
                 //    packet.Send(-1, Main.myPlayer);
                 //    break;
                 case ModPacketType.PlasmaChargeChange:
-                    Player plr = Main.player[reader.ReadByte()];
-                    sbyte amountToChange = reader.ReadSByte();   
+                    //code is executed here once for the server, and then again on the other clients.
+                    byte plrWhoAmI = reader.ReadByte();
+                    Player plr = Main.player[plrWhoAmI];
+                    sbyte amountToChange = reader.ReadSByte();
                     KirbPlayer mplr = plr.GetModPlayer<KirbPlayer>();
-                    mplr.plasmaCharge += amountToChange;
-                    mplr.plasmaTimer = 0;
-                    Main.NewText($"received packet: plasma charge change. player {plr.whoAmI} changed plasma charge by {amountToChange}");
+                    mplr.ModifyPlasmaChargeAndResetPlasmaChargeDecayTimer_NoNetMessageSend(amountToChange);
+                    if (Main.dedServ)
+                    {
+                        //ModPacket packet = KirboMod.instance.GetPacket();
+                        //packet.Write((byte)ModPacketType.PlasmaChargeChange);
+                        //packet.Write(plrWhoAmI);
+                        //packet.Write(amountToChange);
+                        //packet.Send(-1, plrWhoAmI);
+                        SyncPlasmaChargeChange(plr, amountToChange);
+                    }
                     break;
                 case ModPacketType.PlayerRightClickFalse:
                     byte index = reader.ReadByte();
                     KirbPlayer.playerRightClicks[index] = false;
-                    Main.NewText($"received packet: player {index}  right click false");
+                    if (Main.dedServ)
+                    {
+                        ModPacket p = KirboMod.instance.GetPacket();
+                        p.Write((byte)(ModPacketType.PlayerRightClickFalse));
+                        p.Write(index);
+                        p.Send();
+                    }
                     break;
                 case ModPacketType.PlayerRightClickTrue:
                     index = reader.ReadByte();
                     KirbPlayer.playerRightClicks[index] = true;
-                    Main.NewText($"received packet: player {index}  right click true");
+                    if (Main.dedServ)
+                    {
+                        ModPacket p = KirboMod.instance.GetPacket();
+                        p.Write((byte)(ModPacketType.PlayerRightClickTrue));
+                        p.Write(index);
+                        p.Send();
+                    }
                     break;
                 case ModPacketType.PlayerPosition or ModPacketType.PlayerPositionAndVelocity:
-                    plr = Main.player[reader.ReadByte()];
-                    plr.position = reader.ReadVector2();
+                    byte plrIndex = reader.ReadByte();
+                    plr = Main.player[plrIndex];
+                    Vector2 pos = reader.ReadVector2();
+                    plr.position = pos;
                     if (packetType == ModPacketType.PlayerPositionAndVelocity)
                     {
-                        plr.velocity = reader.ReadVector2();
+                        Vector2 velocity = reader.ReadVector2();
+                        plr.velocity = velocity;
+                        if (Main.dedServ)
+                        {
+                            SyncPlayerPositionAndVelocity(plr);
+                        }
                     }
+                    else if(Main.dedServ)
+                    {
+                        SyncPlayerPosition(plrIndex);
+                    }
+
+                    break;
+                case ModPacketType.SpawnWhispy:
+                    // don't need to re-send packet because the server will be responsible for spawning the NPC
+                    int playerIndex = reader.ReadByte();
+                    int i = reader.ReadInt32();
+                    int j = reader.ReadInt32();
+                    NewWhispySummonTile.SpawnWhispyAt(playerIndex, i, j);
                     break;
 
             }

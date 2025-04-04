@@ -127,20 +127,18 @@ namespace KirboMod.Items.NewWhispy
                 }
                 return true;
             }
-            int spawnX = i * 16 + 8;
-            int spawnY = j * 16 + 16;
+           
             if (NPC.AnyNPCs(ModContent.NPCType<NewWhispyBoss>()))
             {
                 return true;
             }
             if (Main.netMode == NetmodeID.SinglePlayer)
             {
-                bool unused = false;
-                RemoveWhispyDustIndicatorProjs(ref unused);
-                NPC.NewNPC(new EntitySource_TileInteraction(Main.LocalPlayer, i, j), spawnX, spawnY, ModContent.NPCType<NewWhispyBoss>());
+                SpawnWhispyAt(Main.myPlayer, i, j);
             }
             else
             {
+                NetMethods.SpawnWhispy(i, j);
                 //TODO: ADD NETCODE FOR WHISPY SPAWN
             }
             SoundEngine.PlaySound(SoundID.Roar, player.position);
@@ -148,7 +146,16 @@ namespace KirboMod.Items.NewWhispy
             return true;
         }
 
-        private static int RemoveWhispyDustIndicatorProjs(ref bool disabledEffect)
+        public static void SpawnWhispyAt(int playerIndex, int i, int j)
+        {
+            bool unused = false;
+            int spawnX = i * 16 + 8;
+            int spawnY = j * 16 + 16;
+            RemoveWhispyDustIndicatorProjs(ref unused);
+            NPC.NewNPC(new EntitySource_TileInteraction(Main.player[playerIndex], i, j), spawnX, spawnY, ModContent.NPCType<NewWhispyBoss>());
+        }
+
+        public static int RemoveWhispyDustIndicatorProjs(ref bool disabledEffect)
         {
             int dustGeneratorProjType = ModContent.ProjectileType<NewWhispySummonTileDustGenerator>();
             for (int k = 0; k < Main.maxProjectiles; k++)
@@ -181,7 +188,7 @@ namespace KirboMod.Items.NewWhispy
         }
         public override void AI()
         {
-            if (Projectile.localAI[0] % 45 == 0)
+            if (Projectile.localAI[0] % 45 == 0 && Projectile.ai[1] <= 0)
             {
                 int i = (int)Projectile.position.X / 16;
                 int j = (int)Projectile.position.Y / 16;
@@ -208,7 +215,11 @@ namespace KirboMod.Items.NewWhispy
             Projectile.localAI[0]++;
 
             //multiplayer reasons
-            if (Projectile.ai[1] == 1)
+            if (Projectile.ai[1] > 0)
+            {
+                Projectile.ai[1]++;
+            }
+            if (Projectile.ai[1] > 2)
             {
                 Projectile.Kill();
             }

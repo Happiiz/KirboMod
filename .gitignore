@@ -116,3 +116,4 @@ obj/project.nuget.cache
 *.json
 *.bin
 *.2
+/.vs/KirboMod/v17

@@ -5,18 +5,18 @@ using Microsoft.Xna.Framework;
 using System.IO;
 using Terraria;
 using Terraria.Audio;
-using Terraria.Chat;
-using Terraria.DataStructures;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
-using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace KirboMod.NPCs
 {
     public partial class PureDarkMatter : ModNPC
     {
+        public static SoundStyle LaserSFX => new SoundStyle("KirboMod/Sounds/NPC/DarkMatter/PureDarkMatterLaser") with { MaxInstances = 0 };
+        public static SoundStyle PetalThrowSFX => new SoundStyle("KirboMod/Sounds/NPC/DarkMatter/PureDarkMatterPetalThrow");
+        public static SoundStyle DashSFX => new SoundStyle("KirboMod/Sounds/NPC/DarkMatter/PureDarkMatterDash") with { Volume = 1.6f };
         enum DarkMatterAttackType : byte
         {
             Petals,//1
@@ -30,7 +30,7 @@ namespace KirboMod.NPCs
             // DisplayName.SetDefault("Dark Matter");
             Main.npcFrameCount[NPC.type] = 4;
 
-            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
+            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new(0)
             {
                 //CustomTexturePath = ,
                 PortraitScale = 1, // Portrait refers to the full picture when clicking on the icon in the bestiary
@@ -149,8 +149,8 @@ namespace KirboMod.NPCs
         {
             npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<DarkMatterBag>())); //only drops in expert
 
-            LeadingConditionRule notExpertRule = new LeadingConditionRule(new Conditions.NotExpert()); //checks if not expert
-            LeadingConditionRule masterMode = new LeadingConditionRule(new Conditions.IsMasterMode()); //checks if master mode
+            LeadingConditionRule notExpertRule = new(new Conditions.NotExpert()); //checks if not expert
+            LeadingConditionRule masterMode = new(new Conditions.IsMasterMode()); //checks if master mode
 
             notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<Items.DarkMaterial>(), 1, 30, 30));
             notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<DarkMatterMask>(), 7));

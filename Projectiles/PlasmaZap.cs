@@ -1,8 +1,4 @@
-using KirboMod.Particles;
-using Microsoft.Xna.Framework;
-using System;
 using Terraria;
-using Terraria.ID;
 
 namespace KirboMod.Projectiles
 {
@@ -14,6 +10,7 @@ namespace KirboMod.Projectiles
             Projectile.hostile = false;
             Projectile.friendly = true;
             Projectile.tileCollide = true; //make collide
+            Projectile.width = Projectile.height = 16;
         }
     }
 }

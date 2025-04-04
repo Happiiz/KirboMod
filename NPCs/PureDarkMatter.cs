@@ -165,6 +165,9 @@ namespace KirboMod.NPCs
             }
             else
             {
+                //DEBUG LINE
+                //attacktype = DarkMatterAttackType.Petals;
+
                 attacktype = possibleAttacks[Main.rand.Next(possibleAttacks.Count)];
                 attackTurn += 1; //add every turn 
 
@@ -175,8 +178,8 @@ namespace KirboMod.NPCs
 
         void AttackPetals()
         {
-            Player player = Main.player[NPC.target];
-            Vector2 playerDistance = player.Center - NPC.Center;
+            Player target = Main.player[NPC.target];
+            Vector2 playerDistance = target.Center - NPC.Center;
             NPC.TargetClosest();
 
             //deciding which side
@@ -191,7 +194,7 @@ namespace KirboMod.NPCs
             }
 
             //movement
-            Vector2 playerXOffest = player.Center + new Vector2(xOffset, 0f); //go ahead of player
+            Vector2 playerXOffest = target.Center + new Vector2(xOffset, 0f); //go ahead of player
             Vector2 move = playerXOffest - NPC.Center;
 
 
@@ -203,28 +206,18 @@ namespace KirboMod.NPCs
             NPC.velocity = (NPC.velocity * (inertia - 1) + move) / inertia;
 
             //main attack
-            if (phase == 1)
+            int fireRate = phase == 1 ? 90 : 80;
+            if (NPC.ai[0] % fireRate == 0)
             {
-                if (NPC.ai[0] % 15 == 0)
+                if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
-                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    for (int i = 0; i < 4; i++)
                     {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, new Vector2(NPC.direction * -10, Main.rand.Next(-10, 10)),
-                        ModContent.ProjectileType<MatterOrb>(), 60 / 2, 4, default, 0, player.whoAmI, NPC.ai[0] / 60f);
-                    }
-                    SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center); //blub
-                }
-            }
-            else
-            {
-                if (NPC.ai[0] % 10 == 0)
-                {
-                    if (Main.netMode != NetmodeID.MultiplayerClient)
-                    {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, new Vector2(NPC.direction * -10, Main.rand.Next(-10, 10)),
-                        ModContent.ProjectileType<MatterOrb>(), 60 / 2, 4, default, 0, player.whoAmI, NPC.ai[0] / 60f);
-                    }
-                    SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center); //blub blub
+                        int dirSign = MathF.Sign(playerDistance.X);
+                        MatterOrb.GetAIValues(dirSign, NPC.whoAmI, i, out float ai0, out float ai1, out float ai2, out Vector2 vel);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, vel,
+                        ModContent.ProjectileType<MatterOrb>(), 60 / 2, 4, -1, ai0, ai1, ai2);
+                    }     
                 }
             }
 
@@ -289,7 +282,8 @@ namespace KirboMod.NPCs
 
                 if (NPC.ai[0] == 150)
                 {
-                    SoundEngine.PlaySound(SoundID.Roar, NPC.Center); //OOooAAAHHRrrr
+                    PlayDashSFX();
+                    //SoundEngine.PlaySound(SoundID.Roar, NPC.Center); //OOooAAAHHRrrr
                 }
             }
             else //slow
@@ -360,7 +354,7 @@ namespace KirboMod.NPCs
                             Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + posOffset, turned,
                                 ModContent.ProjectileType<DarkMatterLaser>(), 60 / 2, 4, default, ai0, ai1);
                         }
-                        SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                        SoundEngine.PlaySound(LaserSFX, NPC.Center); //boss laser
                     }
                 }
                 else
@@ -373,7 +367,7 @@ namespace KirboMod.NPCs
                             Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + posOffset, turned,
                                 ModContent.ProjectileType<DarkMatterLaser>(), 60 / 2, 4, default, ai0, ai1);
                         }
-                        SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                        SoundEngine.PlaySound(LaserSFX, NPC.Center); //boss laser
                     }
                 }
             }
@@ -450,8 +444,9 @@ namespace KirboMod.NPCs
 
                 if (NPC.ai[0] == 90)
                 {
-                    SoundEngine.PlaySound(SoundID.Roar, NPC.Center); //OOooAAAHHRrrr
-
+                    //SoundEngine.PlaySound(SoundID.Roar, NPC.Center); //OOooAAAHHRrrr
+                    //PlayDashSFX();
+                    SoundEngine.PlaySound(PetalThrowSFX, NPC.Center);
                     for (int i = 0; i < 20; i++) //Dust in an arc behind Dark Matter
                     {
                         Dust.NewDustPerfect(NPC.Center, ModContent.DustType<DarkResidue>(), Main.rand.Next(5, 10) * -NPC.direction * Main.rand.NextVector2Unit(-45, MathHelper.ToRadians(90)));
@@ -465,7 +460,7 @@ namespace KirboMod.NPCs
                         Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero,
                         ModContent.ProjectileType<Projectiles.MatterOrbVertical>(), 60 / 2, 4, default, 0, NPC.ai[1] % 2 == 0 ? 0 : 1);
                     }
-                    SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center); //blub blub blub
+                    //SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center); //blub blub blub
                 }
             }
 
@@ -517,8 +512,8 @@ namespace KirboMod.NPCs
                 {
                     NPC.rotation = playerDistance.ToRotation();
 
-                    SoundEngine.PlaySound(SoundID.ForceRoarPitched, NPC.Center); //pitched roar
-
+                    //SoundEngine.PlaySound(SoundID.ForceRoarPitched, NPC.Center); //pitched roar
+                    PlayDashSFX();
                     for (int i = 0; i < 20; i++) //Dust in an arc behind Dark Matter
                     {
                         Dust.NewDustPerfect(NPC.Center, ModContent.DustType<DarkResidue>(), Main.rand.Next(5, 10) * -Main.rand.NextVector2Unit(NPC.rotation + MathHelper.ToRadians(-45), MathHelper.ToRadians(90)));
@@ -602,13 +597,14 @@ namespace KirboMod.NPCs
                 {
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        for (int i = -2; i < 1; i++)
+                        for (int i = -2; i < 1; i++) 
                         {
                             tradjectory = MathHelper.ToRadians(45 * i);
                             Vector2 vel = NPC.direction * tradjectory.ToRotationVector2().RotatedBy(MathHelper.ToRadians(45)) * 20;
 
                             LightningProj.GetSpawningStats(vel, out float ai0, out float ai1);
                             Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 45, 0), vel, ModContent.ProjectileType<DarkMatterLaser>(), 60 / 2, 4, -1, ai0, ai1);
+                            
                         }
                     }
                     NPC.ai[1] = 1;
@@ -631,7 +627,7 @@ namespace KirboMod.NPCs
 
                 spot = player.Center + new Vector2(xOffset, 0); //move ahead of player
 
-                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                SoundEngine.PlaySound(LaserSFX, NPC.Center); //boss laser
             }
 
             Vector2 offset = new Vector2(45, 0).RotatedBy(NPC.rotation) * NPC.direction;
@@ -742,30 +738,42 @@ namespace KirboMod.NPCs
             Vector2 drawPos = NPC.Center + new Vector2(NPC.direction * 45, 0) - Main.screenPosition;
             float direction;
             float extraRot = NPC.direction == -1 ? 180 : 0;
+            Vector2 scale = new Vector2(4, 4);
             if (phase >= 3)
             {
                 if (NPC.ai[1] == 0)
                 {
                     for (int i = -2; i < 1; i++)
                     {
+                        scale = new Vector2(4, 4);
                         direction = MathHelper.ToRadians(45 * i + 45 + extraRot);
-                        Main.EntitySpriteDraw(telegraph, drawPos, null, Color.Purple, direction, origin, 4, SpriteEffects.None);
+                        Main.EntitySpriteDraw(telegraph, drawPos, null, Color.Purple, direction, origin, scale, SpriteEffects.None);
+                        scale.Y *= .5f;
+                        Main.EntitySpriteDraw(telegraph, drawPos, null, Color.Black, direction, origin, scale, SpriteEffects.None);
                     }
                     return;
                 }
                 for (int i = -1; i < 1; i++)
                 {
+                    scale = new Vector2(4, 4);
                     direction = MathHelper.ToRadians(-22.5f + (45 * i) + 45 + extraRot);
-                    Main.EntitySpriteDraw(telegraph, drawPos, null, Color.Purple, direction, origin, 4, SpriteEffects.None);
-
+                    Main.EntitySpriteDraw(telegraph, drawPos, null, Color.Purple, direction, origin, scale, SpriteEffects.None);
+                    scale.Y *= .5f;
+                    Main.EntitySpriteDraw(telegraph, drawPos, null, Color.Black, direction, origin, scale, SpriteEffects.None);
                 }
                 return;
             }
             direction = NPC.direction == 1 ? NPC.rotation : NPC.rotation + MathF.PI;
             drawPos = NPC.Center + direction.ToRotationVector2() * 45 - Main.screenPosition;
           
-            Main.EntitySpriteDraw(telegraph, drawPos, null, Color.Purple, direction, origin, 4, SpriteEffects.None);
+            Main.EntitySpriteDraw(telegraph, drawPos, null, Color.Purple, direction, origin, scale, SpriteEffects.None);
+            scale.Y *= .5f;
+            Main.EntitySpriteDraw(telegraph, drawPos, null, Color.Black, direction, origin, scale, SpriteEffects.None);
 
+        }
+        void PlayDashSFX()
+        {
+            SoundEngine.PlaySound(DashSFX, NPC.Center);
         }
     }
 

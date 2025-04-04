@@ -12,6 +12,7 @@ using KirboMod.Items;
 using KirboMod.Items.Nightmare;
 using KirboMod.Systems;
 using System.IO;
+using KirboMod.Projectiles.NightmareLightningOrb;
 
 namespace KirboMod.NPCs
 {
@@ -149,6 +150,19 @@ namespace KirboMod.NPCs
 
         public override void HitEffect(NPC.HitInfo hit)
         {
+            if(NPC.life <= 0)
+            {
+                int lightningOrb1 = ModContent.ProjectileType<NightmareLightningOrb>();
+                int lightningOrb2 = ModContent.ProjectileType<NightmareLightningOrbHoming>();
+                for (int i = 0; i < Main.maxProjectiles; i++)
+                {
+                    Projectile projectile = Main.projectile[i];
+                    if(projectile.active && (projectile.type == lightningOrb2 || projectile.type == lightningOrb1))
+                    {
+                        projectile.Kill();
+                    }
+                }
+            }
             if (deathCounter >= 360 && NPC.life <= 0)
             {
                 for (int i = 0; i < 8; i++) 

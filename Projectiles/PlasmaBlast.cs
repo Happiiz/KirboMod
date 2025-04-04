@@ -1,98 +1,131 @@
-using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
 using Terraria;
-using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles
 {
-	public class PlasmaBlast : ModProjectile, ITrailedProjectile
-	{
-		public override void SetStaticDefaults()
-		{
+    public class PlasmaBlast : ModProjectile
+    {
+        public override void SetStaticDefaults()
+        {
             ProjectileID.Sets.TrailCacheLength[Projectile.type] = 35; // The length of old position to be recorded
             ProjectileID.Sets.TrailingMode[Projectile.type] = 2; // The recording mode
         }
 
-		public override void SetDefaults()
-		{
-			Projectile.width = 10;
-			Projectile.height = 10;
-			Projectile.friendly = true;
-			Projectile.hostile = false;
-			Projectile.timeLeft = 120;
-			Projectile.tileCollide = true; 
-			Projectile.usesLocalNPCImmunity = true;
-			Projectile.localNPCHitCooldown = -1;
-			Projectile.extraUpdates = 2;
-			Projectile.scale = 1;
-			Projectile.penetrate = -1; //infinite
-			//VFX.LoadTextures();
-			//List<Vector2> pos = Lightning.CreateEvenlySpacedVector2sOnLine(Projectile.Center, Projectile.Center + new Vector2(0, 500), 10);
-			//Lightning.PublicRandomlyOffset(ref pos);
-			//lightningTest = new Lightning[1];
-			//lightningTest[0] = Lightning.CreateLightning(pos, new() { Lightning.RandPlasmaCol }, 20);
-            
-		}
+        public override void SetDefaults()
+        {
+            Projectile.width = 10;
+            Projectile.height = 10;
+            Projectile.friendly = true;
+            Projectile.hostile = false;
+            Projectile.timeLeft = 120;
+            Projectile.tileCollide = true;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = -1;
+            Projectile.extraUpdates = 2;
+            Projectile.scale = 1;
+            Projectile.penetrate = -1; //infinite
+                                       //VFX.LoadTextures();
+                                       //List<Vector2> pos = Lightning.CreateEvenlySpacedVector2sOnLine(Projectile.Center, Projectile.Center + new Vector2(0, 500), 10);
+                                       //Lightning.PublicRandomlyOffset(ref pos);
+                                       //lightningTest = new Lightning[1];
+                                       //lightningTest[0] = Lightning.CreateLightning(pos, new() { Lightning.RandPlasmaCol }, 20);
+
+        }
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
-			return Helper.CheckCircleCollision(targetHitbox, Projectile.Center, 80);
+            return Helper.CheckCircleCollision(targetHitbox, Projectile.Center, 80);
         }
         public override void AI()
-		{
-			Projectile.rotation = Projectile.velocity.ToRotation();
-			//dust effects
-			Dust dust = Dust.NewDustPerfect(Projectile.Center + Main.rand.NextVector2Circular(80,80), DustID.FireworksRGB, null, 0, Color.Cyan, 2);
-			dust.velocity += Projectile.velocity;
-			dust = Dust.CloneDust(dust);
-			if (dust.dustIndex != 6000)
-			{
-				dust.scale *= 0.7f;
-				dust.color = Color.White;
-			}
-			dust = Dust.NewDustPerfect(Projectile.Center + Main.rand.NextVector2Circular(80, 80), DustID.FireworksRGB, null, 0, Color.GreenYellow, 2);
-			dust.velocity += Projectile.velocity;
-			dust = Dust.CloneDust(dust);
-			if (dust.dustIndex != 6000)
-			{
-				dust.scale *= 0.7f;
-				dust.color = Color.White;
-			}
-		}
+        {
+            Projectile.frameCounter++;//using the frame counter not as a frrame counter...
+            Projectile.rotation = Projectile.velocity.ToRotation();
+            //dust effects
+            Dust dust = Dust.NewDustPerfect(Projectile.Center + Main.rand.NextVector2Circular(80, 80), DustID.FireworksRGB, null, 0, Color.Cyan, 2);
+            dust.velocity += Projectile.velocity;
+            dust = Dust.CloneDust(dust);
+            if (dust.dustIndex != 6000)
+            {
+                dust.scale *= 0.7f;
+                dust.color = Color.White;
+            }
+            dust = Dust.NewDustPerfect(Projectile.Center + Main.rand.NextVector2Circular(80, 80), DustID.FireworksRGB, null, 0, Color.GreenYellow, 2);
+            dust.velocity += Projectile.velocity;
+            dust = Dust.CloneDust(dust);
+            if (dust.dustIndex != 6000)
+            {
+                dust.scale *= 0.7f;
+                dust.color = Color.White;
+            }
+        }
 
-		public override void OnKill(int timeLeft)
-		{
-			for (int i = 0; i < 100; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-			{
-				Vector2 speed = Main.rand.NextVector2Circular(20, 20); //circle
-				Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.TerraBlade, speed, Scale: 2f); //Makes dust in a messy circle
-				d.noGravity = true;
-			}
-		}
+        public override void OnKill(int timeLeft)
+        {
+            for (int i = 0; i < 100; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+            {
+                Vector2 speed = Main.rand.NextVector2Circular(20, 20); //circle
+                Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.TerraBlade, speed, Scale: 2f); //Makes dust in a messy circle
+                d.noGravity = true;
+            }
+        }
 
-		//Lightning[] lightningTest;
+        //Lightning[] lightningTest;
         public override bool PreDraw(ref Color lightColor)
         {
-
-					//drawPos = Projectile.Center - Main.screenPosition;
-			//Main.EntitySpriteDraw(texture, drawPos, null, new Color(255,255,255,0) * 0.05f, Projectile.rotation, texture.Size() / 2, Projectile.scale, SpriteEffects.None);
-			float rotation = Projectile.rotation;
-			Projectile.rotation = 0;
-			VFX.DrawElectricOrb(Projectile, new Vector2(6));
-			Projectile.rotation = rotation;
-			return false;
+            //drawPos = Projectile.Center - Main.screenPosition;
+            //Main.EntitySpriteDraw(texture, drawPos, null, new Color(255,255,255,0) * 0.05f, Projectile.rotation, texture.Size() / 2, Projectile.scale, SpriteEffects.None);
+            float rotation = Projectile.rotation;
+            Projectile.rotation = 0;
+            //VFX.DrawElectricOrb(Projectile, new Vector2(6));
+            Projectile.rotation = rotation;
+            Texture2D main = ModContent.Request<Texture2D>("KirboMod/Projectiles/PlasmaOrb/PlasmaOrbBase").Value;
+            int skipCount = 6;
+            for (int i = Projectile.oldPos.Length - 1; i >= 0; i-= skipCount)
+            {
+                int index = i - Projectile.frameCounter % skipCount;
+                if(index < 0 || index >= Projectile.oldPos.Length)
+                {
+                    continue;
+                }
+                Vector2 oldPos = Projectile.oldPos[index] + Projectile.Size / 2;
+                float scaleMult = Utils.Remap(i, 0, Projectile.oldPos.Length - 1, 1f, .7f);
+                float progress = (float)index / Projectile.oldPos.Length;
+                Color c = Color.Lerp(Color.Teal, Color.Cyan, progress);
+                c.A = 128;
+                c *= 1 - progress;
+                Main.EntitySpriteDraw(main, oldPos - Main.screenPosition, null, c, 0, main.Size() / 2, scaleMult, SpriteEffects.None, 0f);
+            }
+            DrawPlasmaBlast(Projectile, Main.spriteBatch);
+            return false;
         }
-
-        public void AddTrail()
+        //it's like this because I was gonna implement player draw layer using this but realized that actually I shouldn't do it by using this method.
+        //
+        static void DrawPlasmaBlast(Projectile proj, SpriteBatch sb)
         {
-            TrailSystem.Trail.AddAdditive(Projectile, 100, Color.LimeGreen * Projectile.Opacity, Color.Cyan * Projectile.Opacity);
-            TrailSystem.Trail.AddAdditive(Projectile, 50,  Color.Transparent * Projectile.Opacity, Color.White * Projectile.Opacity);
-        }
+            Color col = Color.White;
+            col.A = 0;
+            Texture2D main = ModContent.Request<Texture2D>("KirboMod/Projectiles/PlasmaOrb/PlasmaOrbBase").Value;
+            Texture2D strands1 = ModContent.Request<Texture2D>("KirboMod/Projectiles/PlasmaOrb/PlasmaOrbStrands1").Value;
+            Texture2D strands2 = ModContent.Request<Texture2D>("KirboMod/Projectiles/PlasmaOrb/PlasmaOrbStrands2").Value;           
+            sb.Draw(main, proj.Center - Main.screenPosition, null, Color.White with { A = 128 }, 0, main.Size() / 2, 1f, SpriteEffects.None, 0f);
+            float time = (float)(Main.GlobalTimeWrappedHourly * 100f);
+            int strand1FlashCycleLength = 30;
+            int strand2FlashCycleLength = (int)(strand1FlashCycleLength * Helper.Phi);
+            float strand1Opacity = Utils.GetLerpValue(0, strand1FlashCycleLength / 2f, time % strand1FlashCycleLength, true) * Utils.GetLerpValue(strand1FlashCycleLength - 1, strand1FlashCycleLength / 2f, time % strand1FlashCycleLength, true);
+            int strand1FlashCycleIndex = (int)(time / strand1FlashCycleLength);
+            float rotation = (int)(strand1FlashCycleIndex * Helper.Phi) * MathF.PI * 0.5f;
+            SpriteEffects fx = (SpriteEffects)(strand1FlashCycleIndex % 3);
+            sb.Draw(strands1, proj.Center - Main.screenPosition, null, col * strand1Opacity, rotation, strands1.Size() / 2, 1f, fx, 0f);
+            float strand2Opacity = Utils.GetLerpValue(0, strand2FlashCycleLength / 2f, time % strand2FlashCycleLength, true) * Utils.GetLerpValue(strand2FlashCycleLength - 1, strand2FlashCycleLength / 2f, time % strand2FlashCycleLength, true);
+            int strand2FlashCycleIndex = (int)((time) / strand2FlashCycleLength);
+            rotation = (int)(strand2FlashCycleIndex * Helper.Phi) * MathF.PI * 0.5f;
+            fx = (SpriteEffects)(strand2FlashCycleIndex % 3);
 
+            sb.Draw(strands2, proj.Center - Main.screenPosition, null, col * strand2Opacity, rotation, strands2.Size() / 2, 1f, fx, 0f);
+        }
         ///// <summary>
         ///// 
         ///// might need to make a lightning drawer struct or static method for drawing the lightning and a bunch of branches at once AAAAAAAAA

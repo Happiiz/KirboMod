@@ -148,8 +148,16 @@ namespace KirboMod.NPCs.NewWhispy
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
                     Vector2 mouthPos = GetMouthPosition();
-                    NewWhispyWind.GetAIValues(NPC.target, out float ai0);
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), mouthPos, new Vector2(NPC.spriteDirection * 5, 0), ModContent.ProjectileType<NewWhispyWind>(), WindDamage, 0, -1, ai0);
+                    for (int i = 0; i < Main.maxPlayers; i++)
+                    {
+                        Player p = Main.player[i];
+                        if(!p.active || p.dead)
+                        {
+                            continue;
+                        }
+                        NewWhispyWind.GetAIValues(i, out float ai0);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), mouthPos, new Vector2(NPC.spriteDirection * 5, 0), ModContent.ProjectileType<NewWhispyWind>(), WindDamage, 0, -1, ai0);
+                    }
                 }
             }
             SetSpitAnimationValues();

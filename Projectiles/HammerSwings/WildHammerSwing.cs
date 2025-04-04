@@ -1,10 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
 using Terraria;
-using Terraria.Audio;
-using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -91,10 +88,7 @@ namespace KirboMod.Projectiles.HammerSwings
                     }
                     else
                     {
-                        Vector2 velocity = player.velocity;
-                        player.velocity = Vector2.Zero;
                         NetMethods.SyncPlayerPositionAndVelocity(player);
-                        player.velocity = velocity;
                     }
                 }
             }
@@ -128,7 +122,7 @@ namespace KirboMod.Projectiles.HammerSwings
                 float timer = MathF.Cos(i * MathF.PI + Projectile.localAI[1] * 0.4f);
                 Vector2 scale = new Vector2(timer, 1) * 1.5f;
                 SpriteEffects fx = SpriteEffects.None;
-                Vector2 origin = new Vector2(0, tex.Height / 2);
+                Vector2 origin = new(0, tex.Height / 2);
                 if (scale.X < 0)
                 {
                     scale.X *= -1;

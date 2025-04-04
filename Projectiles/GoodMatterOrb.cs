@@ -52,6 +52,7 @@ namespace KirboMod.Projectiles
 				move.Normalize();
 				move *= 18;
 				Projectile.velocity = move; //movemove = player.Center - projectile.Center; //update player position
+				Projectile.netUpdate = true;
 			}
 
 			if (Projectile.ai[0] == 60) //sixth of a second (extra updates accounted for)

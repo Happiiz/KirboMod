@@ -46,15 +46,18 @@ namespace KirboMod.Items.Weapons
 
         public override bool CanUseItem(Player player)
         {
-			if (player.GetModPlayer<KirbPlayer>().plasmaCharge < 3)
+			int plasmaCharge = player.GetModPlayer<KirbPlayer>().PlasmaCharge;
+
+			//todo: change these to be played on the projectile AI.
+            if (plasmaCharge < 3)
 			{
                 Item.UseSound = SoundID.Item12; //laser beam
             }
-			else if (player.GetModPlayer<KirbPlayer>().plasmaCharge < 12)
+			else if (plasmaCharge < 12)
 			{
                 Item.UseSound = SoundID.Item75; //pulse bow (not boss laser beam because I don't want ptsd)
             }
-			else if (player.GetModPlayer<KirbPlayer>().plasmaCharge >= 12)
+			else if (plasmaCharge >= 12)
 			{
 				SoundEngine.PlaySound(SoundID.Item38, player.Center);//tactical shotgun
                 Item.UseSound = SoundID.Item117; //conjure arcanum 
@@ -77,7 +80,7 @@ namespace KirboMod.Items.Weapons
 		{
 			float timeToPressKey = 16;
 			float chargeBonus = 1;
-			float chargeFromShot = player.GetModPlayer<KirbPlayer>().plasmaCharge;
+			float chargeFromShot = player.GetModPlayer<KirbPlayer>().PlasmaCharge;
             if (chargeFromShot < 3)
             {
 				chargeFromShot = 1;
@@ -135,7 +138,7 @@ namespace KirboMod.Items.Weapons
         public override bool GetDefaultVisibility(PlayerDrawSet drawInfo)
         {
 			KirbPlayer mplr = drawInfo.drawPlayer.GetModPlayer<KirbPlayer>();
-			return mplr.plasmaCharge >= 3; 
+			return mplr.PlasmaCharge >= 3 /*&&drawInfo.drawPlayer.HeldItem.type == ModContent.ItemType<Plasma>()*/; 
         }
         public override Position GetDefaultPosition()
         {
@@ -146,14 +149,29 @@ namespace KirboMod.Items.Weapons
         {
 			if (drawInfo.shadow != 0)
 				return;
-			KirbPlayer mplr = drawInfo.drawPlayer.GetModPlayer<KirbPlayer>();
-			Texture2D tex;
-			int orb = ModContent.ProjectileType<PlasmaShield>();
-			int shiel = ModContent.ProjectileType<PlasmaOrb>();
-			bool bigCharge = mplr.plasmaCharge > 12;
-			tex = TextureAssets.Projectile[bigCharge ? orb : shiel].Value;
-			float scale = (bigCharge ? KirbPlayer.plasmaShieldRadiusLarge : KirbPlayer.plasmaShieldRadiusSmall) / (float)tex.Width * 2f;
-			drawInfo.DrawDataCache.Add(new DrawData(tex, drawInfo.Center - Main.screenPosition, null, Color.White, 0, tex.Size() / 2, scale, SpriteEffects.None));
+            Texture2D main = ModContent.Request<Texture2D>("KirboMod/Projectiles/PlasmaOrb/PlasmaOrbBase").Value;
+            Texture2D strands1 = ModContent.Request<Texture2D>("KirboMod/Projectiles/PlasmaOrb/PlasmaOrbStrands1").Value;
+            Texture2D strands2 = ModContent.Request<Texture2D>("KirboMod/Projectiles/PlasmaOrb/PlasmaOrbStrands2").Value;
+            KirbPlayer mplr = drawInfo.drawPlayer.GetModPlayer<KirbPlayer>();
+			bool bigCharge = mplr.PlasmaCharge > 12;
+			float scale = (bigCharge ? KirbPlayer.plasmaShieldRadiusLarge : KirbPlayer.plasmaShieldRadiusSmall) / (float)main.Width * 2f;
+			Vector2 drawCenter = drawInfo.Center - Main.screenPosition;
+            Color col = Color.White;
+            col.A = 0;
+            drawInfo.DrawDataCache.Add(new DrawData(main, drawCenter, null, Color.White with { A = 128 }, 0, main.Size() / 2, scale, SpriteEffects.None));
+            float time = (float)(Main.GlobalTimeWrappedHourly * 100f);
+            int strand1FlashCycleLength = 30;
+            int strand2FlashCycleLength = (int)(strand1FlashCycleLength * Helper.Phi);
+            float strand1Opacity = Utils.GetLerpValue(0, strand1FlashCycleLength / 2f, time % strand1FlashCycleLength, true) * Utils.GetLerpValue(strand1FlashCycleLength - 1, strand1FlashCycleLength / 2f, time % strand1FlashCycleLength, true);
+            int strand1FlashCycleIndex = (int)(time / strand1FlashCycleLength);
+            float rotation = (int)(strand1FlashCycleIndex * Helper.Phi) * MathF.PI * 0.5f;
+            SpriteEffects fx = (SpriteEffects)(strand1FlashCycleIndex % 3);
+			drawInfo.DrawDataCache.Add(new DrawData(strands1, drawCenter, null, col * strand1Opacity, rotation, strands1.Size() / 2, scale, fx));
+            float strand2Opacity = Utils.GetLerpValue(0, strand2FlashCycleLength / 2f, time % strand2FlashCycleLength, true) * Utils.GetLerpValue(strand2FlashCycleLength - 1, strand2FlashCycleLength / 2f, time % strand2FlashCycleLength, true);
+            int strand2FlashCycleIndex = (int)((time) / strand2FlashCycleLength);
+            rotation = (int)(strand2FlashCycleIndex * Helper.Phi) * MathF.PI * 0.5f;
+            fx = (SpriteEffects)(strand2FlashCycleIndex % 3);
+			drawInfo.DrawDataCache.Add(new DrawData(strands2, drawCenter, null, col * strand2Opacity, rotation, strands2.Size() / 2, scale, fx));
         }
     }
 }
