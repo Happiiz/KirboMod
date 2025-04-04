@@ -42,8 +42,6 @@ namespace KirboMod.Projectiles
         }
         public override void AI()
         {
-
-
             if (!Main.hardMode)
             {
                 if (Main.rand.NextFloat() < Utils.GetLerpValue(0, Main.maxDust, Main.maxDustToDraw) && Main.rand.NextBool(2,3))
