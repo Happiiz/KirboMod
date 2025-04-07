@@ -41,9 +41,7 @@ namespace KirboMod.Projectiles
         {
 			return Helper.CheckCircleCollision(targetHitbox, Projectile.Center, 60);
         }
-
-        int amountOfTimesToGrindTarget = 10;
-
+        static int AmountOfTimesToGrindTarget => 10;
         public override void AI()
         {
             Player player = Main.player[Projectile.owner];
@@ -78,7 +76,7 @@ namespace KirboMod.Projectiles
 				}
 			}
 
-			if (Projectile.ai[1] >= amountOfTimesToGrindTarget)
+			if (Projectile.ai[1] >= AmountOfTimesToGrindTarget)
 			{
 				Projectile.ai[0] = 50;
 				Projectile.ai[1] = -30;
@@ -112,7 +110,7 @@ namespace KirboMod.Projectiles
         }
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-			if (Projectile.ai[1] >= 0 && Projectile.ai[1] < amountOfTimesToGrindTarget) //can grind again
+			if (Projectile.ai[1] >= 0 && Projectile.ai[1] < AmountOfTimesToGrindTarget) //can grind again
 			{
 				Projectile.ai[1]++;
 				Projectile.ai[0] = 39;

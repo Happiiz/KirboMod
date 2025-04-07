@@ -605,9 +605,10 @@ Mods: {
 				Tooltip:
 					'''
 					Fires a volley of icicles
-					Icicles that touch any enemy cause them to grow ice on their body
-					Non-bosses killed by one condense into an ice cube
+					Icicles that touch any enemy cause them to grow damaging ice on their body
+					Killing an enemy transforms them into ice cubes
 					Icicles that land on the ground spike giant ice formations
+					The formations do not transform enemies into icicles upon killing them
 					'''
 			}
 
@@ -655,12 +656,22 @@ Mods: {
 
 			ClutterNeedle: {
 				DisplayName: Clutter Needle Ball
-				Tooltip: drops a bunch of clutter when expired
+				Tooltip:
+					'''
+					Rolls on the ground
+					Creates a lot of bouncing clutter over time
+					Explodes into 20 clutter projectiles after a while
+					All clutter deals full damage
+					'''
 			}
 
 			CrownOfClimate: {
 				DisplayName: Crown Of Climate
-				Tooltip: Summons a burning leo and chilly combo to fight for you
+				Tooltip: 
+				'''
+				Summons a burning leo and chilly combo to fight for you
+				'lol the damage value is so low how good could it really be'
+				'''
 			}
 
 			CrownOfFire: {

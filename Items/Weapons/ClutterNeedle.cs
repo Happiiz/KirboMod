@@ -23,8 +23,8 @@ namespace KirboMod.Items.Weapons
 			Item.DamageType = DamageClass.Ranged;
 			Item.width = 82;
 			Item.height = 82;
-			Item.useTime = 45;
-			Item.useAnimation = 45;
+			Item.useTime = 37;
+			Item.useAnimation = 37;
 			Item.useStyle = ItemUseStyleID.Swing;
 			Item.knockBack = 5;
 			Item.value = Item.buyPrice(0 , 0,  1, 0);
@@ -32,7 +32,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.ClutterNeedleBall>();
-			Item.shootSpeed = 12f;
+			Item.shootSpeed = 15f;
 			Item.consumable = true;
 			Item.maxStack = 9999;
 			Item.noMelee = true;

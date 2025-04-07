@@ -62,12 +62,19 @@ namespace KirboMod.Items.Weapons
 
         public override void AddRecipes()
         {
+			//changed from hallowed to titanium/adamantite so that you can fight nightmare before mechs.
             Recipe recipe = CreateRecipe();//Sets result to this item
 			recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
 			recipe.AddIngredient(ModContent.ItemType<DreamEssence>(), 20);
-            recipe.AddIngredient(ItemID.HallowedBar, 5); //5 hallowed bars
+            recipe.AddIngredient(ItemID.TitaniumBar, 5);
             recipe.AddTile(TileID.MythrilAnvil); //Crafted at hardmode anvil
 			recipe.Register(); //Adds this recipe to the game
-		}
+            recipe = CreateRecipe();//Sets result to this item
+            recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
+            recipe.AddIngredient(ModContent.ItemType<DreamEssence>(), 20);
+            recipe.AddIngredient(ItemID.AdamantiteBar, 5);
+            recipe.AddTile(TileID.MythrilAnvil); //Crafted at hardmode anvil
+            recipe.Register(); //Adds this recipe to the game
+        }
     }
 }

@@ -26,7 +26,7 @@ namespace KirboMod.Projectiles
 		}
 		public override void AI()
 		{
-			Projectile.velocity.Y = Projectile.velocity.Y + 0.4f;
+			Projectile.velocity.Y = Projectile.velocity.Y + 0.15f;
 			if (Projectile.velocity.Y >= 12f)
             {
 				Projectile.velocity.Y = 12f;
@@ -44,7 +44,6 @@ namespace KirboMod.Projectiles
 
         public override bool OnTileCollide(Vector2 oldVelocity) 
         {
-			Player player = Main.player[0];
 			if (Projectile.velocity.X != oldVelocity.X) //bounce
 			{
 				Projectile.velocity.X = -oldVelocity.X;

@@ -38,9 +38,9 @@ namespace KirboMod.Projectiles
 
             //Gravity
             Projectile.velocity.Y = Projectile.velocity.Y + 0.5f;
-			if (Projectile.velocity.Y >= 10f)
+			if (Projectile.velocity.Y >= 16f)
 			{
-				Projectile.velocity.Y = 10f;
+				Projectile.velocity.Y = 16f;
 			}
 
 
@@ -49,7 +49,7 @@ namespace KirboMod.Projectiles
             {
                 NPC npc = Main.npc[i]; //any npc
 
-                if (npc.Hitbox.Intersects(Projectile.Hitbox) && npc.active && !npc.friendly) //hitboxes touching
+                if (npc.Hitbox.Intersects(Projectile.Hitbox) && npc.CanBeChasedBy()) //hitboxes touching
                 {
                     Projectile.Kill();
                 }

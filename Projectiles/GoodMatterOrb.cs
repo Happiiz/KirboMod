@@ -1,3 +1,4 @@
+using KirboMod.NPCs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -37,10 +38,10 @@ namespace KirboMod.Projectiles
 
 			Projectile.ai[0]++;
 
-			if (Projectile.ai[0] == 1)
-            {
-				SoundEngine.PlaySound(SoundID.SplashWeak, player.Center);
-			}
+			//if (Projectile.ai[0] == 1)
+   //         {
+				//SoundEngine.PlaySound(SoundID.SplashWeak, player.Center);
+			//}
 			if (Projectile.ai[0] < 40)
 			{
 				Projectile.velocity *= 0.92f;
@@ -48,7 +49,8 @@ namespace KirboMod.Projectiles
 
 			if (Projectile.ai[0] == 40 && Projectile.owner == Main.myPlayer)
             {
-				Vector2 move = Main.MouseWorld - Projectile.Center;
+                SoundEngine.PlaySound(PureDarkMatter.PetalThrowSFX with { Volume = .4f, MaxInstances = 1 }, player.Center);
+                Vector2 move = Main.MouseWorld - Projectile.Center;
 				move.Normalize();
 				move *= 18;
 				Projectile.velocity = move; //movemove = player.Center - projectile.Center; //update player position

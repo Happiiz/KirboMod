@@ -19,7 +19,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults() 
 		{
-			Item.damage = 30;
+			Item.damage = 90;//slow fire rate, limited in range, can't get reforges, justified higher damage
 			Item.DamageType = DamageClass.Ranged;
 			Item.width = 29;
 			Item.height = 29;

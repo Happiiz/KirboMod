@@ -266,7 +266,6 @@ namespace KirboMod.NPCs.MidBosses
             }
 
             NPC.ai[0]++;
-
             if (NPC.ai[0] > 30)
 			{
 				if (NPC.ai[0] < 180) //dash towards player
@@ -280,9 +279,9 @@ namespace KirboMod.NPCs.MidBosses
                     speed *= Main.hardMode ? 1.5f : 1;
 					float inertia = 20f; //acceleration and decceleration speed
 
-                    ClimbTiles(player);
-
                     MoveX(player, speed, inertia);
+
+                    ClimbTiles(player);
 
                     Vector2 distance = player.Center - NPC.Center;
 
@@ -290,7 +289,7 @@ namespace KirboMod.NPCs.MidBosses
 
                     bool inRangeY = distance.Y > (Main.hardMode ? -600 : -200) &&  distance.Y < 100;
 
-                    if (inRangeX && inRangeY && player.dead == false) //past the player, near player and player not dead
+                    if (inRangeX && inRangeY && !player.dead) //past the player, near player and player not dead
                     {
                         if (Main.hardMode) //launch toward player
                         {
@@ -322,8 +321,13 @@ namespace KirboMod.NPCs.MidBosses
 				{
 					Player player = Main.player[NPC.target];
 
-                    NPC.noTileCollide = false;
-
+                    //NPC.noTileCollide = !Collision.CanHitLine(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height);
+                    //NPC.noGravity = NPC.Bottom.X > player.Bottom.X;//below player
+                    //if (!NPC.noGravity)
+                    //{
+                    //    //don't fall, but don't set to 0 if it has upwards velocity
+                    //    NPC.velocity.Y = MathF.Min(NPC.velocity.Y, 0f);
+                    //}
                     if (!Main.hardMode)
                         NPC.velocity.X *= 0.95f; //slow 
 
@@ -392,31 +396,29 @@ namespace KirboMod.NPCs.MidBosses
         private void ClimbTiles(Player player)
         {
             bool climableTiles = false;
-
-            for (int i = 0; i < NPC.height - 30; i++)
+            NPC.noGravity = false;
+            for (int i = 0; i < NPC.height - 17; i+= 16)
             {
                 if (NPC.direction == 1)
                 {
                     //checks for tiles on right side of NPC
-                    Tile tile = Main.tile[new Vector2(NPC.Right.X + 1, NPC.position.Y + i).ToTileCoordinates()];
-                    climableTiles = WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType] || tile.IsHalfBlock;
+                    Tile tile = Main.tile[new Vector2(NPC.Right.X + 2, NPC.position.Y + i).ToTileCoordinates()];
+                    climableTiles |= WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType] || tile.IsHalfBlock;
                 }
                 else
                 {
                     //checks for tiles on left side of NPC
-                    Tile tile = Main.tile[new Vector2(NPC.Left.X - 1, NPC.position.Y + i).ToTileCoordinates()];
-                    climableTiles = WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType] || tile.IsHalfBlock;
+                    Tile tile = Main.tile[new Vector2(NPC.Left.X - 2, NPC.position.Y + i).ToTileCoordinates()];
+                    climableTiles |= WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType] || tile.IsHalfBlock;
                 }
-
-                if (climableTiles && MathF.Abs(NPC.Bottom.Y - player.Bottom.Y) > 20f || NPC.velocity.X == 0)
+                if (climableTiles && MathF.Abs(NPC.Bottom.Y - player.Bottom.Y) >= 0f)
                 {
                     NPC.noTileCollide = true;
-
+                    NPC.noGravity = true;
                     if (player.Center.Y < NPC.Center.Y && !player.dead) //higher than NPC or dead
                     {
-                        NPC.velocity.Y = -4f;
+                        NPC.velocity.Y = -8f;
                     }
-
                     break;
                 }
             }

@@ -10,13 +10,10 @@ namespace KirboMod.Projectiles
 {
 	public class BodyIce : ModProjectile
 	{
-		Vector2 randomOffset = new Vector2(0, 0);
 		public override void SetStaticDefaults()
 		{
-			Main.projFrames[Projectile.type] = 1;
-			
+			Main.projFrames[Projectile.type] = 1;	
 		}
-
 		public override void SetDefaults()
 		{
 			Projectile.width = 18;
@@ -35,18 +32,9 @@ namespace KirboMod.Projectiles
 		public override void AI()
 		{
 			NPC bodyToAttachTo = Main.npc[(int)Projectile.ai[0]];
-
-			if (Projectile.ai[1] == 0) //only when zero
-			{
-				randomOffset = new Vector2(Main.rand.Next(0, bodyToAttachTo.width), Main.rand.Next(0, bodyToAttachTo.height));
-
-            }
-			Projectile.ai[1]++; //no longer zero
-
-            if (bodyToAttachTo.active && !bodyToAttachTo.dontTakeDamage)
+            if (bodyToAttachTo.CanBeChasedBy())
             {
-				//random position on body
-                Projectile.Center = bodyToAttachTo.position + randomOffset + bodyToAttachTo.netOffset;
+				Projectile.Center = bodyToAttachTo.position + new Vector2(Projectile.ai[1], Projectile.ai[2]);// + bodyToAttachTo.netOffset;
                 Projectile.gfxOffY = bodyToAttachTo.gfxOffY;
             }
 			else
@@ -54,7 +42,13 @@ namespace KirboMod.Projectiles
 				Projectile.Kill();
 			}
         }
-
+		public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+		{
+			if (target.life <= 0)
+			{
+				BlizzardIcicle.SpawnIceChunk(Projectile, target);
+			}
+		}
         public override void OnKill(int timeLeft)
         {
 			for (int i = 0; i < 3; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop

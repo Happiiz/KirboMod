@@ -15,18 +15,19 @@ namespace KirboMod.Items.Weapons
 			 // DisplayName.SetDefault("Jolly Bomb"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
 			// Tooltip.SetDefault("Detonate after a while or upon contact with an enemy");
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 99; //amount needed to research
+			ItemID.Sets.ItemsThatAllowRepeatedRightClick[Type] = true;
         }
 
 		public override void SetDefaults() 
 		{
-			Item.damage = 30;
+			Item.damage = 45;
 			Item.DamageType = DamageClass.Ranged;
 			Item.width = 50;
 			Item.height = 50;
 			Item.useTime = 30;
 			Item.useAnimation = 30;
 			Item.useStyle = ItemUseStyleID.Swing;
-			Item.knockBack = 5;
+			Item.knockBack = 10f;
 			Item.value = Item.buyPrice(0, 0, 0, 10);
 			Item.rare = ItemRarityID.Blue;
 			Item.UseSound = SoundID.Item1;

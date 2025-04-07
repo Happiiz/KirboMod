@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework;
-using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -22,9 +21,9 @@ namespace KirboMod.Projectiles
 			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.timeLeft = 300;
 			Projectile.tileCollide = true;
-			Projectile.penetrate = -1;
+			Projectile.penetrate = 5;
             Projectile.usesLocalNPCImmunity = true; //wait for very own timer
-            Projectile.localNPCHitCooldown = 10;
+            Projectile.localNPCHitCooldown = 25;
         }
 		public override void AI()
 		{
@@ -47,7 +46,7 @@ namespace KirboMod.Projectiles
 
             if (Projectile.ai[0] % 30 == 0) //every 30 ticks
             {
-                Vector2 speed = Main.rand.NextVector2CircularEdge(8f, 8f); //circle
+                Vector2 speed = Main.rand.BetterNextVector2Circular(8f); //circle
                 Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, speed, ModContent.ProjectileType<Projectiles.Clutter>(), Projectile.damage, 4, Projectile.owner, 0, 0);
             }
 

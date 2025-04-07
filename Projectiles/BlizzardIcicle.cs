@@ -32,6 +32,10 @@ namespace KirboMod.Projectiles
 			Projectile.extraUpdates = 2;
 			Projectile.ignoreWater = true;
 		}
+        public override void ModifyDamageHitbox(ref Rectangle hitbox)
+        {
+			hitbox = Utils.CenteredRectangle(Projectile.Center, new Vector2(60));//glow is also a hitbox
+        }
         public override bool PreDraw(ref Color lightColor)
         {
 			Texture2D texture = TextureAssets.Projectile[Type].Value;
@@ -76,7 +80,7 @@ namespace KirboMod.Projectiles
 
 		public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
 		{
-			if (target.active) //checks if the npc is active
+			if (target.active) 
 			{
 				//spawns body ice on npc 
 				int bodyIceDamage = Projectile.damage / 10;
@@ -84,31 +88,34 @@ namespace KirboMod.Projectiles
 				{
 					bodyIceDamage = 1;
 				}
-				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + Projectile.velocity, Projectile.velocity, ModContent.ProjectileType<BodyIce>(), bodyIceDamage, 0, Projectile.owner, target.whoAmI); 
+				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + Projectile.velocity, Projectile.velocity, ModContent.ProjectileType<BodyIce>(), bodyIceDamage, 0, Projectile.owner, target.whoAmI, Main.rand.Next(target.width), Main.rand.Next(target.height)); 
 			}
 			target.AddBuff(BuffID.Frostburn, 400);
 			target.AddBuff(BuffID.Frostburn2, 400);//frostbite, inflicted by frozen armor
-            if (target.life <= 0 & target.boss == false) //checks if the npc is dead
+            if (target.life <= 0) //checks if the npc is dead
             {
-                SoundEngine.PlaySound(SoundID.Item46, Projectile.position); //ice hydra
-                for (int i = 0; i < 8; i++)
-                {
-                    Vector2 speed = Main.rand.NextVector2Circular(4f, 4f); //circle
-                    Dust d = Dust.NewDustPerfect(Projectile.Center, ModContent.DustType<Dusts.Flake>(), speed * 2, Scale: 1f); //Makes dust in a messy circle
-                    d.noGravity = false;
-                }
-
-                //spawns ice chunk 
-                Player player = Main.player[Projectile.owner];
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), target.position, new Vector2(player.direction * 5, 0), ModContent.ProjectileType<Projectiles.IceChunk>(), Projectile.damage * 2, 6, Projectile.owner);
-            }
+				//MOVED THIS CODE TO ICE CHUNK SPAWNING FOR MULTIPLAYER REASONS
+				//SoundEngine.PlaySound(SoundID.Item46, Projectile.position); //ice hydra
+				//for (int i = 0; i < 8; i++)
+				//{
+				//    Vector2 speed = Main.rand.NextVector2Circular(4f, 4f); //circle
+				//    Dust d = Dust.NewDustPerfect(Projectile.Center, ModContent.DustType<Dusts.Flake>(), speed * 2, Scale: 1f); //Makes dust in a messy circle
+				//    d.noGravity = false;
+				//}
+				SpawnIceChunk(Projectile, target);
+			}
         }
-
+		//also used by body ice
+		public static void SpawnIceChunk(Projectile parent, NPC target)
+		{
+            Player player = Main.player[parent.owner];
+            Projectile.NewProjectile(parent.GetSource_FromThis(), target.position, new Vector2(player.direction * 5, 0), ModContent.ProjectileType<Projectiles.IceChunk>(), parent.damage, 6, parent.owner);
+        }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            if (Main.rand.NextBool(5)) //chance of making a blizzard formation
+            //if (Main.rand.NextBool(5)) //chance of making a blizzard formation
             {
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.position, Projectile.velocity * 0, ModContent.ProjectileType<BlizzardFormation>(), Projectile.damage, 4f, Projectile.owner);
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.position, Projectile.velocity * 0, ModContent.ProjectileType<BlizzardFormation>(), Projectile.damage / 2, 20f, Projectile.owner);
             }
 			return true;
         }
