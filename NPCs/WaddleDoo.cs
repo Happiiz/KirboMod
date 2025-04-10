@@ -20,7 +20,7 @@ namespace KirboMod.NPCs
 
         private bool jumped = false;
         //public static so I can reference this in other parts of the code.
-        public static SoundStyle BeamAttackSound => new SoundStyle("KirboMod/Sounds/Projectiles/BeamAttack");
+        public static SoundStyle BeamAttackSound => new SoundStyle("KirboMod/Sounds/NPC/BeamAttack");
         public override void SetStaticDefaults() 
 		{
 			// DisplayName.SetDefault("Waddle Doo");
@@ -247,7 +247,6 @@ namespace KirboMod.NPCs
                 if (NPC.ai[0] % 4 == 0)
                 {
                     SoundEngine.PlaySound(BeamAttackSound, NPC.Center);
-
                 }
             }
 			if (NPC.ai[0] >= 240)

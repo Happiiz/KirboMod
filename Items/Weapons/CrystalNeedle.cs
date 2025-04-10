@@ -1,3 +1,4 @@
+using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
@@ -12,6 +13,7 @@ namespace KirboMod.Items.Weapons
 	{
 		public override void SetStaticDefaults() 
 		{
+			ItemID.Sets.IsRangedSpecialistWeapon[Type] = true;
 			 // DisplayName.SetDefault("Crystal Needle Ball"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
 			/* Tooltip.SetDefault("leaves crystals along the ground" +
 				"\nShoots crystal spikes out when expired"); */
@@ -20,7 +22,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults() 
 		{
-			Item.damage = 120;
+			Item.damage = 112;
 			Item.DamageType = DamageClass.Ranged;
 			Item.width = 82;
 			Item.height = 82;
@@ -38,6 +40,15 @@ namespace KirboMod.Items.Weapons
 			Item.maxStack = 9999;
 			Item.noMelee = true;
 			Item.noUseGraphic = true;
+		}
+		public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+		{
+			if (Main.myPlayer == player.whoAmI)
+			{
+                //randomize starting value of the timer so it starts placing the spikes at a different time
+                Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI, Main.rand.Next(CrystalNeedleBall.DistRequiredForTrap));
+			}
+			return false;
 		}
 
 		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)

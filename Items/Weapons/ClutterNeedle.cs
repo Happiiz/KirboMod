@@ -12,8 +12,9 @@ namespace KirboMod.Items.Weapons
 	{
 		public override void SetStaticDefaults() 
 		{
-			 // DisplayName.SetDefault("Clutter Needle Ball"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
-			// Tooltip.SetDefault("drops a bunch of clutter when expired"); 
+            ItemID.Sets.IsRangedSpecialistWeapon[Type] = true;
+            // DisplayName.SetDefault("Clutter Needle Ball"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
+            // Tooltip.SetDefault("drops a bunch of clutter when expired"); 
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 99; //amount needed to research 
         }
 

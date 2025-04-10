@@ -22,7 +22,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 500;//redeeming quality: damage(it has no piercing or AoE)
+			Item.damage = 800;//redeeming quality: damage(it has no piercing or AoE)
 			Item.DamageType = DamageClass.Ranged;
 			Item.noMelee = true;
 			Item.width = 80;

@@ -19,10 +19,12 @@ namespace KirboMod.Projectiles.Lightnings
             outerColor = Color.MediumSlateBlue;
             innerColor = Color.Black;
             width = 15;
+            maxDeviation = 70;
             Projectile.scale = 1.5f;
             opacityFunction = OpacityFunction;
             Projectile.tileCollide = true;
             Projectile.DamageType = DamageClass.Magic;
+            SetAmountOfLightingSegments(7, Projectile.type);
         }
         float OpacityFunction(float progress)
         {

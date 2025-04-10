@@ -27,16 +27,16 @@ namespace KirboMod.Items.Weapons
 			Item.noMelee = true;
 			Item.width = 48;
 			Item.height = 62;
-			Item.useTime = 8;
-			Item.useAnimation = 8;
+			Item.useTime = Item.useAnimation = 12;
 			Item.useStyle = ItemUseStyleID.Shoot;
-			Item.knockBack = 2;
+			Item.knockBack = 7f;
+			Item.crit = 10;//stake launcher has this
 			Item.value = Item.buyPrice(0, 0, 30, 5);
 			Item.rare = ItemRarityID.Yellow;
 			Item.UseSound = SoundID.Item5; //bow shot
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.CyborgArcherArrow>();
-			Item.shootSpeed = 30f;
+			Item.shootSpeed = 8f;
 			Item.useAmmo = AmmoID.Arrow;
 		}
 
@@ -48,11 +48,7 @@ namespace KirboMod.Items.Weapons
             }
             else
             {
-                velocity.X /= 2;
-                velocity.Y /= 2;
-
-                position.X += velocity.X * 4;
-                position.Y += velocity.Y * 4;
+				
                 type = ModContent.ProjectileType<Projectiles.CyborgArcherLaser>();
             }
 
@@ -60,33 +56,33 @@ namespace KirboMod.Items.Weapons
 
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
-			if (type == ModContent.ProjectileType<Projectiles.CyborgArcherLaser>()) //instead of star arrow because this is called AFTER mod shoot stats
+			if (Main.myPlayer == player.whoAmI && type == ModContent.ProjectileType<Projectiles.CyborgArcherLaser>()) //instead of star arrow because this is called AFTER mod shoot stats
 			{
 				//Get distances of each probe from mouse
-
+				float vel = velocity.Length();
 				Vector2 projshoot1 = Main.MouseWorld - (player.Center + new Vector2(0, -60)); //get distance
 				projshoot1.Normalize(); //to one
-				projshoot1 *= 30f; //now thirty
+				projshoot1 *= vel; 
 
 				Vector2 projshoot2 = Main.MouseWorld - (player.Center + new Vector2(0, 60)); //get distance
 				projshoot2.Normalize(); //to one
-				projshoot2 *= 30f; //now thirtyplayer.QuickSpawnItem(player.GetSource_OpenItem(Item.type), 
+				projshoot2 *= vel;  
 
 				Vector2 projshoot3 = Main.MouseWorld - (player.Center + new Vector2(-60, 0)); //get distance
 				projshoot3.Normalize(); //to one
-				projshoot3 *= 30f; //now thirty
+				projshoot3 *= vel;
 
 				Vector2 projshoot4 = Main.MouseWorld - (player.Center + new Vector2(60, 0)); //get distance
 				projshoot4.Normalize(); //to one
-				projshoot4 *= 30f; //now thirty
+				projshoot4 *= vel; 
 
 				//Shoot probe laser arrows
-				Projectile.NewProjectile(source, player.Center.X, player.Center.Y - 60, projshoot1.X, projshoot1.Y, ModContent.ProjectileType<Projectiles.CyborgArcherArrow>(), damage / 3, 0, Main.myPlayer);
-				Projectile.NewProjectile(source, player.Center.X, player.Center.Y + 60, projshoot2.X, projshoot2.Y, ModContent.ProjectileType<Projectiles.CyborgArcherArrow>(), damage / 3, 0, Main.myPlayer);
-				Projectile.NewProjectile(source, player.Center.X - 60, player.Center.Y, projshoot3.X, projshoot3.Y, ModContent.ProjectileType<Projectiles.CyborgArcherArrow>(), damage / 3, 0, Main.myPlayer);
-				Projectile.NewProjectile(source, player.Center.X + 60, player.Center.Y, projshoot4.X, projshoot4.Y, ModContent.ProjectileType<Projectiles.CyborgArcherArrow>(), damage / 3, 0, Main.myPlayer);
-
-				SoundEngine.PlaySound(SoundID.Item12, player.Center); //space gun
+				Projectile.NewProjectile(source, player.Center.X, player.Center.Y - 60, projshoot1.X, projshoot1.Y, ModContent.ProjectileType<Projectiles.CyborgArcherArrow>(), damage / 4, knockback, Main.myPlayer);
+				Projectile.NewProjectile(source, player.Center.X, player.Center.Y + 60, projshoot2.X, projshoot2.Y, ModContent.ProjectileType<Projectiles.CyborgArcherArrow>(), damage / 4, knockback, Main.myPlayer);
+				Projectile.NewProjectile(source, player.Center.X - 60, player.Center.Y, projshoot3.X, projshoot3.Y, ModContent.ProjectileType<Projectiles.CyborgArcherArrow>(), damage / 4, knockback, Main.myPlayer);
+				Projectile.NewProjectile(source, player.Center.X + 60, player.Center.Y, projshoot4.X, projshoot4.Y, ModContent.ProjectileType<Projectiles.CyborgArcherArrow>(), damage / 4, knockback, Main.myPlayer);
+				//moved code to laser for multiplayer reasons
+				//SoundEngine.PlaySound(SoundID.Item158, player.Center); //zapinator
 			}
                return true;
 		}
@@ -94,10 +90,10 @@ namespace KirboMod.Items.Weapons
         public override void HoldItem(Player player)
         {
 			//Create probes
-			Projectile.NewProjectile(player.GetSource_ItemUse(player.HeldItem), player.Center.X, player.Center.Y - 60, 0, 0, ModContent.ProjectileType<Projectiles.CyborgArcherProbe>(), 0, 0, Main.myPlayer);
-			Projectile.NewProjectile(player.GetSource_ItemUse(player.HeldItem), player.Center.X, player.Center.Y + 60, 0, 0, ModContent.ProjectileType<Projectiles.CyborgArcherProbe>(), 0, 0, Main.myPlayer);
-			Projectile.NewProjectile(player.GetSource_ItemUse(player.HeldItem), player.Center.X - 60, player.Center.Y, 0, 0, ModContent.ProjectileType<Projectiles.CyborgArcherProbe>(), 0, 0, Main.myPlayer);
-			Projectile.NewProjectile(player.GetSource_ItemUse(player.HeldItem), player.Center.X + 60, player.Center.Y, 0, 0, ModContent.ProjectileType<Projectiles.CyborgArcherProbe>(), 0, 0, Main.myPlayer);
+			Projectile.NewProjectile(player.GetSource_ItemUse(player.HeldItem), player.Center.X, player.Center.Y - 60, 0, 0, ModContent.ProjectileType<Projectiles.CyborgArcherProbe>(), -1, 0, Main.myPlayer);
+			Projectile.NewProjectile(player.GetSource_ItemUse(player.HeldItem), player.Center.X, player.Center.Y + 60, 0, 0, ModContent.ProjectileType<Projectiles.CyborgArcherProbe>(), -1, 0, Main.myPlayer);
+			Projectile.NewProjectile(player.GetSource_ItemUse(player.HeldItem), player.Center.X - 60, player.Center.Y, 0, 0, ModContent.ProjectileType<Projectiles.CyborgArcherProbe>(), -1, 0, Main.myPlayer);
+			Projectile.NewProjectile(player.GetSource_ItemUse(player.HeldItem), player.Center.X + 60, player.Center.Y, 0, 0, ModContent.ProjectileType<Projectiles.CyborgArcherProbe>(), -1, 0, Main.myPlayer);
         }
 
         public override void AddRecipes()

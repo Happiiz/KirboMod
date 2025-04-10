@@ -10,6 +10,7 @@ namespace KirboMod.Items.Weapons
 	{
 		public override void SetStaticDefaults()
 		{
+			ItemID.Sets.IsRangedSpecialistWeapon[Type]= true;
 			// DisplayName.SetDefault("Final Cutter"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
 			/* Tooltip.SetDefault("Flies in the opposite direction" 
 				+ "\nTwenty can be out at a time"); */

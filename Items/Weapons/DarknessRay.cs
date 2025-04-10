@@ -1,3 +1,4 @@
+using KirboMod.NPCs;
 using KirboMod.Projectiles.Lightnings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,26 +16,26 @@ namespace KirboMod.Items.Weapons
 		public override void SetStaticDefaults()
 		{
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research 
+			
         }
 
 		public override void SetDefaults()
 		{
-			Item.damage = 120;
+			Item.damage = 138;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 22;
 			Item.height = 22;
-			Item.useTime = 12;
-			Item.useAnimation = 12;
+			Item.useAnimation = Item.useTime = 12;
 			Item.useStyle = ItemUseStyleID.Shoot;
 			Item.knockBack = 4;
 			Item.value = Item.buyPrice(0, 5, 50, 50);
 			Item.rare = ItemRarityID.Yellow;
-			Item.UseSound = SoundID.Item12; //space gun
+			Item.UseSound = PureDarkMatter.LaserSFX.WithVolumeScale(.25f);
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<GoodDarkMatterLaser>();
 			Item.shootSpeed = 24f;
-			Item.mana = 4;
+			Item.mana = 5;
 		}
 
         public override bool AltFunctionUse(Player player)
@@ -53,7 +54,7 @@ namespace KirboMod.Items.Weapons
 
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {
-			position += velocity; //move forward a smidge
+			position += Vector2.Normalize(velocity) * 30; //move forward a smidge
         }
 
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)

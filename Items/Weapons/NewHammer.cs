@@ -41,7 +41,6 @@ namespace KirboMod.Items.Weapons
 			Item.autoReuse = true;
 			Item.shoot = ProjectileID.None;
 			Item.noUseGraphic = false; //use sprite
-			SetStaticDefaults();
 		}
 
         public override bool AltFunctionUse(Player player)

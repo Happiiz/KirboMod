@@ -55,7 +55,7 @@ namespace KirboMod.Projectiles
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-			if (target.life <= 0 & target.boss == false) //checks if the npc is dead
+			if (target.life <= 0) //checks if the npc is dead
             {
                 SoundEngine.PlaySound(SoundID.Item46, Projectile.position); //ice hydra
                 for (int i = 0; i < 8; i++)

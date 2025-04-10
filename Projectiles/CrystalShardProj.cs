@@ -53,7 +53,7 @@ namespace KirboMod.Projectiles
                 }
                 Projectile.localAI[0]++;
             }
-            float rangeSQ = 1500 * 1500;
+            float rangeSQ = 1000 * 1000;
             if (!Helper.ValidIndexedTarget(TargetIndex, Projectile, out _))
             {
                 Projectile.velocity = Vector2.Lerp(Projectile.velocity, Vector2.Normalize(Projectile.velocity) * InitialVelLength, 0.1f);
@@ -121,15 +121,15 @@ namespace KirboMod.Projectiles
 
         void DustLine(Vector2 from, Vector2 to, float spacingMultiplier, Vector2 centerRef)
         {
+            spacingMultiplier *= 3;
             from += centerRef;
             to += centerRef;
             float dist = from.Distance(to);
             for (float i = 0; i < 1; i += spacingMultiplier / dist)
             {
                 Vector2 vel = Vector2.Lerp(from, to, i) - centerRef;
-                Dust d = Dust.NewDustPerfect(Vector2.Lerp(from, to, i), DustID.RainbowMk2, vel);
+                Dust d = Dust.NewDustPerfect(Vector2.Lerp(from, to, i), DustID.RainbowMk2, vel, 0, default, 2f);
                 d.color = Color.Lerp(Color.Cyan, Color.Purple, Main.rand.NextFloat());
-                d.scale *= 1.2f;
                 d.noGravity = true;
                 if (d.dustIndex != 6000)
                 {

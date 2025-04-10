@@ -24,6 +24,7 @@ namespace KirboMod.Projectiles.Lightnings
             Projectile.tileCollide = true;
             Projectile.DamageType = DamageClass.Summon;
             Projectile.ArmorPenetration = 30;
+            SetAmountOfLightingSegments(7, Projectile.type);
         }
         float OpacityFunction(float progress)
         {

@@ -69,16 +69,6 @@ namespace KirboMod.Globals
             else
             {
                 entity.damage = (int)(entity.damage * 1.2f);
-                if(entity.type == ModContent.ItemType<StarRod>())//calam retiers hallowed ore
-                {
-                    entity.damage = (int)(entity.damage * 1.2f);
-
-                }
-                if(entity.type == ModContent.ItemType<TripleStar>())
-                {
-                    entity.damage = (int)(entity.damage * 1.2f);
-
-                }
             }
             if(entity.type == ModContent.ItemType<MasterSword>())
             {

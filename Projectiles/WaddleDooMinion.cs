@@ -11,12 +11,15 @@ using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles
-{
+{ 
 	public class WaddleDooMinion : ModProjectile
 	{
-		ref float attack => ref Projectile.ai[0];
-        ref float jumpTimer => ref Projectile.ai[1];
-
+		ref float Attack => ref Projectile.ai[0];
+        ref float JumpTimer => ref Projectile.ai[1];
+        public static int AttackDuration => 15;
+        static float Speed => 15;
+        static float Inertia => 3;
+        static float BeamRangeMult => 10f;
         public bool attacking = false; //checks if in attacking state
         bool spaceJumping = false; //determines if gonna warp
         float spaceJumpRotation = 0; //here for sprite rotation of space jump
@@ -79,7 +82,7 @@ namespace KirboMod.Projectiles
         {
             Projectile.spriteDirection = Projectile.direction; //face direction it's going
 
-            jumpTimer--;
+            JumpTimer--;
 
             Player player = Main.player[Projectile.owner];
 
@@ -107,13 +110,12 @@ namespace KirboMod.Projectiles
                 } 
 				else //fall slower
 				{
-                    if (Projectile.velocity.Y >= 1f)
+                    if (Projectile.velocity.Y >= Speed)
                     {
-                        Projectile.velocity.Y = 1f;
+                        Projectile.velocity.Y = Speed;
                     }
                 }
             }
-
             //for stepping up tiles
             if (spaceJumping == false)
             {
@@ -140,82 +142,35 @@ namespace KirboMod.Projectiles
                 }
             }
 
-            if (aggroTarget == null || !aggroTarget.active || aggroTarget.dontTakeDamage) //search target
+            if (aggroTarget == null || !aggroTarget.CanBeChasedBy()) //search target
             {
-                //start each number with a very big number so they can't be targeted if their npc doesn't exist
-                Targetdistances = Enumerable.Repeat(999999f, Main.maxNPCs).ToList();
-
-                for (int i = 0; i < Main.maxNPCs; i++)
+                aggroTarget = null;
+                int targetIndex = -1;
+                Projectile.Minion_FindTargetInRange(1500, ref targetIndex, true, null);
+                attacking = false;
+                if(targetIndex >= 0 && Main.maxNPCs >= targetIndex)
                 {
-                    NPC npc = Main.npc[i];
-
-                    float distance = Vector2.Distance(Projectile.Center, npc.Center);
-
-                    if (npc.CanBeChasedBy()) //checks if targetable
-                    {
-                        Vector2 positionOffset = new Vector2(0, -5);
-                        bool inView = Collision.CanHitLine(Projectile.position + positionOffset, Projectile.width, Projectile.height, npc.position, npc.width, npc.height);
-
-                        //close, hittable, hostile and can see target
-                        if (inView && !npc.friendly && !npc.dontTakeDamage && !npc.dontCountMe && distance < distanceFromTarget && npc.active && spaceJumping == false)
-                        {
-                            Targetdistances.Insert(npc.whoAmI, (int)distance); //add to list of potential targets
-                        }
-                    }
-
-                    if (i == Main.maxNPCs - 1)
-                    {
-                        int theTarget = -1;
-
-                        //count up 'til reached maximum distance
-                        for (float j = 0; j < distanceFromTarget; j++)
-                        {
-                            int Aha = Targetdistances.FindIndex(a => a == j); //count up 'til a target is found in that range
-
-                            if (Aha > -1) //found target
-                            {
-                                theTarget = Aha;
-
-                                break;
-                            }
-                        }
-
-                        if (theTarget > -1) //exists
-                        {
-                            NPC npc2 = Main.npc[theTarget];
-
-                            if (npc2 != null) //exists
-                            {
-                                aggroTarget = npc2;
-                            }
-                        }
-                        else
-                        {
-                            break; //just in case
-                        }
-                    }
+                    aggroTarget = Main.npc[targetIndex];
+                    attacking = true;
                 }
             }
-            if (attacking == true) //checks if attacking
-            {
-                Attack();
-            }
-            else if (aggroTarget != null && aggroTarget.active && !aggroTarget.dontTakeDamage) //ATTACK
+
+            if (aggroTarget != null && aggroTarget.CanBeChasedBy()) //ATTACK
 			{
                 Vector2 direction = aggroTarget.Center - Projectile.Center; //start - end
 
-                if (direction.Length() < 120) //attack if close enough and not currently attacking
+                if (direction.Length() < 15 * BeamRangeMult) //attack if close enough and not currently attacking
 				{
                     attacking = true; //start beamin 
 				}
 				else 
                 {
-					attack = 0;
+					Attack = 0;
 
-					if (direction.Y <= -100f && jumpTimer <= 0 && spaceJumping == false) //jump when below enemy and can jump again
-					{
-                        Jump();
-                    }
+					//if (direction.Y <= -100f && JumpTimer <= 0 && spaceJumping == false) //jump when below enemy and can jump again
+					//{
+     //                   Jump();
+     //               }
 
                     float speed = 7f; //walk speed
                     float inertia = 6f; //turn speed
@@ -273,7 +228,11 @@ namespace KirboMod.Projectiles
                         Projectile.frameCounter = 0;
                     }
                 }
-			}
+                if (attacking == true) //checks if attacking
+                {
+                    AI_Attack();
+                }
+            }
 			else //FOLLOW PLAYER
 			{
                 if (Projectile.velocity.X <= 0.1f & Projectile.velocity.X >= -0.1f) //barely moving
@@ -321,9 +280,9 @@ namespace KirboMod.Projectiles
                     }
                 }
 
-                attack = 0;
+                Attack = 0;
 
-				if (vectorToIdlePosition.Y <= -50f & jumpTimer <= 0 && spaceJumping == false) //jump (lower distance when following player)
+				if (vectorToIdlePosition.Y <= -50f & JumpTimer <= 0 && spaceJumping == false) //jump (lower distance when following player)
                 {
                     Jump();
                 }
@@ -347,9 +306,7 @@ namespace KirboMod.Projectiles
                     //we put this instead of player.Center so it will always be moving top speed instead of slowing down when enemy is near but unreachable
                     //A "carrot on a stick" if you will
 
-                    Vector2 carrotDirection = Projectile.Center + new Vector2(pseudoDirection * 50, 0) - Projectile.Center; //start - end 
-                    carrotDirection.Normalize();
-                    carrotDirection *= speed;
+                    Vector2 carrotDirection = new Vector2(pseudoDirection * speed, 0); 
 
                     //use .X so it only effects horizontal movement
                     Projectile.velocity.X = (Projectile.velocity.X * (inertia - 1) + carrotDirection.X) / inertia; //use .X so it only effects horizontal movement
@@ -366,7 +323,7 @@ namespace KirboMod.Projectiles
             {
                 Projectile.tileCollide = false;
                 Projectile.ignoreWater = true;
-                jumpTimer = 1; // hold till not space jumping
+                JumpTimer = 1; // hold till not space jumping
                 Projectile.alpha = 255; //hide projectile
 
                 float speed = Math.Clamp(direction2.Length() / 30, 20f, float.MaxValue);
@@ -402,42 +359,46 @@ namespace KirboMod.Projectiles
                 spaceJumping = false;
             }
 
-            if (jumpTimer > 0 && attack == 0) //if jumping and not attacking
+            if (JumpTimer > 0 && Attack == 0) //if jumping and not attacking
 			{
 				Projectile.frame = 9; //jump frame
             }
 		}
 
-		private void Attack()
+		private void AI_Attack()
         {
-			Projectile.velocity.X *= 0.8f;
-			attack++;
+            if (aggroTarget == null)
+                return;
+
+            Projectile.velocity.X *= 0.8f;
+			Attack++;
 
             Vector2 direction = aggroTarget.Center - Projectile.Center; //start - end 
 
-            if (attack >= 15) //over 15
+            if (Attack >= AttackDuration) //over 15
             {
-                if (direction.Length() > 160 || !aggroTarget.active)
+                if (direction.Length() > 160 || !aggroTarget.CanBeChasedBy())
                 {
                     attacking = false;
-                    attack = 0;
+                    Attack = 0;
                 }
             }
 
             Player player = Main.player[Projectile.owner];
-
-            if (attack % 15 == 0 && player.ownedProjectileCounts[ModContent.ProjectileType<MinionBeamSpread>()] == 0)
+            Vector2 toTarget = Projectile.DirectionTo(aggroTarget.Center);
+            Projectile.spriteDirection = MathF.Sign(toTarget.X);
+            if (Attack % AttackDuration == 0)
 			{
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, 
-                    ModContent.ProjectileType<MinionBeamSpread>(), Projectile.damage, 0, player.whoAmI, Projectile.whoAmI);
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, toTarget * 10, 
+                    ModContent.ProjectileType<MinionBeamSpread>(), Projectile.damage, Projectile.knockBack, player.whoAmI, Projectile.identity);
 			}
 
             Projectile.frame = 8;
         }
         private void Jump()
         {
-            Projectile.velocity.Y = -10f; //velocityY boosts up 
-            jumpTimer = 15;
+            Projectile.velocity.Y = -Speed; //velocityY boosts up 
+            JumpTimer = 15;
             Projectile.frame = 9;
         }
 

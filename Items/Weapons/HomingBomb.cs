@@ -12,6 +12,7 @@ namespace KirboMod.Items.Weapons
 	{
 		public override void SetStaticDefaults() 
 		{
+			ItemID.Sets.IsRangedSpecialistWeapon[Type] = true;
 			 // DisplayName.SetDefault("Homing Bomb"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
 			/* Tooltip.SetDefault("Chases after enemies before detonation" +
 				"\nSets off other nearby homing bombs when detonated"); */

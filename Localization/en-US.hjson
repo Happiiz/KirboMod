@@ -291,12 +291,8 @@ Mods: {
 			}
 
 			CrystalShard: {
-				DisplayName: Crystal Shard
-				Tooltip:
-					'''
-					A makeshift version of special otherworldy crystals
-					'The cooler Crystal Shard'
-					'''
+				DisplayName: Otherwordly Crystal Shard
+				Tooltip: "'The cooler Crystal Shard'"
 			}
 
 			DarkMaterial: {
@@ -592,7 +588,11 @@ Mods: {
 
 			BeamStaff: {
 				DisplayName: Beam Staff
-				Tooltip: ""
+				Tooltip:
+					'''
+					High damage, high knockback, high piercing, ease of aim, and low mana cost, at the cost of range
+					'Beam Attack!'
+					'''
 			}
 
 			Blado: {
@@ -623,6 +623,7 @@ Mods: {
 					'''
 					Shoots flying sawblades that bounce off walls and grind against enemies
 					{$CommonItemTooltip.IgnoresDefense}
+					This weapon and its downgrades benefit from the [i:1548] Shroomite Helmet
 					'''
 			}
 
@@ -667,11 +668,11 @@ Mods: {
 
 			CrownOfClimate: {
 				DisplayName: Crown Of Climate
-				Tooltip: 
-				'''
-				Summons a burning leo and chilly combo to fight for you
-				'lol the damage value is so low how good could it really be'
-				'''
+				Tooltip:
+					'''
+					Summons a burning leo and chilly combo to fight for you
+					'lol the damage value is so low how good could it really be'
+					'''
 			}
 
 			CrownOfFire: {
@@ -692,8 +693,10 @@ Mods: {
 				DisplayName: Ribbon's Crystal
 				Tooltip:
 					'''
-					Consumes magic crystal shards
+					Homes in on enemies very strongly
+					Consumes special [i:KirboMod/CrystalShard] otherwordly crystal shards. (not [i:502])
 					75% chance to not consume ammo
+					This weapon benefits from the [i:1548] Shroomite Helmet
 					'''
 			}
 
@@ -701,8 +704,9 @@ Mods: {
 				DisplayName: Crystal Needle Ball
 				Tooltip:
 					'''
-					leaves crystals along the ground
+					Leaves crystals along the ground
 					Shoots crystal spikes out when expired
+					This weapon and its downgrades benefit from the [i:1548] Shroomite Helmet
 					'''
 			}
 
@@ -717,6 +721,8 @@ Mods: {
 					'''
 					Converts star arrows into a laser beam & four extra laser arrows
 					Converts all other arrows into laser arrows
+					Laser arrows ignore 25 defense and pierce 9 times with 5% falloff
+					Laser beam pierces infinitely
 					'''
 			}
 
@@ -732,7 +738,11 @@ Mods: {
 
 			DooStaff: {
 				DisplayName: Doo Staff
-				Tooltip: Summons a waddle doo to fight for you
+				Tooltip:
+					'''
+					Summons a waddle doo to fight for you
+					'Oh I missed, I'll get him next time'
+					'''
 			}
 
 			DragonFire: {
@@ -765,7 +775,11 @@ Mods: {
 
 			FinalCutter: {
 				DisplayName: Final Cutter
-				Tooltip: Flies in the opposite direction
+				Tooltip:
+					'''
+					Flies in the opposite direction
+					This weapon and its downgrades benefit from the [i:1548] Shroomite Helmet
+					'''
 			}
 
 			Fire: {
@@ -794,7 +808,6 @@ Mods: {
 					'''
 					Sprays a flurry of snowballs that form snowmen
 					Enemies killed by one condense into an ice cube
-					Does not work on bosses
 					'''
 			}
 
@@ -836,7 +849,7 @@ Mods: {
 
 			HeroSword: {
 				DisplayName: Hero Sword
-				Tooltip: ""
+				Tooltip: Fires 1 beam every 2 swings
 			}
 
 			HomingBomb: {
@@ -846,6 +859,7 @@ Mods: {
 					Activates homing capabilities after landing
 					Chases after enemies before detonation
 					Sets off other nearby homing bombs when detonated
+					This weapon and its downgrades benefit from the [i:1548] Shroomite Helmet
 					'''
 			}
 
@@ -864,7 +878,6 @@ Mods: {
 					'''
 					Sprays a flurry of snowballs
 					Enemies killed by one condense into an ice cube
-					Does not work on bosses
 					'''
 			}
 
@@ -982,11 +995,12 @@ Mods: {
 			}
 
 			RangerGun: {
-				DisplayName: Pow Shot Gun
+				DisplayName: Star Shot Gun
 				Tooltip:
 					'''
 					Converts all bullets into star bubbles
 					Converts star bullets into giant star bubbles
+					Contrary to its name, it does not use fallen stars as ammo
 					'''
 			}
 
@@ -1016,7 +1030,11 @@ Mods: {
 
 			StarRod: {
 				DisplayName: Star Rod
-				Tooltip: Ignores 60 defense
+				Tooltip:
+					'''
+					Ignores 60 defense
+					'No, I'll give you a house... in Boca Raton!'
+					'''
 			}
 
 			StormTornado: {
@@ -1243,7 +1261,7 @@ Mods: {
 			BadStar.DisplayName: Night Star
 			BallOfImpendingDoom.DisplayName: Ball Of Impending Doom
 			BeamBad.DisplayName: Beam
-			BeamBall.DisplayName: Beam
+			BeamWhipProj.DisplayName: Beam
 			BeamBig.DisplayName: Beam
 			BigRangerStar.DisplayName: Big Ranger Star
 			BioDagger.DisplayName: Kunai
@@ -1273,7 +1291,7 @@ Mods: {
 			CresentSlash.DisplayName: Cresent Slash
 			CrystalClutter.DisplayName: Crystal Clutter
 			CrystalNeedleBall.DisplayName: Crystal Needle Ball
-			CrystalShardProj.DisplayName: Crystal Shard
+			CrystalShardProj.DisplayName: Otherwordly Crystal Shard
 			CrystalTrap.DisplayName: Crystal Trap
 			CutterBlade.DisplayName: Cutter Blade
 			CyborgArcherArrow.DisplayName: Laser Arrow

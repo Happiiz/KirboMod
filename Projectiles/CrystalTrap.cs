@@ -1,7 +1,5 @@
 using Microsoft.Xna.Framework;
-using System;
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles
@@ -24,6 +22,7 @@ namespace KirboMod.Projectiles
 			Projectile.penetrate = 5;
             Projectile.usesLocalNPCImmunity = true; //wait for no one else's immunity timer
             Projectile.localNPCHitCooldown = 10;
+			Projectile.ArmorPenetration = 99999;
         }
 		public override void AI()
 		{

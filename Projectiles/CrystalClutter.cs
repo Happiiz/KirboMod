@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework;
-using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -16,24 +15,21 @@ namespace KirboMod.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 62;
-			Projectile.height = 62;
+			Projectile.width = 50;
+			Projectile.height = 50;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.timeLeft = 240;
 			Projectile.tileCollide = true;
-			Projectile.penetrate = 3;
-            Projectile.usesLocalNPCImmunity = true; 
-            Projectile.localNPCHitCooldown = 5;
         }
 		public override void AI()
 		{
-			Projectile.velocity.Y = Projectile.velocity.Y + 0.2f;
+			Projectile.velocity.Y = Projectile.velocity.Y + 0.3f;
 			if (Projectile.velocity.Y >= 3f)
             {
 				Projectile.velocity.Y = 3f;
             }
-			Projectile.rotation += 0.12f * (float)Projectile.direction; // rotates projectile
+			Projectile.rotation += 0.03f * (float)Projectile.direction * Projectile.velocity.X; // rotates projectile
 		}
          public override void OnKill(int timeLeft) //when the projectile dies
          {
@@ -43,7 +39,7 @@ namespace KirboMod.Projectiles
                  Dust d = Dust.NewDustPerfect(Projectile.position, 91, speed * 3, 0, new Color(Main.rand.Next(0, 255), Main.rand.Next(0, 255), Main.rand.Next(0, 255)), Scale: 1f); //Makes dust in a messy circle
              }
 			
-			SoundEngine.PlaySound(SoundID.Item27 with {Volume = 0.5f}, Projectile.Center); //quiet crystal break
+			SoundEngine.PlaySound(SoundID.Item27 with {Volume = 0.5f, MaxInstances = 0}, Projectile.Center); //quiet crystal break
 		}
 
         public override bool OnTileCollide(Vector2 oldVelocity)
@@ -59,16 +55,18 @@ namespace KirboMod.Projectiles
 
 			return false;
 		}
-
+        public override bool PreDraw(ref Color lightColor)
+        {
+			return Projectile.DrawSelf(Color.White);
+        }
         public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
         {
             fallThrough = false; //don't fall through platforms
             return true;
         }
-
-        public override Color? GetAlpha(Color lightColor)
-		{
-			return Color.White; // Makes it uneffected by light
-		}
+        public override void ModifyDamageHitbox(ref Rectangle hitbox)
+        {
+			hitbox = Utils.CenteredRectangle(Projectile.Center, new Vector2(58));
+        }
 	}
 }

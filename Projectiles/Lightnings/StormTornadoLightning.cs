@@ -1,15 +1,15 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
 using Terraria;
-using Terraria.GameContent;
-using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles.Lightnings
 {
     public class StormTornadoLightning : LightningProj
     {
+        public override void SetStaticDefaults()
+        {
+            SetAmountOfLightingSegments(5, Type);
+        }
         public override void SetDefaults()
         {
             base.SetDefaults();

@@ -22,6 +22,7 @@ namespace KirboMod.Projectiles.Lightnings
             width = 20;
             Projectile.scale = 2;
             opacityFunction = OpacityFunction;
+            SetAmountOfLightingSegments(7, Projectile.type);
         }
         float OpacityFunction(float progress)
         {

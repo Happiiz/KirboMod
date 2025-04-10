@@ -15,9 +15,19 @@ namespace KirboMod.Projectiles.Lightnings
         public override string Texture => "Terraria/Images/Projectile_" + ProjectileID.CultistBossLightningOrbArc;
         public override void SetStaticDefaults()
         {
+            //MAKE SURE THE OLD POS LENGTH IS A MULTIPLE OF MAXUPDATES + 1
             ProjectileID.Sets.TrailingMode[Type] = 2;
             ProjectileID.Sets.TrailCacheLength[Type] = 100;
             ProjectileID.Sets.DrawScreenCheckFluff[Type] = 1500;
+        }
+        /// <summary>
+        /// SHOULD BE CALLED IN SetStaticDefaults !!!!!!!
+        /// </summary>
+        public static void SetAmountOfLightingSegments(int amount, int projID)
+        {
+            ProjectileID.Sets.TrailCacheLength[projID] = amount * 3 + 1;
+            ProjectileID.Sets.DrawScreenCheckFluff[projID] = 1500;
+            ProjectileID.Sets.TrailingMode[projID] = 2;
         }
         public override void SetDefaults()
         {
@@ -164,6 +174,7 @@ namespace KirboMod.Projectiles.Lightnings
                 for (int j = Projectile.oldPos.Length - 1; j > 0; j -= Projectile.MaxUpdates)
                 {
                     SetColorVariable(i, ref halfSize, opacityFunction(Utils.GetLerpValue(Projectile.oldPos.Length, 0, j)));
+                    //MAKE SURE THE OLD POS LENGTH IS A MULTIPLE OF MAXUPDATES + 1
                     if (Projectile.oldPos[j] == Vector2.Zero)
                     {
                         continue;
@@ -184,10 +195,11 @@ namespace KirboMod.Projectiles.Lightnings
                 }
                 DelegateMethods.f_1 = 1f;
                 Vector2 lastPos = Projectile.oldPos[Projectile.MaxUpdates] + Projectile.Size / 2 + gfxOff;
-                if (Projectile.oldPos[Projectile.MaxUpdates] != Vector2.Zero)
-                {
-                    Utils.DrawLaser(Main.spriteBatch, laserTex, lastPos, drawPos, halfSize, DelegateMethods.LightningLaserDraw);
-                }
+
+               // if (Projectile.oldPos[Projectile.MaxUpdates] != Vector2.Zero)
+               // {
+                   // Utils.DrawLaser(Main.spriteBatch, laserTex, lastPos, drawPos, halfSize, DelegateMethods.LightningLaserDraw);
+                //}
             }
             if (Projectile.velocity == Vector2.Zero)
             {
@@ -279,7 +291,8 @@ namespace KirboMod.Projectiles.Lightnings
         }
         public override void ModifyDamageHitbox(ref Rectangle hitbox)
         {
-            hitbox = Utils.CenteredRectangle(hitbox.Center(), new Vector2(32));
+            float size = Projectile.friendly ? 46 : 32;//bigger hitboxes if it's friendly so it feels better for the player
+            hitbox = Utils.CenteredRectangle(hitbox.Center(), new Vector2(size));
         }
     }
 }

@@ -44,7 +44,7 @@ namespace KirboMod.Projectiles
 
             Projectile.ai[0]++;
 
-            if (Projectile.ai[0] % 30 == 0) //every 30 ticks
+            if (Projectile.ai[0] % 30 == 0 && Main.myPlayer == Projectile.owner) //every 30 ticks
             {
                 Vector2 speed = Main.rand.BetterNextVector2Circular(8f); //circle
                 Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, speed, ModContent.ProjectileType<Projectiles.Clutter>(), Projectile.damage, 4, Projectile.owner, 0, 0);
@@ -71,12 +71,15 @@ namespace KirboMod.Projectiles
 				Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.Iron, speed * 3, Scale: 1.5f); //Makes dust in a messy circle
 			}
 
-			//nail projectiles
-			for (int i = 0; i < 20; i++)
-			{
-				Vector2 speed = Main.rand.NextVector2CircularEdge(16f, 16f); //circle
-				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, speed, ModContent.ProjectileType<Projectiles.Clutter>(), Projectile.damage, 4, Projectile.owner, 0, 0); 
-			}
+            if (Main.myPlayer == Projectile.owner)
+            {
+                //nail projectiles
+                for (int i = 0; i < 20; i++)
+                {
+                    Vector2 speed = Main.rand.NextVector2CircularEdge(16f, 16f); //circle
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, speed, ModContent.ProjectileType<Projectiles.Clutter>(), Projectile.damage, 4, Projectile.owner, 0, 0);
+                }
+            }
 		}
 
         public override bool OnTileCollide(Vector2 oldVelocity)

@@ -12,8 +12,9 @@ namespace KirboMod.Items.Weapons
 	{
 		public override void SetStaticDefaults() 
 		{
-			 // DisplayName.SetDefault("Needle Ball"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
-			// Tooltip.SetDefault("Slows down when not poking enemies"); 
+            ItemID.Sets.IsRangedSpecialistWeapon[Type] = true;
+            // DisplayName.SetDefault("Needle Ball"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
+            // Tooltip.SetDefault("Slows down when not poking enemies"); 
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 99; //amount needed to research
         }
 

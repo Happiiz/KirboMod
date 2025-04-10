@@ -12,8 +12,9 @@ namespace KirboMod.Items.Weapons
 	{
 		public override void SetStaticDefaults()
 		{
-			// DisplayName.SetDefault("Buzz Cutter"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
-			/* Tooltip.SetDefault("Shoots a flying sawblade that bounces off nearby walls" +
+            ItemID.Sets.IsRangedSpecialistWeapon[Type] = true;
+            // DisplayName.SetDefault("Buzz Cutter"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
+            /* Tooltip.SetDefault("Shoots a flying sawblade that bounces off nearby walls" +
 				"\nReturns to the player if not hitting any walls" +
 				"\nFive can be out at a time"); */
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research 

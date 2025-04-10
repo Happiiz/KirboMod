@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -8,6 +9,7 @@ namespace KirboMod.Projectiles
 {
     public class CrystalNeedleBall : ModProjectile
     {
+        public static int DistRequiredForTrap => 16 * 3;
         public override void SetStaticDefaults()
         {
             Main.projFrames[Projectile.type] = 1;
@@ -15,23 +17,24 @@ namespace KirboMod.Projectiles
 
         public override void SetDefaults()
         {
-            Projectile.width = 102;
-            Projectile.height = 102;
+            //modified damaged hitbox.
+            Projectile.width = 90;
+            Projectile.height = 90;
             Projectile.friendly = true;
             Projectile.DamageType = DamageClass.Ranged;
             Projectile.timeLeft = 300;
             Projectile.tileCollide = true;
-            Projectile.penetrate = -1;
+            Projectile.penetrate = 7;
             Projectile.usesLocalNPCImmunity = true; //wait for no one
-            Projectile.localNPCHitCooldown = 5;
+            Projectile.localNPCHitCooldown = 3;
         }
         public override void AI()
         {
-
-            Projectile.ai[0]++;
-            if (Projectile.ai[0] % 10 == 0 && Projectile.velocity.Y == 0) //every 10 ticks and on the ground
+            Projectile.ai[0]+= Projectile.position.Distance(Projectile.oldPosition);
+            if (Projectile.ai[0] >= DistRequiredForTrap && Projectile.velocity.Y == 0 && Main.myPlayer == Projectile.owner) //every 14 ticks and on the ground
             {
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Bottom.X, Projectile.Bottom.Y - 16, Projectile.velocity.X * 0.01f, Projectile.velocity.Y * 0.01f, ModContent.ProjectileType<CrystalTrap>(), Projectile.damage * 3 / 4, 1, Projectile.owner, 0, 0, 0);
+                Projectile.ai[0] %= DistRequiredForTrap;
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Bottom.X - MathF.Sign(Projectile.velocity.X) * Projectile.ai[0] + Main.rand.NextFloat(-8,8), Projectile.Bottom.Y - 16, Projectile.velocity.X * 0.01f, Projectile.velocity.Y * 0.01f, ModContent.ProjectileType<CrystalTrap>(), Projectile.damage / 5, Projectile.knockBack, Projectile.owner, 0, 0, 0);
             }
 
             //Gravity
@@ -67,13 +70,20 @@ namespace KirboMod.Projectiles
                 Vector2 speed = Main.rand.NextVector2Circular(1f, 1f); //circle
                 Dust d = Dust.NewDustPerfect(Projectile.Center, 91, speed * 3, 0, new Color(Main.rand.Next(0, 255), Main.rand.Next(0, 255), Main.rand.Next(0, 255)), Scale: 1.5f); //Makes dust in a messy circle
             }
-            //crystal clutter projectiles
-            for (int i = 0; i < 3; i++)
+            if (Main.myPlayer == Projectile.owner)
             {
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center.X, Projectile.Center.Y, Projectile.direction * 10f, Main.rand.Next(-10, 0), ModContent.ProjectileType<Projectiles.CrystalClutter>(), Projectile.damage, 10f, Projectile.owner, 0, 0);
+                //crystal clutter projectiles
+                for (int i = 0; i < 3; i++)
+                {
+                    float topVal = 35;
+                    Vector2 vel = new Vector2(Projectile.direction * topVal, Main.rand.NextFloat(-topVal, 20 -topVal));
+                    vel.Normalize();
+                    vel *= 15f;
+                    vel += Main.rand.BetterNextVector2Circular(3);
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, vel, ModContent.ProjectileType<Projectiles.CrystalClutter>(), Projectile.damage, 10f, Projectile.owner, 0, 0);
+                }
             }
-
-            SoundEngine.PlaySound(SoundID.Item27, Projectile.Center); //crystal break
+            SoundEngine.PlaySound(SoundID.Item27 with { MaxInstances = 0}, Projectile.Center); //crystal break
         }
 
         public override bool OnTileCollide(Vector2 oldVelocity)
@@ -81,6 +91,7 @@ namespace KirboMod.Projectiles
             if (Projectile.velocity.X != oldVelocity.X) //bounce
             {
                 Projectile.velocity.X = -oldVelocity.X;
+                Projectile.ai[0]++;//avoid stacking spike shards
             }
             return false; //dont die
         }
@@ -90,10 +101,13 @@ namespace KirboMod.Projectiles
             fallThrough = false; //don't fall through platforms
             return true;
         }
-
-        public override Color? GetAlpha(Color lightColor)
+        public override void ModifyDamageHitbox(ref Rectangle hitbox)
         {
-            return Color.White; // Makes it uneffected by light
+            hitbox = Utils.CenteredRectangle(Projectile.Center, new Vector2(100));
+        }
+        public override bool PreDraw(ref Color lightColor)
+        {
+            return Projectile.DrawSelf(Color.White);
         }
     }
 }
