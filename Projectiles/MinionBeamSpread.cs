@@ -37,8 +37,8 @@ namespace KirboMod.Projectiles
             Projectile.penetrate = -1;
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = -1;
-            Projectile.WhipSettings.RangeMultiplier = 2;
-            Projectile.WhipSettings.Segments = 10;
+            Projectile.WhipSettings.RangeMultiplier = 0.5f;
+            Projectile.WhipSettings.Segments = 8;
             Projectile.extraUpdates = 3;
         }
         public static int OffsetLength => 10;
@@ -53,7 +53,7 @@ namespace KirboMod.Projectiles
             float timeToFlyOut = WaddleDooMinion.AttackDuration * Projectile.MaxUpdates;
             Projectile.rotation = Projectile.velocity.ToRotation() + (float)Math.PI / 2f;//leaving it like this incase vanilla code uses it
             Timer += 1f;
-            Projectile.Center = dooOwner.Projectile.Center + Vector2.UnitX * OffsetLength * dooOwner.Projectile.spriteDirection - Projectile.velocity;
+            Projectile.Center = dooOwner.Projectile.Center + Vector2.UnitX * OffsetLength * dooOwner.Projectile.spriteDirection - Projectile.velocity + dooOwner.Projectile.velocity;
             Projectile.spriteDirection = (!(Vector2.Dot(Projectile.velocity, Vector2.UnitX) < 0f)) ? 1 : (-1);
             if (Timer % (4 * Projectile.MaxUpdates) == 1 && Timer < timeToFlyOut - 8 * Projectile.MaxUpdates)
             {
@@ -69,17 +69,13 @@ namespace KirboMod.Projectiles
         {
             List<Vector2> list = new();
             FillWhipControlPoints(list);
-            Vector2 pos = list[0];
-            float prevDrawnRadius = -1;
-            Vector2 prevDrawnPos = pos;
             for (int i = 0; i < list.Count; i++)
             {
-                pos = list[i];
+                Vector2 pos = list[i];
 
                 //if (pos.Distance(prevDrawnPos) > prevDrawnRadius)
                 {
-                    prevDrawnPos = pos;
-                    prevDrawnRadius = Utils.Remap(i, 0, list.Count - 1, 0.5f, 1f);
+                    float prevDrawnRadius = Utils.Remap(i, 0, list.Count - 1, 0.5f, 1f);
                     VFX.DrawWaddleDooBeam(pos, prevDrawnRadius, 1f);
                 }
             }
@@ -116,7 +112,7 @@ namespace KirboMod.Projectiles
         {
             timeToFlyOut = WaddleDooMinion.AttackDuration * Projectile.MaxUpdates;
             segments = 10;
-            rangeMultiplier = 1f;
+            rangeMultiplier = 0.5f;
         }
         void FillWhipControlPoints(List<Vector2> controlPoints)
         {

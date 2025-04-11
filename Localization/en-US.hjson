@@ -590,7 +590,7 @@ Mods: {
 				DisplayName: Beam Staff
 				Tooltip:
 					'''
-					High damage, high knockback, high piercing, ease of aim, and low mana cost, at the cost of range
+					High damage, high knockback, high piercing, ease of aim, at the cost of range and high mana use
 					'Beam Attack!'
 					'''
 			}
@@ -741,7 +741,7 @@ Mods: {
 				Tooltip:
 					'''
 					Summons a waddle doo to fight for you
-					'Oh I missed, I'll get him next time'
+					'Beam Attack!'
 					'''
 			}
 
@@ -1260,8 +1260,8 @@ Mods: {
 			BadPlasmaZap.DisplayName: Plasma Zap
 			BadStar.DisplayName: Night Star
 			BallOfImpendingDoom.DisplayName: Ball Of Impending Doom
-			BeamBad.DisplayName: Beam
-			BeamWhipProj.DisplayName: Beam
+			BeamBad.DisplayName: Beam Attack
+			BeamWhipProj.DisplayName: Beam Attack
 			BeamBig.DisplayName: Beam
 			BigRangerStar.DisplayName: Big Ranger Star
 			BioDagger.DisplayName: Kunai

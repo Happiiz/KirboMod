@@ -16,7 +16,7 @@ namespace KirboMod.Projectiles
 	{
 		ref float Attack => ref Projectile.ai[0];
         ref float JumpTimer => ref Projectile.ai[1];
-        public static int AttackDuration => 15;
+        public static int AttackDuration => 25;
         static float Speed => 15;
         static float Inertia => 3;
         static float BeamRangeMult => 10f;
@@ -118,9 +118,9 @@ namespace KirboMod.Projectiles
             }
             //for stepping up tiles
             if (spaceJumping == false)
-            {
-                Collision.StepUp(ref Projectile.position, ref Projectile.velocity, Projectile.width, Projectile.height, ref Projectile.stepSpeed, ref Projectile.gfxOffY);
-            }
+                {
+                    Collision.StepUp(ref Projectile.position, ref Projectile.velocity, Projectile.width, Projectile.height, ref Projectile.stepSpeed, ref Projectile.gfxOffY);
+                }
 
             float distanceFromTarget = 1000f;
 
@@ -159,21 +159,21 @@ namespace KirboMod.Projectiles
 			{
                 Vector2 direction = aggroTarget.Center - Projectile.Center; //start - end
 
-                if (direction.Length() < 15 * BeamRangeMult) //attack if close enough and not currently attacking
+                if (direction.Length() < 30 * BeamRangeMult) //attack if close enough and not currently attacking
 				{
                     attacking = true; //start beamin 
 				}
-				else 
+				//else 
                 {
-					Attack = 0;
+					//Attack = 0;
 
-					//if (direction.Y <= -100f && JumpTimer <= 0 && spaceJumping == false) //jump when below enemy and can jump again
-					//{
-     //                   Jump();
-     //               }
+                    if (direction.Y <= -100f && JumpTimer <= 0 && spaceJumping == false) //jump when below enemy and can jump again
+                    {
+                        Jump();
+                    }
 
-                    float speed = 7f; //walk speed
-                    float inertia = 6f; //turn speed
+                    float speed = Speed; //walk speed
+                    float inertia = Inertia; //turn speed
                     int pseudoDirection = 1;
                     if (direction.X < 0) //enemy is behind
                     {
@@ -182,13 +182,17 @@ namespace KirboMod.Projectiles
                     //we put this instead of player.Center so it will always be moving top speed instead of slowing down when enemy is near but unreachable
                     //A "carrot on a stick" if you will
 
-                    Vector2 carrotDirection = Projectile.Center + new Vector2(pseudoDirection * 50, 0) - Projectile.Center; //start - end 
-                    carrotDirection.Normalize();
-                    carrotDirection *= speed;
+                    Vector2 carrotDirection = new Vector2(pseudoDirection * speed, 0); //start - end 
 
-                    //use .X so it only effects horizontal movement
-                    Projectile.velocity.X = (Projectile.velocity.X * (inertia - 1) + carrotDirection.X) / inertia; //use .X so it only effects horizontal movement
-
+                    if (MathF.Abs(direction.X) > 100)
+                    {
+                        //use .X so it only effects horizontal movement
+                        Projectile.velocity.X = (Projectile.velocity.X * (inertia - 1) + carrotDirection.X) / inertia; //use .X so it only effects horizontal movement
+                    }
+                    else
+                    {
+                        Projectile.velocity.X *= 0.9f;
+                    }
                     //animation
                     Projectile.frameCounter++;
                     if (Projectile.frameCounter < 5.0)
@@ -286,9 +290,8 @@ namespace KirboMod.Projectiles
                 {
                     Jump();
                 }
-
-                float speed = 7; //walk speed
-                float inertia = 6f; //turn speed
+                float speed = Speed; //walk speed
+                float inertia = Inertia; //turn speed
 
                 if (Math.Abs(vectorToIdlePosition.X) < 10f) //near idle position
 				{
@@ -364,18 +367,32 @@ namespace KirboMod.Projectiles
 				Projectile.frame = 9; //jump frame
             }
 		}
+        void SocialDistancing()
+        {
 
+            int owner = Projectile.owner;
+            int type = Projectile.type;
+            int index = Projectile.whoAmI;
+            for (int i = 0; i < Main.maxProjectiles; i++)
+            {
+                Projectile proj = Main.projectile[i];
+                if(proj.active && proj.owner == owner && type == proj.type && proj.whoAmI != index && proj.Distance(Projectile.Center) < 32f)
+                {
+                    proj.velocity -= proj.DirectionTo(Projectile.Center)*3;
+                }
+            }
+        }
 		private void AI_Attack()
         {
             if (aggroTarget == null)
                 return;
-
+            SocialDistancing();
             Projectile.velocity.X *= 0.8f;
 			Attack++;
 
             Vector2 direction = aggroTarget.Center - Projectile.Center; //start - end 
 
-            if (Attack >= AttackDuration) //over 15
+            if (Attack >= AttackDuration) 
             {
                 if (direction.Length() > 160 || !aggroTarget.CanBeChasedBy())
                 {

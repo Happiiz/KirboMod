@@ -16,8 +16,8 @@ namespace KirboMod.Items.Weapons
 
         public override void SetDefaults()
         {
-            //low range so it has high damage value
-            Item.DefaultToWhip(ModContent.ProjectileType<Projectiles.BeamWhipProj>(), 32, 6.5f, 2.2f, 30);
+            //low range and high mana cost so it has high damage value
+            Item.DefaultToWhip(ModContent.ProjectileType<Projectiles.BeamWhipProj>(), 37, 6.5f, 2.2f, 30);
             Item.DamageType = DamageClass.Magic;
             Item.noMelee = true;
             Item.width = 40;
@@ -26,7 +26,7 @@ namespace KirboMod.Items.Weapons
             Item.value = Item.buyPrice(0, 0, 3);
             Item.rare = ItemRarityID.Blue;
             Item.autoReuse = true;
-            Item.mana = 5;
+            Item.mana = 18;
             Item.UseSound = default;
         }
 

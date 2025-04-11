@@ -22,8 +22,8 @@ namespace KirboMod.Projectiles
 
         public override void SetDefaults()
         {
-            Projectile.width = 30;
-            Projectile.height = 30;
+            Projectile.width = 180;
+            Projectile.height = 216;
             Projectile.friendly = true;
             Projectile.hostile = false;
             Projectile.DamageType = DamageClass.Magic;
