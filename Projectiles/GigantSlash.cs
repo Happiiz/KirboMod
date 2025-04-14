@@ -100,7 +100,7 @@ namespace KirboMod.Projectiles
 
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
-            return targetHitbox.IntersectsConeSlowMoreAccurate(Projectile.Center, 100, Projectile.rotation, MathF.PI / 2f);
+            return targetHitbox.IntersectsConeSlowMoreAccurate(Projectile.Center, 110, Projectile.rotation, MathF.PI / 2f);
         }
     }
 }

@@ -47,9 +47,16 @@ namespace KirboMod.Projectiles
             Timer += 1f;
             Projectile.Center = Main.GetPlayerArmPosition(Projectile) + Projectile.velocity * (Timer - 1f);
             Projectile.spriteDirection = (!(Vector2.Dot(Projectile.velocity, Vector2.UnitX) < 0f)) ? 1 : (-1);
-            if (Timer % (4 * Projectile.MaxUpdates) == 1 && Timer < timeToFlyOut - 8 * Projectile.MaxUpdates)
+            if (Timer % (4 * Projectile.MaxUpdates) == 1 && Timer < timeToFlyOut - (4 * Projectile.MaxUpdates))
             {
-                SoundEngine.PlaySound(WaddleDoo.BeamAttackSound, Projectile.Center);
+                if (Timer + (4 * Projectile.MaxUpdates) >= timeToFlyOut - (4 * Projectile.MaxUpdates))
+                {
+                    SoundEngine.PlaySound(WaddleDoo.BeamAttackEnd, Projectile.Center);
+                }
+                else
+                {
+                    SoundEngine.PlaySound(WaddleDoo.BeamAttackLoop, Projectile.Center);
+                }
             }
             if (Timer >= timeToFlyOut)
             {

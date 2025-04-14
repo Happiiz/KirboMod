@@ -1,3 +1,4 @@
+using KirboMod.NPCs;
 using System;
 using Terraria;
 using Terraria.ID;
@@ -19,10 +20,9 @@ namespace KirboMod.Projectiles
 			DrawOffsetX = -4; //make hitbox line up with sprite middle
 			Projectile.friendly = false;
 			Projectile.hostile = true;
-			Projectile.timeLeft = 9;
+			Projectile.timeLeft = (int)(KnuckleJoe.VulcanJabRange / KnuckleJoe.VulcanJabVelocity);
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
-			Projectile.alpha = 127;
 		}
 		public override void AI()
 		{

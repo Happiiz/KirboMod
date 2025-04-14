@@ -1,6 +1,8 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -9,8 +11,8 @@ namespace KirboMod.Projectiles
 	public class FlyingPunch : ModProjectile
 	{
 		public override void SetStaticDefaults()
-		{ 
-
+		{
+			//ProjectileID.Sets.TrailCacheLength[Type] = 8;
 		}
 
 		public override void SetDefaults()
@@ -20,43 +22,38 @@ namespace KirboMod.Projectiles
 			Projectile.friendly = true;
 			Projectile.timeLeft = 7;
 			Projectile.tileCollide = false;
-			Projectile.penetrate = -1;
+			Projectile.penetrate = 2;
 			Projectile.DamageType = DamageClass.Melee;
 			Projectile.usesLocalNPCImmunity = true; //uses own immunity frames
 			Projectile.localNPCHitCooldown = 7; //time before hit again
 			Projectile.ownerHitCheck = true;
 			Projectile.alpha = 60;
+			Projectile.scale = 1.5f;
 		}
 
 		public override void AI()
 		{
-            Projectile.rotation = Projectile.velocity.ToRotation(); 
+			Projectile.spriteDirection = Projectile.direction;
+            Projectile.rotation = Projectile.velocity.ToRotation() + MathF.PI * ((1 - Projectile.spriteDirection) / 2); 
 		}
-
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-			Player player = Main.player[Projectile.owner];
-
-			player.GetModPlayer<KirbPlayer>().fighterComboCounter += 1;
+			Projectile.damage = (int)(Projectile.damage * 0.4f);
+			KirbPlayer.IncreaseComboCounter(Projectile.owner);
 		}
 
-        public override bool? CanCutTiles() //only cut if player can "see" projectile (Hasn't gone through a wall)
+        public override bool PreDraw(ref Color lightColor)
         {
-            Player player = Main.player[Projectile.owner];
-
-            if (Collision.CanHit(player, Projectile))
+			Texture2D texture = TextureAssets.Projectile[Type].Value;
+			SpriteEffects dir = Projectile.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+            for (int i = Projectile.oldPos.Length - 1; i >= 0; i--)
             {
-                return true;
+				float opacity = i / (float)Projectile.oldPos.Length;
+				opacity = Utils.GetLerpValue(0, .5f, i, true) * Utils.GetLerpValue(1f, .5f, opacity, true);
+				opacity *= 0.2f; 
+				Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition - Projectile.velocity * (i-Projectile.oldPos.Length / 2) / 16f, null, Color.White with { A = 128 } * opacity, Projectile.rotation, texture.Size() / 2, Projectile.scale, dir);
             }
-            else
-            {
-                return false;
-            }
-        }
-
-        public override Color? GetAlpha(Color lightColor)
-        {
-            return Color.White * Projectile.Opacity; //independent from light level while still being affected by opacity
+			return false;// Projectile.DrawSelf(Color.White);
         }
     }
 }

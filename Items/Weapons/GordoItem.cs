@@ -20,12 +20,12 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults() 
 		{
-			Item.damage = 10;
+			Item.damage = 12;
 			Item.DamageType = DamageClass.Ranged;
 			Item.width = 25;
 			Item.height = 25;
-			Item.useTime = 45;
-			Item.useAnimation = 45;
+			Item.useTime = 30;
+			Item.useAnimation = 30;
 			Item.useStyle = ItemUseStyleID.Swing;
 			Item.knockBack = 5;
 			Item.value = 20;

@@ -35,7 +35,7 @@ namespace KirboMod.Items.Weapons
 			Item.autoReuse = false;
 			Item.shoot = ModContent.ProjectileType<Projectiles.StormTornadoNado>();
 			Item.shootSpeed = 16f;
-			Item.mana = 5;
+			Item.mana = 20;
             Item.channel = true;
         }
 
@@ -44,6 +44,14 @@ namespace KirboMod.Items.Weapons
             position.Y -= 70f; //spawn above player
         }
 
+        public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+        {
+            if (Main.myPlayer == player.whoAmI)
+            {
+                Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI, 0, Item.mana, 0);
+            }
+            return false;
+        }
         public override bool CanUseItem(Player player)
         {
              return player.ownedProjectileCounts[Item.shoot] < 1;

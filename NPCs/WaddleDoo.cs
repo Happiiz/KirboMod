@@ -1,53 +1,55 @@
+using KirboMod.Bestiary;
+using KirboMod.ItemDropRules.DropConditions;
+using KirboMod.Items;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
 using Terraria.Audio;
-using Terraria.ID;
-using Terraria.ModLoader;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
-using KirboMod.Items;
-using KirboMod.ItemDropRules.DropConditions;
-using KirboMod.Bestiary;
+using Terraria.ID;
+using Terraria.ModLoader;
 
 namespace KirboMod.NPCs
 {
-	public class WaddleDoo : ModNPC
-	{
+    public class WaddleDoo : ModNPC
+    {
         static int BeamStart => 60;
         static int BeamDuration => 120;
-		private bool attacking = false; //controls if in attacking state
+        private bool attacking = false; //controls if in attacking state
 
         private bool jumped = false;
         //public static so I can reference this in other parts of the code.
-        public static SoundStyle BeamAttackSound => new SoundStyle("KirboMod/Sounds/NPC/BeamAttack");
-        public override void SetStaticDefaults() 
-		{
-			// DisplayName.SetDefault("Waddle Doo");
-			Main.npcFrameCount[NPC.type] = 11; //frames something has
-		}
+        public static SoundStyle BeamAttackSound => new("KirboMod/Sounds/NPC/WaddleDoo/BeamAttack");
+        public static SoundStyle BeamAttackLoop => new SoundStyle("KirboMod/Sounds/NPC/WaddleDoo/BeamAttackLoop") with { MaxInstances = 0 };
+        public static SoundStyle BeamAttackEnd => new SoundStyle("KirboMod/Sounds/NPC/WaddleDoo/BeamAttackEnd") with { MaxInstances = 0 };
+        public override void SetStaticDefaults()
+        {
+            // DisplayName.SetDefault("Waddle Doo");
+            Main.npcFrameCount[NPC.type] = 11; //frames something has
+        }
 
-		public override void SetDefaults() 
-		{
-			NPC.width = 36;
-			NPC.height = 34;
-			NPC.damage = 5;
-			NPC.defense = 5;
-			NPC.lifeMax = 30;
-			NPC.HitSound = SoundID.NPCHit1;
-			NPC.DeathSound = SoundID.NPCDeath1;
-			NPC.value = Item.buyPrice(0, 0, 0, 5); // money it drops
-			NPC.knockBackResist = 1f;
-			Banner = NPC.type;
-			BannerItem = ModContent.ItemType<Items.Banners.WaddleDooBanner>();
-			NPC.aiStyle = -1;
-			NPC.friendly = false;
-			NPC.noGravity = false;
+        public override void SetDefaults()
+        {
+            NPC.width = 36;
+            NPC.height = 34;
+            NPC.damage = 5;
+            NPC.defense = 5;
+            NPC.lifeMax = 30;
+            NPC.HitSound = SoundID.NPCHit1;
+            NPC.DeathSound = SoundID.NPCDeath1;
+            NPC.value = Item.buyPrice(0, 0, 0, 5); // money it drops
+            NPC.knockBackResist = 1f;
+            Banner = NPC.type;
+            BannerItem = ModContent.ItemType<Items.Banners.WaddleDooBanner>();
+            NPC.aiStyle = -1;
+            NPC.friendly = false;
+            NPC.noGravity = false;
             NPC.direction = Main.rand.NextBool(2) == true ? 1 : -1;
         }
 
-		public override float SpawnChance(NPCSpawnInfo spawnInfo)
-		{
+        public override float SpawnChance(NPCSpawnInfo spawnInfo)
+        {
             if (spawnInfo.Player.ZoneOverworldHeight && Main.dayTime && !spawnInfo.Invasion && !Main.eclipse) //if player is within surface height & daytime
             {
                 if (spawnInfo.Player.ZoneJungle)
@@ -89,46 +91,47 @@ namespace KirboMod.NPCs
 				new FlavorTextBestiaryInfoElement("The more dangerous cousin of the Waddle Dee. Shoots out electric beams whenever it feels threatened.")
             });
         }
-		public bool SpawnedFromKracko { get => NPC.ai[1] == 1; }
-		public override void AI() //constantly cycles each time
-		{
-			NPC.spriteDirection = NPC.direction;
-			Player player = Main.player[NPC.target];
-			Vector2 distance = player.Center - NPC.Center;
+        public bool SpawnedFromKracko { get => NPC.ai[1] == 1; }
+        public override void AI() //constantly cycles each time
+        {
+            NPC.spriteDirection = NPC.direction;
+            Player player = Main.player[NPC.target];
+            Vector2 distance = player.Center - NPC.Center;
 
-			if (SpawnedFromKracko) //kracko doo
-			{
-				NPC.value = Item.buyPrice(0, 0, 0, 0); // money it dro- oh wait!
-			}
+            if (SpawnedFromKracko) //kracko doo
+            {
+                NPC.value = Item.buyPrice(0, 0, 0, 0); // money it dro- oh wait!
+            }
 
-			bool lineOfSight = Collision.CanHitLine(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height);
+            bool lineOfSight = Collision.CanHitLine(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height);
 
-			if (distance.X < 120 & distance.X > -120 & distance.Y > -120 & distance.Y < 120 && lineOfSight && attacking == false) //checks if da doo is in range
-			{
-				NPC.ai[0] = 0;
-				attacking = true;
-			}
+            if (distance.X < 120 & distance.X > -120 & distance.Y > -120 & distance.Y < 120 && lineOfSight && attacking == false) //checks if da doo is in range
+            {
+                NPC.ai[0] = 0;
+                attacking = true;
+            }
 
-			//keep attacking if started
-			if (attacking == true)
-			{
-				Beam();
-			}
-			else
-			{
-				Walk();
-			}
+            //keep attacking if started
+            if (attacking == true)
+            {
+                Beam();
+            }
+            else
+            {
+                Walk();
+            }
 
-			//for stepping up tiles
-			try {
-				Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
-			}
+            //for stepping up tiles
+            try
+            {
+                Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
+            }
             catch { }
-			}
-		public override void FindFrame(int frameHeight) // animation
-		{
-			if (attacking == false) //walking
-			{
+        }
+        public override void FindFrame(int frameHeight) // animation
+        {
+            if (attacking == false) //walking
+            {
                 NPC.frameCounter += 1.0;
                 if (NPC.frameCounter < 10.0)
                 {
@@ -167,7 +170,7 @@ namespace KirboMod.NPCs
                     NPC.frameCounter = 0.0;
                 }
             }
-			else //BeAm AttAck
+            else //BeAm AttAck
             {
                 if (NPC.ai[0] < BeamStart) //charge
                 {
@@ -188,97 +191,104 @@ namespace KirboMod.NPCs
                 }
                 else //shoot
                 {
-                    NPC.frame.Y = frameHeight * 10; 
+                    NPC.frame.Y = frameHeight * 10;
                 }
-			}
-		}
+            }
+        }
 
         public override bool PreKill() //check if Kracko Doo so it won't drop anything, not even if told to from outside mods
         {
             if (NPC.ai[1] == 1)
-			{
-				return false;
-			}
-			return true;
+            {
+                return false;
+            }
+            return true;
         }
         public override void ModifyNPCLoot(NPCLoot npcLoot)
-		{
-            WaddleDooDropCondition WaddleDooDropCondition = new WaddleDooDropCondition();
+        {
+            WaddleDooDropCondition WaddleDooDropCondition = new();
             IItemDropRule NotKrackoDoo = new LeadingConditionRule(WaddleDooDropCondition);
 
-			//checks if npcai[1] != 1
+            //checks if npcai[1] != 1
             NotKrackoDoo.OnSuccess(ItemDropRule.NormalvsExpert(ModContent.ItemType<Items.Weapons.BeamStaff>(), 40, 20)); // 1 in 40 (2.5%) chance in Normal. 1 in 20 (5%) chance in Expert
             NotKrackoDoo.OnSuccess(ItemDropRule.Common(ModContent.ItemType<Starbit>(), 1, 1, 2));
 
-			npcLoot.Add(NotKrackoDoo);
+            npcLoot.Add(NotKrackoDoo);
         }
 
-		private void Beam()
+        private void Beam()
         {
 
             Player player = Main.player[NPC.target];
 
-			if (NPC.ai[0] < BeamStart) //target before attacking
-			{
-				NPC.TargetClosest(true);
-			}
+            if (NPC.ai[0] < BeamStart) //target before attacking
+            {
+                NPC.TargetClosest(true);
+            }
 
             NPC.ai[0]++;
 
-			NPC.velocity.X *= 0.9f;
-			float beamRange = 15;
-			if (Main.expertMode)
-				beamRange *= 1.2f;
-			if (SpawnedFromKracko)
-				beamRange *= 1.2f;
+            NPC.velocity.X *= 0.9f;
+            float beamRange = 15;
+            if (Main.expertMode)
+                beamRange *= 1.2f;
+            if (SpawnedFromKracko)
+                beamRange *= 1.2f;
             Vector2 projshoot = MathF.Sin((NPC.ai[0] - BeamStart) / 20f - MathF.PI / 2).ToRotationVector2() * beamRange;
             projshoot.X *= NPC.direction;
-			Vector2 startOffset = new Vector2(NPC.direction * 8, 0);
+            Vector2 startOffset = new(NPC.direction * 8, 0);
 
             if (NPC.ai[0] >= BeamStart & NPC.ai[0] <= BeamStart + BeamDuration) //attack window
-			{
-				if (NPC.ai[0] % 3 == 0) //every multiple of 3
-				{
-					if (Main.netMode != NetmodeID.MultiplayerClient)
-					{
-						Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + startOffset, projshoot, ModContent.ProjectileType<Projectiles.BeamBad>(), NPC.damage / 2, 1, Main.myPlayer, 0, 0);
-					}
+            {
+                if (NPC.ai[0] % 3 == 0) //every multiple of 3
+                {
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + startOffset, projshoot, ModContent.ProjectileType<Projectiles.BeamBad>(), NPC.damage / 2, 1, Main.myPlayer, 0, 0);
+                    }
                 }
                 if (NPC.ai[0] % 4 == 0)
                 {
-                    SoundEngine.PlaySound(BeamAttackSound, NPC.Center);
+                    if (NPC.ai[0] + 4 > BeamStart + BeamDuration)//last time will play
+                    {
+                        SoundEngine.PlaySound(BeamAttackEnd, NPC.Center);
+                    }
+                    else
+                    {
+                        SoundEngine.PlaySound(BeamAttackLoop, NPC.Center);
+                    }
                 }
             }
-			if (NPC.ai[0] >= 240)
+            if (NPC.ai[0] >= 240)
             {
                 NPC.ai[0] = 0f;
                 attacking = false;
             }
         }
 
-		private void Walk()
+        private void Walk()
         {
-			if (NPC.ai[1] == 1) //hostile ai, used for kracko
-			{
+            if (NPC.ai[1] == 1) //hostile ai, used for kracko
+            {
                 NPC.TargetClosest(true);
 
                 float speed = 0.8f;
-				speed *= SpawnedFromKracko ? 1.5f : 1f;
-				speed *= Main.expertMode ? 1.5f : 1f;
-				//top speed
+                speed *= SpawnedFromKracko ? 1.5f : 1f;
+                speed *= Main.expertMode ? 1.5f : 1f;
+                //top speed
                 float inertia = 20f; //acceleration and decceleration speed
 
                 //we put this instead of player.Center so it will always be moving top speed instead of slowing down when player is near
                 Vector2 direction = NPC.Center + new Vector2(NPC.direction * 50, 0) - NPC.Center; //start - end 
-                                                                                                  
+
 
                 direction.Normalize();
                 direction *= speed;
-				if (NPC.velocity.Y == 0 || jumped == true) //walking/jumping (so it doesn't interfere with knockback)
+                if (NPC.velocity.Y == 0 || jumped == true) //walking/jumping (so it doesn't interfere with knockback)
                 {
-					NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
-				}
-				NPC.ai[0] = 0;
+                    NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
+                }
+                NPC.ai[0] = 0;
 
 
                 if (NPC.collideX && NPC.velocity.Y == 0) //hop if touching wall
@@ -292,8 +302,8 @@ namespace KirboMod.NPCs
                     jumped = false;
                 }
             }
-			else
-			{
+            else
+            {
                 NPC.TargetClosest(false);
 
                 //reroll direction
@@ -335,25 +345,25 @@ namespace KirboMod.NPCs
 
                 //movement
                 float speed = 0.7f;
-				float inertia = 20f;
+                float inertia = 20f;
 
-				Vector2 moveTo = NPC.Center + new Vector2(NPC.direction * 200, 0);
-				Vector2 direction = moveTo - NPC.Center; //start - end
-				direction.Normalize();
-				direction *= speed;
-				if (NPC.velocity.Y == 0) //on ground (so it doesn't interfere with knockback)
-				{
-					NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
-				}
-			}
-		}
+                Vector2 moveTo = NPC.Center + new Vector2(NPC.direction * 200, 0);
+                Vector2 direction = moveTo - NPC.Center; //start - end
+                direction.Normalize();
+                direction *= speed;
+                if (NPC.velocity.Y == 0) //on ground (so it doesn't interfere with knockback)
+                {
+                    NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
+                }
+            }
+        }
 
-		public override void HitEffect(NPC.HitInfo hit)
-		{
-			if (NPC.life <= 0)
-			{
-				if (NPC.ai[1] != 1)
-				{
+        public override void HitEffect(NPC.HitInfo hit)
+        {
+            if (NPC.life <= 0)
+            {
+                if (NPC.ai[1] != 1)
+                {
                     for (int i = 0; i < 10; i++)
                     {
                         Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle edge
@@ -366,6 +376,6 @@ namespace KirboMod.NPCs
                     Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center, speed, Main.rand.Next(11, 13), Scale: 1f); //double jump smoke
                 }
             }
-		}
-	}
+        }
+    }
 }

@@ -1,6 +1,7 @@
 ﻿using KirboMod.Items.NewWhispy;
 using Microsoft.Xna.Framework;
 using System.IO;
+using System.Linq;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -45,11 +46,38 @@ namespace KirboMod
             /// spawns whispy woods boss
             /// byte: player index, int: tileX, int: tileY
             /// </summary>
-
-            SpawnWhispy = 10
+            SpawnWhispy = 10,
+            /// <summary>
+            /// syncs a projectile's position
+            /// byte: projectile.identity of the projectile to sync, Vector2: projectile.position(not center!), byte: player whoAmI of client that called the method
+            /// </summary>
+            ProjectilePosition = 11,
         }
-
-
+        //initially called on the client that owns the projectile
+        public static void SyncProjPosition(Projectile proj, byte playerWhoAmI)
+        {
+            ModPacket packet = KirboMod.instance.GetPacket();
+            packet.Write((byte)ModPacketType.ProjectilePosition);
+            packet.Write((short)proj.identity);
+            packet.WriteVector2(proj.position);
+            packet.Write(playerWhoAmI);
+            packet.Send(-1, playerWhoAmI);
+        }
+        static void ReadSyncProjPosition(BinaryReader reader)
+        {
+            int identity = reader.ReadInt16();
+            Vector2 pos = reader.ReadVector2();
+            byte projOwner = reader.ReadByte();
+            Projectile proj = Main.projectile.FirstOrDefault(p => p.identity == identity && p.active && p.owner == projOwner);
+            if (proj != default)
+            {
+                proj.position = pos;
+                if (Main.dedServ)//if server, re-send the packet to the other clients
+                {
+                    SyncProjPosition(proj, projOwner);
+                }
+            }
+        }
         public static void SpawnWhispy(int tileX, int tileY)
         {
             ModPacket packet = KirboMod.instance.GetPacket();
@@ -185,21 +213,29 @@ namespace KirboMod
                             SyncPlayerPositionAndVelocity(plr);
                         }
                     }
-                    else if(Main.dedServ)
+                    else if (Main.dedServ)
                     {
                         SyncPlayerPosition(plrIndex);
                     }
 
                     break;
                 case ModPacketType.SpawnWhispy:
-                    // don't need to re-send packet because the server will be responsible for spawning the NPC
-                    int playerIndex = reader.ReadByte();
-                    int i = reader.ReadInt32();
-                    int j = reader.ReadInt32();
-                    NewWhispySummonTile.SpawnWhispyAt(playerIndex, i, j);
+                    ReadSpawnWhispy(reader);
+                    break;
+                case ModPacketType.ProjectilePosition:
+                    ReadSyncProjPosition(reader);
                     break;
 
             }
+        }
+
+        private static void ReadSpawnWhispy(BinaryReader reader)
+        {
+            // don't need to re-send packet because the server will be responsible for spawning the NPC
+            int playerIndex = reader.ReadByte();
+            int i = reader.ReadInt32();
+            int j = reader.ReadInt32();
+            NewWhispySummonTile.SpawnWhispyAt(playerIndex, i, j);
         }
     }
 }

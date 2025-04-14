@@ -8,7 +8,7 @@ Mods: {
 		}
 
 		ProgressionDescription: {
-			Whispy: Use a [i:{0}].
+			Whispy: Place down a [i:{0}] and right click it.
 			Kracko: Kill a naturally spawning Kracko Jr. or use a [i:{0}] to summon one.
 			Dedede: Use a [i:{0}].
 			Nightmare: Use a [i:{0}] at a Fountain of Dreams during night.
@@ -768,8 +768,11 @@ Mods: {
 				DisplayName: Fighter Glove
 				Tooltip:
 					'''
-					Right click to do a uppercut, sending you upwards
-					The more punches you land, the stronger the uppercut
+					Land punches to build up charge
+					Right click to use all stored charge and perform an uppercut
+					If you use more than half of the maximum charge at once, the uppercut will travel further and make you invincible
+					The uppercut deals more damage the more chare you use.
+					{$CommonItemTooltip.DefensePenetration}
 					'''
 			}
 
@@ -798,7 +801,6 @@ Mods: {
 					Control a tornado by holding down the mouse
 					Splits into multiple feathers upon death
 					Drains mana while being used
-					{$CommonItemTooltip.IgnoresDefense}
 					'''
 			}
 
@@ -1245,6 +1247,11 @@ Mods: {
 				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Dream Land Boss)"
 				Tooltip: ""
 			}
+
+			Photonic0Boots: {
+				DisplayName: Photonic0's Boots
+				Tooltip: "'Because there were no boots that matched how your arms look while wearing Dark Artist's robes'"
+			}
 		}
 
 		Projectiles: {
@@ -1308,7 +1315,7 @@ Mods: {
 			DuoBurningLeoMinion.DisplayName: Burning Leo
 			DuoChillyMinion.DisplayName: Chilly
 			ExplosiveCoconut.DisplayName: Explosive Coconut
-			FighterUppercut.DisplayName: Fighter Uppercut
+			FighterUppercut.DisplayName: Rising Break
 			FinalCutterBlade.DisplayName: Final Cutter Blade
 			FireFire.DisplayName: Fire Fire
 			FireSphere.DisplayName: Fire Sphere
@@ -1342,7 +1349,7 @@ Mods: {
 			HomingNightStar.DisplayName: Night Star
 			IceChunk.DisplayName: Ice Chunk
 			IceIce.DisplayName: Ice Ice
-			JoeBlast.DisplayName: Joe Blast
+			JoeBlast.DisplayName: Smash Punch
 			KirbyBallProj.DisplayName: Friend Ball
 			KrackoLightning.DisplayName: Lightning
 			LaserBeamLaser.DisplayName: Laser beam
@@ -1420,7 +1427,7 @@ Mods: {
 			UFOLaser.DisplayName: UFO Laser
 			VolcanoFireExplode.DisplayName: Volcano Fire
 			VolcanoFireFire.DisplayName: Volcano Fire
-			VulcanPunch.DisplayName: Vulcan Punch
+			VulcanPunch.DisplayName: Vulcan Jab
 			WaddleDooMinion.DisplayName: Waddle Doo
 			Whisp.DisplayName: Whisp
 			WhispyBark.DisplayName: Whispy Bark
@@ -1482,6 +1489,7 @@ Mods: {
 			NewWhispySplittingWind.DisplayName: Wind
 			NewWhispySummonTileDustGenerator.DisplayName: New Whispy Summon Tile Dust Generator
 			NewWhispyAppleMedium.DisplayName: New Whispy Apple Medium
+			HardenedFighterUppercut.DisplayName: Hardened Fighter Uppercut
 		}
 
 		NPCs: {

@@ -12,6 +12,9 @@
     <None Remove="ExtraTextures\RingShinePremultiplied.png" />
     <None Remove="ExtraTextures\WaddleDooBeam0.png" />
     <None Remove="ExtraTextures\WaddleDooBeam1.png" />
+    <None Remove="Items\Armor\Photonic0Boots\Photonic0Boots.png" />
+    <None Remove="Items\Armor\Photonic0Boots\Photonic0BootsGlow.png" />
+    <None Remove="Items\Armor\Photonic0Boots\Photonic0Boots_Legs.png" />
     <None Remove="Items\DarkSword\DarkSwordBeam.png" />
     <None Remove="Items\RainbowSword\RainbowSword.png" />
     <None Remove="Items\RainbowSword\RainbowSwordHeld (1).png" />

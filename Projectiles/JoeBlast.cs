@@ -1,3 +1,4 @@
+using KirboMod.NPCs;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
@@ -18,7 +19,7 @@ namespace KirboMod.Projectiles
 			Projectile.height = 50;
 			Projectile.friendly = false;
 			Projectile.hostile = true;
-			Projectile.timeLeft = 30;
+			Projectile.timeLeft = (int)(KnuckleJoe.BlastRange / KnuckleJoe.BlastVelocityPublic);
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 			Projectile.scale = 1f;

@@ -9,10 +9,10 @@ namespace KirboMod.Projectiles.Flames
         public override void SetDefaults()
         {
             base.FlamethrowerStats();//copy flamethrower stats of bad fire(including color)
-            debuffID = BuffID.OnFire3;
+            debuffID = BuffID.OnFire;
             debuffDuration = 600;
-            duration = defaultDuration;
-            fadeOutDuration = defaultFadeOutDuration;
+            duration = DefaultDuration;
+            fadeOutDuration = DefaultFadeOutDuration;
             Projectile.friendly = true;
             Projectile.DamageType = DamageClass.Magic;
             Projectile.tileCollide = true;
@@ -25,6 +25,11 @@ namespace KirboMod.Projectiles.Flames
             trailLengthMultiplier = .6f;
             TotalDuration /= 2;
             whiteInsideSizeMultiplier = 1;
+        }
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            base.OnHitNPC(target, hit, damageDone);
+            Projectile.damage = (int)(Projectile.damage * 0.5f);
         }
     }
 }

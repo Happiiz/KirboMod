@@ -32,11 +32,11 @@ namespace KirboMod.Projectiles.Flames
         protected float dustChance = .25f;
         protected int debuffID;
         protected int debuffDuration;
-        protected int duration = defaultDuration;
-        protected int fadeOutDuration = defaultFadeOutDuration;
+        protected int duration = DefaultDuration;
+        protected int fadeOutDuration = DefaultFadeOutDuration;
         protected float whiteInsideOpacity = 1;
-        public const int defaultDuration = 60;
-        public const int defaultFadeOutDuration = 12;
+        public const int DefaultDuration = 60;
+        public const int DefaultFadeOutDuration = 12;
         protected float whiteInsideSizeMultiplier = 1;
         protected float trailLengthMultiplier = 1;
         public int TotalDuration { get => (duration + fadeOutDuration); 

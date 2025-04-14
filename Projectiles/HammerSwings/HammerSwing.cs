@@ -63,11 +63,7 @@ namespace KirboMod.Projectiles.HammerSwings
 
             player.immuneTime = player.itemAnimationMax + 10;
             player.immune = true;
-            player.immuneNoBlink = true;
-
-            player.noKnockback = true;
-            player.dashType = 0;
-
+            player.SetImmuneTimeForAllTypes(10);
             player.mount.Dismount(player); //dismount mounts
 
 
@@ -75,7 +71,7 @@ namespace KirboMod.Projectiles.HammerSwings
             {
                 float dashSteeringRate = .07f;
                 Vector2 targetVelocity = player.Center.DirectionTo(Main.MouseWorld) * 15;
-                player.velocity.X = Vector2.Lerp(player.velocity, targetVelocity, dashSteeringRate).X;
+                player.velocity = Vector2.Lerp(player.velocity, targetVelocity, dashSteeringRate);
                 if (Projectile.localAI[0] == 0)//first frame
                 {
                     spinDirection = Math.Sign(Main.MouseWorld.X - player.Center.X);

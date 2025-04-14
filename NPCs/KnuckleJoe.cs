@@ -1,102 +1,101 @@
 using KirboMod.Items;
+using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
-using Terraria.Audio;
+using Terraria.GameContent.Bestiary;
+using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.ModLoader;
 using SoundEngine = Terraria.Audio.SoundEngine;
-using Terraria.GameContent.Bestiary;
-using Terraria.GameContent.ItemDropRules;
-using System.IO;
 
 namespace KirboMod.NPCs
 {
-	public class KnuckleJoe : ModNPC
-	{
-		private int attacktype = 0;
-
-        int attackTimer = 0;
-
-        int walkTimer = 0;
-        int walkDirection = 1; //determines whether the enemy will walk forward or backward
-
-        private bool jumped = false;
-
+    public class KnuckleJoe : ModNPC
+    {
         public override void SetStaticDefaults()
-		{
-			// DisplayName.SetDefault("Knuckle Joe");
-			Main.npcFrameCount[NPC.type] = 11;
-		}
+        {
+            // DisplayName.SetDefault("Knuckle Joe");
+            Main.npcFrameCount[NPC.type] = 11;
+        }
+        //state 0: walk
+        //state 1: sidestep
+        //state 2: vulcan jab
+        //state 3: blast
+        ref float State => ref NPC.ai[0];
+        ref float Timer => ref NPC.localAI[1];
+        const int StateIDWalk = 0;
+        const int StateIDSideStep = 1;
+        const int StateIDVulcanJab = 2;
+        const int StateIDBlast = 3;
+        public override void SetDefaults()
+        {
+            NPC.width = 44;
+            NPC.height = 44;
+            NPC.damage = 40;
+            NPC.defense = 25;
+            NPC.lifeMax = 320;
+            NPC.HitSound = SoundID.NPCHit1;
+            NPC.DeathSound = SoundID.NPCDeath1;
+            NPC.value = Item.buyPrice(0, 0, 0, 10);
+            NPC.knockBackResist = 0f; //how much knockback applies
+            Banner = NPC.type;
+            BannerItem = ModContent.ItemType<Items.Banners.KnuckleJoeBanner>();
+            NPC.aiStyle = -1;
+            NPC.friendly = false;
+            NPC.noGravity = false;
+        }
 
-		public override void SetDefaults()
-		{
-			NPC.width = 44;
-			NPC.height = 44;
-			NPC.damage = 20;
-			NPC.defense = 12;
-			NPC.lifeMax = 60;
-			NPC.HitSound = SoundID.NPCHit1;
-			NPC.DeathSound = SoundID.NPCDeath1;
-			NPC.value = Item.buyPrice(0, 0, 0, 10);
-			NPC.knockBackResist = 0f; //how much knockback applies
-			Banner = NPC.type;
-			BannerItem = ModContent.ItemType<Items.Banners.KnuckleJoeBanner>();
-			NPC.aiStyle = -1; 
-			NPC.friendly = false;
-			NPC.noGravity = false;
-		}
-
-		public override float SpawnChance(NPCSpawnInfo spawnInfo)
-		{
-			if (spawnInfo.Player.ZoneRockLayerHeight) //if player is within cave height
-			{
-				if (spawnInfo.Player.ZoneJungle)
+        public override float SpawnChance(NPCSpawnInfo spawnInfo)
+        {
+            if (spawnInfo.Player.ZoneRockLayerHeight) //if player is within cave height
+            {
+                if (spawnInfo.Player.ZoneJungle)
                 {
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneSnow)
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneBeach) //don't spawn on beach
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneDesert) //don't spawn on beach
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneCorrupt) //don't spawn on beach
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneCrimson) //don't spawn on beach
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Player.ZoneDungeon) //don't spawn in dungeon
-				{
-					return 0f;
-				}
-				else if (spawnInfo.Water) //don't spawn in water
-				{
-					return 0f;
-				}
+                    return 0f;
+                }
+                else if (spawnInfo.Player.ZoneSnow)
+                {
+                    return 0f;
+                }
+                else if (spawnInfo.Player.ZoneBeach) //don't spawn on beach
+                {
+                    return 0f;
+                }
+                else if (spawnInfo.Player.ZoneDesert) //don't spawn on beach
+                {
+                    return 0f;
+                }
+                else if (spawnInfo.Player.ZoneCorrupt) //don't spawn on beach
+                {
+                    return 0f;
+                }
+                else if (spawnInfo.Player.ZoneCrimson) //don't spawn on beach
+                {
+                    return 0f;
+                }
+                else if (spawnInfo.Player.ZoneDungeon) //don't spawn in dungeon
+                {
+                    return 0f;
+                }
+                else if (spawnInfo.Water) //don't spawn in water
+                {
+                    return 0f;
+                }
                 else if (spawnInfo.Sky) //don't spawn in space
                 {
                     return 0f;
                 }
                 else //only forest
                 {
-					return spawnInfo.SpawnTileType == TileID.Stone || spawnInfo.SpawnTileType == TileID.Dirt ? .03f : 0f; //functions like a mini if else statement
-				}
-			}
-			else
-			{
-				return 0f; //no spawn rate
-			}
-		}
+                    return spawnInfo.SpawnTileType == TileID.Stone || spawnInfo.SpawnTileType == TileID.Dirt ? .03f : 0f; //functions like a mini if else statement
+                }
+            }
+            else
+            {
+                return 0f; //no spawn rate
+            }
+        }
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
@@ -104,160 +103,181 @@ namespace KirboMod.NPCs
             bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
             {
 				// Sets the spawning conditions of this NPC that is listed in the bestiary.
-				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Caverns,
+				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Caverns, 
 
 				// Sets the description of this NPC that is listed in the bestiary.
 				new FlavorTextBestiaryInfoElement("Watch out! Knuckle Joe wants a challenge and you seem perfectly fit! They'll bombard you with a flurry of vulcan jabs and smash punches 'til you're down!")
             });
         }
-
-        public override void SendExtraAI(BinaryWriter writer)
-        {
-			writer.Write(attacktype); //send non NPC.ai array info to servers
-            writer.Write(attackTimer);
-            writer.Write(attackTimer);
-            writer.Write(walkDirection);
-        }
-
-		public override void ReceiveExtraAI(BinaryReader reader)
-		{
-            attacktype = reader.ReadInt32(); //sync in multiplayer
-            attackTimer = reader.ReadInt32();
-            attackTimer = reader.ReadInt32();
-            walkDirection = reader.ReadInt32();
-        }
+        static float AggroRange => 250;
+        static float VulcanJabRate => 3;
+        public static float VulcanJabRange =>AggroRange + 16 * 3;
+        public static float VulcanJabVelocity => 25;
+        public static float VulcanJabSpread => 0.4f;
+        static float VulcanJabChargeup => 40;
+        static int VulcanJabShotCount => 30;
+        static float BlastChargeup => 25;
+        static float BlastVelocity => 20;
+        static float BlastRate => 35;
+        static float WalkSpeed => 3;
+        static float JumpSpeed => -8;
+        static int VulcanJabDamage => 60 / 2;
+        static int BlastShotCount => Main.getGoodWorld ? 3 : Main.expertMode ? 2 : 1;
+        static int BlastDamage => 100 / 2;
+        public static float BlastRange => 1000;
+        public static float BlastVelocityPublic => BlastVelocity;
 
         public override void AI() //constantly cycles each time
-		{
+        {
+            Timer++;
+            NPC.TargetClosest(true);
             NPC.spriteDirection = NPC.direction;
+            if (!NPC.HasValidTarget)
+            {
+                NPC.TargetClosest(true);
+                NPC.spriteDirection = NPC.direction;
+            }
+            if (!NPC.HasValidTarget)
+            {
+                NPC.velocity.X *= 0;
+                return;
+            }
+            switch (State)
+            {
+                case StateIDWalk:
+                    State_Walk();
+                    break;
+                case StateIDVulcanJab:
+                    State_VulcanJab();
+                    break;
+                case StateIDBlast:
+                    State_Blast();
+                    break;
+                default:
+                    State = StateIDWalk;
+                    Timer = 0;
+                    break;
+            }
+
+            //for stepping up tiles
+            Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
+        }
+        float JumpHeight => (JumpSpeed * JumpSpeed) / (2 * NPC.gravity);
+        private void Debug_DisplayAggroRangeBox()
+        {
+            Vector2 tl = NPC.Center + new Vector2(-AggroRange, -AggroRange);
+            Vector2 br = NPC.Center + new Vector2(AggroRange, AggroRange);
+            Dust.QuickBox(tl, br, (int)(AggroRange / 8), Color.White, null);
+        }
+
+        void State_Walk()
+        {
             Player player = Main.player[NPC.target];
-            Vector2 distance = player.Center - NPC.Center;
-
-            bool inRange = Math.Abs(distance.X) < 400 && Math.Abs(distance.Y) < 400 && !player.dead;
-
-            bool lineOfSight = Collision.CanHitLine(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height);
-
-            if (attacktype > 1 || inRange) //attacking or in range
+            NPC.velocity.X = NPC.direction * WalkSpeed;
+         
+            Vector2 deltaPos = player.Center - NPC.Center;
+            if (MathF.Abs(deltaPos.X) < AggroRange && MathF.Abs(deltaPos.Y) < AggroRange)
             {
-                attackTimer++; //attack timer
+                Timer = 0;
+                State = StateIDVulcanJab;
             }
 
-            if (inRange) //checks if the joe is in range
+           
+            if (NPC.velocity.Y == 0)
             {
-                walkTimer = 0; //reset walk timer
-
-                if (attackTimer < 120) //not attacking
+                if (Timer > 400)
                 {
-                    attacktype = 1; //side stepping
+                    Timer = 0;
+                    State = StateIDBlast;
+                    return;
                 }
-                else if (attackTimer == 120) //times up!
+                CheckForJumpOffTiles();
+                if (NPC.collideX)
                 {
-                    if (Math.Abs(distance.X) < 150 && Math.Abs(distance.X) < 200) //close enough
-                    {
-                        attacktype = 2; //vulcan jab
-                    }
-                    else if (lineOfSight) //can see player
-                    {
-                        attacktype = 3; //smash punch 
-                    }
-                    else //wait until can see player within range
-                    {
-                        attacktype = 1;
-                        attackTimer = 119; //reset attack timer to before time's up
-                    }
+                    NPC.velocity.Y = JumpSpeed;
                 }
             }
-            else if (attacktype == 1) //sidestepping when out of range
+        }
+        void CheckForJumpOffTiles()
+        {
+            Player player = Main.player[NPC.target];
+
+            Vector2 bottomLeft = NPC.BottomLeft;
+            if (bottomLeft.Y < player.BottomLeft.Y)//if above player then don't need to jump
             {
-                attacktype = 0; //walk
-                attackTimer = 0; //reset attack timer
+                return;
             }
+            bottomLeft.X += NPC.velocity.X;
+            bottomLeft.Y += 4;
 
-            //declaring attacktype values
-            if (attacktype == 0)
-			{
-				Walk();
-			}
-			if (attacktype == 1)
-			{
-				Sidestep();
-			}
-			if (attacktype == 2)
-			{
-				RapidPunch();
-			}
-			if (attacktype == 3)
+            if (!Collision.SolidTiles(bottomLeft, NPC.width, 1))
             {
-				ChargeBlast();
-			}
-
-			//for stepping up tiles
-			Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
-		}
-
-		public override void FindFrame(int frameHeight) // animation
-		{
-			if (attacktype == 0 || attacktype == 1) //sidestep
-			{
-				NPC.frameCounter += 1;
-				if (NPC.frameCounter < 5)
-				{
-					NPC.frame.Y = 0; 
-				}
-				else if (NPC.frameCounter < 10)
-				{
-					NPC.frame.Y = frameHeight; 
-				}
+                NPC.velocity.Y = JumpSpeed;
+            }
+        }
+        public override void FindFrame(int frameHeight) // animation
+        {
+            if (State == 0 || State == 1) //sidestep
+            {
+                NPC.frameCounter += 1;
+                if (NPC.frameCounter < 5)
+                {
+                    NPC.frame.Y = 0;
+                }
+                else if (NPC.frameCounter < 10)
+                {
+                    NPC.frame.Y = frameHeight;
+                }
                 else if (NPC.frameCounter < 15)
                 {
-                    NPC.frame.Y = frameHeight * 2; 
+                    NPC.frame.Y = frameHeight * 2;
                 }
                 else if (NPC.frameCounter < 20)
                 {
-                    NPC.frame.Y = frameHeight; 
+                    NPC.frame.Y = frameHeight;
                 }
                 else
-				{
+                {
                     NPC.frameCounter = 0;
-				}
-			}
-			if (attacktype == 2) //vulcan jabs
-			{
+                }
+            }
+            if (State == 2) //vulcan jabs
+            {
                 NPC.frameCounter += 1;
 
-				if (attackTimer >= 60 + 120) //attacking
-				{
-					if (NPC.frameCounter < 3)
-					{
-						NPC.frame.Y = frameHeight * 5; //punch
-					}
-					else
-					{
-						NPC.frame.Y = frameHeight * 6; //punch
-					}
-					if (NPC.frameCounter > 6)
+                if (Timer >= VulcanJabChargeup) //attacking
+                {
+                    if (NPC.frameCounter < 3)
+                    {
+                        NPC.frame.Y = frameHeight * 5; //punch
+                    }
+                    else
+                    {
+                        NPC.frame.Y = frameHeight * 6; //punch
+                    }
+                    if (NPC.frameCounter > 6)
                     {
                         NPC.frameCounter = 0;
                     }
-				}
-				else if (attackTimer >= 5 + 120) //ready punch
-                {
-					NPC.frame.Y = frameHeight * 4; 
-				}
-				else
-				{
-                    NPC.frame.Y = frameHeight * 3; 
                 }
-			}
-			if (attacktype == 3) //smash punch
-			{
+                else if (Timer >= 5) //ready punch
+                {
+                    NPC.frame.Y = frameHeight * 4;
+                }
+                else
+                {
+                    NPC.frame.Y = frameHeight * 3;
+                }
+            }
+            if (State == 3) //smash punch
+            {
                 NPC.frameCounter += 1;
 
-                if (attackTimer >= 60 + 120) //blast
+                if (Timer >= BlastChargeup && (Timer - BlastChargeup) % BlastRate < 10) //blast
                 {
                     NPC.frame.Y = frameHeight * 9;
 
-                    if (attackTimer >= 65 + 120)
+                    if (Timer >= BlastChargeup + 5)
                     {
                         NPC.frame.Y = frameHeight * 10;
                     }
@@ -270,7 +290,7 @@ namespace KirboMod.NPCs
                 {
                     NPC.frameCounter += 1;
 
-                    if (NPC.frameCounter < 5) 
+                    if (NPC.frameCounter < 5)
                     {
                         NPC.frame.Y = frameHeight * 8;
                     }
@@ -284,16 +304,63 @@ namespace KirboMod.NPCs
                     }
                 }
             }
-		}
+        }
+        void State_VulcanJab()
+        {
+            NPC.velocity.X *= 0.9f;
+            if (Timer < VulcanJabChargeup)
+                return;
+            else if (Timer < VulcanJabChargeup + VulcanJabShotCount * VulcanJabRate)
+            {
+                if ((Timer - VulcanJabChargeup) % VulcanJabRate == 0)
+                {
+                    SoundEngine.PlaySound(SoundID.Item1 with { MaxInstances = 0 }, NPC.Center);//swing
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        Player plr = Main.player[NPC.target];
+                        Vector2 shootVel = NPC.DirectionTo(plr.Center).RotatedByRandom(VulcanJabSpread) * VulcanJabVelocity;
 
-		private void Walk() //walk towards player
-		{
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, shootVel, ModContent.ProjectileType<VulcanPunch>(), VulcanJabDamage, 1f);
+                    }
+                }
+            }
+            else
+            {
+                State = StateIDBlast;
+                Timer = 0;
+            }
+        }
+        void State_Blast()
+        {
+            NPC.velocity.X *= 0.9f;
+            if (Timer < BlastChargeup)
+                return;
+            else if (Timer < BlastChargeup + BlastShotCount * BlastRate)
+            {
+                if ((Timer - BlastChargeup) % BlastRate == 0)
+                {
+                    SoundEngine.PlaySound(SoundID.Item158, NPC.Center);//zapinator pew
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        Player plr = Main.player[NPC.target];
+                        Vector2 shootVel = NPC.DirectionTo(plr.Center) * BlastVelocity;
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, shootVel, ModContent.ProjectileType<JoeBlast>(), BlastDamage, 1f);
+                    }
+                }
+            }
+            else
+            {
+                State = StateIDWalk;
+                Timer = 0;
+            }
+        }
+        private void Walk() //walk towards player
+        {
             Player player = Main.player[NPC.target];
             Vector2 distance = player.Center - NPC.Center;
 
-            walkTimer++;
 
-            if (walkTimer % 10 == 0) //turn towards player every 10 ticks
+            //if (walkTimer % 10 == 0) //turn towards player every 10 ticks
             {
                 NPC.TargetClosest(true);
             }
@@ -301,71 +368,65 @@ namespace KirboMod.NPCs
 
             if (distance.X > 0) //player is ahead
             {
-                walkDirection = 1; //walk forward
+                //walkDirection = 1; //walk forward
             }
             else //player is behind
             {
-                walkDirection = -1; //walk forward
+                // walkDirection = -1; //walk forward
             }
 
             Jump();
         }
 
-		private void Sidestep() //back up or move forward randomly
+        private void Sidestep() //back up or move forward randomly
         {
             NPC.TargetClosest(true);
 
             Player player = Main.player[NPC.target];
             Vector2 distance = player.Center - NPC.Center;
 
-            if (attackTimer % 10 == 0)
+            if (Timer % 10 == 0)
             {
                 if (distance.X > 0) //player is ahead
                 {
                     if (distance.X > 200) //far enough
                     {
-                        walkDirection = 1; //walk forward
+                        // walkDirection = 1; //walk forward
                     }
                     if (distance.X < 100) //close enough
                     {
-                        walkDirection = -1; //walk backward
+                        //  walkDirection = -1; //walk backward
                     }
                 }
                 else //player is behind
                 {
                     if (distance.X < -200) //far enough
                     {
-                        walkDirection = -1; //walk forward (reversed)
+                        //walkDirection = -1; //walk forward (reversed)
                     }
                     if (distance.X > -100) //close enough
                     {
-                        walkDirection = 1; //walk backward (reversed)
+                        //  walkDirection = 1; //walk backward (reversed)
                     }
                 }
             }
 
             Jump();
 
-            NPC.velocity.X = walkDirection * 1.6f;
+            // NPC.velocity.X = walkDirection * 1.6f;
         }
 
         private void Jump()
         {
             if (NPC.collideX && NPC.velocity.Y == 0) //hop if touching wall
             {
-                NPC.velocity.Y = -5;
-                jumped = true;
-            }
-
-            if (NPC.velocity.Y == 0) //on ground
-            {
-                jumped = false;
+                NPC.velocity.Y = JumpSpeed;
             }
         }
 
-		private void RapidPunch() //fires punches
+        private void RapidPunch() //fires punches
         {
-            if (attackTimer < 120 + 60) //stance (add 120 as that's where it starts from)
+            if (Timer < 120 + 60) //stance (add 120 as that's where it starts from)
             {
                 NPC.TargetClosest(true); //face player
                 NPC.velocity.X *= 0.5f; //slow
@@ -378,29 +439,29 @@ namespace KirboMod.NPCs
                 projshoot *= 10f;
 
                 NPC.velocity.X *= 0.5f; //slow
-                if (attackTimer >= 120 + 60) //unleash punch
+                if (Timer >= 120 + 60) //unleash punch
                 {
-                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    if (Main.netMode != NetmodeID.MultiplayerClient && Timer % VulcanJabRate == 0)
                     {
                         Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 20, 0), projshoot.RotatedByRandom(MathHelper.ToRadians(45)), Mod.Find<ModProjectile>("VulcanPunch").Type, 30 / 2, 0.1f, Main.myPlayer, 0, 0);
                     }
 
-                    if (attackTimer % 5 == 0) //every 5 ticks
+                    if (Timer % 5 == 0) //every 5 ticks
                     {
                         SoundEngine.PlaySound(SoundID.Item1, NPC.Center);
                     }
                 }
-                if (attackTimer >= 120 + 180) //restart after 2 seconds
+                if (Timer >= 120 + 180) //restart after 2 seconds
                 {
-                    attacktype = 1;
-                    attackTimer = 0;
+                    State = 1;
+                    Timer = 0;
                 }
             }
         }
 
-		private void ChargeBlast() //blast 
-		{
-            if (attackTimer < 120 + 60)
+        private void ChargeBlast() //blast 
+        {
+            if (Timer < 120 + 60)
             {
                 NPC.TargetClosest(true);
                 NPC.velocity.X *= 0.5f; //slow
@@ -410,18 +471,18 @@ namespace KirboMod.NPCs
             projshoot.Normalize();
             projshoot *= 10f;
 
-            if (attackTimer == 120 + 60) //climax
+            if (Timer == 120 + 60) //climax
             {
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projshoot, Mod.Find<ModProjectile>("JoeBlast").Type, 30 / 2, 8, Main.myPlayer, 0, 0); //actual damage has to be divided by 2
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projshoot, Mod.Find<ModProjectile>("JoeBlast").Type, 30, 8, Main.myPlayer, 0, 0);
                 }
                 SoundEngine.PlaySound(SoundID.Item1, NPC.Center);
             }
-            if (attackTimer >= 120 + 120) //restart
+            if (Timer >= 120 + 120) //restart
             {
-                attacktype = 1;
-                attackTimer = 0;
+                State = 1;
+                Timer = 0;
             }
         }
 
@@ -432,7 +493,7 @@ namespace KirboMod.NPCs
         }
 
         public override void HitEffect(NPC.HitInfo hit)
-		{
+        {
             if (NPC.life <= 0)
             {
                 if (NPC.life <= 0)
@@ -450,5 +511,5 @@ namespace KirboMod.NPCs
                 }
             }
         }
-	}
+    }
 }

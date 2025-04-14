@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
-using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader;
@@ -36,24 +35,25 @@ namespace KirboMod.Projectiles.Tornadoes
 
         public override void PostAI()
         {
-            Timer+= 1;
+            Timer += 1;
         }
 
         public virtual Color[] SetPalette()
         {
-            Color[] palette = { new Color(204, 255, 247), new Color(152, 255, 238), Color.LightCyan };
+            Color[] palette = { new(204, 255, 247), new(152, 255, 238), Color.LightCyan };
             return palette;
         }
-
+        public virtual int WidthForVisual => Projectile.width;
+        public virtual int HeightForVisual => Projectile.height;
         public override bool PreDraw(ref Color lightColor)
         {
             tornado1 ??= ModContent.Request<Texture2D>("KirboMod/Projectiles/Tornadoes/tornado_1");
             tornado2 ??= ModContent.Request<Texture2D>("KirboMod/Projectiles/Tornadoes/tornado_2");
             Texture2D[] textures = { TextureAssets.Projectile[Type].Value, tornado1.Value, tornado2.Value };
-            int maxheight = Projectile.height;
+            int maxheight = HeightForVisual;
             int spirals = (int)MathF.Round(maxheight * 0.11333333333f);
             float wobbleSpeed = .1f;
-            UnifiedRandom rnd = new UnifiedRandom(Projectile.identity * 1000);
+            UnifiedRandom rnd = new(Projectile.identity * 1000);
             Color[] palette = SetPalette();
             float scrollSpeed = 4;
 
@@ -76,9 +76,9 @@ namespace KirboMod.Projectiles.Tornadoes
                 float progress = Utils.GetLerpValue(0, maxheight, -offset.Y);
                 float wobbleT = MathF.Sin(rnd.NextFloat() * MathF.Tau + Timer * wobbleSpeed);
                 float wobble = MathHelper.Lerp(-.05f, .05f, wobbleT);
-                Vector2 scale = new Vector2(MathHelper.Lerp(.5f, 1, progress), .25f);
+                Vector2 scale = new(MathHelper.Lerp(.5f, 1, progress), .25f);
                 scale *= MathHelper.Lerp(.4f, .6f, rnd.NextFloat());
-                scale *= (float)(Projectile.width + 32) / frame.Width;
+                scale *= (float)(WidthForVisual + 32) / frame.Width;
                 Main.EntitySpriteDraw(t, Projectile.Center - Main.screenPosition + offset + new Vector2(0, maxheight * .5f), frame, palette[rnd.Next(palette.Length)].MultiplyRGB(lightColor) * opacity * Projectile.Opacity, wobble, frame.Size() / 2, scale, (SpriteEffects)rnd.Next(3));
             }
         }
@@ -92,11 +92,11 @@ namespace KirboMod.Projectiles.Tornadoes
                 float progress = Utils.GetLerpValue(0, spirals, i);
                 float wobbleT = MathF.Sin(rnd.NextFloat() * MathF.Tau + Timer * wobbleSpeed);
                 float wobble = MathHelper.Lerp(-.05f, .05f, wobbleT);
-                Vector2 scale = new Vector2(MathHelper.Lerp(1, 2, progress), .5f);
+                Vector2 scale = new(MathHelper.Lerp(1, 2, progress), .5f);
                 scale *= MathHelper.Lerp(.3f, .45f, rnd.NextFloat());
                 Vector2 offset = rnd.NextVector2Unit(Timer * MathHelper.Lerp(.1f, .2f, rnd.NextFloat())) * 4;
                 offset.Y -= i % spirals * (maxheight / spirals);
-                scale *= (float)(Projectile.width + 32) / frame.Width;
+                scale *= (float)(WidthForVisual + 32) / frame.Width;
                 Main.EntitySpriteDraw(t, Projectile.Center - Main.screenPosition + offset + new Vector2(0, maxheight * .5f), frame, palette[rnd.Next(palette.Length)].MultiplyRGB(lightColor) * Projectile.Opacity, wobble, frame.Size() / 2, scale, (SpriteEffects)rnd.Next(3));
             }
         }

@@ -1,3 +1,4 @@
+using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
@@ -16,34 +17,50 @@ namespace KirboMod.Items.Weapons
 			/* Tooltip.SetDefault("Right click to slam the ground and shoot rocks!" +
 				"\nSlam onto enemies to boost yourself"); */
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research 
-			ItemID.Sets.ItemsThatAllowRepeatedRightClick[Type] = true;
         }
-
+		static int UseTime => 5;
+		static float ShootSpeed => 35f;
 		public override void SetDefaults() 
 		{
-			Item.damage = 55;
+			Item.damage = 18;
 			Item.DamageType = DamageClass.Melee/* tModPorter Suggestion: Consider MeleeNoSpeed for no attack speed scaling */;
 			Item.width = 30; //world dimensions
 			Item.height = 30; //world dimensions
-			Item.useTime = 5;
-			Item.useAnimation = 5;
+			Item.useTime = UseTime;
+			Item.useAnimation = UseTime;
 			Item.noMelee = true;
 			Item.noUseGraphic = true;
 			Item.knockBack = 1;
-			Item.useStyle = ItemUseStyleID.Swing;
+			Item.useStyle = ItemUseStyleID.Rapier;
 			Item.value = Item.buyPrice(0, 0, 45, 0);
 			Item.rare = ItemRarityID.LightRed;
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.HardenedFistProj>();
-			Item.shootSpeed = 35f;
+			Item.shootSpeed = ShootSpeed;
+			Item.ArmorPenetration = 15;
 		}
 
+        public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+        {
+            KirbPlayer kplr = player.GetModPlayer<KirbPlayer>();
+            if (player.altFunctionUse == 2)
+            {
+                if (Main.myPlayer == player.whoAmI)
+                {
+                    FighterUppercut.GetAIValues(player, 0.5f, out float ai1);
+                    Projectile.NewProjectile(source, position, velocity, type, damage, knockback, -1, 0, ai1);
+                }
+                kplr.fighterComboCounter = 0;
+                return false;
+            }
+            return true;
+        }
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {
             if (player.altFunctionUse == 2) //right click
             {
-                damage *= 4;
+                damage = FighterGlove.GetDamageScaledByComboCounter(player, damage, 0.5f);
             }
             else //left click
             {
@@ -60,19 +77,22 @@ namespace KirboMod.Items.Weapons
         {
 			if (player.altFunctionUse == 2) //right click
 			{
-				Item.useTime = 12; 
-				Item.useAnimation = 12;
-				Item.shoot = ModContent.ProjectileType<Projectiles.HardenedSlam>();
+				Item.useTime = 50; 
+				Item.useAnimation = 50;
+				Item.shoot = ModContent.ProjectileType<Projectiles.HardenedFighterUppercut>();
 				Item.shootSpeed = 0.0001f; //make it very small but not immobile
+                Item.useStyle = ItemUseStyleID.HoldUp;
             }
-			else //left click
+            else //left click
 			{
 				Item.useTime = 5;
 				Item.useAnimation = 5;
 				Item.shoot = ModContent.ProjectileType<Projectiles.HardenedFistProj>();
-				Item.shootSpeed = 35f;
+				Item.shootSpeed = ShootSpeed;
+                Item.useStyle = ItemUseStyleID.Rapier;
+				Item.autoReuse = true;
             }
-			return player.ownedProjectileCounts[ModContent.ProjectileType<Projectiles.HardenedSlam>()] < 1;
+            return true;
 		}
 
         public override void AddRecipes()

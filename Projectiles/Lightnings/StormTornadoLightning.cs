@@ -8,7 +8,7 @@ namespace KirboMod.Projectiles.Lightnings
     {
         public override void SetStaticDefaults()
         {
-            SetAmountOfLightingSegments(5, Type);
+            SetAmountOfLightingSegments(7, Type);
         }
         public override void SetDefaults()
         {

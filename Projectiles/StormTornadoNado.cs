@@ -1,12 +1,8 @@
-using KirboMod.Particles;
 using KirboMod.Projectiles.Lightnings;
 using KirboMod.Projectiles.Tornadoes;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
 using Terraria;
 using Terraria.Audio;
-using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -33,12 +29,18 @@ namespace KirboMod.Projectiles
             //uses own immunity frames
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = 5;
-            Projectile.ArmorPenetration = 9999;
+            Projectile.scale = 1.6f;
+            Projectile.ContinuouslyUpdateDamageStats = true;
         }
-
+        public override int HeightForVisual => 110;
+        public override int WidthForVisual => 240;
+        public static int LightningRate => 10;
+        int ManaToUse => (int)Projectile.ai[1];
+        static float StormCloudDamageMult => 0.5f;
+        static float ThunderDamageMult => 0.5f;
         public override Color[] SetPalette()
         {
-            Color[] palette = { Color.Black, Color.Gray, Color.LightGray };
+            Color[] palette = { Color.White, Color.Black, Color.MediumPurple };
             return palette;
         }
 
@@ -46,40 +48,39 @@ namespace KirboMod.Projectiles
         {
             Player player = Main.player[Projectile.owner];
             Projectile.ai[0]++;
-
-            Projectile.scale = 1.6f;
-
-            //stuff here so it doesn't oppose drain
             player.manaRegenDelay = 20;
             player.manaRegenCount = 0;
-            player.manaCost = 1;
-
-            //Tooken from old Example Mod (Bad idea)
-            bool manaIsAvailable = player.CheckMana(1, true, false); //consume 1 mana per tick
+            bool manaIsAvailable = player.CheckMana(10);
             bool stillInUse = player.channel && manaIsAvailable && !player.noItems && !player.CCed;
-
-            if (stillInUse) //HOMING
+            if (Projectile.ai[0] % 20 == 0)
             {
-                float speed = 40f; //top speed
-                float inertia = 30f; //acceleration and decceleration speed
-
-                if (Projectile.owner == Main.myPlayer)
-                {
-                    Vector2 direction = Main.MouseWorld - Projectile.Center; //start - end 
-
-                    direction.Normalize();
-                    direction *= speed;
-                    if (Projectile.ai[0] % 3 == 0)
-                    {
-                        Projectile.netUpdate = true;
-                    }
-                    Projectile.velocity = (Projectile.velocity * (inertia - 1) + direction) / inertia; //movement
-                }
-                UpdateDamageForManaSickness(player); //Tooken from old Example Mod (Bad idea)
+                player.CheckMana(ManaToUse, true); //consume ManaToUse mana every 20 frames, affected by player's mana reduction stat
             }
-            else
+            if (Projectile.owner == Main.myPlayer)
             {
-                Projectile.Kill();
+                if (stillInUse) //HOMING
+                {
+                    float speed = 60f; //top speed
+                    float inertia = 9f; //influences acceleration and decceleration
+
+                    if (Projectile.owner == Main.myPlayer)
+                    {
+                        Vector2 direction = Main.MouseWorld - Projectile.Center; //start - end 
+
+                        direction.Normalize();
+                        direction *= speed;
+                        Projectile.velocity = (Projectile.velocity * (inertia - 1) + direction) / inertia; //movement
+                    }
+                    if (Main.netMode == NetmodeID.MultiplayerClient)
+                    {
+                        NetMethods.SyncProjPosition(Projectile, (byte)Projectile.owner);
+                    }
+                }
+                else
+                {
+                    Projectile.Kill();
+                }
+              
             }
 
             if (++Projectile.frameCounter >= 4) //changes frames every 4 ticks 
@@ -94,29 +95,65 @@ namespace KirboMod.Projectiles
             //Storm Cloud
             if (Projectile.ai[0] % 5 == 0 && Main.myPlayer == Projectile.owner)
             {
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * 0, ModContent.ProjectileType<Projectiles.StormTornadoCloud>(), Projectile.damage / 2, 0f, Projectile.owner);
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Main.rand.NextVector2FromRectangle(Projectile.Hitbox), Projectile.velocity * 0.01f, ModContent.ProjectileType<Projectiles.StormTornadoCloud>(), (int)(Projectile.damage * StormCloudDamageMult), 0f, Projectile.owner);
             }
 
             //"Thunder"
-            if (Projectile.ai[0] % 60 == 0 || Projectile.ai[0] == 1) //remainder is 0 or 1
+            if (Projectile.ai[0] % 60 == 1) 
             {
                 SoundEngine.PlaySound(SoundID.Item69.WithVolumeScale(1.5f).WithPitchOffset(-20f), Projectile.Center); //staff of earth
             }
 
-            if (Main.rand.NextBool(20)) //1/20 every tick
+            if (Projectile.ai[0] % LightningRate == 0)
             {
-                Vector2 speed = Main.rand.NextVector2CircularEdge(15f, 15f); //circle 
-                LightningProj.GetSpawningStats(speed, out float ai0, out float ai1);
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, speed, 
-                    ModContent.ProjectileType<StormTornadoLightning>(), Projectile.damage / 2, 0f, Projectile.owner, ai0, ai1);
-                SoundEngine.PlaySound(SoundID.Item122, Projectile.Center);
+                SpawnLightningBolt();
             }
         }
 
-        private void UpdateDamageForManaSickness(Player player) //Tooken from old Example Mod
+        private void SpawnLightningBolt()
         {
-            float ownerCurrentMagicDamage = player.GetDamage(DamageClass.Generic).Multiplicative + (player.GetDamage(DamageClass.Magic).Multiplicative - 1f);
-            Projectile.damage = (int)(player.HeldItem.damage * ownerCurrentMagicDamage);
+            SoundEngine.PlaySound(SoundID.Item122, Projectile.Center);
+            if (Main.myPlayer != Projectile.owner)
+            {
+                return;
+            }
+            Vector2 speed = Main.rand.NextVector2CircularEdge(15f, 15f); //circle 
+            int target = -1;
+            Vector2 center = Projectile.Center;
+            float minRange = 800f;
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                NPC npc = Main.npc[i];
+                if (!npc.CanBeChasedBy())
+                {
+                    continue;
+                }
+                if (target == -1)
+                {
+                    if (npc.DistanceSQ(center) < minRange * minRange)
+                    {
+                        target = i;
+                    }
+                    continue;
+                }
+                NPC current = Main.npc[target];
+                if (current.DistanceSQ(center) > npc.DistanceSQ(center))
+                {
+                    target = i;
+                }
+            }
+            if (target != -1)
+            {
+                NPC targetNPC = Main.npc[target];
+                Utils.ChaseResults results = Utils.GetChaseResults(center, speed.Length(), targetNPC.Center, targetNPC.velocity);
+                if (results.InterceptionHappens)
+                {
+                    speed = results.ChaserVelocity;
+                }
+            }
+            LightningProj.GetSpawningStats(speed, out float ai0, out float ai1);
+            Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, speed,
+                ModContent.ProjectileType<StormTornadoLightning>(), (int)(Projectile.damage * ThunderDamageMult) , 0f, Projectile.owner, ai0, ai1);
         }
 
         public override void OnKill(int timeLeft)

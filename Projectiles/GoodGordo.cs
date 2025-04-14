@@ -30,7 +30,7 @@ namespace KirboMod.Projectiles
 		{
             Projectile.velocity.Y += 0.2f;
 			Projectile.velocity.Y = MathHelper.Clamp(Projectile.velocity.Y, -12, 12);
-			Projectile.rotation += 0.1f; // rotates projectile
+			Projectile.rotation += Projectile.velocity.X * 0.015f; // rotates projectile
 		}
 
         public override bool OnTileCollide(Vector2 oldVelocity) 

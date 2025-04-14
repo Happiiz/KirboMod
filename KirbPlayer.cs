@@ -1,3 +1,4 @@
+using KirboMod.Items.Armor.Photonic0Boots;
 using KirboMod.Items.Weapons;
 using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
@@ -45,6 +46,7 @@ namespace KirboMod
         public bool hasdarkShield; //additional check that only updates when not dashing
 
         public int fighterComboCounter = 0; //combo Counter to determine strength of uppercut in regular fighter glove
+        public const int MaxFighterComboCounter = 100;
 
         public bool airWalkerSet = false;
         public bool airWalkerJump = false;
@@ -136,9 +138,9 @@ namespace KirboMod
                 darkDashTime = 0;
             }
 
-            if (fighterComboCounter > 100)
+            if (fighterComboCounter > MaxFighterComboCounter)
             {
-                fighterComboCounter = 100;
+                fighterComboCounter = MaxFighterComboCounter;
             }
 
             if (Player.dead) //reset fighter counter if dead
@@ -870,7 +872,7 @@ namespace KirboMod
         }
         public override void OnHurt(Player.HurtInfo info)
         {
-            if (whispbush)
+            if (whispbush && Player.whoAmI == Main.myPlayer)
             {
                 for (int i = 0; i < 4; i++)
                 {
@@ -970,6 +972,15 @@ namespace KirboMod
             {
                 numStars = 50;
             }
+        }
+        public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo)
+        {
+            Photonic0BootsDrawLayer.ModifyDrawInfo(ref drawInfo);
+        }
+
+        public static void IncreaseComboCounter(int owner)
+        {
+            Main.player[owner].GetModPlayer<KirbPlayer>().fighterComboCounter++;
         }
     }
 

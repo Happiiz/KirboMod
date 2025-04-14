@@ -24,12 +24,12 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 36;
+			Item.damage = 39;
 			Item.DamageType = DamageClass.Melee/* tModPorter Suggestion: Consider MeleeNoSpeed for no attack speed scaling */;
 			Item.width = 40;
 			Item.height = 40;
-			Item.useTime = 15;
-			Item.useAnimation = 15;
+			Item.useTime = 17;
+			Item.useAnimation = 17;
 			Item.useStyle = ItemUseStyleID.Swing;
 			Item.knockBack = 8;
 			Item.value = Item.buyPrice( 0, 0, 12, 0);

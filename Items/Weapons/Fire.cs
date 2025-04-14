@@ -22,13 +22,13 @@ namespace KirboMod.Items.Weapons
 
         public override void SetDefaults()
 		{
-			Item.damage = 13;
+			Item.damage = 10;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 32;
 			Item.height = 40;
-			Item.useTime = 7;
-			Item.useAnimation = Item.useTime * 5;
+			Item.useTime = 8;
+			Item.useAnimation = Item.useTime * 3;
 			Item.useStyle = ItemUseStyleID.Shoot;
 			Item.knockBack = 0.1f;
             Item.value = Item.buyPrice(0, 0, 4, 0);
@@ -37,7 +37,8 @@ namespace KirboMod.Items.Weapons
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.Flames.FireFire>();
 			Item.shootSpeed = 15f;
-			Item.mana = 3;
+			Item.mana = 6;
+            Item.ArmorPenetration = 4;
         }
 
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
