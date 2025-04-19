@@ -326,11 +326,14 @@ namespace KirboMod.NPCs
             }
 
             //movement
-            Vector2 playerXOffest = player.Center + new Vector2(xOffset, MathF.Sin((NPC.ai[0] - 30) / 30) * 300); //go ahead of player
+            Vector2 playerXOffest = player.Center + new Vector2(xOffset, MathF.Sin((NPC.ai[0] - 30) / (10 * Helper.Phi)) * 500); //go ahead of player
             Vector2 move = playerXOffest - NPC.Center;
 
-            NPC.rotation = MathHelper.ToRadians(MathF.Sin((NPC.ai[0] - 30) / 30) * 60);
-
+            NPC.rotation = (player.Center - NPC.Center).ToRotation() + MathF.Sin((NPC.ai[0] - 30) / 10) * 0.2f;
+            if(NPC.direction == -1)
+            {
+                NPC.rotation += MathF.PI;
+            }
             float speed = 10f;
             float inertia = 10f;
 
@@ -676,9 +679,14 @@ namespace KirboMod.NPCs
 
                 Vector2 velocity = NPC.rotation.ToRotationVector2() * 30;
                 if (Main.netMode != NetmodeID.MultiplayerClient)
+                {
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center - velocity, -velocity, ModContent.ProjectileType<AngledDarkBeam>(), 60 / 2, 4, Main.myPlayer);
-
-                SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                }
+                if (NPC.ai[0] % 3 == 0)
+                {
+                    PlayBeamSFX();
+                }
+              //  SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
             }
             else if (NPC.ai[0] > 240 + rotationDuration + 50) //reset with cooldown of 50 frames after finishing attack
             {

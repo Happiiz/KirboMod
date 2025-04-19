@@ -31,9 +31,9 @@ namespace KirboMod.Projectiles
         }
         public virtual int AnimationDuration => 10;
         public virtual int DecelerateDuration => 3;
-        ref float Timer => ref Projectile.localAI[0];
-        bool MakePlayerInvincible => Projectile.ai[1] == 1;
-        ref float DrawCounter => ref Projectile.localAI[2];
+        public ref float Timer => ref Projectile.localAI[0];
+        public bool MakePlayerInvincible => Projectile.ai[1] == 1;
+        public ref float DrawCounter => ref Projectile.localAI[2];
         public virtual Color EndColor => Color.Blue with { A = 128 };
         public virtual Color StartColor => Color.OrangeRed with { A = 128 };
         public virtual Color InnerStartColor => new Color(255, 255, 255, 0);
@@ -93,7 +93,7 @@ namespace KirboMod.Projectiles
                 player.hurtCooldowns[i] = (int)MathF.Max(player.hurtCooldowns[i], 1);
             }
         }
-        private static void ClampIframes(Player player)
+        public static void ClampIframes(Player player)
         {
             int min = 60;
             player.immune = true;

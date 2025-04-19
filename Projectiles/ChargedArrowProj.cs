@@ -28,14 +28,14 @@ namespace KirboMod.Projectiles
 			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.timeLeft = 120; //2 seconds
 			Projectile.tileCollide = true;
-			Projectile.penetrate = -1;
+			Projectile.penetrate = 3;
 			Projectile.scale = 1f;
 			Projectile.alpha = 50;
 			Projectile.aiStyle = 0;
 			Projectile.light = 0.4f;
 			Projectile.ignoreWater = true;
             Projectile.usesLocalNPCImmunity = true;
-            Projectile.localNPCHitCooldown = 10;
+            Projectile.localNPCHitCooldown = 20;
             Projectile.extraUpdates = 1;
 		}
         ref float MaxVel => ref Projectile.localAI[0];
@@ -97,6 +97,7 @@ namespace KirboMod.Projectiles
         {
             SoundEngine.PlaySound(SoundID.Item10, Projectile.position); //impact
             return true; //collision
+
         }
 
         public static Asset<Texture2D> afterimage;
@@ -125,11 +126,12 @@ namespace KirboMod.Projectiles
             HomingLockoutTimer = 10;
             HomingTargetIndex = -1;
             Projectile.netUpdate = true;
+            Projectile.damage = (int)(Projectile.damage * 0.8f);
         }
         public override void PostDraw(Color lightColor)
         {
             //add glow ball at tip of arrow
-            VFX.DrawGlowBallAdditive(Projectile.Center + Projectile.velocity * 0.5f, 1.2f, Color.Blue, Color.White);
+            VFX.DrawGlowBallAdditive(Projectile.Center + Projectile.velocity * 0.5f, .8f, Color.Blue * .5f, Color.Transparent, true);
         }
     }
 }

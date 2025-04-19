@@ -16,7 +16,8 @@ namespace KirboMod.NPCs
     {
         public static SoundStyle LaserSFX => new SoundStyle("KirboMod/Sounds/NPC/DarkMatter/PureDarkMatterLaser") with { MaxInstances = 0 };
         public static SoundStyle PetalThrowSFX => new SoundStyle("KirboMod/Sounds/NPC/DarkMatter/PureDarkMatterPetalThrow");
-        public static SoundStyle DashSFX => new SoundStyle("KirboMod/Sounds/NPC/DarkMatter/PureDarkMatterDash") with { Volume = 1.6f };
+        public static SoundStyle DashSFX => new SoundStyle("KirboMod/Sounds/NPC/DarkMatter/PureDarkMatterDash") with { Volume = 2f };
+        public static SoundStyle BeamSFX => new SoundStyle("KirboMod/Sounds/NPC/DarkMatter/PureDarkMatterBeam") with { Volume = 0.8f };
         enum DarkMatterAttackType : byte
         {
             Petals,//1
@@ -164,6 +165,10 @@ namespace KirboMod.NPCs
             // add the rules
             npcLoot.Add(notExpertRule);
             npcLoot.Add(masterMode);
+        }
+        void PlayBeamSFX()
+        {
+            SoundEngine.PlaySound(SoundID.Item158, NPC.Center);
         }
     }
 }

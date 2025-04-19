@@ -17,7 +17,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults() 
 		{
-			Item.damage = 80;
+			Item.damage = 90;
 			Item.DamageType = DamageClass.Ranged;
 			Item.width = 28;
 			Item.height = 26;
@@ -30,7 +30,7 @@ namespace KirboMod.Items.Weapons
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.KirbyBallProj>();
-			Item.shootSpeed = 15f;
+			Item.shootSpeed = 18f;
 			Item.consumable = true;
 			Item.maxStack = 9999;
 			Item.noMelee = true;

@@ -21,7 +21,7 @@ namespace KirboMod.Projectiles
 			Projectile.DamageType = DamageClass.Magic;
 			Projectile.timeLeft = 20;
 			Projectile.tileCollide = true;
-			Projectile.penetrate = -1;
+			Projectile.penetrate = 2;
 			Projectile.scale = 1f;
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = 10;
@@ -44,6 +44,8 @@ namespace KirboMod.Projectiles
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
+            Projectile.damage = (int)(Projectile.damage * .8f);
+            target.AddBuff(BuffID.Frostburn, 60);
 			if (target.life <= 0) //checks if the npc is dead
             {
                 SoundEngine.PlaySound(SoundID.Item46, Projectile.position); //ice hydra

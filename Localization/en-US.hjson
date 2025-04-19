@@ -1490,6 +1490,7 @@ Mods: {
 			NewWhispySummonTileDustGenerator.DisplayName: New Whispy Summon Tile Dust Generator
 			NewWhispyAppleMedium.DisplayName: New Whispy Apple Medium
 			HardenedFighterUppercut.DisplayName: Hardened Fighter Uppercut
+			MetalKick.DisplayName: Metal Kick
 		}
 
 		NPCs: {

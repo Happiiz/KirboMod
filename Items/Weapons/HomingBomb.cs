@@ -21,7 +21,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults() 
 		{
-			Item.damage = 108;
+			Item.damage = 148;
 			Item.DamageType = DamageClass.Ranged;
 			Item.width = 50;
 			Item.height = 50;
@@ -39,6 +39,7 @@ namespace KirboMod.Items.Weapons
 			Item.maxStack = 9999;
 			Item.noMelee = true;
 			Item.noUseGraphic = true;
+
 		}
 
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)

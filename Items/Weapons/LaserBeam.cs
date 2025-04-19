@@ -1,6 +1,4 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -22,7 +20,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 45;
+			Item.damage = 37;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 31; 
@@ -59,7 +57,7 @@ namespace KirboMod.Items.Weapons
 			Recipe recipe1 = CreateRecipe();//the result is gigantsword
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.BeamStaff>()); //Beam Staff
 			recipe1.AddIngredient(ItemID.LaserRifle); //Laser Rifle
-			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 50); //100 starbits
+			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 50); //50 starbits
 			recipe1.AddIngredient(ModContent.ItemType<RareStone>(), 1); //1 rare stone
 			recipe1.AddTile(TileID.MythrilAnvil); //crafted at mythril/orichalcum anvil
 			recipe1.Register(); //adds this recipe to the game

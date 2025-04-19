@@ -61,12 +61,7 @@ namespace KirboMod.Projectiles
             
 
             Lighting.AddLight(Projectile.Center, 0.9f, 0.5f, 0f); //orange light
-
-
-            player.immuneTime = player.itemAnimationMax + 10;
-            player.immune = true;
-            player.immuneNoBlink = true;
-
+            player.SetImmuneTimeForAllTypes(40);
             //extra...
             player.maxFallSpeed = 0;
             player.noKnockback = true;

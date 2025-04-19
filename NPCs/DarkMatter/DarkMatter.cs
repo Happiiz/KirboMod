@@ -13,11 +13,11 @@ using Terraria.ModLoader;
 namespace KirboMod.NPCs.DarkMatter
 {
     [AutoloadBossHead]
-	public partial class DarkMatter : ModNPC
-	{
-		private int animation = 0; //frame cycles
+    public partial class DarkMatter : ModNPC
+    {
+        private int animation = 0; //frame cycles
 
-		private int phase = 1; //phase 1 = regular, phase 2 = harder, phase 3 = enraged, phase 4 = transition
+        private int phase = 1; //phase 1 = regular, phase 2 = harder, phase 3 = enraged, phase 4 = transition
 
         private Vector2 playerTargetArea = Vector2.Zero;
 
@@ -26,28 +26,28 @@ namespace KirboMod.NPCs.DarkMatter
         private DarkMatterAttackType lastattacktype = DarkMatterAttackType.Orbs;
 
         public override void AI() //constantly cycles each time
-		{
-			Player player = Main.player[NPC.target];
+        {
+            Player player = Main.player[NPC.target];
 
-			//cap life
-			if (NPC.life >= NPC.lifeMax)
-			{
-				NPC.life = NPC.lifeMax;
-			}
+            //cap life
+            if (NPC.life >= NPC.lifeMax)
+            {
+                NPC.life = NPC.lifeMax;
+            }
 
             if (phase == 4)
             {
                 Transition();
             }
-			//INTRO
+            //INTRO
             else if (NPC.ai[1] < 60)
             {
                 if (NPC.ai[1] == 30) //teleport to player
                 {
-                    NPC.Center = player.Center + new Vector2(MathF.Cos((float)Utils.Lerp(0, MathF.Tau, Main.rand.NextFloat())) * 500, 
+                    NPC.Center = player.Center + new Vector2(MathF.Cos((float)Utils.Lerp(0, MathF.Tau, Main.rand.NextFloat())) * 500,
                         MathF.Sin((float)Utils.Lerp(0, MathF.Tau, Main.rand.NextFloat())) * 500);
 
-                    for (int i = 0; i < 100; i++) 
+                    for (int i = 0; i < 100; i++)
                     {
                         Vector2 speed = Main.rand.NextVector2Circular(20f, 20f); //circle
                         Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed, 3); //Makes dust in a messy circle
@@ -65,26 +65,26 @@ namespace KirboMod.NPCs.DarkMatter
             }
             //DESPAWNING
             else if (NPC.target < 0 || NPC.target == 255 || player.dead || !player.active)
-			{
-				NPC.TargetClosest(false);
+            {
+                NPC.TargetClosest(false);
 
                 NPC.velocity.Y = NPC.velocity.Y - 0.2f; //rise
 
                 NPC.ai[0] = 0;
 
-				if (NPC.timeLeft > 60)
-				{
-					NPC.timeLeft = 60;
-					return;
-				}
-			}
-			else //regular attack
+                if (NPC.timeLeft > 60)
+                {
+                    NPC.timeLeft = 60;
+                    return;
+                }
+            }
+            else //regular attack
             {
-				AttackPattern();
-			}
-		}
-		private void AttackPattern()
-		{
+                AttackPattern();
+            }
+        }
+        private void AttackPattern()
+        {
             NPC.ai[0]++;
             NPC.spriteDirection = NPC.direction;
             //passive effects
@@ -243,7 +243,7 @@ namespace KirboMod.NPCs.DarkMatter
                 NPC.TargetClosest(); //face player only for charge
                 move.Normalize();
                 move *= speed;
-                NPC.velocity = (NPC.velocity * (inertia - 1) + move) / inertia; 
+                NPC.velocity = (NPC.velocity * (inertia - 1) + move) / inertia;
             }
             else if (NPC.ai[0] == 120) //stop X velocity for a moment to make the backup stand out more
             {
@@ -335,7 +335,7 @@ namespace KirboMod.NPCs.DarkMatter
 
                 if (Main.rand.NextBool(2))
                 {
-                    xlocation = 500; 
+                    xlocation = 500;
                 }
 
                 //teleport to either side of the player
@@ -350,13 +350,17 @@ namespace KirboMod.NPCs.DarkMatter
             }
 
             //normal mode above half
-            if (phase == 1) 
+            if (phase == 1)
             {
                 if (NPC.ai[0] == 70) //shoot
                 {
-                    Vector2 Yoffset = new Vector2(0, -170);
+                    Vector2 Yoffset = new(0, -170);
 
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, default, 0, player.whoAmI);
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, default, 0, player.whoAmI);
+                    }
+                    PlayBallChargeSoundEffect(NPC.Center + Yoffset);
                 }
 
                 if (NPC.ai[0] > 130)
@@ -372,9 +376,12 @@ namespace KirboMod.NPCs.DarkMatter
                 {
                     if (NPC.ai[0] % 30 == 0) //shoot
                     {
-                        Vector2 Yoffset = new Vector2(0, -170);
-
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, default, 0, player.whoAmI, NPC.whoAmI);
+                        Vector2 Yoffset = new(0, -170);
+                        if (Main.netMode != NetmodeID.MultiplayerClient)
+                        {
+                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, default, 0, player.whoAmI, NPC.whoAmI);
+                        }
+                        PlayBallChargeSoundEffect(NPC.Center + Yoffset);
                     }
                 }
 
@@ -393,7 +400,7 @@ namespace KirboMod.NPCs.DarkMatter
             Player player = Main.player[NPC.target];
             Vector2 playerDistance = player.Center - NPC.Center;
             animation = 0;
-            float xOffset = MathF.CopySign(400, -playerDistance.X);      
+            float xOffset = MathF.CopySign(400, -playerDistance.X);
             Vector2 playerXOffest = playerTargetArea + new Vector2(xOffset, -20f); //go in front of player
             Vector2 position = NPC.Center + new Vector2(0, 30f);
             if (NPC.ai[0] < 160) //not doing spread attack
@@ -404,7 +411,7 @@ namespace KirboMod.NPCs.DarkMatter
             {
                 TripleShot(40 + i * 30);
             }
-            Vector2 velocity = new Vector2(NPC.direction * 20, 0);
+            Vector2 velocity = new(NPC.direction * 20, 0);
 
             if (NPC.ai[0] == 160)
             {
@@ -445,7 +452,10 @@ namespace KirboMod.NPCs.DarkMatter
                 NPC.velocity.X *= 0.01f;
                 if (NPC.ai[0] % 5 == 0)
                 {
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+                    }
                     SfxShoot();
                 }
             }
@@ -455,17 +465,20 @@ namespace KirboMod.NPCs.DarkMatter
                 NPC.ai[0] = 0; //restart
             }
         }
-     
+
         private void TripleShot(float start)
         {
             Vector2 position = NPC.Center + new Vector2(0, 30f);
-            Vector2 velocity = new Vector2(NPC.direction * 40, 0);
+            Vector2 velocity = new(NPC.direction * 40, 0);
             if (NPC.ai[0] > start && NPC.ai[0] < start + 20)
             {
                 if (NPC.ai[0] % 5 == 0) //every 5 ticks
                 {
                     NPC.velocity *= 0.01f;
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, ModContent.ProjectileType<DarkBeam>(), 60 / 2, 6);
+                    }
                     SfxShoot();
                 }
             }
@@ -492,7 +505,7 @@ namespace KirboMod.NPCs.DarkMatter
             }
             else if (NPC.ai[0] < 60) //small backup
             {
-                NPC.alpha -= 30; 
+                NPC.alpha -= 30;
                 targetDistance.Normalize();
                 targetDistance *= -speed;
                 NPC.velocity = (NPC.velocity * (inertia - 1) + targetDistance) / inertia;
@@ -535,20 +548,25 @@ namespace KirboMod.NPCs.DarkMatter
             {
                 if (NPC.ai[0] % 20 == 0) //shoot
                 {
-                    Vector2 Yoffset = new Vector2(0, -170);
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, default, 0, player.whoAmI, 0);
+
+                    Vector2 Yoffset = new(0, -170);
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, default, 0, player.whoAmI, 0);
+                    }
+                    PlayBallChargeSoundEffect(NPC.Center + Yoffset);
                 }
                 //spin around player
                 NPC.Center = player.Center + new Vector2(MathF.Cos((NPC.ai[0] - 100) / 30) * 500, MathF.Sin((NPC.ai[0] - 100) / 30) * 500);
             }
 
             playerTargetArea = player.Center; //set dash target 
-            
+
             if (NPC.ai[0] > 40)
             {
                 NPC.alpha -= 30;
             }
-            
+
             if (NPC.ai[0] > 310)
             {
                 NPC.alpha = 0;
@@ -576,12 +594,12 @@ namespace KirboMod.NPCs.DarkMatter
         }
         void SfxShoot()
         {
-            SoundEngine.PlaySound(SoundID.Item33 with { Volume = .6f }, NPC.Center);
+            SoundEngine.PlaySound(DarkBeamShoot, NPC.Center);
         }
         public override void FindFrame(int frameHeight) // animation
         {
-			if (animation == 0) //idle
-			{
+            if (animation == 0) //idle
+            {
                 NPC.frameCounter += 1.0;
                 if (NPC.frameCounter < 12.0)
                 {
@@ -657,19 +675,19 @@ namespace KirboMod.NPCs.DarkMatter
                 NPC.frameCounter += 1.0;
                 if (NPC.frameCounter < 6.0)
                 {
-                    NPC.frame.Y = frameHeight * 12; 
+                    NPC.frame.Y = frameHeight * 12;
                 }
                 else if (NPC.frameCounter < 12.0)
                 {
-                    NPC.frame.Y = frameHeight * 13; 
+                    NPC.frame.Y = frameHeight * 13;
                 }
                 else if (NPC.frameCounter < 18.0)
                 {
-                    NPC.frame.Y = frameHeight * 14; 
+                    NPC.frame.Y = frameHeight * 14;
                 }
                 else if (NPC.frameCounter < 24.0)
                 {
-                    NPC.frame.Y = frameHeight * 15; 
+                    NPC.frame.Y = frameHeight * 15;
                 }
                 else
                 {
@@ -693,11 +711,11 @@ namespace KirboMod.NPCs.DarkMatter
         public static Asset<Texture2D> darkBlade;
         public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-			darkBlade = ModContent.Request<Texture2D>("KirboMod/NPCs/DarkMatter/DarkBlade");
+            darkBlade = ModContent.Request<Texture2D>("KirboMod/NPCs/DarkMatter/DarkBlade");
 
             float rotation = MathF.PI / 2;
             SpriteEffects direction = NPC.direction == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None;
-            Vector2 offset = new Vector2(50 * NPC.direction, 30);  
+            Vector2 offset = new(50 * NPC.direction, 30);
 
             //orb animation
             if (attacktype == DarkMatterAttackType.Orbs)

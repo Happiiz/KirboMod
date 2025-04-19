@@ -20,12 +20,12 @@ namespace KirboMod.Projectiles
             Projectile.height = 150;
             Projectile.friendly = true;
             Projectile.DamageType = DamageClass.Ranged;
-            Projectile.timeLeft = 60;
+            Projectile.timeLeft = 12;
             Projectile.tileCollide = false;
             Projectile.penetrate = -1;
             Projectile.scale = 1f;
             Projectile.usesLocalNPCImmunity = true;
-            Projectile.localNPCHitCooldown = 10;
+            Projectile.localNPCHitCooldown = 12;
             Projectile.alpha = 50;
         }
         public override void AI()

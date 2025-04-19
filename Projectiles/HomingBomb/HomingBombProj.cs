@@ -18,7 +18,7 @@ namespace KirboMod.Projectiles
         private bool awake = false;
         ref float Power => ref Projectile.ai[1];
 
-        private List<float> Targetdistances = new List<float>(); //targeting
+        private List<float> Targetdistances = new(); //targeting
         private NPC aggroTarget = null; //target the minion is currently focused on
         public override void SetStaticDefaults()
         {
@@ -39,6 +39,7 @@ namespace KirboMod.Projectiles
         }
         public override void AI()
         {
+            Projectile.localAI[2]--;
             if (Projectile.velocity.Y == 0 || Projectile.wet)
             {
                 awake = true;
@@ -51,13 +52,22 @@ namespace KirboMod.Projectiles
             }
 
             //Gravity
-            if (Projectile.wet)
+            if (Projectile.localAI[2] < 0)
             {
-                
+                Projectile.ignoreWater = false;
+            }
+            else
+            {
+                Projectile.wet = false;
+            }
+            if (Projectile.wet & Projectile.localAI[2] < 0)
+            {
+
                 if (Projectile.velocity.Y < 0)
                 {
                     Projectile.velocity.Y = 0;
                 }
+                groundcollide = true;
                 int x = (int)(Projectile.Center.X + 8) / 16;
                 int y = (int)(Projectile.Center.Y + 8) / 16;
                 x = Utils.Clamp(x, 0, Main.maxTilesX);
@@ -76,7 +86,10 @@ namespace KirboMod.Projectiles
             }
             else
             {
-                Projectile.velocity.Y += 0.5f;
+                //if (!awake)
+                {
+                    Projectile.velocity.Y += 0.5f;
+                }
             }
             if (Projectile.velocity.Y >= 10f)
             {
@@ -125,7 +138,7 @@ namespace KirboMod.Projectiles
                 //Targeting
                 float distanceFromTarget = 2000f;
 
-                if (aggroTarget == null || !aggroTarget.active || aggroTarget.dontTakeDamage) //search target
+                if (aggroTarget == null || !aggroTarget.CanBeChasedBy()) //search target
                 {
                     //start each number with a very big number so they can't be targeted if their npc doesn't exist
                     Targetdistances = Enumerable.Repeat(999999f, Main.maxNPCs).ToList();
@@ -138,11 +151,11 @@ namespace KirboMod.Projectiles
 
                         if (npc.CanBeChasedBy()) //checks if targetable
                         {
-                            Vector2 positionOffset = new Vector2(0, -5);
+                            Vector2 positionOffset = new(0, -5);
                             bool inView = Collision.CanHitLine(Projectile.position + positionOffset, Projectile.width, Projectile.height, npc.position, npc.width, npc.height);
 
                             //close, hittable, hostile and can see target
-                            if (inView && !npc.friendly && !npc.dontTakeDamage && !npc.dontCountMe && distance < distanceFromTarget && npc.active)
+                            if (inView && npc.CanBeChasedBy() && distance < distanceFromTarget && npc.active)
                             {
                                 Targetdistances.Insert(npc.whoAmI, (int)distance); //add to list of potential targets
                             }
@@ -181,40 +194,37 @@ namespace KirboMod.Projectiles
                         }
                     }
                 }
-                else if (aggroTarget != null && aggroTarget.active && !aggroTarget.dontTakeDamage) //ATTACK
+                else if (aggroTarget != null && aggroTarget.CanBeChasedBy()) //ATTACK
                 {
-                    Vector2 direction = aggroTarget.Center - Projectile.Center; //start - end
-                    float speed = Projectile.wet ? 30 : 15f;
-                    float inertia = 15f;
-
-                    //Jumping
-                    Vector2 jumprange = aggroTarget.Center - Projectile.Center;
-                    if (jumprange.X < 0)
-                        jumprange.X = -jumprange.X;
-                    float distance = Math.Abs(direction.X); //get absolute
-                    if (jumprange.Y <= -20 && groundcollide == true && jumprange.X < 1000 || (Projectile.velocity.X == 0 && groundcollide == true)) //jump when a little close and no attack cycle and when touching ground
+                    Vector2 deltaPos = aggroTarget.Center - Projectile.Center; //start - end
+                    float accel = 0.9f;
+                    float distance = Math.Abs(deltaPos.X); 
+                    if (deltaPos.Y <= -20 && groundcollide == true && distance < 400 && MathF.Sign(deltaPos.X) == MathF.Sign(Projectile.velocity.X) || (Projectile.velocity.X == 0 && groundcollide == true))
                     {
-                        Projectile.velocity.Y = direction.Y / 20; //jump
-                        groundcollide = false; //wait to touch floor again
+                        float? timeToReachNullable = TimeToTarget(Projectile.Center.X, aggroTarget.Center.X, Projectile.velocity.X);
+                        
+                        if (timeToReachNullable != null && timeToReachNullable.HasValue)
+                        {
+                            Projectile.localAI[2] = 10;
+                            Projectile.ignoreWater = true;
+                            float timeToReach = timeToReachNullable.Value;
+                            float gravity = 0.5f;       //needs ~20 to correct aim for some reason?
+                            float requiredYVelocity = ((deltaPos.Y + 20) - 0.5f * gravity * timeToReach * timeToReach) / timeToReach;
+                            Projectile.velocity.Y = requiredYVelocity; //jump
+                            groundcollide = false; //wait to touch floor again
+                        }
                     }
 
                     int pseudoDirection = 1;
-                    if (direction.X < 0) //enemy is behind
+                    if (deltaPos.X < 0) //enemy is behind
                     {
                         pseudoDirection = -1; //change direction so it will go towards enemy
                     }
-                    //we put this instead of player.Center so it will always be moving top speed instead of slowing down when enemy is near but unreachable
-                    //A "carrot on a stick" if you will
-
-                    Vector2 carrotDirection = new Vector2(pseudoDirection * 50, 0); //start - end 
-                    carrotDirection.Normalize();
-                    carrotDirection *= speed;
-
                     //use .X so it only effects horizontal movement
-                    Projectile.velocity.X = (Projectile.velocity.X * (inertia - 1) + carrotDirection.X) / inertia;
+                    Projectile.velocity.X += accel * pseudoDirection;
 
                     //Direction
-                    if (direction.X >= 0)
+                    if (deltaPos.X >= 0)
                     {
                         Projectile.direction = 1;
                     }
@@ -225,10 +235,34 @@ namespace KirboMod.Projectiles
                 }
             }
         }
+        public static float? TimeToTarget(float currentX, float targetX, float initialVelX, float acceleration = 0.9f)
+        {
+            float dx = targetX - currentX;
+            int direction = dx >= 0 ? 1 : -1;
+            float a = acceleration * direction;
+
+            float discriminant = initialVelX * initialVelX + 2 * a * dx;
+            if (discriminant < 0)
+            {
+                return null;
+            }
+
+            float sqrtDisc = (float)Math.Sqrt(discriminant);
+            float timeToReachLate = (-initialVelX + sqrtDisc) / acceleration;
+            float timeToReachEarly = (-initialVelX - sqrtDisc) / acceleration;
+            if (timeToReachEarly < timeToReachLate && timeToReachEarly > 0)
+            {
+                timeToReachLate = timeToReachEarly;
+            }
+            return timeToReachLate >= 0 ? timeToReachLate : null;
+        }
         public override void OnKill(int timeLeft) //when the projectile dies
         {
-            Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * 0.01f, //no zero else it won't launch right
-                ModContent.ProjectileType<Projectiles.HomingBombExplosion>(), Projectile.damage + (int)((Projectile.damage * 0.4) * Power), 12, Projectile.owner, 0, Power);
+            if (Main.myPlayer == Projectile.owner)
+            {
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * 0.01f, //no zero else it won't launch right
+                    ModContent.ProjectileType<Projectiles.HomingBombExplosion>(), Projectile.damage + (int)(Projectile.damage * Power), 12, Projectile.owner, 0, Power);
+            }
         }
 
         public override bool? CanCutTiles()
@@ -291,15 +325,16 @@ namespace KirboMod.Projectiles
             }
             Texture2D texture = TextureAssets.Projectile[Type].Value;
             SpriteEffects dir = Projectile.spriteDirection < 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
-            
-            Vector2 absOffset = new Vector2(0, -6);
+
+            Vector2 absOffset = new(0, -6);
             if (Projectile.wet)
             {
                 absOffset.Y -= 14;
             }
             Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition + absOffset, null, Color.White, Projectile.rotation, texture.Size() / 2, Projectile.scale, dir);
             Vector2 rotationRelativeOffset = new Vector2(4 * Projectile.spriteDirection, 16).RotatedBy(Projectile.rotation);
-            if (Projectile.wet)
+
+            if (Collision.WetCollision(Projectile.position, Projectile.width, Projectile.height))
             {
                 absOffset.X -= Projectile.spriteDirection * 4;
                 absOffset.Y += 1;
@@ -316,7 +351,7 @@ namespace KirboMod.Projectiles
 
         public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
         {
-            fallThrough = false; //don't fall through platforms
+            fallThrough = Projectile.localAI[0] > 0;
             return true;
         }
     }

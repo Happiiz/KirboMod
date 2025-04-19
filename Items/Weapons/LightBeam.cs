@@ -9,6 +9,7 @@ using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static Terraria.GameContent.Prefixes.PrefixLegacy;
 
 namespace KirboMod.Items.Weapons
 {
@@ -25,14 +26,14 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 90;
+			Item.damage = 40;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 48;
 			Item.height = 62;
-			Item.useTime = 3; //lower than use animation to repeat projectiles
-			Item.useAnimation = 60;
-			Item.reuseDelay = 25;
+			Item.useTime = 5;
+			Item.useAnimation = Item.useTime;
+			//Item.reuseDelay = 25;
 			Item.useStyle = ItemUseStyleID.Shoot;
 			Item.knockBack = 8;
 			Item.value = Item.buyPrice(0, 0, 30, 5);
@@ -41,7 +42,7 @@ namespace KirboMod.Items.Weapons
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.LightBeamLaser>();
 			Item.shootSpeed = 30f;
-			Item.mana = 12;
+			Item.mana = 15;
 		}
 		int FindTarget(Vector2 position)
         {
@@ -109,7 +110,7 @@ namespace KirboMod.Items.Weapons
 
         public override void AddRecipes()
 		{
-			Recipe recipe1 = CreateRecipe();//the result is gigantsword
+			Recipe recipe1 = CreateRecipe();
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.LaserBeam>()); //Laser Beam Staff
 			recipe1.AddIngredient(ItemID.RainbowRod); //Rainbow Rod
             recipe1.AddIngredient(ItemID.FairyQueenMagicItem); //Nightglow

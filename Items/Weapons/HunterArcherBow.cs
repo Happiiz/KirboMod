@@ -21,13 +21,13 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 40;
+			Item.damage = 17;
 			Item.DamageType = DamageClass.Ranged;
 			Item.noMelee = true;
 			Item.width = 48;
 			Item.height = 62;
-			Item.useTime = 20;
-			Item.useAnimation = 20;
+			Item.useTime = 30;
+			Item.useAnimation = 30;
 			Item.useStyle = ItemUseStyleID.Shoot;
 			Item.knockBack = 4;
 			Item.value = Item.buyPrice(0, 0, 45, 0);
@@ -41,43 +41,37 @@ namespace KirboMod.Items.Weapons
 
 		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
 		{
-            Vector2 projshoot = Main.MouseWorld - player.Center;
-            projshoot.Normalize();
 
-            if (type != ModContent.ProjectileType<Projectiles.StarArrowProj>())
-            {
-                type = ProjectileID.JestersArrow;
-                projshoot *= 10f;
-            }
-            else
-            {
-                type = ModContent.ProjectileType<Projectiles.ChargedArrowProj>();
-                damage = (int)(damage * 1.5f);
-                projshoot *= 30f;
-            }
-
-            velocity.X = projshoot.X;
-            velocity.Y = projshoot.Y;
+			if (type != ModContent.ProjectileType<Projectiles.StarArrowProj>())
+			{
+				type = ProjectileID.JestersArrow;
+				if (ContentSamples.ProjectilesByType[type].localNPCHitCooldown == -2 || !ContentSamples.ProjectilesByType[type].usesLocalNPCImmunity)
+				{
+					//check if uses local because of some other mod
+					damage *= 3;//compensate for static/global immunity because relogic is STUPID
+				}
+			}
+			else
+			{
+				type = ModContent.ProjectileType<Projectiles.ChargedArrowProj>();
+				damage = (int)(damage * (3f/5f) * 1.2f);
+				velocity *= 1.2f;
+			}
         }
 		public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
 			Vector2 projshoot = Main.MouseWorld - player.Center;
 			projshoot.Normalize();
-
-            //shoot two extra arrows
-
-            Projectile.NewProjectile(source, position, velocity.RotatedBy(MathHelper.ToRadians(10)), type, damage, knockback, Item.playerIndexTheItemIsReservedFor);
-            Projectile.NewProjectile(source, position, velocity.RotatedBy(MathHelper.ToRadians(-10)), type, damage, knockback, Item.playerIndexTheItemIsReservedFor);
-
-			//extra extra arrows
-            if (type == ModContent.ProjectileType<Projectiles.ChargedArrowProj>())
-			{
-                Projectile.NewProjectile(source, position, velocity.RotatedBy(MathHelper.ToRadians(20)), type, damage, knockback, Item.playerIndexTheItemIsReservedFor);
-                Projectile.NewProjectile(source, position, velocity.RotatedBy(MathHelper.ToRadians(-20)), type, damage, knockback, Item.playerIndexTheItemIsReservedFor);
+            bool useChargedArrows = type == ModContent.ProjectileType<Projectiles.ChargedArrowProj>();
+            int arrowCount = useChargedArrows ? 5 : 3;
+            float totalSpread = 0.2f;
+            for (int i = 0; i < arrowCount; i++)
+            {
+                float angle = Utils.Remap(i, 0, arrowCount - 1, -totalSpread / 2f, totalSpread / 2f);
+                Vector2 vel = velocity.RotatedBy(angle);
+                Projectile.NewProjectile(source, position, vel, type, damage, knockback, Item.playerIndexTheItemIsReservedFor);
             }
-            velocity.X = projshoot.X;
-			velocity.Y = projshoot.Y;
-			return true;
+			return false;
 		}
 
 		public override void AddRecipes()

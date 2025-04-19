@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework;
-using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -25,7 +24,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 128;
+			Item.damage = 200;
 			Item.DamageType = DamageClass.Melee/* tModPorter Suggestion: Consider MeleeNoSpeed for no attack speed scaling */;
 			Item.width = 40; //make it half to make world hitbox better
 			Item.height = 40; //make it half to make world hitbox better
@@ -46,7 +45,7 @@ namespace KirboMod.Items.Weapons
 			KirbPlayer kplr = player.GetModPlayer<KirbPlayer>();
 			if (kplr.RightClicking & player.ItemTimeIsZero) //holding up & not attacking
 			{
-				if(++kplr.hammerCharge >= chargeNeededForTornado)
+				if(++kplr.hammerCharge >= chargeNeededForTornado / player.GetWeaponAttackSpeed(Item))
 				{
 					kplr.hammerCharge = chargeNeededForTornado;
 					for (int i = 0; i < 5; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop

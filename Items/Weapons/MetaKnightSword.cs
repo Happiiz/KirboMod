@@ -22,20 +22,20 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults() 
 		{
-			Item.damage = 107;
+			Item.damage = 85;
 			Item.DamageType = DamageClass.Melee;
 			Item.width = 40;
 			Item.height = 40;
-			Item.useTime = 10;
-			Item.useAnimation = 10;
+			Item.useTime = 17;
+			Item.useAnimation = 17;
 			Item.useStyle = ItemUseStyleID.Swing;
-			Item.knockBack = 6;
+			Item.knockBack = 7f;
 			Item.value = Item.buyPrice(0, 5, 50, 0);
 			Item.rare = ItemRarityID.Yellow;
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<CresentSlash>();
-			Item.shootSpeed = 100f;
+			Item.shootSpeed = 80f;
 			Item.shootsEveryUse = true;
 			Item.noMelee = true; //no melee hitbox
 		}

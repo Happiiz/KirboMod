@@ -21,27 +21,27 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 10;
+			Item.damage = 11;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 32;
 			Item.height = 40;
-			Item.useTime = 5;
-			Item.useAnimation = Item.useTime * 5;
+			Item.useTime = 13;
+			Item.useAnimation = Item.useTime;
             Item.useStyle = ItemUseStyleID.Shoot;
-			Item.knockBack = 0.1f;
+			Item.knockBack = 2f;
 			Item.value = Item.buyPrice(0, 0, 4, 0);
 			Item.rare = ItemRarityID.Green;
 			Item.UseSound = SoundID.Item24; //spectre boots
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.IceIce>();
 			Item.shootSpeed = 16f;
-			Item.mana = 3;
+			Item.mana = 14;
         }
 
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {
-            Vector2 rotationoffset = new Vector2(velocity.X, velocity.Y).RotatedByRandom(MathHelper.ToRadians(30)); //30 degree spread for dusts
+            Vector2 rotationoffset = new Vector2(velocity.X, velocity.Y).RotatedByRandom(MathHelper.ToRadians(20)); //20 degree spread for dusts
 
             velocity = velocity.RotatedByRandom(MathHelper.ToRadians(30)); //30 degree spread for proj too
 

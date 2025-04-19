@@ -19,9 +19,9 @@ namespace KirboMod.Projectiles
 			Projectile.height = 20;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Magic;
-			Projectile.timeLeft = 60; //seconds = timeLeft - extraUpdates / 60
+			Projectile.timeLeft = 100; //seconds = timeLeft - extraUpdates / 60
 			Projectile.tileCollide = false; //initally
-			Projectile.penetrate = -1;
+			Projectile.penetrate = 1;
 			Projectile.scale = 1f;
 			Projectile.ignoreWater = true;
 
@@ -29,7 +29,7 @@ namespace KirboMod.Projectiles
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = 10; //regular npc immunity
 
-			Projectile.extraUpdates = 20; //cycle through code multiple times in one tick
+			Projectile.extraUpdates = 100; //cycle through code multiple times in one tick
 		}
 		public override void AI()
 		{
@@ -63,7 +63,7 @@ namespace KirboMod.Projectiles
 
         public override void OnKill(int timeLeft)
         {
-			for (int i = 0; i < 15; i++)
+			for (int i = 0; i < 9; i++)
 			{
 				Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
 				Dust d = Dust.NewDustPerfect(Projectile.Center, ModContent.DustType<Dusts.RainbowSparkle>(), speed, Scale: 1f); //Makes dust in a messy circle

@@ -1,4 +1,5 @@
 using KirboMod.NPCs;
+using KirboMod.NPCs.DarkMatter;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -28,7 +29,8 @@ namespace KirboMod.Projectiles
 			Projectile.tileCollide = false;
 			Projectile.penetrate = 1;
 		}
-		float Scale { get => Utils.GetLerpValue(0, 20, Projectile.ai[0], true); }
+		static int TimeBeforeShoot => 37;
+		float Scale { get => Utils.GetLerpValue(0, TimeBeforeShoot - 10, Projectile.ai[0], true); }
 		bool Predictive { get => Projectile.ai[2] == 1; }
 		public override void AI()
 		{
@@ -44,9 +46,9 @@ namespace KirboMod.Projectiles
             Projectile.ai[0]++;
 			Projectile.scale = Easings.EaseInOutSine(Scale);
 			float shootSpeed = 30;
-			if (Projectile.ai[0] == 30) //Start hurtin'
+			if (Projectile.ai[0] == TimeBeforeShoot) //Start hurtin'
             {
-				SoundEngine.PlaySound(SoundID.Item117, Projectile.Center); //conjure arcanum sfx
+				SoundEngine.PlaySound(DarkMatter.OrbShoot, Projectile.Center); 
 
 				Vector2 move = (player.Center + player.velocity * 10) - Projectile.Center; //aims ahead of player
 				if (Predictive)

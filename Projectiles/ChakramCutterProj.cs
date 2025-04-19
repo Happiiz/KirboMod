@@ -28,15 +28,18 @@ namespace KirboMod.Projectiles
 			Projectile.timeLeft = 3600; //1 minute
 			Projectile.tileCollide = true;
 			Projectile.penetrate = -1;
-			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.extraUpdates = 2;
 			Projectile.alpha = 255;
 			Projectile.usesLocalNPCImmunity = true; //doesn't wait for other projectiles to hit again
-			Projectile.localNPCHitCooldown = 10; //time until able to hit npc even if npc has just been struck
+			Projectile.localNPCHitCooldown = 40; //time until able to hit npc even if npc has just been struck
 		}
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
 			return Projectile.ai[0] >= 0 && (Helper.CheckCircleCollision(targetHitbox, Projectile.Center, 35) || Helper.CheckCircleCollision(targetHitbox, Projectile.oldPos[0] + Projectile.Size / 2, 35));
+        }
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+			Projectile.damage = (int)(Projectile.damage * 0.7);
         }
         public override bool PreAI()
         {

@@ -28,7 +28,7 @@ namespace KirboMod.Projectiles
 			Projectile.tileCollide = true;
 			Projectile.penetrate = -1; //infinity
 			Projectile.usesLocalNPCImmunity = true; //doesn't wait for other projectiles to hit again
-			Projectile.localNPCHitCooldown = 5; //time until able to hit npc even if npc has just been struck
+			Projectile.localNPCHitCooldown = 12; //time until able to hit npc even if npc has just been struck
 		}
 
 		public override void AI()
@@ -38,7 +38,8 @@ namespace KirboMod.Projectiles
 			//gravity
 			if (flattening == false) //not bouncing
 			{
-				Projectile.velocity.Y += 0.5f;
+				
+				Projectile.velocity.Y += 0.4f;
 				if (Projectile.velocity.Y > 60)
 				{
 					Projectile.velocity.Y = 60;
@@ -92,7 +93,6 @@ namespace KirboMod.Projectiles
                 olderVelocity.X = oldVelocity.X;
                 bounces++; //go up by 1
                 Projectile.ai[0]++; //increase by 1
-
                 SoundEngine.PlaySound(SoundID.Item10, Projectile.position); //impact
             }
 

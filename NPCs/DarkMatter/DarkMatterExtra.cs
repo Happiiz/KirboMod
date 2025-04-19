@@ -9,6 +9,7 @@ using KirboMod.Bestiary;
 using KirboMod.Systems;
 using System.IO;
 using Terraria.DataStructures;
+using Terraria.Audio;
 
 namespace KirboMod.NPCs.DarkMatter
 {
@@ -19,8 +20,11 @@ namespace KirboMod.NPCs.DarkMatter
             DarkBeams,//1
             Dash,//2
             Orbs,//3
-        }
-
+        }                                                                                                  
+        public static SoundStyle OrbCharge => new SoundStyle("KirboMod/Sounds/NPC/DarkMatter/DarkMatterSwordsmanSwordBallCharge2") with { MaxInstances = 0 };
+        public static SoundStyle DarkBeamShoot => new SoundStyle("KirboMod/Sounds/NPC/DarkMatter/DarkMatterSwordsmanBeam");
+        public static SoundStyle OrbShoot => new SoundStyle("KirboMod/Sounds/NPC/DarkMatter/DarkMatterSwordsmanSwordBallThrow2") with { MaxInstances = 0, Volume = 1.6f };
+        //public static SoundStyle 
         public override void SetStaticDefaults()
         {
             // DisplayName.SetDefault("Dark Matter");
@@ -177,6 +181,14 @@ namespace KirboMod.NPCs.DarkMatter
             // add the rules
             npcLoot.Add(notExpertRule);
             npcLoot.Add(masterMode);
+        }
+        public static void PlayBallChargeSoundEffect(Vector2 pos)
+        {
+            SoundEngine.PlaySound(OrbCharge, pos);
+        }
+        void PlayBallChargeSoundEffect()
+        {
+            SoundEngine.PlaySound(OrbCharge, NPC.Center);
         }
     }
 }

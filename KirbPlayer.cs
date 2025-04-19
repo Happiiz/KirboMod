@@ -47,7 +47,12 @@ namespace KirboMod
 
         public int fighterComboCounter = 0; //combo Counter to determine strength of uppercut in regular fighter glove
         public const int MaxFighterComboCounter = 100;
-
+        public byte fighterKickAndUppercutTimer = 0;//initialize this stuff on spawn of the projectile
+        public byte fighterKickAndUppercutType;
+        public const byte KickAndUppercutIDFighterGloveUppercut = 0;
+        public const byte KickAndUppercutIDHardenedFighterUppercut = 1;
+        public const byte KickAndUppercutIDMetalFighterUppercut = 2;
+        public const byte KickAndUppercutIDMetalFighterKick = 3;
         public bool airWalkerSet = false;
         public bool airWalkerJump = false;
         public bool blockAirWalkerJump = false;
@@ -93,6 +98,7 @@ namespace KirboMod
         public int finalCutterAnimationCounter = 0;
         public int finalCutterDamageCounter = 0;//should cap out at 5
         public List<int> currentFinalCutterTargets = new();
+
 
         public override void ResetEffects() //restart accesory stats so if not wearing one then it stops doing the effects
         {
@@ -246,7 +252,10 @@ namespace KirboMod
             UpdateRightClicksArray();
             UpdateFinalCutter();
         }
-
+        public override void PreUpdateMovement()
+        {
+            UpdateFighterManeuvers();
+        }
         private void UpdateRightClicksArray()
         {
             if (Main.netMode == NetmodeID.SinglePlayer)
@@ -668,11 +677,11 @@ namespace KirboMod
         {
             plasmaCharge += changeAmount;
             plasmaChargeDecayTimer = 0;
-            if(plasmaCharge > 20)
+            if (plasmaCharge > 20)
             {
                 plasmaCharge = 20;
             }
-            if(plasmaCharge < 0)
+            if (plasmaCharge < 0)
             {
                 plasmaCharge = 0;
             }
@@ -866,10 +875,6 @@ namespace KirboMod
                 }
             }
         }
-        public override void OnHitByProjectile(Projectile proj, Player.HurtInfo hurtInfo)
-        {
-
-        }
         public override void OnHurt(Player.HurtInfo info)
         {
             if (whispbush && Player.whoAmI == Main.myPlayer)
@@ -977,7 +982,48 @@ namespace KirboMod
         {
             Photonic0BootsDrawLayer.ModifyDrawInfo(ref drawInfo);
         }
+        public void StartMetalFighterKick()
+        {
+            MetalKick kick = (MetalKick)ContentSamples.ProjectilesByType[ModContent.ProjectileType<MetalKick>()].ModProjectile;
+            fighterKickAndUppercutTimer = (byte)kick.AnimationDuration;
+        }
+        public void UpdateFighterManeuvers()
+        {
+            if (fighterKickAndUppercutTimer > 0)
+            {
+                switch (fighterKickAndUppercutType)
+                {
+                    case KickAndUppercutIDFighterGloveUppercut:
+                        break;
+                    case KickAndUppercutIDHardenedFighterUppercut:
+                        break;
+                       
+                    case KickAndUppercutIDMetalFighterUppercut:
+                        UpdateMetalUppercut();
+                        break;
+                    case KickAndUppercutIDMetalFighterKick:
+                        UpdateMetalKick();
+                        break;
+                    default:
+                        break;
+                }
+                fighterKickAndUppercutTimer--;
+            }
+        }
 
+        private void UpdateMetalUppercut()
+        {
+        }
+        public void TriggerMetalKick()
+        {
+            fighterKickAndUppercutTimer = (byte)MetalKick.SampleInstance.AnimationDuration;
+            fighterKickAndUppercutType = KickAndUppercutIDMetalFighterKick;
+        }
+        public void UpdateMetalKick()
+        {
+            Player.mount.Dismount(Player);
+            Player.velocity = MetalKick.GetSpeed(Player, Player.velocity.Y == 0, MetalKick.SampleInstance, fighterKickAndUppercutTimer);
+        }
         public static void IncreaseComboCounter(int owner)
         {
             Main.player[owner].GetModPlayer<KirbPlayer>().fighterComboCounter++;

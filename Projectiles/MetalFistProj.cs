@@ -1,43 +1,44 @@
 using Microsoft.Xna.Framework;
-using System;
 using Terraria;
-using Terraria.ID;
+using Terraria.GameContent.Creative;
 using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles
 {
-	public class MetalFistProj : ModProjectile
-	{
-		public override void SetStaticDefaults()
-		{ 
-
-		}
-
-		public override void SetDefaults()
-		{
-			Projectile.width = 40;
-			Projectile.height = 40;
-			Projectile.friendly = true;
-			Projectile.timeLeft = 7;
-			Projectile.tileCollide = false;
-			Projectile.penetrate = -1;
-			Projectile.DamageType = DamageClass.Melee;
-			Projectile.usesLocalNPCImmunity = true; //uses own immunity frames
-			Projectile.localNPCHitCooldown = 7; //time before hit again
+    public class MetalFistProj : ModProjectile
+    {
+        public override void SetStaticDefaults()
+        {
+        }
+        public static int MaxPenetrate => 5;
+        public override void SetDefaults()
+        {
+            Projectile.width = 40;
+            Projectile.height = 40;
+            Projectile.friendly = true;
+            Projectile.timeLeft = 7;
+            Projectile.extraUpdates = 1;
+            Projectile.tileCollide = false;
+            Projectile.penetrate = MaxPenetrate;
+            Projectile.DamageType = DamageClass.Melee;
+            Projectile.usesLocalNPCImmunity = true; //uses own immunity frames
+            Projectile.localNPCHitCooldown = 7; //time before hit again
             Projectile.ownerHitCheck = true;
             Projectile.alpha = 30;
-		}
+        }
 
-		public override void AI()
-		{
+        public override void AI()
+        {
             Projectile.rotation = Projectile.velocity.ToRotation();
-		}
-		public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
-		{
-			Player player = Main.player[Projectile.owner];
-
-			player.GetModPlayer<KirbPlayer>().fighterComboCounter += 1;
-		}
+        }
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            if (Projectile.penetrate == MaxPenetrate)
+            {
+                KirbPlayer.IncreaseComboCounter(Projectile.owner);
+            }
+            Projectile.damage = (int)(Projectile.damage * 0.7f);
+        }
 
         public override Color? GetAlpha(Color lightColor)
         {
@@ -49,13 +50,13 @@ namespace KirboMod.Projectiles
             Player player = Main.player[Projectile.owner];
 
             if (Collision.CanHit(player, Projectile))
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
