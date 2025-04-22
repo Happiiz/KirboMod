@@ -11,6 +11,7 @@ namespace KirboMod.Projectiles
             Projectile.friendly = true;
             Projectile.tileCollide = true; //make collide
             Projectile.width = Projectile.height = 16;
+            Projectile.penetrate = 1;
         }
     }
 }

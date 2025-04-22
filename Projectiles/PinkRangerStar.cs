@@ -47,20 +47,21 @@ namespace KirboMod.Projectiles
 
         public override void OnKill(int timeLeft) //when the projectile dies
         {
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 5; i++)
             {
-                Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-                Dust.NewDustPerfect(Projectile.Center + Projectile.velocity, DustID.Enchanted_Pink, speed, Scale: 1f); //Makes dust in a messy circle
-            }
-            for (int i = 0; i < 10; i++)
-            {
-                Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-                Dust.NewDustPerfect(Projectile.Center + Projectile.velocity, DustID.Confetti_Pink, speed, Scale: 1f); //Makes dust in a messy circle
+                Vector2 speed = Main.rand.BetterNextVector2Circular(5f); //circle
+                Dust.NewDustPerfect(Projectile.Center, DustID.Enchanted_Pink, speed, Scale: 1.3f); //Makes dust in a messy circle
             }
             for (int i = 0; i < 5; i++)
             {
-                Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-                Gore.NewGorePerfect(Projectile.GetSource_FromAI(), Projectile.Center, speed, Main.rand.Next(16, 18));
+                Vector2 speed = Main.rand.BetterNextVector2Circular(5f); //circle
+                Dust.NewDustPerfect(Projectile.Center, DustID.Confetti_Pink, speed, Scale: 1.6f); //Makes dust in a messy circle
+            }
+            for (int i = 0; i < 5; i++)
+            {
+                Vector2 speed = Main.rand.BetterNextVector2Circular(5f); //circle
+                Gore gore = Gore.NewGorePerfect(Projectile.GetSource_FromAI(), Projectile.Center, speed, Main.rand.Next(16, 18), 1f);
+				gore.scale = 1.5f;
             }
         }
 

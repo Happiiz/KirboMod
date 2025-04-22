@@ -20,7 +20,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 22;
+			Item.damage = 23;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 19;
@@ -40,10 +40,10 @@ namespace KirboMod.Items.Weapons
 
 		public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
 		{
-            position.Y = player.Center.Y - 10;
-            position.X = player.Center.X + 10;
+			position.Y -= 14;
+			position.X += player.direction * 14;
 
-			velocity = velocity.RotatedByRandom(MathHelper.ToRadians(60));
+			velocity = velocity.RotatedByRandom(1f);
 
 			velocity *= Main.rand.NextFloat(0.75f, 1.25f); //increase speed by a random amount
         }

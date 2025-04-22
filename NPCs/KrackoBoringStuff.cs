@@ -29,6 +29,7 @@ namespace KirboMod.NPCs
 			Lightning//4
         }
 
+		public static SoundStyle ElecOrbsSFX = new SoundStyle("KirboMod/Sounds/NPC/Kracko/KrackoElecOrbs").WithVolumeScale(0.3f);
 		public override void FindFrame(int frameHeight) // animation
 		{
 			if (animation == 0) //slow

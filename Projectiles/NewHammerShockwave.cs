@@ -1,4 +1,3 @@
-using Microsoft.CodeAnalysis;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -25,12 +24,15 @@ namespace KirboMod.Projectiles
 			Projectile.timeLeft = 180;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
-			Projectile.usesIDStaticNPCImmunity = true; //all projectiles of type share cooldown
-			Projectile.idStaticNPCHitCooldown = 10; //time until all projectiles of type can hit npc
+			Projectile.usesLocalNPCImmunity = true; //all projectiles of type share cooldown
+			Projectile.localNPCHitCooldown = 30; //time until all projectiles of type can hit npc
 			Projectile.ignoreWater = true; //doesn't confine to water physics for it is on a higher realm of existance
 		}
-
-		public override bool? CanCutTiles()
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            Projectile.damage = (int)(Projectile.damage * 0.5f);
+        }
+        public override bool? CanCutTiles()
 		{
 			return false; //can't break pots/grass/etc
 		}
@@ -69,7 +71,8 @@ namespace KirboMod.Projectiles
                     break;
                 }
             }
-
+            Dust.NewDustPerfect(Projectile.Top + new Vector2(Projectile.width / 2 * Projectile.direction, + 46), DustID.Electric, Vector2.UnitY * -Projectile.velocity.Length()).noGravity = true;
+            Dust.NewDustPerfect(Projectile.Bottom + new Vector2(Projectile.width / 2 * Projectile.direction, - 46), DustID.Electric, Vector2.UnitY * Projectile.velocity.Length()).noGravity = true;
             if (Projectile.ai[0] % 2 == 0)
             {
                 int dust = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Electric, 

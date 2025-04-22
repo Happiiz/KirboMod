@@ -33,11 +33,11 @@ namespace KirboMod.Projectiles
 
 			Projectile.spriteDirection = Projectile.direction; //look
 
-			//death
-			if (player.itemTime == 1)
+			if (Projectile.localAI[0] > Projectile.ai[0])
 			{
 				Projectile.Kill();
 			}
-		}
-	}
+            Projectile.localAI[0]++;
+        }
+    }
 }

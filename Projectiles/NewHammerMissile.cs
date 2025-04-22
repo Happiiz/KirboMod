@@ -30,6 +30,7 @@ namespace KirboMod.Projectiles
 		}
         int TargetIndex { get => (int)Projectile.ai[0]; set => Projectile.ai[0] = value; }
         ref float InitialVelLength { get => ref Projectile.ai[1]; }
+        int  NPCToNotHit { get => (int)Projectile.localAI[2]; set => Projectile.localAI[2] = value; }
         public override void AI()
         {
             if (Projectile.localAI[0] == 0)
@@ -38,6 +39,7 @@ namespace KirboMod.Projectiles
                 InitialVelLength = Projectile.velocity.Length();
                 TargetIndex = -1;
                 Projectile.localAI[0]++;
+                NPCToNotHit = -1;
             }
             float rangeSQ = 1500 * 1500;
             if (!Helper.ValidIndexedTarget(TargetIndex, Projectile, out _))
@@ -61,7 +63,7 @@ namespace KirboMod.Projectiles
             if (Helper.ValidIndexedTarget(TargetIndex, Projectile, out NPC target))
             {
                 Projectile.localAI[0]++;
-                float homingStrength = Helper.RemapEased(Projectile.localAI[0], 1, 20, 0, .01f, Easings.EaseInOutSine);
+                float homingStrength = Helper.RemapEased(Projectile.localAI[0], 1, 20, 0, .1f, Easings.EaseInOutSine);
                 Projectile.velocity = Vector2.Lerp(Projectile.velocity, Vector2.Normalize(target.Center - Projectile.Center) * InitialVelLength, homingStrength);
             }
             Projectile.rotation = Projectile.velocity.ToRotation();
@@ -81,9 +83,23 @@ namespace KirboMod.Projectiles
             Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, null, Color.White, Projectile.rotation, origin, Projectile.scale, fx);
             return false;
         }
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            if (Projectile.penetrate == 1)
+            {
+                NPCToNotHit = target.whoAmI;             
+            }
+        }
+        public override bool? CanHitNPC(NPC target)
+        {
+            return target.whoAmI != NPCToNotHit;
+        }
         public override void OnKill(int timeLeft) //when the projectile dies
         {
-			for (int i = 0; i < 10; i++)
+            Projectile.Hitbox = Utils.CenteredRectangle(Projectile.Center, new Vector2(100));
+            Projectile.Damage();
+            Helper.DustExplosion(Projectile, DustID.Torch, false, 0.03f);
+            for (int i = 0; i < 10; i++)
 			{
 				Vector2 speed = RandomInCircle(4);
 				Dust.NewDustPerfect(Projectile.Center + RandomInCircle(10), DustID.Smoke, speed, Scale: 2f); //Makes dust in a messy circle

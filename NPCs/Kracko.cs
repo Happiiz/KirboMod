@@ -291,9 +291,10 @@ namespace KirboMod.NPCs
             if (NPC.ai[0] >= beamStart && NPC.ai[0] < beamEnd) //120 ticks 
             {
                 SpawnBeam(numberOfBeamsPerSpiral, beamStart);
-                if (NPC.ai[0] == beamStart || (NPC.ai[0] - beamStart) % 34 == 0)// 34 is sound length
+                if (NPC.ai[0] == beamStart/* || (NPC.ai[0] - beamStart) % 34 == 0*/)// 34 is sound length
                 {
-                    SoundEngine.PlaySound(SoundID.Item93 with { MaxInstances = 0 }, NPC.Center);
+                    SoundEngine.PlaySound(ElecOrbsSFX with { Volume = .4f}, NPC.Center);
+                    //SoundEngine.PlaySound(SoundID.Item93 with { MaxInstances = 0 }, NPC.Center);
                 }
             }
             return beamEnd;

@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
+using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
@@ -21,7 +22,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 55;
+			Item.damage = 47;
 			Item.DamageType = DamageClass.Ranged;
 			Item.noMelee = true;
 			Item.width = 70;
@@ -33,10 +34,9 @@ namespace KirboMod.Items.Weapons
 			Item.knockBack = 10;
             Item.value = Item.buyPrice(0, 0, 45, 0);
             Item.rare = ItemRarityID.LightRed;
-			Item.UseSound = SoundID.Item11; //basic gun shot
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.RangerStar>();
-			Item.shootSpeed = 12f;
+			Item.shootSpeed = 18f;
 			Item.useAmmo = AmmoID.Bullet;
 		}
 
@@ -52,13 +52,14 @@ namespace KirboMod.Items.Weapons
 
 		public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
+			SoundEngine.PlaySound(SoundID.Item14 with { Pitch = 1f, MaxInstances = 0 }, position);
 			if (type != ModContent.ProjectileType<Projectiles.StarBulletProj>()) //if not star bullet
 			{
 				return true;
 			}
 			else //multi ranger star
             {
-				Projectile.NewProjectile(source, position, velocity * 2, ModContent.ProjectileType<Projectiles.PinkRangerStar>(), damage, 10, player.whoAmI, 0, 0);
+				Projectile.NewProjectile(source, position, velocity * 1.4f, ModContent.ProjectileType<Projectiles.PinkRangerStar>(), damage, 10, player.whoAmI, 0, 0);
 				return false;
 			}
 		}

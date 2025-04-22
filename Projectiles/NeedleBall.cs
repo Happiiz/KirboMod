@@ -15,38 +15,48 @@ namespace KirboMod.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 62;
-			Projectile.height = 62;
+			Projectile.width = Projectile.height = 56;
+            DrawOriginOffsetX = DrawOriginOffsetY = -2;
 			Projectile.friendly = true;
 			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.timeLeft = 300;
 			Projectile.tileCollide = true;
-			Projectile.penetrate = -1;
+			Projectile.penetrate = 7;
             Projectile.usesLocalNPCImmunity = true;
-            Projectile.localNPCHitCooldown = 10;
+            Projectile.localNPCHitCooldown = 30;
         }
 		public override void AI()
-		{
-			//Gravity
-			Projectile.velocity.Y = Projectile.velocity.Y + 0.4f;
-			if (Projectile.velocity.Y >= 12f)
+        {
+            RandomizeRotationOnStartup();
+            //Gravity
+            Projectile.velocity.Y = Projectile.velocity.Y + 0.4f;
+            if (Projectile.velocity.Y >= 12f)
             {
-				Projectile.velocity.Y = 12f;
+                Projectile.velocity.Y = 12f;
             }
 
             //Rotation
             Projectile.rotation += Projectile.velocity.X * 0.02f;
 
             if (Projectile.velocity.Y == 0)
-			{
-				Projectile.velocity.X *= 0.992f; //slow down
-			}
+            {
+                Projectile.velocity.X *= 0.992f; //slow down
+            }
 
-			//for stepping up tiles
-			float stepspeed = Projectile.velocity.X * 0.005f;
-			float localgfxOffY = 0f;
-			Collision.StepUp(ref Projectile.position, ref Projectile.velocity, Projectile.width, Projectile.height, ref stepspeed, ref localgfxOffY);
-		}
+            //for stepping up tiles
+            float stepspeed = Projectile.velocity.X * 0.005f;
+            float localgfxOffY = 0f;
+            Collision.StepUp(ref Projectile.position, ref Projectile.velocity, Projectile.width, Projectile.height, ref stepspeed, ref localgfxOffY);
+        }
+
+        private void RandomizeRotationOnStartup()
+        {
+            if (Projectile.localAI[0] == 0)
+            {
+                Projectile.rotation = MathF.Tau * Main.rand.NextFloat();
+                Projectile.localAI[0] = 1;
+            }
+        }
 
         public override void OnKill(int timeLeft) //when the projectile dies
         {

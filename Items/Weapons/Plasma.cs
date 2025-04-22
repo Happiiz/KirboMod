@@ -26,7 +26,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 25;
+			Item.damage = 42;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 34;
@@ -78,7 +78,7 @@ namespace KirboMod.Items.Weapons
         }
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
 		{
-			float timeToPressKey = 16;
+			float timeToPressKey = 10;
 			float chargeBonus = 1;
 			float chargeFromShot = player.GetModPlayer<KirbPlayer>().PlasmaCharge;
             if (chargeFromShot < 3)

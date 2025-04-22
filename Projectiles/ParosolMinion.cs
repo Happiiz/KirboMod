@@ -98,7 +98,7 @@ namespace KirboMod.Projectiles
 			}
 
             //Gravity
-            if (spaceJumping == false)
+            if (spaceJumping == false && !attacking)
             {
                 Projectile.velocity.Y += 0.7f;
                 if (Projectile.velocity.Y >= 10f)
@@ -134,7 +134,7 @@ namespace KirboMod.Projectiles
 			}
 
             //MANUAL TARGETING
-            if (aggroTarget == null || !aggroTarget.active || aggroTarget.dontTakeDamage) //search target
+            if (aggroTarget == null || !aggroTarget.CanBeChasedBy()) //search target
             {
                 //start each number with a very big number so they can't be targeted if their npc doesn't exist
                 Targetdistances = Enumerable.Repeat(999999f, Main.maxNPCs).ToList();
@@ -196,7 +196,7 @@ namespace KirboMod.Projectiles
             {
                 Attack();
             }
-            else if (aggroTarget != null && aggroTarget.active && !aggroTarget.dontTakeDamage) //ATTACK
+            else if (aggroTarget != null && aggroTarget.CanBeChasedBy()) //ATTACK
             {
 				Vector2 direction = aggroTarget.Center - Projectile.Center; //start - end
                 Vector2 absDirection = new Vector2(Math.Abs(direction.X), Math.Abs(direction.Y));
@@ -210,7 +210,7 @@ namespace KirboMod.Projectiles
 
                 //attack (if close enough to target center, touching target hitbox or already attacking)
 
-                if (inEnemyRangeX && absDirection.Y < 30f || aggroTarget.Hitbox.Intersects(Projectile.Hitbox) || attack > 0 & spaceJumping == false) 
+                if (inEnemyRangeX && absDirection.Y < 150f || aggroTarget.Hitbox.Intersects(Projectile.Hitbox) || attack > 0 & spaceJumping == false) 
 				{
                     attacking = true;
                 }
@@ -413,7 +413,6 @@ namespace KirboMod.Projectiles
 
         private void Attack()
         {
-			Projectile.velocity.X *= 0.8f;
 			attack++;
 			if (attack == 3)
 			{
@@ -439,11 +438,22 @@ namespace KirboMod.Projectiles
                 attacking = false;
                 attack = 0;
 			}
-		}
+            if (aggroTarget == null || !aggroTarget.CanBeChasedBy())
+            {
+                Projectile.velocity.X *= 0.8f;
+                return;
+            }
+            Vector2 deltaPos = aggroTarget.Center - Projectile.Center;
+            int dirSign = MathF.Sign(deltaPos.X);
+            Vector2 targetPos = aggroTarget.Center;
+            targetPos -= new Vector2(dirSign * 46).RotatedBy((Projectile.identity * 0.1f) % 1);
+            Projectile.spriteDirection = dirSign;
+            Projectile.velocity = Vector2.Lerp(Vector2.Normalize(targetPos - Projectile.Center) * 15f, Projectile.velocity, 0.95f);
+        }
 
         private void Jump()
         {
-            Projectile.velocity.Y = -10f; //velocityY boosts up 
+            Projectile.velocity.Y = -15; //velocityY boosts up 
             jumpTimer = 15;
             Projectile.frame = 12;
         }

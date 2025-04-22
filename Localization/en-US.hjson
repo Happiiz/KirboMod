@@ -950,10 +950,11 @@ Mods: {
 			}
 
 			NewHammer: {
-				DisplayName: Ham-O-Matic
+				DisplayName: Brand-New Dedede Hammer
 				Tooltip:
 					'''
-					Swing on the ground to cause shockwaves and right click to fire missiles
+					Swing on the ground to cause shockwaves and right click to fire homing missiles
+					Shockwaves deal 2x damage, missiles deal 4.5x damage
 					'Now with 2x the clobbering power!'
 					'''
 			}
