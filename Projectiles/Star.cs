@@ -26,12 +26,17 @@ namespace KirboMod.Projectiles
 			Projectile.tileCollide = true;
 			Projectile.penetrate = -1;
 			Projectile.usesLocalNPCImmunity = true;
-			Projectile.localNPCHitCooldown = 10;
+			Projectile.localNPCHitCooldown = 30;
 			Projectile.scale = 1f;
 			Projectile.alpha = 255;
 		}
 		public override void AI()
 		{
+			if (Projectile.localAI[0] == 0)
+			{
+				Projectile.rotation = Main.rand.NextFloat(MathF.Tau);
+				Projectile.localAI[0] = 1;
+			}
 			Lighting.AddLight(Projectile.Center, 0.8f, 0.8f, 0f); //yellow light half of a torch
 			Projectile.Opacity += 0.1f;
 

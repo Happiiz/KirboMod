@@ -88,7 +88,7 @@ namespace KirboMod.NPCs
                 }
                 else //only forest
                 {
-                    return spawnInfo.SpawnTileType == TileID.Stone || spawnInfo.SpawnTileType == TileID.Dirt ? .03f : 0f; //functions like a mini if else statement
+                    return spawnInfo.SpawnTileType == TileID.Stone || spawnInfo.SpawnTileType == TileID.Dirt ? .015f : 0f; //functions like a mini if else statement
                 }
             }
             else
@@ -488,8 +488,8 @@ namespace KirboMod.NPCs
 
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
-            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<Items.Weapons.FighterGlove>(), 20, 10)); // 1 in 20 (5%) chance in Normal. 1 in 10 (10%) chance in Expert
-            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Starbit>(), 1, 2, 4));
+            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<Items.Weapons.FighterGlove>(), 10, 5));
+            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Starbit>(), 1, 4, 8));
         }
 
         public override void HitEffect(NPC.HitInfo hit)

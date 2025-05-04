@@ -1,9 +1,5 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
 using Terraria;
-using Terraria.GameContent;
-using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles.Lightnings
@@ -24,11 +20,14 @@ namespace KirboMod.Projectiles.Lightnings
             Projectile.tileCollide = true;
             Projectile.DamageType = DamageClass.Summon;
             Projectile.ArmorPenetration = 30;
-            SetAmountOfLightingSegments(7, Projectile.type);
+            SetAmountOfLightingSegments(5, Projectile.type);
+            Projectile.usesLocalNPCImmunity = true;
+            maxDeviation = 80;
+            Projectile.localNPCHitCooldown = 30 * Projectile.MaxUpdates;
         }
         float OpacityFunction(float progress)
         {
-            return 1;
+            return Utils.GetLerpValue(0, .6f, progress);
         }
     }
 }

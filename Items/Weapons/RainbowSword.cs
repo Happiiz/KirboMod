@@ -63,7 +63,7 @@ namespace KirboMod.Items.RainbowSword
         public override void SetDefaults()
 		{
 			ItemID.Sets.ItemNoGravity[Type] = false;
-			Item.damage = 340;//it has a relatively slow base use time so this compensates(+ also shorter range relatively)
+			Item.damage = 211;//it has a relatively slow base use time so this compensates(+ also shorter range relatively)
 			Item.DamageType = DamageClass.Melee; 
 			Item.width = 40;
 			Item.height = 40;

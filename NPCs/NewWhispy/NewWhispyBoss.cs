@@ -29,7 +29,7 @@ namespace KirboMod.NPCs.NewWhispy
         //splitting wind splits into a 7 armed spiral on ftw, 6 armed spiral on expert, and 5 armed spiral on classic
         public static int SplittingWindSplitCount => Main.getGoodWorld ? 7 : Main.expertMode ? 6 : 5;
         public static float SplittingWindRadius => 16 * 4f * SplittingWindSplitCount;
-        public static SoundStyle AirShotSFX => new SoundStyle("KirboMod/Sounds/Projectiles/NewWhispy/AirShot");
+        public static SoundStyle AirShotSFX => new SoundStyle("KirboMod/Sounds/Projectiles/NewWhispy/AirShot") with { Pitch = -0.8f, PitchVariance = 0.2f };
         public static SoundStyle AirShotSplitSFX => new SoundStyle("KirboMod/Sounds/Projectiles/NewWhispy/AirShotSplit");
         public static SoundStyle ObjFallSFX => (new SoundStyle("KirboMod/Sounds/Projectiles/NewWhispy/WhispyObjFall")) with { MaxInstances = 0, Volume = 0.55f, PitchVariance = 0.2f };
         public enum AIState
@@ -79,10 +79,10 @@ namespace KirboMod.NPCs.NewWhispy
             NPC.immortal = true;//for intro
             NPC.width = 272;
             NPC.height = 448-16 * 4;
-            NPC.damage = 30;
+            NPC.damage = 50;
             NPC.noTileCollide = false;
-            NPC.defense = 10;
-            NPC.lifeMax = 2500;
+            NPC.defense = 14;
+            NPC.lifeMax = 3200;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath1;
             NPC.value = 1992f; // money it drops
@@ -218,7 +218,7 @@ namespace KirboMod.NPCs.NewWhispy
         }
         void PlayAirShotSFX()
         {
-            SoundEngine.PlaySound(AirShotSFX with { Pitch = -0.8f, PitchVariance = 0.2f }, GetMouthPosition());
+            SoundEngine.PlaySound(AirShotSFX, GetMouthPosition());
         }
         public override void OnKill()
         {

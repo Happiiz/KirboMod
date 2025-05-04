@@ -15,6 +15,7 @@ namespace KirboMod.Projectiles
             Main.projFrames[Projectile.type] = 1;
         }
 
+        static int DefaultPenetrate => 4;
         public override void SetDefaults()
         {
             Projectile.width = 40;
@@ -22,10 +23,10 @@ namespace KirboMod.Projectiles
             Projectile.friendly = true;
             Projectile.timeLeft = 240;
             Projectile.tileCollide = false;
-            Projectile.penetrate = -1;
+            Projectile.penetrate = DefaultPenetrate;
             Projectile.scale = 1f;
             Projectile.usesLocalNPCImmunity = true;
-            Projectile.localNPCHitCooldown = -1;
+            Projectile.localNPCHitCooldown = 30;
             Projectile.ArmorPenetration = 40;
             Projectile.alpha = 255;
         }
@@ -67,6 +68,11 @@ namespace KirboMod.Projectiles
                 Main.dust[dustnumber].velocity *= 0.3f;
             }
             float rangeSQ = 1500 * 1500;
+            if(Projectile.penetrate != DefaultPenetrate)
+            {
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Vector2.Normalize(Projectile.velocity) * InitialVelLength, 0.1f);
+                return;
+            }
             if (!PVPStar)
             {
                 if (!Helper.ValidIndexedTarget(TargetIndex, Projectile, out _, false))

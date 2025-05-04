@@ -7,7 +7,7 @@ using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles.NewWhispy.NewWhispyWind
 {
-    internal class NewWhispySplittingWind : ModProjectile
+    public class NewWhispySplittingWind : ModProjectile
     {
         public override string Texture => "KirboMod/Projectiles/NewWhispy/NewWhispyWind/NewWhispyWindBig";
 
@@ -24,7 +24,6 @@ namespace KirboMod.Projectiles.NewWhispy.NewWhispyWind
         }
         public override void SetDefaults()
         {
-            Main.projFrames[Type] = 4;
             Projectile.width = Projectile.height = 70;
             Projectile.hostile = true;
             Projectile.timeLeft = 600;
@@ -47,7 +46,6 @@ namespace KirboMod.Projectiles.NewWhispy.NewWhispyWind
             Projectile.ai[0]--;
             if (Projectile.ai[0] < 0)
             {
-                SoundEngine.PlaySound(NewWhispyBoss.AirShotSplitSFX, Projectile.Center);
                 Projectile.Kill();
             }
         }
@@ -57,6 +55,7 @@ namespace KirboMod.Projectiles.NewWhispy.NewWhispyWind
         }
         public override void OnKill(int timeLeft)
         {
+            SoundEngine.PlaySound(NewWhispyBoss.AirShotSplitSFX, Projectile.Center);
             if (Main.netMode != NetmodeID.MultiplayerClient)
             {
                 int projCount = NewWhispyBoss.SplittingWindSplitCount;

@@ -1,3 +1,4 @@
+using KirboMod.NPCs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -10,6 +11,7 @@ namespace KirboMod.Projectiles
 {
 	public class HomingNightStar : ModProjectile
 	{
+		public static float StarShootSpeed => 25f;
 		public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Night Star");
@@ -59,9 +61,13 @@ namespace KirboMod.Projectiles
 			}
 			else if (Projectile.localAI[0] == timeBeforeLaunching)
 			{
-				Projectile.hostile = true;
+				if (Projectile.ai[2] == 0)//used for tracking which star should play the sound effect, to avoid a bunch of stars playing the same sound effect at once.
+				{
+					NightmareOrb.PlayStarThrowSFX(Projectile.Center);
+				}
+                Projectile.hostile = true;
 				move.Normalize();
-				move *= 25;
+				move *= StarShootSpeed;
 				Projectile.velocity = move; //movemove = player.Center - projectile.Center; //update player position
 			}
 		}
@@ -108,7 +114,6 @@ namespace KirboMod.Projectiles
 				}
 			}
             VFX.DrawProjWithStarryTrail(Projectile, new Color(173, 245, 255) * .15f, Color.White * .35f, default, Projectile.Opacity);
-
             return true;
 		}
 	}

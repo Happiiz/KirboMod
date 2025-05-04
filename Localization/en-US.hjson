@@ -801,6 +801,7 @@ Mods: {
 					Control a tornado by holding down the mouse
 					Splits into multiple feathers upon death
 					Drains mana while being used
+					Requires mana to be at its maximum value to start use
 					'''
 			}
 
@@ -1047,6 +1048,7 @@ Mods: {
 					Control a giant tornado by holding down the mouse
 					Leaves storm clouds and bursts of electricity 
 					Drains mana while being used
+					Requires mana to be at its maximum value to start use
 					{$CommonItemTooltip.IgnoresDefense}
 					'''
 			}
@@ -1071,6 +1073,7 @@ Mods: {
 					'''
 					Control a tornado by holding down the mouse
 					Drains mana while being used
+					Requires mana to be at its maximum value to start use
 					{$CommonItemTooltip.IgnoresDefense}
 					'''
 			}
@@ -1492,6 +1495,7 @@ Mods: {
 			NewWhispyAppleMedium.DisplayName: New Whispy Apple Medium
 			HardenedFighterUppercut.DisplayName: Hardened Fighter Uppercut
 			MetalKick.DisplayName: Metal Kick
+			NightmareOrbFirstHitShine.DisplayName: Nightmare Orb First Hit Shine
 		}
 
 		NPCs: {
@@ -1582,8 +1586,15 @@ Mods: {
 
 			ZeroEye.DisplayName: Eye of Zero
 			MidbossRift.DisplayName: Dimensional Rift
-			SuperDummy.DisplayName: Super Dummy
-			NewWhispyBoss.DisplayName: Whispy Woods
+
+			NewWhispyBoss: {
+				DisplayName: Whispy Woods
+
+				BossChecklistIntegration: {
+					SpawnInfo: Place down [i:5681] on flat terrain, and right-click it.
+					DespawnMessage: Whispy Woods blends back in with it's bretheren...
+				}
+			}
 		}
 
 		Tiles: {

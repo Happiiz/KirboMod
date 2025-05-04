@@ -1,3 +1,4 @@
+using KirboMod.NPCs;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
@@ -28,6 +29,11 @@ namespace KirboMod.Projectiles
 
 		public override void AI()
 		{
+			if(Projectile.soundDelay == 0)
+			{
+				Projectile.soundDelay = 99999;
+				NightmareWizard.PlayTeleportSoundEffect(Main.player[Projectile.owner].Center);
+			}
 			if (++Projectile.frameCounter >= 5) //changes frames every 5 ticks 
 			{
 				Projectile.frameCounter = 0;

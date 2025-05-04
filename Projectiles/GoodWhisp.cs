@@ -1,3 +1,6 @@
+using KirboMod.Items.Weapons;
+using KirboMod.NPCs.NewWhispy;
+using KirboMod.Projectiles.NewWhispy.NewWhispyWind;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
@@ -7,78 +10,47 @@ using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles
 {
-	public class GoodWhisp : ModProjectile
-	{
-		private bool collidedWithTile = false;
-		public override void SetStaticDefaults()
-		{
-			Main.projFrames[Projectile.type] = 2;
-		}
-
-		public override void SetDefaults()
-		{
-			Projectile.width = 42;
-			Projectile.height = 42;
-			DrawOffsetX = 6;
-			Projectile.friendly = true;
-			Projectile.DamageType = DamageClass.Melee;
-			Projectile.timeLeft = 180;
-			Projectile.tileCollide = true;
-			Projectile.penetrate = 1;
-		}
-
-		public override void AI()
-		{
-			Projectile.rotation = Projectile.velocity.ToRotation();
-
-			if (++Projectile.frameCounter >= 12) //changes frames every 12 ticks 
-			{
-				Projectile.frameCounter = 0;
-				if (++Projectile.frame >= Main.projFrames[Projectile.type])
-				{
-					Projectile.frame = 0;
-				}
-			}
-			if (Projectile.scale >= 1f)
-            {
-				Projectile.scale = 1f;
-            }
-		}
-
-        public override bool OnTileCollide(Vector2 oldVelocity)
+    public class GoodWhisp : NewWhispySplittingWind
+    {
+        void Split()
         {
-			for (int i = 0; i < 4; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-			{
-				Vector2 speed = -Projectile.velocity.RotatedByRandom(MathHelper.ToRadians(90));
-				speed.Normalize();
-				speed *= 5;
-				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, speed, Mod.Find<ModProjectile>("Puff").Type, Projectile.damage / 2, 2, Projectile.owner);
-			}
-			collidedWithTile = true;
-			return true; //kill proj
-		}
-
+            if (Main.myPlayer != Projectile.owner)
+                return;
+            float randOffset = Main.rand.NextFloat(MathF.Tau);
+            for (int i = 0; i < WindPipe.SplitProjCount; i++)
+            {
+                Puff.GetAIValues(i, WindPipe.SplitProjCount, WindPipe.SplitRadius, WindPipe.SplitProjDuration, out float ai0, out float ai1, out float ai2, out Vector2 velocity, randOffset);
+                Projectile.NewProjectile(Projectile.GetSource_Death(), Projectile.Center, velocity, ModContent.ProjectileType<Puff>(), Projectile.damage, Projectile.knockBack, Projectile.owner, ai0, ai1, ai2);
+            }
+        }
+        public override void SetDefaults()
+        {
+            Projectile.width = Projectile.height = 70;
+            Projectile.friendly = true;
+            Projectile.timeLeft = 600;
+            Projectile.tileCollide = false;
+            Projectile.penetrate = 1;
+            Projectile.DamageType = DamageClass.Magic;
+        }
+        public override void AI()
+        {
+            //Rectangle projHitbox = Projectile.Hitbox;
+            //for (int i = 0; i < Main.maxNPCs; i++)
+            //{
+            //    NPC npc = Main.npc[i];
+            //    if (npc.Hitbox.Intersects(projHitbox))
+            //    {
+            //        Projectile.Kill();
+            //        return;
+            //    }
+            //}
+            base.AI();
+        }
         public override void OnKill(int timeLeft)
         {
-			SoundEngine.PlaySound(SoundID.NPCDeath15.WithVolumeScale(0.8f), Projectile.position); //snow
+            SoundEngine.PlaySound(NewWhispyBoss.AirShotSplitSFX, Projectile.Center);
+            Split();
+        }
 
-			if (collidedWithTile == false)
-            {
-				for (int i = 0; i < 4; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-				{
-					Vector2 speed = Main.rand.NextVector2CircularEdge(5, 5);
-					speed.Normalize();
-					speed *= 5;
-					Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, speed, Mod.Find<ModProjectile>("Puff").Type, Projectile.damage / 2, 2, Projectile.owner); 
-				}
-			}
-
-			//dust
-			for (int i = 0; i < 8; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-			{
-				Vector2 speed = Main.rand.NextVector2Circular(3f, 3f); //circle                     
-				Dust.NewDustPerfect(Projectile.Center, DustID.Smoke, speed * 2, Scale: 1f); //Makes scattered dust
-			}
-		}
     }
 }

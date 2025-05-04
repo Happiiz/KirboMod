@@ -186,11 +186,11 @@ namespace KirboMod.NPCs
             float xOffset;
             if (playerDistance.X <= 0) //if player is behind enemy
             {
-                xOffset = 400; // go in front of player 
+                xOffset = 250; // go in front of player 
             }
             else
             {
-                xOffset = -400; // go behind player
+                xOffset = -250; // go behind player
             }
 
             //movement

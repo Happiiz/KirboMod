@@ -20,25 +20,45 @@ namespace KirboMod.Projectiles
 			DrawOffsetX = -18; //make hitbox line up with sprite middle
 			Projectile.friendly = false; //can't damage enemies(directly)
 			Projectile.hostile = false;
-			Projectile.timeLeft = 60;
+			Projectile.timeLeft = 1000;
 			Projectile.tileCollide = true;
 			Projectile.penetrate = 1;
 			Projectile.ignoreWater = true;
 		}
 		public override void AI()
 		{
+			if (Projectile.localAI[0] == 0)
+			{
+				Projectile.localAI[0] = Main.rand.Next(10);
+			}
+			Projectile.localAI[0]++;
+			if (Projectile.localAI[0] % 10 == 0)
+			{
+				int dustCount = 30;
+				for (int i = 0; i < dustCount; i++)
+				{
+					Vector2 vel = Utils.Remap(i, 0, dustCount, 0, MathF.Tau).ToRotationVector2();
+					vel.X *= 0.5f;
+					vel = vel.RotatedBy(Projectile.velocity.ToRotation());
+					Dust d = Dust.NewDustPerfect(Projectile.Center + vel * 3 + Projectile.velocity * 2, DustID.Electric, vel * 3);
+					d.noGravity = true;
+					d.scale -= 0.2f;
+				}
+			}
 			//projectile.spriteDirection = projectile.direction;
 			Projectile.rotation = Projectile.velocity.ToRotation();
-			int dustnumber = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Electric, 0f, 0f, 200, default, 1f); //dust
-			Main.dust[dustnumber].velocity *= 0.3f;
-			Main.dust[dustnumber].noGravity = true;
-
+			if (Projectile.localAI[0] % 2 == 0) 
+			{
+				int dustnumber = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Electric, 0f, 0f, 200, default, 1f); //dust
+				Main.dust[dustnumber].velocity *= 0.3f;
+				Main.dust[dustnumber].noGravity = true;
+			}
             //explode when in contact with npc
             for (int i = 0; i < Main.maxNPCs; i++) //loop statement that cycles completely every tick
             {
                 NPC npc = Main.npc[i]; //any npc
 
-                if (npc.Hitbox.Intersects(Projectile.Hitbox) && npc.active) //hitboxes touching
+                if (npc.Hitbox.Intersects(Projectile.Hitbox) && npc.active && !npc.dontTakeDamage) //hitboxes touching
                 {
                     Projectile.Kill();
                 }
@@ -64,7 +84,10 @@ namespace KirboMod.Projectiles
 
 		public override void OnKill(int timeLeft) //when the projectile dies
 		{
-			Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity *= 0, ModContent.ProjectileType<Projectiles.SpaceRangerBlastExplosion>(), Projectile.damage, 2f, Projectile.owner);
+			if (Main.myPlayer == Projectile.owner)
+			{
+				Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity *= 0, ModContent.ProjectileType<Projectiles.SpaceRangerBlastExplosion>(), Projectile.damage, 2f, Projectile.owner);
+			}
 		}
 	}
 }

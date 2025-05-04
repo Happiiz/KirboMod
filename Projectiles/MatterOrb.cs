@@ -27,8 +27,7 @@ namespace KirboMod.Projectiles
         {
             Projectile.width = 32;
             Projectile.height = 32;
-            Projectile.friendly = false;
-            Projectile.hostile = false;
+            Projectile.hostile = true;
             Projectile.DamageType = DamageClass.Ranged;
             Projectile.timeLeft = 240;
             Projectile.tileCollide = false;

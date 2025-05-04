@@ -29,11 +29,11 @@ namespace KirboMod.Items.Weapons
 			Item.damage = 120;
 			Item.noMelee = true;
 			Item.DamageType = DamageClass.Magic;
-			Item.mana = 8;
+			Item.mana = 17;
 			Item.width = 40;
 			Item.height = 40;
-			Item.useTime = 22; 
-			Item.useAnimation = 22; 
+			Item.useTime = 29; 
+			Item.useAnimation = 29; 
 			Item.useStyle = ItemUseStyleID.Swing;
 			Item.knockBack = 6;
 			Item.value = Item.buyPrice(0, 3, 30, 30);

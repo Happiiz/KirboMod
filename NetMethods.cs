@@ -1,4 +1,5 @@
 ﻿using KirboMod.Items.NewWhispy;
+using KirboMod.Tiles;
 using Microsoft.Xna.Framework;
 using System.IO;
 using System.Linq;
@@ -52,6 +53,11 @@ namespace KirboMod
             /// byte: projectile.identity of the projectile to sync, Vector2: projectile.position(not center!), byte: player whoAmI of client that called the method
             /// </summary>
             ProjectilePosition = 11,
+            /// <summary>
+            /// spawnsn nightmare power orb
+            /// byte: player index, int: tileX, int: tileY
+            /// </summary>
+            SpawnNightmareOrb = 12,
         }
         //initially called on the client that owns the projectile
         public static void SyncProjPosition(Projectile proj, byte playerWhoAmI)
@@ -82,6 +88,15 @@ namespace KirboMod
         {
             ModPacket packet = KirboMod.instance.GetPacket();
             packet.Write((byte)ModPacketType.SpawnWhispy);
+            packet.Write((byte)Main.myPlayer);
+            packet.Write(tileX);
+            packet.Write(tileY);
+            packet.Send();
+        }
+        public static void SpawnNightmareOrb(int tileX, int tileY)
+        {
+            ModPacket packet = KirboMod.instance.GetPacket();
+            packet.Write((byte)ModPacketType.SpawnNightmareOrb);
             packet.Write((byte)Main.myPlayer);
             packet.Write(tileX);
             packet.Write(tileY);
@@ -225,10 +240,19 @@ namespace KirboMod
                 case ModPacketType.ProjectilePosition:
                     ReadSyncProjPosition(reader);
                     break;
-
+                case ModPacketType.SpawnNightmareOrb:
+                    ReadSpawnNightmareOrb(reader);
+                    break;
             }
         }
-
+        private static void ReadSpawnNightmareOrb(BinaryReader reader)
+        {
+            // don't need to re-send packet because the server will be responsible for spawning the NPC
+            int playerIndex = reader.ReadByte();
+            int i = reader.ReadInt32();
+            int j = reader.ReadInt32();
+            FountainOfDreams.SpawnNightmareOrbAt(playerIndex, i, j);
+        }
         private static void ReadSpawnWhispy(BinaryReader reader)
         {
             // don't need to re-send packet because the server will be responsible for spawning the NPC

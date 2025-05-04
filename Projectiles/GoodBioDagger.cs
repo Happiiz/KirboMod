@@ -18,16 +18,31 @@ namespace KirboMod.Projectiles
 			Projectile.height = 18;
 			Projectile.friendly = true;
 			Projectile.hostile = false;
-			Projectile.timeLeft = 120;
+			Projectile.timeLeft = 200;
 			Projectile.tileCollide = false;
-			Projectile.penetrate = -1;
+			Projectile.penetrate = 10;
 			Projectile.scale = 1f;
 			Projectile.usesLocalNPCImmunity = true;
-			Projectile.localNPCHitCooldown = 10;
+			Projectile.localNPCHitCooldown = -1;
             Projectile.DamageType = DamageClass.Summon;
         }
+		ref float InitialVelLength => ref Projectile.localAI[0];
+		ref float TargetIndex => ref Projectile.ai[0];
 		public override void AI()
 		{
+			if(InitialVelLength == 0)
+			{
+				InitialVelLength = Projectile.velocity.Length();
+			}
+			if (Projectile.penetrate == 10)
+			{
+				Helper.Homing(Projectile, InitialVelLength, ref TargetIndex, ref Projectile.localAI[1]);
+			}
+			else
+			{
+				Projectile.velocity.Normalize();
+				Projectile.velocity *= InitialVelLength;
+			}
 			Projectile.rotation = Projectile.velocity.ToRotation();
 		}
 	}

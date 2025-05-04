@@ -31,7 +31,7 @@ namespace KirboMod.Projectiles
 
 			//wait for no one
 			Projectile.usesLocalNPCImmunity = true;
-			Projectile.localNPCHitCooldown = 10;
+			Projectile.localNPCHitCooldown = 30;
 		}
 
 		public override void AI()

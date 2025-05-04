@@ -15,19 +15,34 @@ namespace KirboMod.NPCs
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             VFX.LoadTextures();
-            if (AttackType == NightmareOrbAtkType.Dash)
+            NightmareOrbAtkType[] atkOrder = GetAttackOrder();
+            NightmareOrbAtkType nextAtkType = atkOrder[(AttacksPerformedSinceSpawn) % atkOrder.Length];
+            if (AttackType == NightmareOrbAtkType.Dash || (AttackType == NightmareOrbAtkType.DecideNext && nextAtkType == NightmareOrbAtkType.Dash))
             {
                 float dashTime = (int)GetDashTime();
-                dashTime += 3;//make the animation end up a bit later for more impact
-                Color purple = Color.Blue;
-                for (int i = 0; i < 10; i++)
+                dashTime -= 12;//make the animation end when the sound effect does
+                Color blue = Color.Blue;
+                float maxScale = 3;
+                float minScale = 0.9f;
+                Color color;
+                float scale;
+                float time;
+                for (int i = 0; i < 11; i++)
                 {
-                    float time = NPC.ai[0] + i * 10;
-                    Color color = Helper.Remap(time, dashTime - 20, dashTime - 12, Color.Transparent, purple);
-                    float scale = Helper.RemapEased(time, dashTime - 20, dashTime, 3, 0.9f, Easings.EaseInSquare);
-                    Main.EntitySpriteDraw(VFX.Ring, NPC.Center - Main.screenPosition, null, color, Main.rand.NextFloat(MathF.Tau), VFX.ring.Size() / 2, scale, default);
+                    time = NPC.ai[0] + i * 5;
+                    color = Helper.Remap(time, dashTime - 20, dashTime - 12, Color.Transparent, blue);
+                    scale = Helper.RemapEased(time, dashTime - 20, dashTime, maxScale, minScale, Easings.EaseInSquare, false);
+                    if (scale < minScale || scale > maxScale)
+                    {
+                        continue;
+                    }
+                    Main.EntitySpriteDraw(VFX.RingShine, NPC.Center - Main.screenPosition, null, color, Main.rand.NextFloat(MathF.Tau), VFX.ringShine.Size() / 2, scale, default);
                 }
-                //make orb ring chargeup animation
+                time = NPC.ai[0] - 1;
+
+                scale = Helper.RemapEased(time, dashTime, dashTime + 15, minScale, 4, Easings.EaseOutSquare);
+                color = Helper.Remap(time, dashTime + 6, dashTime + 15, Color.White, Color.Transparent);
+                Main.EntitySpriteDraw(VFX.Ring, NPC.Center - Main.screenPosition, null, color, Main.rand.NextFloat(MathF.Tau), VFX.ring.Size() / 2, scale, default);
             }
             if (orbShader == null || orbMask == null)
             {

@@ -27,7 +27,7 @@ namespace KirboMod.NPCs.Twister
             NPC.height = 34;
             NPC.damage = 30;
             NPC.defense = 14;
-            NPC.lifeMax = 70;
+            NPC.lifeMax = 74;
             NPC.HitSound = SoundID.NPCHit4; //metal
             NPC.DeathSound = SoundID.NPCDeath14; //also metal
             NPC.value = Item.buyPrice(0, 0, 0, 10);
@@ -77,8 +77,8 @@ namespace KirboMod.NPCs.Twister
             float speed = 10f; //top speed
             float inertia = 80f; //acceleration and decceleration speed
 
-            Vector2 direction = new Vector2(NPC.direction * 50, 0); //start - end 
-                                                                    //we put this instead of player.Center so it will always be moving top speed instead of slowing down when player is near
+            Vector2 direction = new(NPC.direction * 50, 0); //start - end 
+                                                            //we put this instead of player.Center so it will always be moving top speed instead of slowing down when player is near
 
             direction.Normalize();
             direction *= speed;
@@ -127,18 +127,15 @@ namespace KirboMod.NPCs.Twister
         {
             if (NPC.life <= 0)
             {
-                if (NPC.life <= 0)
+                for (int i = 0; i < 10; i++)
                 {
-                    for (int i = 0; i < 10; i++)
-                    {
-                        Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle edge
-                        Gore.NewGorePerfect(NPC.GetSource_FromAI(), NPC.Center, speed, Main.rand.Next(16, 18));
-                    }
-                    for (int i = 0; i < 5; i++)
-                    {
-                        Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
-                        Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center, speed, Main.rand.Next(11, 13), Scale: 1f); //double jump smoke
-                    }
+                    Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle edge
+                    Gore.NewGorePerfect(NPC.GetSource_FromAI(), NPC.Center, speed, Main.rand.Next(16, 18));
+                }
+                for (int i = 0; i < 5; i++)
+                {
+                    Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
+                    Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center, speed, Main.rand.Next(11, 13), Scale: 1f); //double jump smoke
                 }
             }
         }
@@ -152,7 +149,7 @@ namespace KirboMod.NPCs.Twister
             lilHandBallThing ??= ModContent.Request<Texture2D>("KirboMod/NPCs/Twister/TwisterDot");
             Texture2D texture = Twisty.Value;
 
-            Vector2 drawOrigin = new Vector2(texture.Width / 2, 40);
+            Vector2 drawOrigin = new(texture.Width / 2, 40);
             Vector2 drawPos = NPC.Center - Main.screenPosition + new Vector2(0f, 20 + NPC.gfxOffY);
             float handSpinRadius = 28;
             float handSpinSpeed = .09f;

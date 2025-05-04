@@ -20,13 +20,13 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 90;
+			Item.damage = 70;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 25;
 			Item.height = 40;
-			Item.useTime = 45;
-			Item.useAnimation = 45;
+			Item.useTime = 90;
+			Item.useAnimation = 90;
 			Item.useStyle = ItemUseStyleID.HoldUp;
 			Item.knockBack = 2f;
 			Item.value = Item.buyPrice(0, 5, 50, 0);
@@ -54,12 +54,12 @@ namespace KirboMod.Items.Weapons
         }
         public override bool CanUseItem(Player player)
         {
-             return player.ownedProjectileCounts[Item.shoot] < 1;
+             return player.ownedProjectileCounts[Item.shoot] < 1 && player.statMana >= player.statManaMax2;
         }
 
 		public override void AddRecipes()
 		{
-			Recipe recipe1 = CreateRecipe();//the result is Storm Tornado sword
+			Recipe recipe1 = CreateRecipe();//the result is Storm Tornado
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.FleurTornado>()); //Fleur Tornado
 			recipe1.AddIngredient(ItemID.RazorbladeTyphoon); //Razorblade Typhoon
 			recipe1.AddIngredient(ItemID.MagnetSphere); //Magnet Sphere

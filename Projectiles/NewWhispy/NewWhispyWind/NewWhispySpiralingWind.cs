@@ -23,12 +23,12 @@ namespace KirboMod.Projectiles.NewWhispy.NewWhispyWind
             Projectile.tileCollide = false;
             Projectile.penetrate = -1;
         }
-        ref float Timer => ref Projectile.localAI[0];
-        Vector2 SpiralPivot { get => new(Projectile.localAI[2], Projectile.localAI[1]); set { Projectile.localAI[2] = value.X; Projectile.localAI[1] = value.Y; } }
-        ref float RotationPerFrame => ref Projectile.ai[0];
-        ref float NormalizedRotationOffset => ref Projectile.ai[1];
-        ref float TimeLeftUntilDeath => ref Projectile.ai[2];
-        float SpiralRadius => Projectile.velocity.X;
+        public ref float Timer => ref Projectile.localAI[0];
+        public Vector2 SpiralPivot { get => new(Projectile.localAI[2], Projectile.localAI[1]); set { Projectile.localAI[2] = value.X; Projectile.localAI[1] = value.Y; } }
+        public ref float RotationPerFrame => ref Projectile.ai[0];
+        public ref float NormalizedRotationOffset => ref Projectile.ai[1];
+        public ref float TimeLeftUntilDeath => ref Projectile.ai[2];
+        public float SpiralRadius => Projectile.velocity.X;
         public override bool ShouldUpdatePosition()
         {
             return false;

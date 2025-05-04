@@ -48,7 +48,7 @@ namespace KirboMod.Projectiles
             player.manaRegenCount = 0;
             bool manaIsAvailable = player.CheckMana(10);
             bool stillInUse = player.channel && manaIsAvailable && !player.noItems && !player.CCed;
-            if (Projectile.ai[0] % 20 == 0)
+            if (Projectile.ai[0] % 20 == 1 && Projectile.ai[0] != 1)//don't use mana the first cycle because the item already used it
             {
                 player.CheckMana(ManaToUse, true); //consume ManaToUse mana every 20 frames, affected by player's mana reduction stat
             }

@@ -27,11 +27,11 @@ namespace KirboMod.NPCs
 
         int tpEffectCounter = 12;
         Vector2 tpEffectPos;
-        static void ClampLength(ref Vector2 vector, float length = 100)
+        static void ClampLength(ref Vector2 vector, float length = 100)//TODO: CHANGE DEFAULT VALUE TO 300
         {
             length = 300;
             float vecLength = vector.Length();
-            if(vecLength < length)
+            if (vecLength < length)
             {
                 vector *= length / vecLength;
             }
@@ -90,7 +90,7 @@ namespace KirboMod.NPCs
 
             for (int i = 0; i < Main.maxProjectiles; i++) //checking if orbs are out while homing orb attack is about to be used
             {
-                if (attacktype == NightmareAttackType.LightningOrbsHoming 
+                if (attacktype == NightmareAttackType.LightningOrbsHoming
                     && (Main.projectile[i].type == ModContent.ProjectileType<NightmareLightningOrb>() ||
                     Main.projectile[i].type == ModContent.ProjectileType<NightmareLightningOrbHoming>()))
                 {
@@ -228,10 +228,14 @@ namespace KirboMod.NPCs
                 animation = 5; //damageable
             }
 
-            if (CheckShouldShoot(firerate, numOrbs, start) && NetmodeID.MultiplayerClient != Main.netMode)
+            if (CheckShouldShoot(firerate, numOrbs, start))
             {
-                NightmareLightningOrb.GetShootStats(firerate, numOrbs, start, (int)timer, NPC.target, out float ai0, out float ai1, out float ai2, out Vector2 velocity);
-                Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center, velocity, ModContent.ProjectileType<NightmareLightningOrb>(), 40, 0, -1, ai0, ai1, ai2);
+                PlayOrbSpawnSoundEffect();
+                if (NetmodeID.MultiplayerClient != Main.netMode)
+                {
+                    NightmareLightningOrb.GetShootStats(firerate, numOrbs, start, (int)timer, NPC.target, out float ai0, out float ai1, out float ai2, out Vector2 velocity);
+                    Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center, velocity, ModContent.ProjectileType<NightmareLightningOrb>(), 40, 0, -1, ai0, ai1, ai2);
+                }
             }
             if (timer > firerate * (numOrbs + 1))
             {
@@ -269,9 +273,13 @@ namespace KirboMod.NPCs
                 animation = 5; //damageable
             }
 
-            if (CheckShouldShoot(firerate, numOrbs, start) && NetmodeID.MultiplayerClient != Main.netMode)
+            if (CheckShouldShoot(firerate, numOrbs, start))
             {
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, default, ModContent.ProjectileType<NightmareLightningOrbHoming>(), 40, 0, -1, NPC.target, NightmareLightningOrbHoming.GetMaxSpeed(firerate, numOrbs, start, (int)timer));
+                PlayOrbSpawnSoundEffect();
+                if (Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, default, ModContent.ProjectileType<NightmareLightningOrbHoming>(), 40, 0, -1, NPC.target, NightmareLightningOrbHoming.GetMaxSpeed(firerate, numOrbs, start, (int)timer));
+                }
             }
             if (timer > firerate * numOrbs)
             {
@@ -317,7 +325,7 @@ namespace KirboMod.NPCs
                 NPC.velocity *= 0.9f;
 
                 //spawn on top of hand
-                Vector2 startpos = NPC.Center + new Vector2(NPC.direction * -50, -90);
+                Vector2 startpos = NPC.Center + new Vector2(NPC.direction * -50, -80);
                 int firerate = Main.expertMode ? 9 : 12;
                 if (phase2)
                 {
@@ -328,22 +336,26 @@ namespace KirboMod.NPCs
                 direction *= phase2 ? 30 : 25;
 
 
+
                 if (timer % (firerate * 2) == firerate)
                 {
-                    SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
-
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction,
-                        ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
+                    NightmareOrb.PlaySpreadShotSFX(startpos);
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction,
+                            ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
+                    }
                 }
                 else if (timer % (firerate * 2) == 0)
                 {
-                    SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
-
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction.RotatedBy(-(MathF.PI / 8)),
+                    NightmareOrb.PlaySpreadShotSFX(startpos);
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction.RotatedBy(-(MathF.PI / 8)),
                             ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
-
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction.RotatedBy(MathF.PI / 8),
-                            ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction.RotatedBy(MathF.PI / 8),
+                                ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
+                    }
                 }
             }
 
@@ -371,17 +383,16 @@ namespace KirboMod.NPCs
                 if (timer > 80 && timer % 20 == 0)
                 {
                     int starsInRing = Main.expertMode ? 15 : 9;
-
-                    for (float i = 0; i < starsInRing; i += 1f)
+                    PlayBodyStarSoundEffect();
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        float angle = ((timer - 60) * 2f) + (i * (MathF.PI / 6));
-
-                        Vector2 vel = new Vector2(MathF.Cos(angle) * 15, MathF.Sin(angle) * 15);
-
-                        SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
-
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, vel,
-                            ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
+                        for (float i = 0; i < starsInRing; i += 1f)
+                        {
+                            float angle = ((timer - 60) * 2f) + (i * (MathF.Tau / starsInRing));
+                            Vector2 vel = new(MathF.Cos(angle) * 15, MathF.Sin(angle) * 15);
+                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, vel,
+                                ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
+                        }
                     }
                 }
             }
@@ -613,16 +624,20 @@ namespace KirboMod.NPCs
                 animation = 5; //damageable
                 if ((timer - (tpRate - 10)) % tpRate == 0)
                 {
-                    for (float i = 0; i < 13; i += 1f)
+                    PlayBodyStarSoundEffect();
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        float angle = ((timer - 60) * 2f) + (i * (MathF.PI / 6));
+                        for (float i = 0; i < 16; i += 1f)
+                        {
 
-                        Vector2 vel = new Vector2(MathF.Cos(angle) * 15, MathF.Sin(angle) * 15);
+                            float angle = ((timer - 60) * 2f) + (i * (MathF.Tau / 16));
 
-                        SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
+                            Vector2 vel = new(MathF.Cos(angle) * 15, MathF.Sin(angle) * 15);
 
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, vel,
-                            ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
+
+                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, vel,
+                                ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
+                        }
                     }
                 }
             }
@@ -689,7 +704,7 @@ namespace KirboMod.NPCs
                 int y = (int)NPC.position.Y - 75; //move up a bit 
 
 
-                Rectangle hitbox = new Rectangle(x, y, NPC.width, NPC.height);
+                Rectangle hitbox = new(x, y, NPC.width, NPC.height);
 
                 //hurt
                 if (hitbox.Intersects(player.getRect()) && player.immune == false)
@@ -869,12 +884,19 @@ namespace KirboMod.NPCs
                 {
                     tpEffectPos = NPC.Center;
                 }
-
+                Vector2 prevPos = NPC.Center;
                 tpEffectCounter = 4;//animSpeed
 
                 NPC.Center = player.Center + location;
                 NPC.frameCounter = 0;
-
+                if (NPC.Center.Distance(player.Center) < prevPos.Distance(player.Center))
+                {
+                    PlayTeleportSoundEffect();
+                }
+                else
+                {
+                    PlayTeleportSoundEffect(prevPos);
+                }
                 NPC.TargetClosest(false); //just in case
             }
             if (timer < 12)
@@ -897,7 +919,7 @@ namespace KirboMod.NPCs
             //3 frames on the tp anim
             int frameY = (int)Utils.Remap(tpEffectCounter, animSpeed, animSpeed * 3, 10, 12, true);
             Rectangle frame = sheet.Frame(1, Main.npcFrameCount[NPC.type], 0, frameY);
-            Vector2 origin = new Vector2(frame.Width / 2, frame.Height / 2);
+            Vector2 origin = new(frame.Width / 2, frame.Height / 2);
             Main.EntitySpriteDraw(sheet, tpEffectPos - Main.screenPosition, frame, Color.White, 0, origin, 1f, SpriteEffects.None);
         }
         public override bool CheckDead()

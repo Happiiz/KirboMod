@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework;
-using System;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
@@ -21,7 +20,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 23;
+			Item.damage = 13;
 			Item.knockBack = 6f;
 			Item.mana = 12;
 			Item.width = 40;
@@ -52,8 +51,11 @@ namespace KirboMod.Items.Weapons
 			// This is needed so the buff that keeps your minion alive and allows you to despawn it properly applies
 			player.AddBuff(Item.buffType, 2);
 
-            //spawns minion with scaled damaged automatically
-            player.SpawnMinionOnCursor(source, player.whoAmI, Item.shoot, Item.damage, knockback);
+			//spawns minion with scaled damaged automatically
+			if (player.whoAmI == Main.myPlayer)
+			{
+				player.SpawnMinionOnCursor(source, player.whoAmI, Item.shoot, Item.damage, knockback);
+			}
             return false;
 		}
 	}

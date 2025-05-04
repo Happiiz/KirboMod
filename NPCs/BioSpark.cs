@@ -28,8 +28,8 @@ namespace KirboMod.NPCs
             NPC.height = 40;
             DrawOffsetY = 4; //make sprite line up with hitbox
             NPC.damage = 70;
-            NPC.defense = 30;
-            NPC.lifeMax = 400;
+            NPC.defense = 35;
+            NPC.lifeMax = 650;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath1;
             NPC.value = Item.buyPrice(0, 0, 2, 50); // money it drops
@@ -44,7 +44,7 @@ namespace KirboMod.NPCs
         {
             if (spawnInfo.Player.ZoneRockLayerHeight && Main.hardMode) //if player is within cave height
             {
-                return spawnInfo.SpawnTileType == TileID.Dirt || spawnInfo.SpawnTileType == TileID.Stone ? .03f : 0f; //functions like a mini if else statement
+                return spawnInfo.SpawnTileType == TileID.Dirt || spawnInfo.SpawnTileType == TileID.Stone ? .015f : 0f; //functions like a mini if else statement
             }
             else
             {
@@ -63,6 +63,8 @@ namespace KirboMod.NPCs
 				new FlavorTextBestiaryInfoElement("An elite ninja that hides deep within the caverns, training to become stronger. Ambushes targets with a flurry of attacks.")
             });
         }
+        static int StartAttackTime => 90;
+        static int TimeSpentWalkingToForceAttack => 100;
         public override void AI() //constantly cycles each time
         {
             if (NPC.localAI[0] == 0)
@@ -79,32 +81,33 @@ namespace KirboMod.NPCs
             {
                 AttackTimer++; //attack timer
             }
-            if (inRange) //checks if the spark is in range
+            if (inRange || WalkTimer > TimeSpentWalkingToForceAttack) //checks if the spark is in range
             {
-                WalkTimer = 0; //reset walk timer
-
-                if (AttackTimer < 120) //not attacking
+                if (AttackTimer < StartAttackTime && WalkTimer <= TimeSpentWalkingToForceAttack) //not attacking
                 {
-                    Attacktype = 1; //side stepping
+                    Attacktype = 0; //side stepping
                 }
-                else if (AttackTimer == 120) //times up!
+                else if (AttackTimer <= StartAttackTime) //times up!
                 {
                     bool lineOfSight = Collision.CanHitLine(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height);
                     if (Math.Abs(distance.Y) < 100 && distance.Y <= 0 && MathF.Abs(distance.X) < 250) //close enough && above or leveled with player && the slash can actually hit the player before decelerating
                     {
                         Attacktype = 2; //slash
+                        WalkTimer = 0; //reset walk timer
+                        AttackTimer = StartAttackTime;
                     }
-                    else if (lineOfSight) //can see player
+                    else if (lineOfSight || WalkTimer > TimeSpentWalkingToForceAttack) //can see player
                     {
                         Attacktype = 3; //kunai
+                        WalkTimer = 0; //reset walk timer
+                        AttackTimer = StartAttackTime;
                     }
                     else //wait until can see player within range
                     {
-                        Attacktype = 1;
-                        AttackTimer = 119; //reset attack timer to before time's up
+                        Attacktype = 0;
+                        AttackTimer = StartAttackTime - 1; //reset attack timer to before time's up
                     }
                 }
-
             }
             else if (Attacktype == 1) //sidestepping when out of range
             {
@@ -134,17 +137,16 @@ namespace KirboMod.NPCs
         }
         private void Walk() //walk towards player
         {
+            NPC.TargetClosest(true);
             Player player = Main.player[NPC.target];
             Vector2 distance = player.Center - NPC.Center;
 
             WalkTimer++;
-
-            if (WalkTimer % 10 == 0) //turn towards player every 10 ticks
+            NPC.velocity.X = NPC.direction * 5f;
+            if(distance.Length() < 56)
             {
-                NPC.TargetClosest(true);
+                AttackTimer = StartAttackTime - 1;
             }
-            NPC.velocity.X = NPC.direction * 2.5f;
-
             if (distance.X > 0) //player is ahead
             {
                 WalkDirection = 1; //walk forward
@@ -188,21 +190,40 @@ namespace KirboMod.NPCs
                     }
                 }
             }
-
             Jump();
 
-            NPC.velocity.X = WalkDirection * 2.5f;
+            NPC.velocity.X = WalkDirection * 5f;
         }
         private void Jump()
         {
-            if (NPC.collideX && NPC.velocity.Y == 0) //hop if touching wall
+            if (NPC.velocity.Y == 0)
             {
-                NPC.velocity.Y = -5;
+                CheckForJumpOffTiles();
+                if (NPC.collideX) //hop if touching wall
+                {
+                    NPC.velocity.Y = -7;
+                }
+            }
+        }
+        void CheckForJumpOffTiles()
+        {
+            Player player = Main.player[NPC.target];
+
+            Vector2 bottomLeft = NPC.BottomLeft;
+            if (bottomLeft.Y < player.BottomLeft.Y)//if above player then don't need to jump
+            {
+                return;
+            }
+            bottomLeft.Y += 4;
+            bottomLeft.X += NPC.velocity.X;
+            if (!Collision.SolidTiles(bottomLeft, NPC.width, 1))
+            {
+                NPC.velocity.Y = -7f;
             }
         }
         private void Slash() //draws sword
         {
-            if (AttackTimer < 120 + 30) //stance
+            if (AttackTimer < StartAttackTime + 30) //stance
             {
                 NPC.TargetClosest(true); //face player
 
@@ -212,7 +233,7 @@ namespace KirboMod.NPCs
             {
 
                 Player player = Main.player[NPC.target];
-                if (AttackTimer == 120 + 30) //unleash slash
+                if (AttackTimer == StartAttackTime + 30) //unleash slash
                 {
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
@@ -221,10 +242,10 @@ namespace KirboMod.NPCs
                     }
                     float moveSpeed = 25;
                     NPC.velocity.X = NPC.direction * moveSpeed;
-                    NPC.velocity.Y = -MathF.Abs((player.Center.Y - NPC.Center.Y) / moveSpeed) * 4;
+                    NPC.velocity.Y = -MathF.Abs((player.Center.Y - NPC.Center.Y) / moveSpeed) * 3;
                     SoundEngine.PlaySound(SoundID.Item1, NPC.Center); //we dont define the stuff after coordinates because legacy sound style
                 }
-                if (AttackTimer > 120 + 30 & AttackTimer < 120 + 60)
+                if (AttackTimer > StartAttackTime + 30 & AttackTimer < StartAttackTime + 60)
                 {
                     if (NPC.velocity.Y < -2)
                     {
@@ -237,9 +258,9 @@ namespace KirboMod.NPCs
                     }
                     NPC.velocity.X *= 0.92f;
                 }
-                if (AttackTimer >= 120 + 60) //restart
+                if (AttackTimer >= StartAttackTime + 60) //restart
                 {
-                    Attacktype = 1;
+                    Attacktype = 0;
                     AttackTimer = 0;
                 }
             }
@@ -249,12 +270,12 @@ namespace KirboMod.NPCs
             Player player = Main.player[NPC.target];
             Vector2 projshoot = player.Center - NPC.Center;
             float shootSpeed = 20;
-         
+
             NPC.TargetClosest(true);
 
             NPC.velocity.X *= 0.5f; //slow down
 
-            if (AttackTimer % 5 == 0 && AttackTimer > 120 + 30 && AttackTimer <= 120 + 45) //unleash daggers every 5 ticks within 15 ticks
+            if (AttackTimer % 5 == 0 && AttackTimer > StartAttackTime + 30 && AttackTimer <= StartAttackTime + 45) //unleash daggers every 5 ticks within 15 ticks
             {
                 if (Main.getGoodWorld)
                 {
@@ -286,9 +307,9 @@ namespace KirboMod.NPCs
                 }
                 SoundEngine.PlaySound(SoundID.Item1, NPC.Center);
             }
-            if (AttackTimer >= 120 + 60) //restart
+            if (AttackTimer >= StartAttackTime + 60) //restart
             {
-                Attacktype = 1;
+                Attacktype = 0;
                 AttackTimer = 0;
             }
         }
@@ -320,27 +341,27 @@ namespace KirboMod.NPCs
             }
             if (Attacktype == 2) //slash
             {
-                if (AttackTimer < 120 + 30)
+                if (AttackTimer < StartAttackTime + 30)
                 {
                     NPC.frame.Y = frameHeight * 6; //frame 7
                 }
-                else if (AttackTimer < 124 + 30)
+                else if (AttackTimer < StartAttackTime + 34)
                 {
                     NPC.frame.Y = frameHeight * 7; //frame 8
                 }
-                else if (AttackTimer < 128 + 30)
+                else if (AttackTimer < StartAttackTime + 38)
                 {
                     NPC.frame.Y = frameHeight * 8; //frame 9
                 }
-                else if (AttackTimer < 132 + 30)
+                else if (AttackTimer < StartAttackTime + 42)
                 {
                     NPC.frame.Y = frameHeight * 9; //frame 10
                 }
-                else if (AttackTimer < 136 + 30)
+                else if (AttackTimer < StartAttackTime + 46)
                 {
                     NPC.frame.Y = frameHeight * 12; //frame 13
                 }
-                else if (AttackTimer < 140 + 30)
+                else if (AttackTimer < StartAttackTime + 50)
                 {
                     NPC.frame.Y = frameHeight * 15; //frame 16
                 }
@@ -351,7 +372,7 @@ namespace KirboMod.NPCs
             }
             else if (Attacktype == 3) //kunai
             {
-                if (AttackTimer < 120 + 30)
+                if (AttackTimer < StartAttackTime + 30)
                 {
                     NPC.frame.Y = frameHeight * 4; //frame 5
                 }
@@ -363,8 +384,8 @@ namespace KirboMod.NPCs
         }
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
-            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<Items.Weapons.ShinobiScroll>(), 20, 10)); // 1 in 20 (5%) chance in Normal. 1 in 10 (10%) chance in Expert
-            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<DreamEssence>(), 1, 4, 8));
+            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<Items.Weapons.ShinobiScroll>(), 10, 5)); // 1 in 20 (5%) chance in Normal. 1 in 10 (10%) chance in Expert
+            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<DreamEssence>(), 1, 2, 16));
         }
         public override void HitEffect(NPC.HitInfo hit)
         {

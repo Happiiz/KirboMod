@@ -3,116 +3,106 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using Terraria;
 using Terraria.Audio;
-using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Color = Microsoft.Xna.Framework.Color;
 
 namespace KirboMod.Projectiles
 {
-	public class BioSparkMinion : ModProjectile
-	{
-		int attack = 0;
-		int attacktype;
-		int jumpTimer = 0;
-		int daggerCoolDown = 0; 
+    public class BioSparkMinion : ModProjectile
+    {
+        int attack = 0;
+        int attacktype;
+        int jumpTimer = 0;
+        int daggerCoolDown = 0;
         bool attacking = false; //checks if in attacking state
         bool spaceJumping = false; //determines if gonna warp
         float spaceJumpRotation = 0; //here for sprite rotation of space jump
 
-        private List<float> Targetdistances = new List<float>(); //targeting
+        private List<float> Targetdistances = new(); //targeting
         private NPC aggroTarget = null; //target the minion is currently focused on
         public override void SetStaticDefaults()
-		{
-			// DisplayName.SetDefault("Bio Spark");
-			// Sets the amount of frames this minion has on its spritesheet
-			Main.projFrames[Projectile.type] = 17;
-			// This is necessary for right-click targeting
-			ProjectileID.Sets.MinionTargettingFeature[Projectile.type] = true;
+        {
+            // DisplayName.SetDefault("Bio Spark");
+            // Sets the amount of frames this minion has on its spritesheet
+            Main.projFrames[Projectile.type] = 17;
+            // This is necessary for right-click targeting
+            ProjectileID.Sets.MinionTargettingFeature[Projectile.type] = true;
 
-			// These below are needed for a minion
-			// Denotes that this projectile is a pet or minion
-			Main.projPet[Projectile.type] = true;
-			// This is needed so your minion can properly spawn when summoned and replaced when other minions are summoned
-			ProjectileID.Sets.MinionSacrificable[Projectile.type] = true;
-			// Don't mistake this with "if this is true, then it will automatically home". It is just for damage reduction for certain NPCs
-			ProjectileID.Sets.CultistIsResistantTo[Projectile.type] = true;
+            // These below are needed for a minion
+            // Denotes that this projectile is a pet or minion
+            Main.projPet[Projectile.type] = true;
+            // This is needed so your minion can properly spawn when summoned and replaced when other minions are summoned
+            ProjectileID.Sets.MinionSacrificable[Projectile.type] = true;
+            // Don't mistake this with "if this is true, then it will automatically home". It is just for damage reduction for certain NPCs
+            ProjectileID.Sets.CultistIsResistantTo[Projectile.type] = true;
 
             //for space jump trail
             ProjectileID.Sets.TrailCacheLength[Projectile.type] = 5; // The length of old position to be recorded
             ProjectileID.Sets.TrailingMode[Projectile.type] = 0; // The recording mode
         }
 
-		public sealed override void SetDefaults()
-		{
-			Projectile.width = 32;
-			Projectile.height = 32;
-			DrawOriginOffsetY = -14;
+        public sealed override void SetDefaults()
+        {
+            Projectile.width = 32;
+            Projectile.height = 32;
+            DrawOriginOffsetY = -14;
             DrawOffsetX = -32;
             Projectile.tileCollide = true;
             Projectile.netImportant = true;
 
             Projectile.friendly = true;
-			Projectile.minion = true;
+            Projectile.minion = true;
             Projectile.DamageType = DamageClass.Summon;
             Projectile.minionSlots = 1f;
-			Projectile.penetrate = -1;
-			Projectile.usesLocalNPCImmunity = true;
-			Projectile.localNPCHitCooldown = 24;
-		}
+            Projectile.penetrate = -1;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = 24;
+        }
 
-		// Here you can decide if your minion breaks things like grass or pots
-		public override bool? CanCutTiles()
-		{
-			return false;
-		}
+        // Here you can decide if your minion breaks things like grass or pots
+        public override bool? CanCutTiles()
+        {
+            return false;
+        }
 
-		// This is mandatory if your minion deals contact damage (further related stuff in AI() in the Movement region)
-		public override bool MinionContactDamage()
-		{
-			return false;
-		}
+        // This is mandatory if your minion deals contact damage (further related stuff in AI() in the Movement region)
+        public override bool MinionContactDamage()
+        {
+            return false;
+        }
 
-		public override void AI()
-		{
-			//continously go down
-			jumpTimer--;
-			daggerCoolDown--;
+        public override void AI()
+        {
+            //continously go down
+            jumpTimer--;
+            daggerCoolDown--;
 
-			Projectile.spriteDirection = Projectile.direction;
-			Player player = Main.player[Projectile.owner];
+            Projectile.spriteDirection = Projectile.direction;
+            Player player = Main.player[Projectile.owner];
 
-			// This is the "active check", makes sure the minion is alive while the player is alive, and despawns if not
-			if (player.dead || !player.active)
-			{
-				player.ClearBuff(ModContent.BuffType<Buffs.MinionBuffs.BioSparkBuff>());
-			}
-			if (player.HasBuff(ModContent.BuffType<Buffs.MinionBuffs.BioSparkBuff>()))
-			{
-				Projectile.timeLeft = 2;
-			}
+            // This is the "active check", makes sure the minion is alive while the player is alive, and despawns if not
+            if (player.dead || !player.active)
+            {
+                player.ClearBuff(ModContent.BuffType<Buffs.MinionBuffs.BioSparkBuff>());
+            }
+            if (player.HasBuff(ModContent.BuffType<Buffs.MinionBuffs.BioSparkBuff>()))
+            {
+                Projectile.timeLeft = 2;
+            }
 
             //Gravity
             if (spaceJumping == false)
             {
-                Projectile.velocity.Y += 0.7f;
 
                 if (attack <= 0) //not attacking
                 {
-                    if (Projectile.velocity.Y >= 10f)
+                    Projectile.velocity.Y += 0.7f;
+                    if (Projectile.velocity.Y >= 20f)
                     {
-                        Projectile.velocity.Y = 10f;
-                    }
-                }
-                else //fall slower
-                {
-                    if (Projectile.velocity.Y >= 1f)
-                    {
-                        Projectile.velocity.Y = 1f;
+                        Projectile.velocity.Y = 20f;
                     }
                 }
             }
@@ -124,7 +114,7 @@ namespace KirboMod.Projectiles
             }
 
             //Important stuff for targeting
-			float distanceFromTarget = 1200f;
+            float distanceFromTarget = 1200f;
 
             Vector2 IdlePosition = player.Center;
             float minionPositionOffsetX = (40 + Projectile.minionPos * 40) * -player.direction; //behind player depending on order summoned
@@ -135,17 +125,17 @@ namespace KirboMod.Projectiles
 
             //player selected targeting
             if (player.HasMinionAttackTargetNPC)
-			{
-				NPC npc = Main.npc[player.MinionAttackTargetNPC];
-				float distance = Vector2.Distance(npc.Center, Projectile.Center);
-				// Reasonable distance away so it doesn't target across multiple screens
-				if (distance < distanceFromTarget)
-				{
+            {
+                NPC npc = Main.npc[player.MinionAttackTargetNPC];
+                float distance = Vector2.Distance(npc.Center, Projectile.Center);
+                // Reasonable distance away so it doesn't target across multiple screens
+                if (distance < distanceFromTarget)
+                {
                     aggroTarget = npc;
                 }
-			}
+            }
 
-            if (aggroTarget == null || !aggroTarget.active || aggroTarget.dontTakeDamage) //search target
+            if (aggroTarget == null || !aggroTarget.CanBeChasedBy()) //search target
             {
                 //start each number with a very big number so they can't be targeted if their npc doesn't exist
                 Targetdistances = Enumerable.Repeat(999999f, Main.maxNPCs).ToList();
@@ -158,7 +148,7 @@ namespace KirboMod.Projectiles
 
                     if (npc.CanBeChasedBy()) //checks if targetable
                     {
-                        Vector2 positionOffset = new Vector2(0, -5);
+                        Vector2 positionOffset = new(0, -5);
                         bool inView = Collision.CanHitLine(Projectile.position + positionOffset, Projectile.width, Projectile.height, npc.position, npc.width, npc.height);
 
                         //close, hittable, hostile and can see target
@@ -206,48 +196,48 @@ namespace KirboMod.Projectiles
             {
                 Attack();
             }
-            else if (aggroTarget != null && aggroTarget.active && !aggroTarget.dontTakeDamage) //ATTACK
+            else if (aggroTarget != null && aggroTarget.CanBeChasedBy()) //ATTACK
             {
-				Vector2 direction = aggroTarget.Center - Projectile.Center; //start - end
-                Vector2 absDirection = new Vector2(Math.Abs(direction.X), Math.Abs(direction.Y));
+                Vector2 direction = aggroTarget.Center - Projectile.Center; //start - end
+                Vector2 absDirection = new(Math.Abs(direction.X), Math.Abs(direction.Y));
 
-                bool inEnemyRangeX = direction.X <= 400f && direction.X >= 0f; //in range of the right
+                bool inEnemyRangeX = direction.X <= 500 && direction.X >= 0f; //in range of the right
 
                 if (Projectile.direction == -1) //facing left
                 {
-                    inEnemyRangeX = direction.X >= -400f && direction.X <= 0f; //in range of the left
+                    inEnemyRangeX = direction.X >= -500 && direction.X <= 0f; //in range of the left
                 }
 
                 //attack (if close enough to target center, touching target hitbox or already attacking)
 
-                if ((inEnemyRangeX && absDirection.Y <= 50 || 
-					aggroTarget.Hitbox.Intersects(Projectile.Hitbox)) && spaceJumping == false) //attack if within range or intersecting hitbox
-				{
-					if (attack == 0) //if attack cycle restarted
-					{
-						attacktype = 0;
-					}
+                if ((inEnemyRangeX && absDirection.Y <= 200 ||
+                    aggroTarget.Hitbox.Intersects(Projectile.Hitbox)) && spaceJumping == false) //attack if within range or intersecting hitbox
+                {
+                    if (attack == 0) //if attack cycle restarted
+                    {
+                        attacktype = 0;
+                    }
                     attacking = true;
                 }
                 //attack if cooldown is done and within range
-                else if ((absDirection.X <= 400 || absDirection.Y <= 400) && daggerCoolDown <= 0 && spaceJumping == false) 
+                else if ((absDirection.X <= 500 || absDirection.Y <= 500) && daggerCoolDown <= 0 && spaceJumping == false)
                 {
-					if (attack == 0)
-					{
-						attacktype = 1;
-					}
+                    if (attack == 0)
+                    {
+                        attacktype = 1;
+                    }
                     attacking = true;
                 }
-				else 
+                else
                 {
-					if (direction.Y <= -50f & jumpTimer <= 0 & attack == 0) //jump when below enemy, can jump again and not attacking
-					{
+                    if (direction.Y <= -50f & jumpTimer <= 0 & attack == 0) //jump when below enemy, can jump again and not attacking
+                    {
                         Jump();
                     }
 
-					//walking
-					float speed = 7f; //walk speed
-					float inertia = 6f; //turn speed
+                    //walking
+                    float speed = 30f; //walk speed
+                    float inertia = 4f; //turn speed
                     int pseudoDirection = 1;
                     if (direction.X < 0) //enemy is behind
                     {
@@ -256,38 +246,36 @@ namespace KirboMod.Projectiles
                     //we put this instead of player.Center so it will always be moving top speed instead of slowing down when enemy is near but unreachable
                     //A "carrot on a stick" if you will
 
-                    Vector2 carrotDirection = Projectile.Center + new Vector2(pseudoDirection * 50, 0) - Projectile.Center; //start - end 
-                    carrotDirection.Normalize();
-                    carrotDirection *= speed;
+                    Vector2 carrotDirection = new(pseudoDirection * speed, 0);
 
                     //use .X so it only effects horizontal movement
                     Projectile.velocity.X = (Projectile.velocity.X * (inertia - 1) + carrotDirection.X) / inertia; //use .X so it only effects horizontal movement		
 
                     Projectile.frameCounter++; //walking
-					if (Projectile.frameCounter >= 5)
-					{
+                    if (Projectile.frameCounter >= 5)
+                    {
                         if (Projectile.frame < 3) //less than 4th frame
-						{
-							Projectile.frame++; //go up
-							Projectile.frameCounter = 0;
-						}
+                        {
+                            Projectile.frame++; //go up
+                            Projectile.frameCounter = 0;
+                        }
                         else
-						{
-							Projectile.frame = 0;
-							Projectile.frameCounter = 0;
-						}
-					}
-				}
-			}
-			else //FOLLOW PLAYER
-			{
-				if (Projectile.velocity.X <= 0.1f & Projectile.velocity.X >= -0.1f) //barely moving
-				{
-					Projectile.frame = 3; //stand still frame
+                        {
+                            Projectile.frame = 0;
+                            Projectile.frameCounter = 0;
+                        }
+                    }
+                }
+            }
+            else //FOLLOW PLAYER
+            {
+                if (Projectile.velocity.X <= 0.1f & Projectile.velocity.X >= -0.1f) //barely moving
+                {
+                    Projectile.frame = 3; //stand still frame
                     Projectile.frameCounter = 0; //reset
                 }
-				else //walk cycle
-				{
+                else //walk cycle
+                {
                     Projectile.frameCounter++; //walking
                     if (Projectile.frameCounter >= 5)
                     {
@@ -304,19 +292,19 @@ namespace KirboMod.Projectiles
                     }
                 }
 
-				if (vectorToIdlePosition.Y <= -50f & jumpTimer <= 0 && spaceJumping == false) //jump (lower distance when following player)
-				{
+                if (vectorToIdlePosition.Y <= -50f & jumpTimer <= 0 && spaceJumping == false) //jump (lower distance when following player)
+                {
                     Jump();
                 }
 
-				if (Math.Abs(vectorToIdlePosition.X) < 10f) //near idle position
-				{
-					Projectile.velocity.X *= 0.8f; //slow
-				}
-				else if (distanceToIdlePosition <= 1000f) //walk within a certain range
-				{
-					float speed = 7f;
-					float inertia = 6f;
+                if (Math.Abs(vectorToIdlePosition.X) < 10f) //near idle position
+                {
+                    Projectile.velocity.X *= 0.8f; //slow
+                }
+                else if (distanceToIdlePosition <= 1000f) //walk within a certain range
+                {
+                    float speed = 7f;
+                    float inertia = 6f;
                     Vector2 direction = IdlePosition - Projectile.Center; //start - end
                     int pseudoDirection = 1;
                     if (direction.X < 0) //enemy is behind
@@ -326,15 +314,13 @@ namespace KirboMod.Projectiles
                     //we put this instead of player.Center so it will always be moving top speed instead of slowing down when enemy is near but unreachable
                     //A "carrot on a stick" if you will
 
-                    Vector2 carrotDirection = Projectile.Center + new Vector2(pseudoDirection * 50, 0) - Projectile.Center; //start - end 
-                    carrotDirection.Normalize();
-                    carrotDirection *= speed;
+                    Vector2 carrotDirection = new(pseudoDirection * speed, 0); //start - end 
 
                     //use .X so it only effects horizontal movement
                     Projectile.velocity.X = (Projectile.velocity.X * (inertia - 1) + carrotDirection.X) / inertia;
                 }
-				else //teleport
-				{
+                else //teleport
+                {
                     spaceJumping = true;
                 }
             }
@@ -382,30 +368,36 @@ namespace KirboMod.Projectiles
             }
 
             if (jumpTimer > 0 && attack <= 0) //jump frame time
-			{
-				Projectile.frame = 16; //jump frame
+            {
+                Projectile.frame = 16; //jump frame
             }
-		}
+        }
 
-		private void Attack()
-		{
+        private void Attack()
+        {
             Player player = Main.player[Projectile.owner];
             //SLASH
             if (attacktype == 0)
-			{
-				attack++; //starts at 1
-				if (attack == 1) //inital slash
-				{
-					Projectile.frame = 7; //slash frame
-					Projectile.velocity.X = 40 * Projectile.direction; //20 times 1(right) or -1(left)
-					Projectile.velocity.Y = 0;
-					Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, ModContent.ProjectileType<BioMinionSlashHitbox>(), Projectile.damage * 3, 8, player.whoAmI, Projectile.whoAmI);
-					SoundEngine.PlaySound(SoundID.Item1, Projectile.Center);
-				}
-				else if (attack > 1) //slow down
-				{
-					Projectile.velocity.X *= 0.92f;
-                    Projectile.velocity.Y = 0;
+            {
+                attack++; //starts at 1
+
+                
+                if (attack == 1) //inital slash
+                {
+                    Vector2 targetPos = aggroTarget.Center + aggroTarget.velocity * 5;
+                    Vector2 tpPos = targetPos + new Vector2(120 * -Projectile.direction, 0).RotatedBy(Projectile.identity * 0.166f % 1 - 0.5f);
+                 
+                    Projectile.frame = 7; //slash frame
+                    Projectile.velocity = Vector2.Normalize(targetPos - tpPos) * 40f;
+                    YellowDustBurst();
+                    Projectile.Center = tpPos;
+                    YellowDustBurst();
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, ModContent.ProjectileType<BioMinionSlashHitbox>(), Projectile.damage, 8, player.whoAmI, Projectile.whoAmI);
+                    SoundEngine.PlaySound(SoundID.Item1, Projectile.Center);
+                }
+                else if (attack > 1) //slow down
+                {
+                    Projectile.velocity *= 0.92f;
                 }
 
                 if (attack >= 1) //slash animation
@@ -420,91 +412,117 @@ namespace KirboMod.Projectiles
                         }
                     }
                 }
+                EmitYellowDust(1);
+                if (attack >= 21) //reset
+                {
+                    attacking = false;
+                    attack = 0;
+                }
+            }
 
-				if (attack >= 21) //reset
-				{
-					attacking = false;
-					attack = 0;
-				}
-			}
+            if (attacktype == 1) //Kunai flurry
+            {
+                Vector2 targetPos = aggroTarget.Center + new Vector2(100 * Projectile.direction, 0).RotatedBy(Projectile.identity * 0.166f % 1 - 0.5f);
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity, 20f * Vector2.Normalize(targetPos - Projectile.Center), 0.2f);
 
-			if (attacktype == 1) //Kunai flurry
-			{
-			    attack++;
+                attack++;
 
-				Projectile.velocity.X *= 0.8f;
-				Projectile.frame = 4; //ready kunai frame
+                Projectile.velocity.X *= 0.8f;
+                Projectile.frame = 4; //ready kunai frame
 
                 if (attack > 10 && attack < 20)
                 {
                     if (attack % 3 == 0) //remiander is 0 (multiple of 3)
                     {
-                        //set direction for each kunai (also slightly predict movement)
-                        Vector2 Kunaidirection = aggroTarget.Center + aggroTarget.velocity - Projectile.Center;
-                        Kunaidirection.Normalize();
-                        Kunaidirection *= 20f;
+                        int type = ModContent.ProjectileType<GoodBioDagger>();
+                        float shootSpeed = 20f / ContentSamples.ProjectilesByType[type].MaxUpdates;
+                        Utils.ChaseResults results = Utils.GetChaseResults(Projectile.Center, shootSpeed, aggroTarget.Center, aggroTarget.velocity);
+                        Vector2 Kunaidirection = results.InterceptionHappens ? results.ChaserVelocity : (Vector2.Normalize(aggroTarget.Center - Projectile.Center * shootSpeed));
+                        
 
-                        Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Kunaidirection, ModContent.ProjectileType<GoodBioDagger>(), 
-                            Projectile.damage, 4, player.whoAmI); //not dividing damage due to expert scaling btw
-						SoundEngine.PlaySound(SoundID.Item1, Projectile.Center);
-					}
+                        Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Kunaidirection, type,
+                            Projectile.damage, 4, player.whoAmI, aggroTarget.whoAmI); //not dividing damage due to expert scaling btw
+                        SoundEngine.PlaySound(SoundID.Item1, Projectile.Center);
+                    }
 
                     Projectile.frame = 5; //throw kunai frame
                 }
 
-				if (attack >= 40) //reset
+                if (attack >= 40) //reset
                 {
                     attacking = false;
-                    daggerCoolDown = 120;
-					attack = 0;
+                    daggerCoolDown = 100;
+                    attack = 0;
                 }
-			}
-		}
+            }
+        }
 
         private void Jump()
         {
-            Projectile.velocity.Y = -10f; //velocityY boosts up 
+            Projectile.velocity.Y = -20f; //velocityY boosts up 
             jumpTimer = 15;
             Projectile.frame = 16; //jump frame
         }
 
         public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
-		{
-			Player player = Main.player[Projectile.owner];
+        {
+            Player player = Main.player[Projectile.owner];
 
-			if (aggroTarget != null && aggroTarget.active && !aggroTarget.dontTakeDamage) //fall to enemy
-			{
-				Vector2 toTarget = aggroTarget.Center - Projectile.Center;
-				// Here we check if the NPC is below the minion and 300/16 = 18.25 tiles away horizontally
-				if (toTarget.Y > 10 && Math.Abs(toTarget.X) < 300)
-				{
-					fallThrough = true;
-				}
-				else
-				{
-					fallThrough = false;
-				}
-			}
-			else //fall to player
-			{
-				Vector2 toPlayer = player.Center - Projectile.Center;
+            if (aggroTarget != null && aggroTarget.active && !aggroTarget.dontTakeDamage) //fall to enemy
+            {
+                Vector2 toTarget = aggroTarget.Center - Projectile.Center;
+                // Here we check if the NPC is below the minion and 300/16 = 18.25 tiles away horizontally
+                if (toTarget.Y > 10 && Math.Abs(toTarget.X) < 300)
+                {
+                    fallThrough = true;
+                }
+                else
+                {
+                    fallThrough = false;
+                }
+            }
+            else //fall to player
+            {
+                Vector2 toPlayer = player.Center - Projectile.Center;
 
-				if (toPlayer.Y > 10 && Math.Abs(toPlayer.X) < 300)
-				{
-					fallThrough = true;
-				}
-				else
-				{
-					fallThrough = false;
-				}
-			}
-			return base.TileCollideStyle(ref width, ref height, ref fallThrough, ref hitboxCenterFrac);
-		}
+                if (toPlayer.Y > 10 && Math.Abs(toPlayer.X) < 300)
+                {
+                    fallThrough = true;
+                }
+                else
+                {
+                    fallThrough = false;
+                }
+            }
+            return base.TileCollideStyle(ref width, ref height, ref fallThrough, ref hitboxCenterFrac);
+        }
 
         //DRAWING SPACE JUMP
 
         public static Asset<Texture2D> JumpStar;
-
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+        {
+            return false;
+        }
+        void YellowDustBurst()
+        {
+            for (int i = 0; i < 7; i++)
+            {
+                Vector2 offset = Main.rand.BetterNextVector2Circular(16f);
+                Dust dust = Dust.NewDustPerfect(Projectile.Center + offset, DustID.RainbowTorch, offset.RotatedByRandom(.3f) * 0.1f, 0, default, 2f);
+                dust.noGravity = true;
+                dust.color = Color.Yellow;
+            }
+        }
+        void EmitYellowDust(int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                Dust dust = Dust.NewDustPerfect(Projectile.Center + Main.rand.BetterNextVector2Circular(32f), DustID.RainbowTorch, Vector2.Zero);
+                dust.noGravity = true;
+                dust.color = Color.Yellow;
+            }
+        }
         public override bool PreDraw(ref Color lightColor)
         {
             if (spaceJumping == true)
@@ -517,8 +535,8 @@ namespace KirboMod.Projectiles
                 {
                     spaceJumpRotation--;
                 }
-                
-                Vector2 drawOrigin = new Vector2(texture.Width / 2, texture.Height / 2);
+
+                Vector2 drawOrigin = new(texture.Width / 2, texture.Height / 2);
                 Vector2 drawPos = Projectile.position - Main.screenPosition + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
 
                 Main.EntitySpriteDraw(texture, drawPos, null, Color.White, spaceJumpRotation, drawOrigin, 1, SpriteEffects.None, 0);
@@ -533,7 +551,7 @@ namespace KirboMod.Projectiles
 
                 for (int k = 1; k < Projectile.oldPos.Length; k++) //start at 1 so no ontop of actual star
                 {
-                    Vector2 drawOrigin2 = new Vector2(texture.Width / 2, texture.Height / 2);
+                    Vector2 drawOrigin2 = new(texture.Width / 2, texture.Height / 2);
                     Vector2 drawPos2 = (Projectile.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
 
                     Color color = Color.DodgerBlue * ((Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);

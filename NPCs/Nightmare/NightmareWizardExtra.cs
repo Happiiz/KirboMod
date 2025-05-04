@@ -1,25 +1,28 @@
-using KirboMod.Items.Zero;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using Terraria;
-using Terraria.Audio;
-using Terraria.ID;
-using Terraria.ModLoader;
-using Terraria.GameContent.Bestiary;
-using Terraria.GameContent.ItemDropRules;
 using KirboMod.Items;
 using KirboMod.Items.Nightmare;
-using KirboMod.Systems;
-using System.IO;
 using KirboMod.Projectiles.NightmareLightningOrb;
+using KirboMod.Systems;
+using Microsoft.Xna.Framework;
+using System;
+using System.IO;
+using Terraria;
+using Terraria.Audio;
+using Terraria.GameContent.Bestiary;
+using Terraria.GameContent.ItemDropRules;
+using Terraria.ID;
+using Terraria.ModLoader;
 
 namespace KirboMod.NPCs
 {
-	public partial class NightmareWizard : ModNPC
+    public partial class NightmareWizard : ModNPC
     {
         public override string HeadTexture => "KirboMod/NPCs/Nightmare/NightmareWizard_Head_Boss";
         public override string Texture => "KirboMod/NPCs/Nightmare/NightmareWizard";
+        public static SoundStyle BodyStarSFX => new SoundStyle("KirboMod/Sounds/NPC/Nightmare/NightmareBodyStar").WithVolumeScale(0.7f);
+        public static SoundStyle TeleportSFX => new("KirboMod/Sounds/NPC/Nightmare/NightmareTeleport");
+        public static SoundStyle DashSFX => new("KirboMod/Sounds/NPC/Nightmare/NightmareDash");
+        public static SoundStyle StarShotSFX => new("KirboMod/Sounds/NPC/Nightmare/NightmareStarShot");
+        public static SoundStyle OrbSpawnSFX => new("KirboMod/Sounds/NPC/Nightmare/NightmareSpawnOrb");
         enum NightmareAttackType : byte
         {
             SpreadStars,//1
@@ -36,7 +39,7 @@ namespace KirboMod.NPCs
             // DisplayName.SetDefault("Nightmare");
             Main.npcFrameCount[NPC.type] = 25;
 
-            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers()
+            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new()
             {
                 PortraitScale = 1f, // Portrait refers to the full picture when clicking on the icon in the bestiary
                 PortraitPositionYOverride = 70f,
@@ -53,7 +56,7 @@ namespace KirboMod.NPCs
             DrawOffsetY = 20;
             NPC.damage = 70;
             NPC.noTileCollide = true;
-            NPC.lifeMax = 24000;
+            NPC.lifeMax = 20000;
             NPC.defense = 20;
             NPC.HitSound = SoundID.NPCHit2; //bone
             NPC.DeathSound = SoundID.NPCDeath2; //undead
@@ -119,8 +122,8 @@ namespace KirboMod.NPCs
         {
             npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<NightmareBag>())); //only drops in expert
 
-            LeadingConditionRule notExpertRule = new LeadingConditionRule(new Conditions.NotExpert()); //checks if not expert
-            LeadingConditionRule masterMode = new LeadingConditionRule(new Conditions.IsMasterMode()); //checks if master mode
+            LeadingConditionRule notExpertRule = new(new Conditions.NotExpert()); //checks if not expert
+            LeadingConditionRule masterMode = new(new Conditions.IsMasterMode()); //checks if master mode
 
             notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<NightCloth>(), 1, 15, 15));
 
@@ -150,14 +153,14 @@ namespace KirboMod.NPCs
 
         public override void HitEffect(NPC.HitInfo hit)
         {
-            if(NPC.life <= 0)
+            if (NPC.life <= 0)
             {
                 int lightningOrb1 = ModContent.ProjectileType<NightmareLightningOrb>();
                 int lightningOrb2 = ModContent.ProjectileType<NightmareLightningOrbHoming>();
                 for (int i = 0; i < Main.maxProjectiles; i++)
                 {
                     Projectile projectile = Main.projectile[i];
-                    if(projectile.active && (projectile.type == lightningOrb2 || projectile.type == lightningOrb1))
+                    if (projectile.active && (projectile.type == lightningOrb2 || projectile.type == lightningOrb1))
                     {
                         projectile.Kill();
                     }
@@ -165,23 +168,50 @@ namespace KirboMod.NPCs
             }
             if (deathCounter >= 360 && NPC.life <= 0)
             {
-                for (int i = 0; i < 8; i++) 
+                for (int i = 0; i < 8; i++)
                 {
                     // go around in a octogonal pattern
-                    Vector2 speed = new Vector2((float)Math.Cos(MathHelper.ToRadians(i * 45)) * 20, (float)Math.Sin(MathHelper.ToRadians(i * 45)) * 20);
+                    Vector2 speed = new((float)Math.Cos(MathHelper.ToRadians(i * 45)) * 20, (float)Math.Sin(MathHelper.ToRadians(i * 45)) * 20);
 
                     Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.NightStar>(), speed, Scale: 3f); //Makes dust in an octogonal formation
                     d.noGravity = true;
                 }
 
-                for (int i = 0; i < 20; i++) 
+                for (int i = 0; i < 20; i++)
                 {
                     Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
                     Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center, speed, Main.rand.Next(11, 13), Scale: 2f); //double jump smoke
                 }
             }
         }
-
+        public static void PlayTeleportSoundEffect(Vector2 pos)
+        {
+            SoundEngine.PlaySound(TeleportSFX, pos);
+        }
+        void PlayTeleportSoundEffect()
+        {
+            SoundEngine.PlaySound(TeleportSFX, NPC.Center);
+        }
+        public static void PlayBodyStarSoundEffect(Vector2 pos)
+        {
+            SoundEngine.PlaySound(BodyStarSFX, pos);
+        }
+        void PlayBodyStarSoundEffect()
+        {
+            SoundEngine.PlaySound(BodyStarSFX, NPC.Center);
+        }
+        void PlayStarShotSoundEffect()//NOT MADE YET, DON'T CALL
+        {
+            SoundEngine.PlaySound(StarShotSFX, NPC.Center);
+        }
+        void PlayOrbSpawnSoundEffect()//NOT MADE YET, DON'T CALL
+        {
+            SoundEngine.PlaySound(OrbSpawnSFX, NPC.Center);
+        }
+        void PlayDashSoundEffect()//NOT MADE YET, DON'T CALL
+        {
+            SoundEngine.PlaySound(DashSFX, NPC.Center);
+        }  
         public override Color? GetAlpha(Color lightColor)
         {
             return Color.White; // Makes it uneffected by light

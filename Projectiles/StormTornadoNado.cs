@@ -28,7 +28,7 @@ namespace KirboMod.Projectiles
 
             //uses own immunity frames
             Projectile.usesLocalNPCImmunity = true;
-            Projectile.localNPCHitCooldown = 5;
+            Projectile.localNPCHitCooldown = 20;
             Projectile.scale = 1.6f;
             Projectile.ContinuouslyUpdateDamageStats = true;
         }
@@ -37,7 +37,7 @@ namespace KirboMod.Projectiles
         public static int LightningRate => 10;
         int ManaToUse => (int)Projectile.ai[1];
         static float StormCloudDamageMult => 0.5f;
-        static float ThunderDamageMult => 0.5f;
+        static float ThunderDamageMult => 1;
         public override Color[] SetPalette()
         {
             Color[] palette = { Color.White, Color.Black, Color.MediumPurple };
@@ -50,9 +50,9 @@ namespace KirboMod.Projectiles
             Projectile.ai[0]++;
             player.manaRegenDelay = 20;
             player.manaRegenCount = 0;
-            bool manaIsAvailable = player.CheckMana(10);
+            bool manaIsAvailable = player.CheckMana(ManaToUse);
             bool stillInUse = player.channel && manaIsAvailable && !player.noItems && !player.CCed;
-            if (Projectile.ai[0] % 20 == 0)
+            if (Projectile.ai[0] % 20 == 1 && Projectile.ai[0] != 1)//don't use mana the first cycle because the item already used it
             {
                 player.CheckMana(ManaToUse, true); //consume ManaToUse mana every 20 frames, affected by player's mana reduction stat
             }
@@ -82,20 +82,12 @@ namespace KirboMod.Projectiles
                 }
               
             }
-
-            if (++Projectile.frameCounter >= 4) //changes frames every 4 ticks 
-            {
-                Projectile.frameCounter = 0;
-                if (++Projectile.frame >= Main.projFrames[Projectile.type])
-                {
-                    Projectile.frame = 0;
-                }
-            }
-
             //Storm Cloud
             if (Projectile.ai[0] % 5 == 0 && Main.myPlayer == Projectile.owner)
             {
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Main.rand.NextVector2FromRectangle(Projectile.Hitbox), Projectile.velocity * 0.01f, ModContent.ProjectileType<Projectiles.StormTornadoCloud>(), (int)(Projectile.damage * StormCloudDamageMult), 0f, Projectile.owner);
+                Vector2 offset = Main.rand.BetterNextVector2Circular(40);
+                offset.Y *= 1.5f;
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + offset, Projectile.velocity * 0.01f, ModContent.ProjectileType<Projectiles.StormTornadoCloud>(), (int)(Projectile.damage * StormCloudDamageMult), 0f, Projectile.owner);
             }
 
             //"Thunder"
@@ -142,17 +134,18 @@ namespace KirboMod.Projectiles
                     target = i;
                 }
             }
+            Vector2 projSpawnPos = center + Main.rand.BetterNextVector2Circular(32f);
             if (target != -1)
             {
                 NPC targetNPC = Main.npc[target];
-                Utils.ChaseResults results = Utils.GetChaseResults(center, speed.Length(), targetNPC.Center, targetNPC.velocity);
+                Utils.ChaseResults results = Utils.GetChaseResults(projSpawnPos, speed.Length(), targetNPC.Center, targetNPC.velocity);
                 if (results.InterceptionHappens)
                 {
                     speed = results.ChaserVelocity;
                 }
             }
             LightningProj.GetSpawningStats(speed, out float ai0, out float ai1);
-            Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, speed,
+            Projectile.NewProjectile(Projectile.GetSource_FromThis(),projSpawnPos, speed,
                 ModContent.ProjectileType<StormTornadoLightning>(), (int)(Projectile.damage * ThunderDamageMult) , 0f, Projectile.owner, ai0, ai1);
         }
 

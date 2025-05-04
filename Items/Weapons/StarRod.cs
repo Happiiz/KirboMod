@@ -22,11 +22,11 @@ namespace KirboMod.Items.Weapons
 			Item.damage = 80; 
 			Item.noMelee = true;
 			Item.DamageType = DamageClass.Magic;
-			Item.mana = 8;
+			Item.mana = 20;
 			Item.width = 40;
 			Item.height = 40;
 			Item.useTime = 20;
-			Item.useAnimation = 20;
+			Item.useAnimation = Item.useTime;
 			Item.useStyle = ItemUseStyleID.Swing;
 			Item.knockBack = 6;
 			Item.value = Item.buyPrice(0, 0, 15, 50);
@@ -49,9 +49,7 @@ namespace KirboMod.Items.Weapons
 		{
 			if (Main.myPlayer != player.whoAmI)
 				return false;
-			Projectile proj = Projectile.NewProjectileDirect(source, position, velocity, ModContent.ProjectileType<Projectiles.Star>(), damage, knockback, player.whoAmI);
-			proj.rotation += Main.rand.NextFloat() * MathF.Tau;
-			proj.netUpdate = true;
+			Projectile.NewProjectileDirect(source, position, velocity, ModContent.ProjectileType<Projectiles.Star>(), damage, knockback, player.whoAmI);
 			return false;
 		}
 

@@ -13,7 +13,9 @@ namespace KirboMod.Projectiles
 			Main.projFrames[Projectile.type] = 1;
             ProjectileID.Sets.MinionShot[Type] = true;
         }
-
+		public static float Gravity => 0.2f;
+		public static Vector2 GravityVec => new Vector2(0, Gravity);
+		public static float MaxFallSpeed => 6f;
 		public override void SetDefaults()
 		{
 			Projectile.width = 20;
@@ -28,10 +30,10 @@ namespace KirboMod.Projectiles
 		{
 			Projectile.ai[0]++;
 			Projectile.velocity.Y = Projectile.velocity.Y + 0.2f;
-			if (Projectile.velocity.Y >= 6f)
-            {
-				Projectile.velocity.Y = 6f;
-            }
+			//if (Projectile.velocity.Y >= MaxFallSpeed)
+   //         {
+			//	Projectile.velocity.Y = MaxFallSpeed;
+   //         }
 			Projectile.rotation += 0.1f; // rotates projectile
 		}
         public override void OnKill(int timeLeft) //when the projectile dies

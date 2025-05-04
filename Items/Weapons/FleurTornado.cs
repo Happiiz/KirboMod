@@ -52,7 +52,7 @@ namespace KirboMod.Items.Weapons
 
         public override bool CanUseItem(Player player)
         {
-            return player.statMana > 40 && player.ownedProjectileCounts[Item.shoot] < 1;
+            return player.statMana >= player.statManaMax2 && player.ownedProjectileCounts[Item.shoot] < 1;
         }
 
         public override void AddRecipes()

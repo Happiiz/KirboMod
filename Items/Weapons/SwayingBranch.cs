@@ -1,6 +1,4 @@
 using Microsoft.Xna.Framework;
-using System;
-using System.Reflection;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
@@ -23,8 +21,8 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 15;
-			Item.knockBack = 0;
+			Item.damage = 17;
+			Item.knockBack = 1;
 			Item.mana = 15;
 			Item.width = 40;
 			Item.height = 40;
@@ -49,11 +47,10 @@ namespace KirboMod.Items.Weapons
 			//adjust pushYUp here depending on how high your projectile hitbox is
 			pushYUp = 71;
 			type = ModContent.ProjectileType<Projectiles.MiniWhispy>();
-			damage = Item.damage;
-			knockback = Item.knockBack;
+			//damage = Item.damage;
+			//knockback = Item.knockBack;
             int index = Projectile.NewProjectile(source, worldX, worldY - pushYUp, 0f, 0f, type, damage, knockback, Main.myPlayer);
-            Main.projectile[index].originalDamage = Item.damage; //make damage scale dynamically
-
+            Main.projectile[index].originalDamage = damage;
             player.UpdateMaxTurrets(); //This despawns old sentries so spawning new ones will not go above player.maxTurrets
 
 

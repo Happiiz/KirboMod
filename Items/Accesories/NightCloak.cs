@@ -26,7 +26,6 @@ namespace KirboMod.Items.Accesories
 		public override void UpdateAccessory(Player player, bool hideVisual) 
 		{
 			player.GetModPlayer<KirbPlayer>().nightcloak = true;
-			hideVisual = true;
 		}
 
 		public override int ChoosePrefix(UnifiedRandom rand) {

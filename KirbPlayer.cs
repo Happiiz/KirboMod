@@ -1,5 +1,6 @@
 using KirboMod.Items.Armor.Photonic0Boots;
 using KirboMod.Items.Weapons;
+using KirboMod.NPCs;
 using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
 using System;
@@ -324,7 +325,7 @@ namespace KirboMod
             }
 
             // NIGHTMARE CROWN
-            if (nightcrown)
+            if (nightcrown && Main.myPlayer == Player.whoAmI)
             {
                 Point mouselocation = Main.MouseWorld.ToTileCoordinates();
 
@@ -957,7 +958,7 @@ namespace KirboMod
                     Dust.NewDustPerfect(pos + Player.Center, DustID.ShadowbeamStaff, Vector2.Zero);
                 }
             }
-            SoundEngine.PlaySound(SoundID.Item4, Player.Center); //life crystal
+            NightmareWizard.PlayBodyStarSoundEffect(Player.Center);
         }
         private static void GetNightCloakValues(Player.HurtInfo info, out int damage, out float numStars, out float starShootSpeed, out int type, out int numStarsCeil, out float starAi2)
         {
@@ -976,6 +977,7 @@ namespace KirboMod
             if (numStars > 50)
             {
                 numStars = 50;
+                numStarsCeil = 50;
             }
         }
         public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo)

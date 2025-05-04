@@ -2,27 +2,20 @@ using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 using Terraria;
-using Terraria.Audio;
-using Terraria.Chat;
-using Terraria.DataStructures;
-using Terraria.GameContent.Bestiary;
 using Terraria.ID;
-using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace KirboMod.NPCs
 {
-	public partial class NightmareOrb : ModNPC
-	{
+    public partial class NightmareOrb : ModNPC
+    {
         public override string HeadTexture => "KirboMod/NPCs/Nightmare/NightmareOrb_Head_Boss";
         public override string Texture => "KirboMod/NPCs/Nightmare/NightmareOrb";
         Vector2 GetTargetPosOffset(float changeRate = 0.05f)
         {
             int moveType = AttacksPerformedSinceSpawn / 2 % 3;
-            Vector2 offset = new Vector2(MathF.Sin(NPC.ai[0] * changeRate * 2 + MathF.PI) * 250, MathF.Sin(NPC.ai[0] * changeRate) * 250);
+            Vector2 offset = new(MathF.Sin(NPC.ai[0] * changeRate * 2 + MathF.PI) * 250, MathF.Sin(NPC.ai[0] * changeRate) * 250);
             if (moveType == 1)
             {
                 offset.X = 0;
@@ -32,40 +25,41 @@ namespace KirboMod.NPCs
                 offset.Y = 0;
                 offset.X += MathF.CopySign(100, NPC.Center.X - Main.player[NPC.target].Center.X);//100 is horizontal offset to player
             }
-            offset.X += MathF.CopySign(500,NPC.Center.X - Main.player[NPC.target].Center.X);//500 is horizontal offset to player
+            offset.X += MathF.CopySign(500, NPC.Center.X - Main.player[NPC.target].Center.X);//500 is horizontal offset to player
             return offset;
         }
         /// <summary>
         /// these values are already divided by 2
         /// </summary>
         static Dictionary<NightmareOrbAtkType, int> dmgPerAtkType = new()
-		{
-			{ NightmareOrbAtkType.SlashBeam, 60 / 2},
-			{ NightmareOrbAtkType.SingleStar, 40 / 2},
-			{ NightmareOrbAtkType.TripleStar, 40 / 2},
-			{ NightmareOrbAtkType.HomingStar, 50 / 2}
-		};
-		private NightmareOrbAtkType AttackType { get => (NightmareOrbAtkType)NPC.ai[2]; set => NPC.ai[2] = (int)value; }
+        {
+            { NightmareOrbAtkType.SlashBeam, 60 / 2},
+            { NightmareOrbAtkType.SingleStar, 40 / 2},
+            { NightmareOrbAtkType.TripleStar, 40 / 2},
+            { NightmareOrbAtkType.HomingStar, 50 / 2}
+        };
+        private NightmareOrbAtkType AttackType { get => (NightmareOrbAtkType)NPC.ai[2]; set => NPC.ai[2] = (int)value; }
         int AttacksPerformedSinceSpawn { get => (int)NPC.ai[1]; set => NPC.ai[1] = value; }
-		public bool frenzy { get => NPC.ai[3] == 1f; set => NPC.ai[3] = value ? 1f : 0f; }
+        public bool frenzy { get => NPC.ai[3] == 1f; set => NPC.ai[3] = value ? 1f : 0f; }
+        static int DashSFXTimeOffset => 80;
         public override void AI() //constantly cycles each time
         {
-			Player player = Main.player[NPC.target];
+            Player player = Main.player[NPC.target];
 
-			NPC.TargetClosest(true);
-			{
+            NPC.TargetClosest(true);
+            {
                 if (NPC.target < 0 || NPC.target == 255 || player.dead || !player.active || Main.dayTime == true)
-				{
-					NPC.ai[0] = 0;
-					
-					NPC.velocity.Y = NPC.velocity.Y - 0.4f;
-					if (NPC.timeLeft > 60)
-					{
-						NPC.timeLeft = 60;
-						return;
-					}
-				}
-				else //regular attack stuff
+                {
+                    NPC.ai[0] = 0;
+
+                    NPC.velocity.Y = NPC.velocity.Y - 0.4f;
+                    if (NPC.timeLeft > 60)
+                    {
+                        NPC.timeLeft = 60;
+                        return;
+                    }
+                }
+                else //regular attack stuff
                 {
                     //checks if should go frenzy (expert mode special phase)
                     if (Main.expertMode && NPC.GetLifePercent() <= 0.4f && AttackType == NightmareOrbAtkType.DecideNext)
@@ -76,13 +70,11 @@ namespace KirboMod.NPCs
                     DecideNextAttack();
                     AttackPattern();
                 }
-			}
-		}
-        void DecideNextAttack()
-        {                     
-            if (AttackType == NightmareOrbAtkType.DecideNext && NPC.ai[0] >= 30)//time between attacks
-            {
-                NightmareOrbAtkType[] atkOrder = new NightmareOrbAtkType[]
+            }
+        }
+        NightmareOrbAtkType[] GetAttackOrder()
+        {
+            return new NightmareOrbAtkType[]
                 {
                 NightmareOrbAtkType.SingleStar,
                 NightmareOrbAtkType.HomingStar,
@@ -92,20 +84,39 @@ namespace KirboMod.NPCs
                 NightmareOrbAtkType.TripleStar,
                 NightmareOrbAtkType.Dash
                 };
-                AttackType = atkOrder[AttacksPerformedSinceSpawn % atkOrder.Length];
+        }
+        void DecideNextAttack()
+        {
+
+            if (AttackType == NightmareOrbAtkType.DecideNext)
+            {
+                NightmareOrbAtkType[] atkOrder = GetAttackOrder();
+                NightmareOrbAtkType nextAtkType = atkOrder[AttacksPerformedSinceSpawn % atkOrder.Length];
+                if(nextAtkType == NightmareOrbAtkType.Dash)
+                {
+                    CheckToPlayDashSFX();
+                }
+                if (NPC.ai[0] >= 30)//time between attacks
+                {
+                    AttackType = nextAtkType;
+                }
             }
         }
-		private void AttackPattern()
-		{
+        private void AttackPattern()
+        {
             Player player = Main.player[NPC.target];
 
             NPC.ai[0]++;
-
-            if (AttackType != NightmareOrbAtkType.Dash)
+            if(AttackType == NightmareOrbAtkType.Spawn)
+            {
+                Intro();
+                return;
+            }
+            if (AttackType != NightmareOrbAtkType.Dash && AttackType != NightmareOrbAtkType.Spawn)
             {
                 MainMovement(player);
             }
-            if (AttackType == NightmareOrbAtkType.SingleStar)//stars
+            if (AttackType == NightmareOrbAtkType.SingleStar)
             {
                 AttackSingleStar(player);
             }
@@ -113,11 +124,11 @@ namespace KirboMod.NPCs
             {
                 AttackSlashBeam(player);
             }
-            else if (AttackType == NightmareOrbAtkType.TripleStar)//star barrage
+            else if (AttackType == NightmareOrbAtkType.TripleStar)
             {
                 AttackTripleStar();
             }
-            else if (AttackType == NightmareOrbAtkType.HomingStar)//homing stars
+            else if (AttackType == NightmareOrbAtkType.HomingStar)
             {
                 AttackHomingStar();
             }
@@ -126,6 +137,21 @@ namespace KirboMod.NPCs
                 AttackDash();
             }
         }
+
+        private void Intro()
+        {
+            float velY = Helper.RemapEased(NPC.ai[0], 0, 40, -10, 0, Easings.EaseOutSquare);
+            NPC.velocity.Y = velY;
+            if (NPC.ai[0] >= 60)
+            {
+                NPC.dontTakeDamage = false;
+            }
+            if (NPC.ai[0] >= 400)
+            {
+                EndAttack();
+            }
+        }
+
         private void MainMovement(Player player)
         {
             Vector2 move = player.Center - NPC.Center + GetTargetPosOffset(0.05f);
@@ -164,7 +190,7 @@ namespace KirboMod.NPCs
                 {
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, new Vector2(NPC.direction * 20, 0), ModContent.ProjectileType<NightSlash>(), dmgPerAtkType[AttackType], 0f, Main.myPlayer, 0, 0);
                 }
-                SoundEngine.PlaySound(SoundID.Item15, NPC.Center); //phasesaber
+                PlaySlashBeamSFX();
             }
             if (NPC.ai[0] >= startTime + fireRate * 5)//5 is number of waves
             {
@@ -190,7 +216,7 @@ namespace KirboMod.NPCs
                     //Up
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, NPC.direction * 10, -5, ModContent.ProjectileType<BadStar>(), dmgPerAtkType[AttackType], 0f, Main.myPlayer, 0, 0);
                 }
-                SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
+                PlaySpreadShotSFX();
             }
             if (NPC.ai[0] > startTime + fireRate * numberOfShots)
             {
@@ -206,7 +232,8 @@ namespace KirboMod.NPCs
             {
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
-                    Vector2[] shotDirections = new Vector2[] { new Vector2(-20, 80), new Vector2(-80, -120), new Vector2(-80, 120), new Vector2(-20, -80) };
+                    Vector2[] shotDirections = new Vector2[] { new(-20, 80), new(-80, -120), new(-80, 120), new(-20, -80) };
+                    int starsSpawned = 0;
                     for (int i = 0; i < Main.maxPlayers; i++)
                     {
                         Player possibleTarget = Main.player[i];
@@ -215,16 +242,16 @@ namespace KirboMod.NPCs
                         for (int j = 0; j < shotDirections.Length; j++)
                         {
                             Vector2 projVel = shotDirections[j] with { X = NPC.direction * shotDirections[j].X };
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projVel * 2, ModContent.ProjectileType<HomingNightStar>(), dmgPerAtkType[AttackType], 0f, Main.myPlayer, NPC.whoAmI, i);
+                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projVel * 2, ModContent.ProjectileType<HomingNightStar>(), dmgPerAtkType[AttackType], 0f, Main.myPlayer, NPC.whoAmI, i, starsSpawned);
+                            starsSpawned++;
                         }
                     }
                 }
-                SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
             }
             if (NPC.ai[0] > startTime + (numberOfShots + 1) * fireRate)
             {
-				EndAttack();
-			}
+                EndAttack();
+            }
         }
         private void AttackSingleStar(Player player)
         {
@@ -236,32 +263,41 @@ namespace KirboMod.NPCs
             int fireRate = frenzy ? 12 : 15;
             int startTime = 49;
             int numberOfShots = frenzy ? 13 : 8;
-			if ((NPC.ai[0] - startTime) % fireRate == 0)
+            if ((NPC.ai[0] - startTime) % fireRate == 0)
             {
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, shootVel, ModContent.ProjectileType<BadStar>(), dmgPerAtkType[AttackType], 0f, Main.myPlayer, 0, 0);
                 }
-                SoundEngine.PlaySound(SoundID.MaxMana, NPC.Center);
+                PlayStarThrowSFX();
             }
-			if (NPC.ai[0] > startTime + numberOfShots * fireRate)
-			{
-				EndAttack();
-			}
-		}
+            if (NPC.ai[0] > startTime + numberOfShots * fireRate)
+            {
+                EndAttack();
+            }
+        }
 
 
         float DashXOffset()
         {
             float dashTime = GetDashTime();
             if (NPC.ai[0] < dashTime / 1.8f)
-                return MathHelper.Lerp(100,900, Easings.EaseInOutSine(Utils.GetLerpValue(0, dashTime, NPC.ai[0]))) * NPC.direction;
+                return MathHelper.Lerp(100, 900, Easings.EaseInOutSine(Utils.GetLerpValue(0, dashTime, NPC.ai[0]))) * NPC.direction;
             if (NPC.ai[0] < dashTime)
                 return 900 * NPC.direction;
             return NPC.direction;//don't set t 0 otherwise it wil just stay still
-        }   
+        }
+        void CheckToPlayDashSFX()
+        {
+            int dashTime = (int)GetDashTime();
+            if (NPC.ai[0] == dashTime - DashSFXTimeOffset)
+            {
+                PlayDashChargeSFXSlow();
+            }
+        }
         private void AttackDash()
         {
+
             Player player = Main.player[NPC.target];
             Vector2 targetPos = player.Center - new Vector2(DashXOffset(), 0);
             float dashTime = GetDashTime();
@@ -271,11 +307,18 @@ namespace KirboMod.NPCs
             if ((MathF.Sign(player.Center.X - (NPC.Center.X - NPC.direction * 100)) != MathF.Sign(NPC.velocity.X) && NPC.ai[0] > dashTime + 4) || NPC.ai[0] > 300)
             {
                 EndAttack();
+                return;
+            }
+            CheckToPlayDashSFX();
+            if (NPC.ai[0] == (int)dashTime)
+            {
+                PlayDashSFX();
             }
             if (dashSpeed <= 40)
             {
                 return;
             }
+
             if ((int)NPC.ai[0] % 5 == 4)
             {
                 for (float i = 0; i < MathF.Tau; i += MathF.Tau / 20f)
@@ -329,11 +372,11 @@ namespace KirboMod.NPCs
             return (int)value;
         }
         private void EndAttack(int delayBeforeNextAttack = 0)
-		{
-			NPC.ai[0] = -delayBeforeNextAttack;
-			AttackType = NightmareOrbAtkType.DecideNext;
-			NPC.netUpdate = true;
+        {
+            NPC.ai[0] = -delayBeforeNextAttack;
+            AttackType = NightmareOrbAtkType.DecideNext;
+            NPC.netUpdate = true;
             AttacksPerformedSinceSpawn++;
-		}
-	}
+        }
+    }
 }
