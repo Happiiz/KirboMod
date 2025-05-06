@@ -244,7 +244,7 @@ namespace KirboMod
                     ReadSpawnNightmareOrb(reader);
                     break;
             }
-        }
+        } 
         private static void ReadSpawnNightmareOrb(BinaryReader reader)
         {
             // don't need to re-send packet because the server will be responsible for spawning the NPC

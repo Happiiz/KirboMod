@@ -20,8 +20,9 @@ namespace KirboMod.NPCs
         public override string Texture => "KirboMod/NPCs/Nightmare/NightmareWizard";
         public static SoundStyle BodyStarSFX => new SoundStyle("KirboMod/Sounds/NPC/Nightmare/NightmareBodyStar").WithVolumeScale(0.7f);
         public static SoundStyle TeleportSFX => new("KirboMod/Sounds/NPC/Nightmare/NightmareTeleport");
-        public static SoundStyle DashSFX => new("KirboMod/Sounds/NPC/Nightmare/NightmareDash");
-        public static SoundStyle StarShotSFX => new("KirboMod/Sounds/NPC/Nightmare/NightmareStarShot");
+        public static SoundStyle DashSFX => new("KirboMod/Sounds/NPC/Nightmare/NightmareWizardDash2");
+        public static SoundStyle DashStartSFX => new("KirboMod/Sounds/NPC/Nightmare/NightmareWizardDashStart2");
+        public static SoundStyle StarShotSFX => new("KirboMod/Sounds/NPC/Nightmare/WizardStarShot");
         public static SoundStyle OrbSpawnSFX => new("KirboMod/Sounds/NPC/Nightmare/NightmareSpawnOrb");
         enum NightmareAttackType : byte
         {
@@ -56,7 +57,7 @@ namespace KirboMod.NPCs
             DrawOffsetY = 20;
             NPC.damage = 70;
             NPC.noTileCollide = true;
-            NPC.lifeMax = 20000;
+            NPC.lifeMax = 13000;
             NPC.defense = 20;
             NPC.HitSound = SoundID.NPCHit2; //bone
             NPC.DeathSound = SoundID.NPCDeath2; //undead
@@ -166,7 +167,7 @@ namespace KirboMod.NPCs
                     }
                 }
             }
-            if (deathCounter >= 360 && NPC.life <= 0)
+            if (DeathCounter >= DeathAnimDuration && NPC.life <= 0)
             {
                 for (int i = 0; i < 8; i++)
                 {
@@ -200,15 +201,19 @@ namespace KirboMod.NPCs
         {
             SoundEngine.PlaySound(BodyStarSFX, NPC.Center);
         }
-        void PlayStarShotSoundEffect()//NOT MADE YET, DON'T CALL
+        void PlayStarShotSoundEffect()
         {
-            SoundEngine.PlaySound(StarShotSFX, NPC.Center);
+            SoundEngine.PlaySound(StarShotSFX.WithVolumeScale(0.7f), NPC.Center);
         }
-        void PlayOrbSpawnSoundEffect()//NOT MADE YET, DON'T CALL
+        void PlayOrbSpawnSoundEffect()
         {
-            SoundEngine.PlaySound(OrbSpawnSFX, NPC.Center);
+            SoundEngine.PlaySound(OrbSpawnSFX with { MaxInstances = 0 }, NPC.Center);
         }
-        void PlayDashSoundEffect()//NOT MADE YET, DON'T CALL
+        void PlayDashStartSFX()
+        {
+            SoundEngine.PlaySound(DashStartSFX, NPC.Center);
+        }
+        void PlayDashSFX()
         {
             SoundEngine.PlaySound(DashSFX, NPC.Center);
         }  

@@ -230,6 +230,7 @@ namespace KirboMod.NPCs
             int numberOfShots = 3;
             if ((NPC.ai[0] - startTime) % fireRate == 0 && (NPC.ai[0] - startTime) <= numberOfShots * fireRate) //homing stars go behind it
             {
+                PlayHomingStarsSpawnSFX();
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
                     Vector2[] shotDirections = new Vector2[] { new(-20, 80), new(-80, -120), new(-80, 120), new(-20, -80) };

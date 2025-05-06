@@ -12,12 +12,14 @@ namespace KirboMod.NPCs
     public partial class NightmareOrb : ModNPC
     {
         public static SoundStyle StarThrowSFX => new("KirboMod/Sounds/NPC/Nightmare/StarThrow5");
+        public static SoundStyle HomingStarThrowSFX => new("KirboMod/Sounds/NPC/Nightmare/HomingStarThrow");
         public static SoundStyle StarSpreadShotSFX => new("KirboMod/Sounds/NPC/Nightmare/NightmareStarSpreadShot");
         public static SoundStyle SlashBeamSFX => new("KirboMod/Sounds/NPC/Nightmare/NightmareSlashShot5");
         public static SoundStyle DashSFX => new("KirboMod/Sounds/NPC/Nightmare/NightmareDash");
         public static SoundStyle FirstHitSFX => new("KirboMod/Sounds/NPC/Nightmare/NightmareOrbStart");
         public static SoundStyle DashChargeSFXSlow => new("KirboMod/Sounds/NPC/Nightmare/ChargeUpSoundSlow");
         public static SoundStyle DashChargeSFXMedium => new("KirboMod/Sounds/NPC/Nightmare/ChargeUpSoundMedium");
+        public static SoundStyle HomingStarsSpawnSFX => new("KirboMod/Sounds/NPC/Nightmare/HomingStarSpawn");
         public bool DoneFirstHit { get => NPC.soundDelay != 0; set => NPC.soundDelay = value ? int.MaxValue : 0; }
         enum NightmareOrbAtkType
         {
@@ -150,9 +152,9 @@ namespace KirboMod.NPCs
                 }
             }
         }
-        public static void PlayStarThrowSFX(Vector2 pos)
+        public static void PlayHomingStarThrowSFX(Vector2 pos)
         {
-            SoundEngine.PlaySound(StarThrowSFX, pos);
+            SoundEngine.PlaySound(HomingStarThrowSFX.WithPitchOffset(0.6f), pos);
         }
         void PlayStarThrowSFX()
         {
@@ -181,6 +183,10 @@ namespace KirboMod.NPCs
         void PlayDashChargeSFXMedium()
         {
             SoundEngine.PlaySound(DashChargeSFXMedium, NPC.Center);
+        }  
+        void PlayHomingStarsSpawnSFX()
+        {
+            SoundEngine.PlaySound(HomingStarsSpawnSFX, NPC.Center);
         }
         void PlayDashChargeSFXSlow()
         {
@@ -188,15 +194,6 @@ namespace KirboMod.NPCs
         }    
         bool ChargeUpdateCallback(ActiveSound soundInstance)
         {
-            if (Main.gamePaused)
-            {
-                soundInstance.Pause();
-            }
-            else
-            {
-                soundInstance.Resume();
-            }
-
             //sound effect stops when dash starts
             return NPC.ai[0] < GetDashTime();
         }

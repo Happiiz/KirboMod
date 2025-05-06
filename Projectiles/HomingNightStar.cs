@@ -63,7 +63,7 @@ namespace KirboMod.Projectiles
 			{
 				if (Projectile.ai[2] == 0)//used for tracking which star should play the sound effect, to avoid a bunch of stars playing the same sound effect at once.
 				{
-					NightmareOrb.PlayStarThrowSFX(Projectile.Center);
+					NightmareOrb.PlayHomingStarThrowSFX(Projectile.Center);
 				}
                 Projectile.hostile = true;
 				move.Normalize();
