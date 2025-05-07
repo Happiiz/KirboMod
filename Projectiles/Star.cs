@@ -34,6 +34,7 @@ namespace KirboMod.Projectiles
 		{
 			if (Projectile.localAI[0] == 0)
 			{
+				Projectile.soundDelay = 20 + Main.rand.Next(40);
 				Projectile.rotation = Main.rand.NextFloat(MathF.Tau);
 				Projectile.localAI[0] = 1;
 			}

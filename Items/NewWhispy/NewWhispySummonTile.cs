@@ -139,7 +139,6 @@ namespace KirboMod.Items.NewWhispy
             else
             {
                 NetMethods.SpawnWhispy(i, j);
-                //TODO: ADD NETCODE FOR WHISPY SPAWN
             }
             SoundEngine.PlaySound(SoundID.Roar, player.position);
 

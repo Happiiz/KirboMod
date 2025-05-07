@@ -1,5 +1,5 @@
 using Microsoft.Xna.Framework;
-using System;
+using System.Diagnostics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -124,18 +124,16 @@ namespace KirboMod.Projectiles
                 animation = 1; //shake
 
                 Projectile.ai[0]++;
-                if (Projectile.ai[0] % 90 == 0 && Projectile.owner == Main.myPlayer) //every multiple of 90
+                if (Projectile.ai[0] % 85 == 0 && Projectile.owner == Main.myPlayer) //every multiple of 90
                 {
                     Vector2 firingPos = Projectile.Center + new Vector2(0, -50f);
                     float shootSpeed = 17f;
                     Vector2 velocity;
                     Vector2 targetPos = targetNPC.Center;
 
-                    velocity = CalculateInterceptVelocityIterative(firingPos, targetPos, targetNPC.velocity, shootSpeed, SmullApple.Gravity, 6);
-                    //add more commas then specified if you want to specify things like x and y
-                    // velocity = velocity.RotatedByRandom(0.8f);
+                    velocity = CalculateInterceptVelocityIterative(firingPos, targetPos, targetNPC.velocity, shootSpeed, SmullApple.Gravity, 60);
                     Projectile.NewProjectile(Projectile.GetSource_FromThis(), firingPos, velocity, ModContent.ProjectileType<SmullApple>(), Projectile.damage, Projectile.knockBack, player.whoAmI, 0, 0);
-                    for (int i = 0; i < 5; i++) //spawns 5 grassblades
+                    for (int i = 0; i < 5; i++)
                     {
                         Dust.NewDustPerfect(firingPos, DustID.GrassBlades, velocity, 0, default, 1);
                     }
@@ -195,23 +193,30 @@ namespace KirboMod.Projectiles
         //thank you chatgpt
         static Vector2 CalculateInterceptVelocityIterative(Vector2 start, Vector2 target, Vector2 targetVelocity, float launchSpeed, float gravity, int iterations = 3)
         {
-            Vector2 predictedTarget = target;
-
+            Vector2 predictedTarget = target + targetVelocity;
             for (int i = 0; i < iterations; i++)
             {
-                Vector2 toPredicted = predictedTarget - start;
-                float dx = toPredicted.X;
-                float horizontalDistance = Math.Abs(dx);
+                // Recalculate the velocity needed to hit the current prediction
+                Vector2 launchVelocity = CalculateLaunchVelocity(start, predictedTarget, launchSpeed, gravity);
 
-                // Estimate time: distance divided by horizontal speed component
-                float timeEstimate = horizontalDistance / launchSpeed;
+                // If launchVelocity is zero (no solution), break early
+                if (launchVelocity == Vector2.Zero)
+                    break;
 
-                // Predict new future position
-                predictedTarget = target + targetVelocity * timeEstimate;
+                // Estimate travel time using actual velocity vector
+                float time = (predictedTarget - start).Length() / launchVelocity.Length();
+
+                // Predict target's future position using that time
+                predictedTarget = target + targetVelocity * time;
             }
-
             // After iterations, calculate final velocity to predicted position
-            return CalculateLaunchVelocity(start, predictedTarget, launchSpeed, gravity);
+            Vector2 result = CalculateLaunchVelocity(start, predictedTarget, launchSpeed, gravity);
+
+            if (result == Vector2.Zero)
+            {//throw in random velocity as a failsafe
+                result = Main.rand.NextVector2CircularEdge(launchSpeed, launchSpeed);
+            }
+            return result;
         }
 
         static Vector2 CalculateLaunchVelocity(Vector2 start, Vector2 target, float launchSpeed, float gravity)

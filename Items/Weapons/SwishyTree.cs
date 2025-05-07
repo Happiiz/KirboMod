@@ -22,8 +22,8 @@ namespace KirboMod.Items.Weapons
             Item.DamageType = DamageClass.Melee/* tModPorter Suggestion: Consider MeleeNoSpeed for no attack speed scaling */;
             Item.width = 80;
             Item.height = 80;
-            Item.useTime = 45;
-            Item.useAnimation = 45;
+            Item.useTime = 20;
+            Item.useAnimation = 20;
             Item.useStyle = ItemUseStyleID.Swing;
             Item.knockBack = 10; //6 is average
             Item.value = Item.buyPrice(0, 0, 0, 60);

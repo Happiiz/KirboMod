@@ -36,6 +36,7 @@ namespace KirboMod.Items.Weapons
 			Item.shoot = ModContent.ProjectileType<Projectiles.Star>();
 			Item.shootSpeed = 32f;
 			Item.crit += 24;
+			Item.UseSound = new SoundStyle("KirboMod/Sounds/Item/StarRod/StarRodShot2").WithVolumeScale(0.3f);
             Item.ArmorPenetration = 60;
         }
 

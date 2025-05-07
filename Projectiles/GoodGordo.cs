@@ -22,7 +22,7 @@ namespace KirboMod.Projectiles
 			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.timeLeft = 300;
 			Projectile.tileCollide = true;
-			Projectile.penetrate = -1;
+			Projectile.penetrate = 7;
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = 30;
 		}
@@ -45,8 +45,11 @@ namespace KirboMod.Projectiles
 			}
 			return false;
 		}
-
-		public override void OnKill(int timeLeft) //when the projectile dies
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            Projectile.damage = (int)(Projectile.damage * 0.9);
+        }
+        public override void OnKill(int timeLeft) //when the projectile dies
 		{
 			for (int i = 0; i < 15; i++)
 			{

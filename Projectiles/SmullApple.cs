@@ -34,7 +34,7 @@ namespace KirboMod.Projectiles
    //         {
 			//	Projectile.velocity.Y = MaxFallSpeed;
    //         }
-			Projectile.rotation += 0.1f; // rotates projectile
+			Projectile.rotation += Projectile.velocity.X * 0.02f; // rotates projectile
 		}
         public override void OnKill(int timeLeft) //when the projectile dies
         {
