@@ -49,14 +49,15 @@ namespace KirboMod.Items.RainbowSword
 				rainbowSwordShader = ModContent.Request<Effect>("KirboMod/Items/RainbowSword/RainbowSwordShader", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
 			}
 		}
-		public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
+        //reset spritebatches to their vanilla state after drawing, as spritebatches were restarted with the shader in the PreDraw hooks.
+        public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
 		{
 			spriteBatch.End();
 			spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
 		}
 		public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
 		{
-			spriteBatch.End();//this is probably what is used
+			spriteBatch.End();
 			spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
 		}
 		public override bool MeleePrefix() => true;

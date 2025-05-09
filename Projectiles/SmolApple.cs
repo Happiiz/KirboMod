@@ -22,23 +22,18 @@ namespace KirboMod.Projectiles
 			Projectile.timeLeft = 200;
 			Projectile.tileCollide = true; 
 			Projectile.penetrate = 1;
+			Projectile.extraUpdates = 1;
+
+			Projectile.timeLeft *= Projectile.MaxUpdates;
 		}
 		public override void AI()
 		{
-			Projectile.velocity.Y = Projectile.velocity.Y + 0.3f;
-			if (Projectile.velocity.Y >= 6f)
+			Projectile.velocity.Y = Projectile.velocity.Y + 0.15f;
+			if (Projectile.velocity.Y >= 20)
             {
-				Projectile.velocity.Y = 6f;
+				Projectile.velocity.Y = 20;
             }
-			Projectile.rotation += 0.1f; // rotates projectile
-			/*if (++projectile.frameCounter >= 15) //changes frames every 15 ticks 
-			{
-				projectile.frameCounter = 0;
-				if (++projectile.frame >= Main.projFrames[projectile.type])
-				{
-					projectile.frame = 0;
-				}
-			}*/
+			Projectile.rotation += 0.1f;
 		}
         public override void OnKill(int timeLeft) //when the projectile dies
         {
@@ -52,8 +47,6 @@ namespace KirboMod.Projectiles
 
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-			Player player = Main.player[0];
-
 			if (Projectile.velocity.X != oldVelocity.X)
 			{
 				Projectile.velocity.X = -oldVelocity.X;

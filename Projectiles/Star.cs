@@ -84,7 +84,7 @@ namespace KirboMod.Projectiles
 		}
         public override bool PreDraw(ref Color lightColor)
         {
-			VFX.DrawProjWithStarryTrail(Projectile, Color.Blue, Color.White * 0.4f, Color.White, 0.4f, 0, 0, 128);
+			VFX.DrawProjWithStarryTrail(Projectile, Color.Blue, Color.White * 0.4f, Color.White, 0.4f, 0, 0, (byte)(128 * Projectile.Opacity));
 			return false;// base.PreDraw(ref lightColor);
         }
         public override bool OnTileCollide(Vector2 oldVelocity)

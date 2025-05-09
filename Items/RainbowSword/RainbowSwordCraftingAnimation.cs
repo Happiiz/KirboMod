@@ -1,20 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using Terraria;
-using Terraria.ModLoader;
-using Terraria.GameContent;
+﻿using KirboMod.Items.RainbowDrops;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using KirboMod.Items.RainbowDrops;
 using ReLogic.Content;
-using Terraria.ID;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.GameContent;
+using Terraria.ID;
+using Terraria.ModLoader;
 
 namespace KirboMod.Items.RainbowSword
 {
-    internal class RainbowSwordCraftingAnimation  : ModProjectile
+    internal class RainbowSwordCraftingAnimation : ModProjectile
     {
         public override string Texture => "KirboMod/Items/RainbowSword/RainbowSword";
         public override void SetDefaults()
@@ -34,7 +34,7 @@ namespace KirboMod.Items.RainbowSword
                 Vector2 targetPos = Main.myPlayer == Projectile.owner ? Main.MouseWorld : Main.player[Projectile.owner].Center;
 
                 float dist = targetPos.Distance(Projectile.Center);
-                for (float i = 0.5f; i < 1; i+= 4/dist)
+                for (float i = 0.5f; i < 1; i += 4 / dist)
                 {
                     Dust dust = Dust.NewDustPerfect(Vector2.Lerp(Projectile.Center, targetPos, i), DustID.RainbowMk2, null, 0, Main.hslToRgb(i, 1, 0.5f), 2);
                     dust.noGravity = true;
@@ -46,12 +46,12 @@ namespace KirboMod.Items.RainbowSword
             float range = MathHelper.Lerp(700, 0, Easing(Utils.GetLerpValue(0, 640, Timer)));
             for (float i = 0; i < MathF.Tau; i += MathF.Tau / 5f)
             {
-                if (Main.rand.NextFloat() < Easing( Utils.GetLerpValue(150, 50, Timer, true)))
+                if (Main.rand.NextFloat() < Easing(Utils.GetLerpValue(150, 50, Timer, true)))
                     continue;
                 Vector2 offset = i.ToRotationVector2().RotatedByRandom(1) * MathHelper.Lerp(0.4f, 0.9f, Main.rand.NextFloat());
                 offset *= range;
                 Color col = Main.hslToRgb(Utils.GetLerpValue(-MathF.PI, MathF.PI, (offset.ToRotation() + Main.GlobalTimeWrappedHourly * 0.3f)) % 1, 1, 0.5f);
-                Dust dust = Dust.NewDustPerfect(offset + Projectile.Center, DustID.RainbowMk2, -offset.RotatedBy(1.5f) * 0.04f,0,col, MathHelper.Lerp(2, 3, Main.rand.NextFloat()));
+                Dust dust = Dust.NewDustPerfect(offset + Projectile.Center, DustID.RainbowMk2, -offset.RotatedBy(1.5f) * 0.04f, 0, col, MathHelper.Lerp(2, 3, Main.rand.NextFloat()));
                 dust.noGravity = true;
                 dust.fadeIn = 1f;
                 dust.noGravity = true;
@@ -68,7 +68,7 @@ namespace KirboMod.Items.RainbowSword
                 for (int i = 0; i < 400; i++)
                 {
                     Vector2 posOffset = Main.rand.NextVector2Circular(1000, 1000) / 20;
-                    Dust dust = Dust.NewDustPerfect(Projectile.Center + posOffset, DustID.RainbowMk2, posOffset * 0.2f, 0, Main.hslToRgb(Utils.GetLerpValue(-MathF.PI, MathF.PI, posOffset.ToRotation()), 1, 0.5f), MathHelper.Lerp(2,3,Main.rand.NextFloat()));
+                    Dust dust = Dust.NewDustPerfect(Projectile.Center + posOffset, DustID.RainbowMk2, posOffset * 0.2f, 0, Main.hslToRgb(Utils.GetLerpValue(-MathF.PI, MathF.PI, posOffset.ToRotation()), 1, 0.5f), MathHelper.Lerp(2, 3, Main.rand.NextFloat()));
                     dust.noGravity = true;
                     dust = Dust.CloneDust(dust);
                     dust.color = Color.White;
@@ -85,7 +85,7 @@ namespace KirboMod.Items.RainbowSword
             origin = tex.Size() / 2;
             return tex;
         }
-        static int[] rainbowDrops = new int[6] { ModContent.ItemType<DesertDrop>(), ModContent.ItemType<EvilDrop>(), ModContent.ItemType<HellDrop>(), ModContent.ItemType<JungleDrop>(), ModContent.ItemType<OceanDrop>(), ModContent.ItemType<SnowDrop>() }; 
+        static int[] rainbowDrops = new int[6] { ModContent.ItemType<DesertDrop>(), ModContent.ItemType<EvilDrop>(), ModContent.ItemType<HellDrop>(), ModContent.ItemType<JungleDrop>(), ModContent.ItemType<OceanDrop>(), ModContent.ItemType<SnowDrop>() };
         public override bool PreDraw(ref Color lightColor)
         {
             for (int i = 0; i < rainbowDrops.Length; i++)
@@ -131,21 +131,46 @@ namespace KirboMod.Items.RainbowSword
             int[] rainbowDrops = new int[6] { ModContent.ItemType<DesertDrop>(), ModContent.ItemType<EvilDrop>(), ModContent.ItemType<HellDrop>(), ModContent.ItemType<JungleDrop>(), ModContent.ItemType<OceanDrop>(), ModContent.ItemType<SnowDrop>() };
             return rainbowDrops.Contains(id);
         }
-        //todo: fix this how the fuck is it not working???????????
+        static bool skipPlaySoundAndPopupText = false;
         private void SpawnRainbowSwordCraftAnimation(On_Main.orig_CraftItem orig, Recipe r)
         {
-            if(r.TryGetResult(Type, out _))
+            if (r.TryGetResult(Type, out _))
             {
-                List<int> rainbowDropIDsTaken = new List<int>();
+                for (int j = 0; j < Main.maxProjectiles; j++)
+                {
+                    Projectile projToCheck = Main.projectile[j];
+                    if (!projToCheck.active || projToCheck.type != ModContent.ProjectileType<RainbowSwordCraftingAnimation>())
+                        continue;
+                    return;
+                }
+                skipPlaySoundAndPopupText = true;
+            }
+            orig(r);
+            skipPlaySoundAndPopupText = false;
+            if (Main.mouseItem != null && !Main.mouseItem.IsAir && Main.mouseItem.type == ModContent.ItemType<RainbowSword>())
+            {
+                SoundEngine.PlaySound(SoundID.Item4);
+                SoundEngine.PlaySound(SoundID.DD2_WinScene);
+                Projectile.NewProjectile(new JustSoItsNotNull(), Main.LocalPlayer.Center - new Vector2(0, 150), Vector2.Zero, ModContent.ProjectileType<RainbowSwordCraftingAnimation>(), -1, 0, 255);
+                Main.mouseItem.TurnToAir();
+            }
+        }
+
+        private bool RainbowSwordCraftAnimationSpawnOld(Recipe r)
+        {
+            if (r.TryGetResult(Type, out _))
+            {
+                List<int> rainbowDropIDsTaken = new();
+                for (int j = 0; j < Main.maxProjectiles; j++)
+                {
+                    Projectile projToCheck = Main.projectile[j];
+                    if (!projToCheck.active || projToCheck.type != ModContent.ProjectileType<RainbowSwordCraftingAnimation>())
+                        continue;
+                    return false;
+                }
                 for (int i = 0; i < Main.LocalPlayer.inventory.Length; i++)
                 {
-                    for (int j = 0; j < Main.maxProjectiles; j++)
-                    {
-                        Projectile projToCheck = Main.projectile[j];
-                        if (!projToCheck.active || projToCheck.type != ModContent.ProjectileType<RainbowSwordCraftingAnimation>())
-                            continue;
-                        return;
-                    }
+
                     Item item = Main.LocalPlayer.inventory[i];
                     if (rainbowDropIDsTaken.Contains(item.type) || !IsARainbowDropID(item.type))
                         continue;
@@ -161,12 +186,13 @@ namespace KirboMod.Items.RainbowSword
                 SoundEngine.PlaySound(SoundID.Item4);
                 SoundEngine.PlaySound(SoundID.DD2_WinScene);
                 Recipe.FindRecipes();
-                Projectile.NewProjectile(new TestSource(), Main.LocalPlayer.Center - new Vector2(0, 150), Vector2.Zero, ModContent.ProjectileType<RainbowSwordCraftingAnimation>(), -1, 0, 255);
-                return;
+                Projectile.NewProjectile(new JustSoItsNotNull(), Main.LocalPlayer.Center - new Vector2(0, 150), Vector2.Zero, ModContent.ProjectileType<RainbowSwordCraftingAnimation>(), -1, 0, 255);
+                return true;
             }
-            orig(r);
+            return false;
         }
-        private class TestSource : IEntitySource
+
+        private class JustSoItsNotNull : IEntitySource
         {
             public string Context => "aeoufabvou";//awesome!!
         }

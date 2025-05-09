@@ -22,8 +22,8 @@ namespace KirboMod.Items.Weapons
             Item.DamageType = DamageClass.Melee/* tModPorter Suggestion: Consider MeleeNoSpeed for no attack speed scaling */;
             Item.width = 80;
             Item.height = 80;
-            Item.useTime = 20;
-            Item.useAnimation = 20;
+            Item.useTime = 38;
+            Item.useAnimation = Item.useTime; 
             Item.useStyle = ItemUseStyleID.Swing;
             Item.knockBack = 10; //6 is average
             Item.value = Item.buyPrice(0, 0, 0, 60);
@@ -31,7 +31,7 @@ namespace KirboMod.Items.Weapons
             Item.UseSound = SoundID.Item1;
             Item.autoReuse = true;
             Item.shoot = ModContent.ProjectileType<Projectiles.SmolApple>();
-            Item.shootSpeed = 12f;
+            Item.shootSpeed = 9f;//proj has extraupdate
             Item.useTurn = false; //can't turn around while using
         }
 

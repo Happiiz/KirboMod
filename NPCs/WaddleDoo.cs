@@ -15,7 +15,8 @@ namespace KirboMod.NPCs
     public class WaddleDoo : ModNPC
     {
         static int BeamStart => 60;
-        static int BeamDuration => 120;
+        static int AttackCycleDuration => 120;
+        public static int FireRate => 30;
         private bool attacking = false; //controls if in attacking state
 
         private bool jumped = false;
@@ -198,7 +199,7 @@ namespace KirboMod.NPCs
 
         public override bool PreKill() //check if Kracko Doo so it won't drop anything, not even if told to from outside mods
         {
-            if (NPC.ai[1] == 1)
+            if (SpawnedFromKracko)
             {
                 return false;
             }
@@ -229,33 +230,21 @@ namespace KirboMod.NPCs
             NPC.ai[0]++;
 
             NPC.velocity.X *= 0.9f;
-            float beamRange = 15;
+            float beamRange = 7f;
             if (Main.expertMode)
                 beamRange *= 1.2f;
             if (SpawnedFromKracko)
                 beamRange *= 1.2f;
-            Vector2 projshoot = MathF.Sin((NPC.ai[0] - BeamStart) / 20f - MathF.PI / 2).ToRotationVector2() * beamRange;
-            projshoot.X *= NPC.direction;
+            Vector2 projshoot = NPC.DirectionTo(player.Center) * beamRange;
             Vector2 startOffset = new(NPC.direction * 8, 0);
 
-            if (NPC.ai[0] >= BeamStart & NPC.ai[0] <= BeamStart + BeamDuration) //attack window
+            if (NPC.ai[0] >= BeamStart & NPC.ai[0] <= BeamStart + AttackCycleDuration) //attack window
             {
-                if (NPC.ai[0] % 3 == 0) //every multiple of 3
+                if (NPC.ai[0] % FireRate == 0) //every multiple of 3
                 {
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + startOffset, projshoot, ModContent.ProjectileType<Projectiles.BeamBad>(), NPC.damage / 2, 1, Main.myPlayer, 0, 0);
-                    }
-                }
-                if (NPC.ai[0] % 4 == 0)
-                {
-                    if (NPC.ai[0] + 4 > BeamStart + BeamDuration)//last time will play
-                    {
-                        SoundEngine.PlaySound(BeamAttackEnd, NPC.Center);
-                    }
-                    else
-                    {
-                        SoundEngine.PlaySound(BeamAttackLoop, NPC.Center);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + startOffset, projshoot, ModContent.ProjectileType<Projectiles.BeamBad>(), NPC.damage / 2, 1, Main.myPlayer, NPC.whoAmI);
                     }
                 }
             }

@@ -402,7 +402,7 @@ namespace KirboMod.Projectiles
             }
 
             Player player = Main.player[Projectile.owner];
-            Vector2 toTarget = Projectile.DirectionTo(aggroTarget.Center);
+            Vector2 toTarget = Projectile.DirectionTo(aggroTarget.Center * aggroTarget.velocity * AttackDuration * 0.5f);
             Projectile.spriteDirection = MathF.Sign(toTarget.X);
             if (Attack % AttackDuration == 0)
 			{

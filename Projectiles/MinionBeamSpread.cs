@@ -102,19 +102,6 @@ namespace KirboMod.Projectiles
             }
             return false;
         }
-        void FillWhipControlPointsWithWorkaround(List<Vector2> list)
-        {
-            Vector2 playerArmPos = Main.GetPlayerArmPosition(Projectile);
-            int plrItemAnimationMax = Main.player[Projectile.owner].itemAnimationMax;
-            Main.player[Projectile.owner].position -= playerArmPos;
-            Main.player[Projectile.owner].position += Projectile.Center;
-            Main.player[Projectile.owner].itemAnimationMax = WaddleDooMinion.AttackDuration;
-            Projectile.FillWhipControlPoints(Projectile, list);
-            Main.player[Projectile.owner].itemAnimationMax = plrItemAnimationMax;
-            Main.player[Projectile.owner].position += playerArmPos;
-            Main.player[Projectile.owner].position -= Projectile.Center;
-        }
-
         void GetWhipSettings(out float timeToFlyOut, out int segments, out float rangeMultiplier)
         {
             timeToFlyOut = WaddleDooMinion.AttackDuration * Projectile.MaxUpdates;
