@@ -59,9 +59,8 @@ namespace KirboMod.NPCs
             NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers()
             {
                 CustomTexturePath = "KirboMod/NPCs/BestiaryTextures/KrackoJrPortrait",
-                PortraitScale = 0.75f, // Portrait refers to the full picture when clicking on the icon in the bestiary
-                PortraitPositionYOverride = 0f,
-                Rotation = MathHelper.ToRadians(45),
+                PortraitPositionYOverride = 0,
+                Position = new(0, 0),
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
         }
@@ -326,10 +325,25 @@ namespace KirboMod.NPCs
             Player player = Main.player[NPC.target];
             float offsetLength = 6.5f;
             Vector2 pupilOffset = Vector2.Normalize(player.Center - NPC.Center) * offsetLength;//the multipier is just what looks good
+
+            if (NPC.IsABestiaryIconDummy)
+            {
+                pupilOffset = Vector2.Zero;
+            }
+
             spriteBatch.Draw(eye, NPC.Center - Main.screenPosition, null, new Color(255, 255, 255), 0, new Vector2(29, 29), 1f, SpriteEffects.None, 0f);
             spriteBatch.Draw(pupil, NPC.Center - Main.screenPosition + pupilOffset, null, Color.White, 0, pupil.Size() / 2, 1, SpriteEffects.None, 0);
             return false;
         }
+
+        public override void FindFrame(int frameHeight)
+        {
+            if (NPC.IsABestiaryIconDummy)
+            {
+                MakeClouds();
+            }
+        }
+
         bool CheckShouldShoot(int fireRate, int numberOfShots, int start)
         {
             return (NPC.ai[0] - start) % fireRate == 0 && NPC.ai[0] < (start + fireRate * numberOfShots) && NPC.ai[0] >= start;

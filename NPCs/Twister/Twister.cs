@@ -19,6 +19,17 @@ namespace KirboMod.NPCs.Twister
         {
             // DisplayName.SetDefault("Twister");
             Main.npcFrameCount[NPC.type] = 4;
+
+            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new()
+            {
+                CustomTexturePath = "KirboMod/NPCs/BestiaryTextures/TwisterPortrait",
+                PortraitPositionYOverride = 0,
+                PortraitPositionXOverride = 0,
+                PortraitScale = 0.3f,
+                Position = new Vector2(0, 0),
+                Scale = 0.3f
+            };
+            NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
         }
 
         public override void SetDefaults()

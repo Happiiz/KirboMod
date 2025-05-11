@@ -5,6 +5,7 @@ using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -65,11 +66,11 @@ namespace KirboMod.NPCs.NewWhispy
 
             NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new()
             {
-                PortraitScale = 1f, // Portrait refers to the full picture when clicking on the icon in the bestiary
-                PortraitPositionYOverride = 40,
-                PortraitPositionXOverride = 50,
-                Position = new Vector2(40, 30),
-                Scale = 0.8f,
+                PortraitScale = 0.6f, // Portrait refers to the full picture when clicking on the icon in the bestiary
+                PortraitPositionYOverride = 20,
+                PortraitPositionXOverride = 60,
+                Position = new Vector2(40, 40),
+                Scale = 0.5f,
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
         }
@@ -118,6 +119,20 @@ namespace KirboMod.NPCs.NewWhispy
             Helper.BossHpScalingForHigherDifficulty(ref NPC.lifeMax, balance);
             //NPC.damage = (int)(NPC.damage * 0.6f);
         }
+
+        public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
+        {
+            // We can use AddRange instead of calling Add multiple times in order to add multiple items at once
+            bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
+            {
+				// Sets the spawning conditions of this NPC that is listed in the bestiary.
+				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Surface,
+
+				// Sets the description of this NPC that is listed in the bestiary.
+				new FlavorTextBestiaryInfoElement("A tree that gained the unatural ability of sentience, and now has devoted its life to guarding it's brethren.")
+            });
+        }
+
         float CurrentStateProgress => Timer / (attackStartTime + attackCount * attackRate + attackExtraWaitTime);
         float CurrentShotProgress => (Timer - attackStartTime) % attackRate / attackRate;
         int CurrentShotIndex => ((int)Timer - attackStartTime) / attackRate;

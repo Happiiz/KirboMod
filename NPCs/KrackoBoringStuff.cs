@@ -157,10 +157,11 @@ namespace KirboMod.NPCs
 			NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers()
 			{
 				CustomTexturePath = "KirboMod/NPCs/BestiaryTextures/KrackoPortrait",
-				PortraitScale = 0.75f, // Portrait refers to the full picture when clicking on the icon in the bestiary
+				PortraitScale = 0.5f, // Portrait refers to the full picture when clicking on the icon in the bestiary
 				PortraitPositionYOverride = 0f,
-				Position = new Vector2(2, 6), //Center the eye
-			};
+				Scale = 1f,
+                Position = new(2, 6),
+            };
 			NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
 
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true; //immune to not mess up movement

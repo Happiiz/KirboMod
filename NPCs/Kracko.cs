@@ -476,7 +476,7 @@ namespace KirboMod.NPCs
             Texture2D texture = TextureAssets.Npc[Type].Value;
             spriteBatch.Draw(texture, NPC.Center - screenPos, NPC.frame, GetAlpha(Color.White).Value, NPC.rotation, NPC.frame.Size() / 2, 1f, SpriteEffects.None, 0f);
             spriteBatch.Draw(spikes.Value, NPC.Center - screenPos, NPC.frame, new Color(255, 255, 255), NPC.rotation, NPC.frame.Size() / 2, 1f, SpriteEffects.None, 0f);
-            if ((transitioning == true && NPC.ai[2] > 0 && NPC.ai[2] <= 180))
+            if ((transitioning == true && NPC.ai[2] > 0 && NPC.ai[2] <= 180) || NPC.IsABestiaryIconDummy)
             {
                 pupilOffset = Vector2.Zero;
             }
