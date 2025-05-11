@@ -811,7 +811,7 @@ namespace KirboMod
 
                     if (initaldash == true)
                     {
-                        SoundEngine.PlaySound(PureDarkMatter.DashSFX, Player.Center);
+                        SoundEngine.PlaySound(PureDarkMatter.DashSFX.WithVolumeScale(0.4f), Player.Center);
                         player.velocity.X = 16.9f * dir;
 
                         //when on ground
