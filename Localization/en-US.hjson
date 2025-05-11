@@ -137,12 +137,12 @@ Mods: {
 				DisplayName: Night Cloak
 				Tooltip:
 					'''
-					Summons homing stars when hit
+					Summons homing stars when hit, their numbers based on damage taken
 					The stars have a combined damage value of 3x the damage taken
 					The stars ignore 40 defense each
 					In PVP, all stars spawn with 3x damage taken.
 					Stars spawned from PVP cannot hit enemies and vice-versa.
-					Does not activate from damage taken from spikes, lava, and using a regular bug net in hell critters.
+					Does not activate from damage taken from spikes, lava, and using a regular bug net on hell critters.
 					'''
 			}
 

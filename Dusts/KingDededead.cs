@@ -9,10 +9,10 @@ namespace KirboMod.Dusts
 		public override void OnSpawn(Dust dust)
 		{
 			dust.noGravity = true;
-			dust.frame = new Rectangle(18, 30, 218, 200);
-			//If our texture had 2 different dust on top of each other (a 30x60 pixel image), we might do this:
-			//dust.frame = new Rectangle(0, Main.rand.Next(2) * 30, 30, 30);
-		}
+			dust.frame = new Rectangle(18, 30, 256, 250);
+            //If our texture had 2 different dust on top of each other (a 30x60 pixel image), we might do this:
+            //dust.frame = new Rectangle(0, Main.rand.Next(2) * 30, 30, 30);
+        }
 
 		public override bool Update(Dust dust)
 		{

@@ -21,7 +21,7 @@ namespace KirboMod.Items
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 3; // Configure the amount of this item that's needed to research it in Journey mode.
         }
 
-		public override void SetDefaults() 
+        public override void SetDefaults() 
 		{
 			Item.width = 20;
 			Item.height = 20;
@@ -60,7 +60,9 @@ namespace KirboMod.Items
                     //this will only work if NPCID.Sets.MPAllowedEnemies[type] is set in boss
                     NetMessage.SendData(MessageID.SpawnBossUseLicenseStartEvent, number: player.whoAmI, number2: ModContent.NPCType<NPCs.KingDedede>());
                 }
-                SoundEngine.PlaySound(SoundID.Roar, player.position);
+
+                SoundStyle HeartyLaugh = new("KirboMod/Sounds/NPC/KingDedede/summon");
+                SoundEngine.PlaySound(HeartyLaugh, player.position);
             }
             return true;
 		}

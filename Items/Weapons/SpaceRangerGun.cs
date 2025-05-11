@@ -86,6 +86,7 @@ namespace KirboMod.Items.Weapons
             Recipe recipe1 = CreateRecipe();
             recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.NobleRangerGun>()); 
             recipe1.AddIngredient(ItemID.ElectrosphereLauncher);
+            recipe1.AddIngredient(ItemID.SniperRifle);
             recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 100); //100 starbits
             recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 2); //2 rare stones
             recipe1.AddTile(TileID.MythrilAnvil); //crafted at mythril/orichalcum anvil

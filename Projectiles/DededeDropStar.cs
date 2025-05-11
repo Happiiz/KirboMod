@@ -31,24 +31,16 @@ namespace KirboMod.Projectiles
 			Projectile.hostile = true;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
-
-			if (dropStarMode == 1)
-			{
-                Projectile.timeLeft = 300;
-            }
-			else
-			{
-                Projectile.timeLeft = 120;
-            }
-		}
+            Projectile.timeLeft = 300;
+        }
 		public override void AI()
 		{
 			if (dropStarMode == 1) //gravity mode
 			{
-				Projectile.velocity.Y = Projectile.velocity.Y + 0.6f;
-				if (Projectile.velocity.Y >= 50)
+				Projectile.velocity.Y = Projectile.velocity.Y + 0.3f;
+				if (Projectile.velocity.Y >= 30)
 				{
-					Projectile.velocity.Y = 50;
+					Projectile.velocity.Y = 30;
 				}
 			}
 			else

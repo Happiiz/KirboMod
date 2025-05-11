@@ -13,7 +13,7 @@ namespace KirboMod.Projectiles
 			// DisplayName.SetDefault("Gordo");
 			Main.projFrames[Projectile.type] = 1;
 		}
-		public static float GordoGravity => .12f;
+		public static float GordoGravity => /*.12f*/ 1.2f;
 		public override void SetDefaults()
 		{
 			Projectile.width = 78;
@@ -28,23 +28,7 @@ namespace KirboMod.Projectiles
 		{
 			Projectile.velocity.Y += GordoGravity;
 			Projectile.rotation += 0.1f; // rotates projectile
-			/*if (++projectile.frameCounter >= 15) //changes frames every 15 ticks 
-			{
-				projectile.frameCounter = 0;
-				if (++projectile.frame >= Main.projFrames[projectile.type])
-				{
-					projectile.frame = 0;
-				}
-			}*/
 		}
-        /* public override void Kill(int timeLeft) //when the projectile dies
-         {
-             for (int i = 0; i < 10; i++)
-             {
-                 Vector2 speed = Main.rand.NextVector2Circular(1f, 1f); //circle
-                 Dust d = Dust.NewDustPerfect(projectile.position, DustID.Enchanted_Gold, speed * 3, Scale: 1f); //Makes dust in a messy circle
-             }
-         }*/
 
         public override bool OnTileCollide(Vector2 oldVelocity) 
         {
@@ -61,7 +45,7 @@ namespace KirboMod.Projectiles
 
         public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
         {
-			fallThrough = false;
+			fallThrough = true;
 			return true;
         }
 

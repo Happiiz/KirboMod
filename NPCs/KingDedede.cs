@@ -5,16 +5,20 @@ using KirboMod.Projectiles;
 using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using rail;
 using ReLogic.Content;
+using Stubble.Core.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using Terraria;
 using Terraria.Audio;
+using Terraria.GameContent;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static KirboMod.NPCs.Zero;
 
 namespace KirboMod.NPCs
 {
@@ -43,10 +47,33 @@ namespace KirboMod.NPCs
         int repeathammer = -1; //for multi hammer swings
 
         int animation = 0; //selection of frames to cycle through
+
+        //for animation (purely visual)
+        int Xframe = 0;
+        int Yframe = 0;
+
+        //Smash Bros. sounds are very loud :I
+
+        public static SoundStyle Walk => new SoundStyle("KirboMod/Sounds/NPC/KingDedede/walk") with { Volume = 0.8f };
+
+        public static SoundStyle Dive => new SoundStyle("KirboMod/Sounds/NPC/KingDedede/dive") with { Volume = 0.8f };
+
+        public static SoundStyle SuperJumpRise => new SoundStyle("KirboMod/Sounds/NPC/KingDedede/superJumpRise") with { Volume = 0.8f };
+
+        public static SoundStyle HeartyLaugh => new("KirboMod/Sounds/NPC/KingDedede/summon");
+
+        public static SoundStyle HammerWindUp => new SoundStyle("KirboMod/Sounds/NPC/KingDedede/hammerWindUp") with { Volume = 0.8f };
+
+        public static SoundStyle Possession => new SoundStyle("KirboMod/Sounds/NPC/KingDedede/possession") with { Volume = 0.8f };
+
+        public static SoundStyle OrbCharge => new SoundStyle("KirboMod/Sounds/NPC/DarkMatter/DarkMatterSwordsmanSwordBallCharge2");
+
+        public static SoundStyle Defeat => new SoundStyle("KirboMod/Sounds/NPC/KingDedede/defeat") with { Volume = 0.8f };
+
         public override void SetStaticDefaults()
         {
             // DisplayName.SetDefault("King Dedede");
-            Main.npcFrameCount[NPC.type] = 25;
+            Main.npcFrameCount[NPC.type] = 33;
 
             // Add this in for bosses that have a summon item, requires corresponding code in the item
             NPCID.Sets.MPAllowedEnemies[Type] = true;
@@ -66,15 +93,15 @@ namespace KirboMod.NPCs
 
         public override void SetDefaults()
         {
-            NPC.width = 150;
+            NPC.width = 100;
             NPC.height = 150;
-            DrawOffsetY = 52;
+            DrawOffsetY = 72;
             NPC.damage = 50;
             NPC.noTileCollide = false;
             NPC.defense = 16;
             NPC.lifeMax = 8000;
             NPC.HitSound = SoundID.NPCHit1; //organic
-            NPC.DeathSound = SoundID.NPCDeath27; //tortoise
+            NPC.DeathSound = Defeat;
             NPC.value = Item.buyPrice(0, 3, 0, 0); // money it drops
             NPC.knockBackResist = 0f;
             NPC.aiStyle = -1;
@@ -205,6 +232,8 @@ namespace KirboMod.NPCs
             //phase 4 change(can happen anytime)
             if (NPC.GetLifePercent() <= 0.3 && Main.expertMode && phase != 4)
             {
+                SoundEngine.PlaySound(Possession, NPC.Center);
+
                 attack = 0; //reset
                 phase = 4;
             }
@@ -262,7 +291,7 @@ namespace KirboMod.NPCs
                 {
                     NPC.noGravity = true;
                     NPC.GravityMultiplier *= MultipliableFloat.One * 2;
-                    AttackSlam(phaseThreeSpeedUp, player);
+                    AttackSlam(phaseThreeSpeedUp, player, distance);
                     NPC.velocity.Y += NPC.gravity;
                 }
             }
@@ -271,13 +300,13 @@ namespace KirboMod.NPCs
 
             else if (phase == 4)
             {
-                //become boring
+                //become normie boss
                 NPC.noTileCollide = true;
                 NPC.noGravity = true;
 
                 if (attack < 240) //*casually gets possessed*
                 {
-                    animation = 11; //woooaaaahhh!
+                    ChooseAnimation(12); //woooaaaahhh my heads spinning!
                     NPC.velocity *= 0.95f;
 
                     NPC.dontTakeDamage = true; //make immune during transformation
@@ -305,7 +334,7 @@ namespace KirboMod.NPCs
 
                         NPC.rotation = 0; //upright
 
-                        animation = 12; //possessed fly
+                        ChooseAnimation(13); //possessed fly
                         NPC.velocity.Y = -0.5f; //go up
                         lastattacktype = DededeAttackType.DarkShot; //go to first attack
                     }
@@ -316,7 +345,7 @@ namespace KirboMod.NPCs
                     {
                         NPC.dontTakeDamage = false; //make vunerable again
 
-                        animation = 12; //possessed fly
+                        ChooseAnimation(13); //possessed fly
                     }
 
                     if (attack % 30 == 0) //every attack / 10 remainder of 0 
@@ -351,13 +380,15 @@ namespace KirboMod.NPCs
                             NPC.TargetClosest(false);
 
                             NPC.frameCounter = 0; //restart animation
-                            animation = 13; //open maw
+                            ChooseAnimation(14); //open maw
                             NPC.velocity *= 0;
+
+                            SoundEngine.PlaySound(SoundID.Roar, NPC.Center);
                         }
 
                         if (attack >= 600 && attack < 720)
                         {
-                            animation = 14; //chomp loop
+                            ChooseAnimation(15); //chomp loop
                             float speed = Main.expertMode ? 24 : 12; //faster if low on health
                             float inertia = 30; //harder to turn
 
@@ -367,26 +398,25 @@ namespace KirboMod.NPCs
 
                             NPC.TargetClosest(true);
 
-
+                            if (attack % 10 == 0)
+                            {
+                                SoundEngine.PlaySound(SoundID.Item2.WithVolumeScale(0.5f), NPC.Center);
+                            }
                         }
                         if (attack == 720) //close
                         {
                             NPC.frameCounter = 0; //restart animation
 
-                            animation = 15; //close maw
+                            ChooseAnimation(16); //close maw
 
                             NPC.TargetClosest(false);
 
                             NPC.velocity *= 0;
-
-
                         }
                         if (attack >= 780) //end
                         {
-                            animation = 12; //possessed fly
+                            ChooseAnimation(13); //possessed fly
                             attack = 300; //restart from here
-
-
                         }
                     }
 
@@ -398,29 +428,32 @@ namespace KirboMod.NPCs
                             NPC.TargetClosest(false);
 
                             NPC.frameCounter = 0; //restart animation
-                            animation = 16; //open eye
+                            ChooseAnimation(17); //open eye
                             NPC.velocity *= 0;
                         }
 
-                        if (attack == 550 || (attack == 600 && Main.expertMode))
+                        if (attack == 580 || (attack == 640 && Main.expertMode))
                         {
                             if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
                             {
-                                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.direction * 100, NPC.Center.Y, NPC.velocity.X * 0, NPC.velocity.Y * 0, ModContent.ProjectileType<Projectiles.DarkOrb>(), 50 / 2, 10f, Main.myPlayer, 0, NPC.target, 1);
+                                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.direction * 150, NPC.Center.Y, NPC.velocity.X * 0, NPC.velocity.Y * 0, ModContent.ProjectileType<Projectiles.DarkOrb>(), 50 / 2, 10f, Main.myPlayer, 0, NPC.target, 1);
                             }
+
+                            SoundEngine.PlaySound(OrbCharge, NPC.Center);
+
                             NPC.TargetClosest(false);
                         }
 
-                        if (attack == 630) //close
+                        if (attack == 680) //close
                         {
                             NPC.TargetClosest(false);
 
                             NPC.frameCounter = 0; //restart animation
-                            animation = 17; //close eye
+                            ChooseAnimation(18); //close eye
                         }
-                        if (attack >= 660) //end
+                        if (attack >= 720) //end
                         {
-                            animation = 12; //possessed fly
+                            ChooseAnimation(13); //possessed fly
                             attack = 300; //restart from here
                         }
                     }
@@ -432,14 +465,14 @@ namespace KirboMod.NPCs
         {
             if (attack == 60 - phaseThreeSpeedUp)
             {
-                animation = 1; //run
-                NPC.velocity.Y = -4; //short up to signify start
+                ChooseAnimation(1); //run
+                NPC.velocity.Y = -4; //short hop to signify start
             }
             if (attack >= 90 - phaseThreeSpeedUp && attack < 270 - phaseThreeSpeedUp)
             {
                 if (attack % (phase == 3 ? 15 : 30) == 0) //multiple of 30(or 15)
                 {
-                    NPC.TargetClosest(true); //target player
+                    NPC.TargetClosest(true); //face player
 
                     if (phase == 3) //faster
                     {
@@ -457,9 +490,14 @@ namespace KirboMod.NPCs
                     NPC.TargetClosest(false); //don't face player
                 }
 
+                if (attack % 20 == 0) //every 20 ticks
+                {
+                    SoundEngine.PlaySound(Walk, NPC.Center);
+                }
+
                 ClimbTiles(player);
 
-                if (Math.Abs(distance.X) <= 200 && (distance.Y <= 50 && distance.Y >= -200)) //range
+                if (Math.Abs(distance.X) <= 300 && distance.Y <= 100 && distance.Y >= -200) //range
                 {
                     attack = 300 - phaseThreeSpeedUp;
                 }
@@ -467,7 +505,7 @@ namespace KirboMod.NPCs
             if (attack == 270 - phaseThreeSpeedUp) //3 seconds up
             {
                 NPC.velocity.X *= 0f;
-                animation = 0; //stand	
+                ChooseAnimation(0); //stand	
 
                 attack = 0;
             }
@@ -475,11 +513,13 @@ namespace KirboMod.NPCs
             {
                 NPC.TargetClosest(false);
 
+                SoundEngine.PlaySound(Dive, NPC.Center);
+
                 NPC.velocity.Y = MathHelper.Clamp((player.Bottom.Y - NPC.Bottom.Y) / 10, -8f, -4f);//jump depending on player height for dive
-                animation = 2; //dive
+                ChooseAnimation(2); //dive
 
 
-                if (phase == 3) //farther
+                if (phase == 3) //faster
                 {
                     NPC.velocity.X = NPC.direction * 20; //5 units higher than run
 
@@ -489,8 +529,6 @@ namespace KirboMod.NPCs
                     NPC.velocity.X = NPC.direction * 15; //5 units higher than run
 
                 }
-
-                SoundEngine.PlaySound(SoundID.NPCDeath8, NPC.Center); //beast grunt 
             }
             if (attack > 300 - phaseThreeSpeedUp)
             {
@@ -498,13 +536,11 @@ namespace KirboMod.NPCs
                 {
                     NPC.velocity.X *= 0.95f;
                 }
-
-                animation = 2; //dive
             }
             if (attack >= 360 - phaseThreeSpeedUp) //restart from dive
             {
                 NPC.velocity.X *= 0f;
-                animation = 0; //stand
+                ChooseAnimation(0); //stand
                 attack = 0;
             }
         }
@@ -514,11 +550,13 @@ namespace KirboMod.NPCs
             if (attack == 60 - phaseThreeSpeedUp)
             {
                 NPC.velocity.Y = -4; //short hop to signify start
-                animation = 3; //draw hammer
+                ChooseAnimation(3); //draw hammer
+
+                SoundEngine.PlaySound(HeartyLaugh, NPC.Center);
             }
             if (attack >= 90 - phaseThreeSpeedUp && attack < 270 - phaseThreeSpeedUp)
             {
-                animation = 4; //run with hammer
+                ChooseAnimation(4); //run with hammer
 
                 if (attack % (phase == 3 ? 7 : 15) == 0) //multiple of 15(or 7)
                 {
@@ -540,6 +578,11 @@ namespace KirboMod.NPCs
                     NPC.TargetClosest(false); //don't face player
                 }
 
+                if (attack % 20 == 0) //every 20 ticks
+                {
+                    SoundEngine.PlaySound(Walk, NPC.Center);
+                }
+
                 ClimbTiles(player);
 
                 if (Math.Abs(distance.X) <= 150) //range
@@ -550,10 +593,11 @@ namespace KirboMod.NPCs
             if (attack == 300 - phaseThreeSpeedUp) //charge swing
             {
                 NPC.TargetClosest(false);
-                SoundEngine.PlaySound(SoundID.NPCDeath8.WithPitchOffset(0.5f), NPC.Center); //beast grunt (high pitch)
+
+                SoundEngine.PlaySound(HammerWindUp, NPC.Center);
 
                 NPC.velocity.X *= 0f;
-                animation = 5; //ready swing   
+                ChooseAnimation(5); //ready swing   
             }
 
             //IF ALREADY MULTISWUNG vvv
@@ -575,7 +619,7 @@ namespace KirboMod.NPCs
                         Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity *= 0.01f, ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI);
                     }
                     NPC.velocity.Y = -4; // stop rising
-                    animation = 6; //swing	
+                    ChooseAnimation(6); //swing	
                 }
                 else if (attack > (phase == 3 ? 315 : 330) - phaseThreeSpeedUp)
                 {
@@ -594,7 +638,7 @@ namespace KirboMod.NPCs
                             Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity *= 0.01f, ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI);
                         }
 
-                        launchDropStars();
+                        LaunchDropStars();
 
                         attack = (phase == 3 ? 371 : 401); //just after multiswing section
                     }
@@ -617,7 +661,7 @@ namespace KirboMod.NPCs
                 {
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity *= 0.01f, ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI);
                 }
-                animation = 6; //swing
+                ChooseAnimation(6); //swing
             }
             else if (attack > (phase == 3 ? 330 : 360) - phaseThreeSpeedUp)
             {
@@ -636,7 +680,7 @@ namespace KirboMod.NPCs
                         Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity *= 0.01f, ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI);
                     }
 
-                    launchDropStars();
+                    LaunchDropStars();
 
                     repeathammer -= 1;
                 }
@@ -650,7 +694,7 @@ namespace KirboMod.NPCs
                     NPC.TargetClosest(false);
 
                     NPC.velocity.X *= 0f;
-                    animation = 5; //ready swing    
+                    ChooseAnimation(5); //ready swing    
                 }
                 if (attack == (phase == 3 ? 350 : 380) - phaseThreeSpeedUp)
                 {
@@ -659,8 +703,8 @@ namespace KirboMod.NPCs
                         Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity *= 0.01f, ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI);
                     }
 
-                    launchDropStars();
-                    animation = 6; //swing
+                    LaunchDropStars();
+                    ChooseAnimation(6); //swing
                     repeathammer -= 1;
                 }
                 if (attack == (phase == 3 ? 360 : 390) - phaseThreeSpeedUp)
@@ -668,7 +712,7 @@ namespace KirboMod.NPCs
                     NPC.TargetClosest(false);
 
                     NPC.velocity.X *= 0f;
-                    animation = 5; //ready swing   
+                    ChooseAnimation(5); //ready swing   
                 }
                 if (attack == (phase == 3 ? 370 : 400) - phaseThreeSpeedUp)
                 {
@@ -677,8 +721,8 @@ namespace KirboMod.NPCs
                         Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity *= 0.01f, ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI);
                     }
 
-                    launchDropStars();
-                    animation = 6; //swing
+                    LaunchDropStars();
+                    ChooseAnimation(6); //swing
 
                     repeathammer -= 1;
                 }
@@ -695,52 +739,58 @@ namespace KirboMod.NPCs
                 attack = 0;
 
                 NPC.velocity.X *= 0f;
-                animation = 0; //stand    
+                ChooseAnimation(0); //stand    
             }
             if (attack >= 460 - phaseThreeSpeedUp && phase == 2) //restart from swing (phase 2)
             {
                 attack = 0;
 
                 NPC.velocity.X *= 0f;
-                animation = 0; //stand    
+                ChooseAnimation(0); //stand    
             }
             if (attack >= 420 - phaseThreeSpeedUp && phase == 1) //restart from swing (phase 1)
             {
                 attack = 0;
 
                 NPC.velocity.X *= 0f;
-                animation = 0; //stand    
+                ChooseAnimation(0); //stand    
             }
         }
 
-        private void AttackSlam(int phaseThreeSpeedUp, Player player)
+        private void AttackSlam(int phaseThreeSpeedUp, Player player, Vector2 distance)
         {
             Vector2 predictDistance = player.Center + player.velocity * 10 - NPC.Center;
 
             if (attack >= 60 - phaseThreeSpeedUp && attack < (phase == 3 ? 90: 120) - phaseThreeSpeedUp)
             {
-                animation = 9; //ready jump
+                ChooseAnimation(9); //ready jump
                 NPC.TargetClosest(true); //face player
+
+                if (attack == 60)
+                {
+                    SoundEngine.PlaySound(Dive, NPC.Center);
+                }
             }
 
             if (attack == (phase == 3 ? 90 : 120) - phaseThreeSpeedUp)
             {
                 NPC.noTileCollide = true; //don't collide with tiles
 
-                NPC.velocity.Y = MathHelper.Clamp(predictDistance.Y / 2, -40, -30);
+                NPC.velocity.Y = MathHelper.Clamp(predictDistance.Y / 2, -35, -30);
                 NPC.velocity.X = MathHelper.Clamp(predictDistance.X / 90, -30, 30);
-                animation = 10; //jump
+                ChooseAnimation(10); //jump
 
-                SoundEngine.PlaySound(SoundID.NPCDeath8.WithPitchOffset(0.5f), NPC.Center); //beast grunt (high pitch)
+                SoundEngine.PlaySound(SuperJumpRise, NPC.Center);
             }
             if (attack > (phase == 3 ? 90 : 120) - phaseThreeSpeedUp
                 && attack < (phase == 3 ? 390 : 420) - phaseThreeSpeedUp) //fall for 5 seconds
             {
                 NPC.GravityIgnoresLiquid = true;
+                NPC.GravityIgnoresSpace = true;
 
-                animation = 10; //jump
+                ChooseAnimation(10); //jump
 
-                if (NPC.Center.Y < player.position.Y - 200 || NPC.velocity.Y < 0) //higher than player or going up
+                if (NPC.Bottom.Y < player.Bottom.Y - 200 || NPC.velocity.Y < 0) //higher than player or going up
                 {
                     NPC.noTileCollide = true; //don't collide with tiles
                 }
@@ -748,12 +798,12 @@ namespace KirboMod.NPCs
                 {
                     NPC.noTileCollide = false; //collide with tiles
 
-                    if (NPC.velocity.Y == 0 || NPC.oldVelocity.Y == 0) //on ground or can't move anymore for some reason
+                    if (NPC.velocity.Y == 0 || NPC.oldVelocity.Y == 0) //on ground or stopped rising/falling midjump
                     {
-                        NPC.velocity.X *= 0.01f;
-                        animation = 9; //end jump
+                        NPC.velocity.X = 0;
+                        ChooseAnimation(9); //end jump
 
-                        launchDropStars();
+                        LaunchDropStars();
 
                         //slam (just for style)
                         if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
@@ -777,7 +827,7 @@ namespace KirboMod.NPCs
             }
             if (attack >= (phase == 3 ? 420 : 450) - phaseThreeSpeedUp)
             {
-                animation = 0; //stance
+                ChooseAnimation(0); //stance
                 attack = 0;
             }
         }
@@ -786,7 +836,7 @@ namespace KirboMod.NPCs
         {
             float timer = attack - 60;
 
-            int numberOfShots = 3 + (2 * phase - 2);
+            int numberOfShots = 3 + 2 * (phase - 1);
 
             float phaseThreeAttackSpeed = 1;
 
@@ -803,29 +853,82 @@ namespace KirboMod.NPCs
 
             float timerRemainder = timer % (60 * phaseThreeAttackSpeed);
 
-            //every 30th tick and not on any 60th tick
+            //remainders on an odd tick else get skipped with phase 3 time reduction
+
+            //every 30th tick, not on any 60th tick
             if (timerRemainder == 30 * phaseThreeAttackSpeed && timerRemainder
                 != 60 * phaseThreeAttackSpeed && timer <= (60 * numberOfShots) * phaseThreeAttackSpeed)
             {
-                animation = 7; //ready gordo
+                if (phase == 3)
+                {
+                    ChooseAnimation(19); //ready gordo (fast)
+                }
+                else
+                {
+
+                    ChooseAnimation(7); //ready gordo
+                }
             }
 
+            /*//faster ver (5 frames before)
+            if (phase == 3 && timerRemainder == 20 * phaseThreeAttackSpeed && timer <= (60 * numberOfShots) * phaseThreeAttackSpeed)
+            {
+                ChooseAnimation(19); //ready gordo (fast)
+            }
+            else
+            {
+                //swing 15 frames before gordo is sent out
+                if (timerRemainder == 30 * phaseThreeAttackSpeed && timer <= (60 * numberOfShots) * phaseThreeAttackSpeed)
+                {
+                    ChooseAnimation(7); //ready gordo
+
+                }
+            }*/
+
+            //faster ver (5 frames before)
+            if (phase == 3 && timerRemainder == 40 * phaseThreeAttackSpeed && timer <= (60 * numberOfShots) * phaseThreeAttackSpeed)
+            {
+                ChooseAnimation(11); //swing gordo (fast)
+            }
+            else
+            {
+                //swing 15 frames before gordo is sent out
+                if (timerRemainder == 45 * phaseThreeAttackSpeed && timer <= (60 * numberOfShots) * phaseThreeAttackSpeed)
+                {
+                    ChooseAnimation(8); //swing gordo
+
+                }
+            }
+
+            //send out gordos in upward arcs
             if (timerRemainder == 0 && timer <= (60 * numberOfShots) * phaseThreeAttackSpeed && timer != 0)
             {
-                animation = 8; //swing gordo
-
-                float shootSpeed = 22;
+                //float shootSpeed = 22;
                 Vector2 shootFrom = NPC.Center + new Vector2(NPC.direction * 100, 0);
-                Utils.ChaseResults results = Utils.GetChaseResults(shootFrom, shootSpeed, player.Center, player.velocity);
+                Vector2 distance = player.Center - shootFrom;
                 Vector2 velocity;
+
+                float YToReach = GetYVelForParabolaPeakToBeAt(player.Center.Y - 100, BouncyGordo.GordoGravity, shootFrom.Y);
+                if (YToReach > -20)
+                {
+                    YToReach = -20;
+                }
+                velocity.Y = YToReach;
+
+                float time = TimeToReachYPoint(shootFrom.Y, player.Center.Y, BouncyGordo.GordoGravity, velocity.Y);
+                velocity.X = distance.X / time;
+
+                /*Utils.ChaseResults results = Utils.GetChaseResults(shootFrom, shootSpeed, player.Center, player.velocity);
+
                 if (results.InterceptionHappens && phase < 3) //predict location if phase is less than 3
                 {
-                    velocity = Utils.FactorAcceleration(results.ChaserVelocity, results.InterceptionTime, new Vector2(0, BouncyGordo.GordoGravity), 0);
+                    velocity.X = Utils.FactorAcceleration(results.ChaserVelocity, results.InterceptionTime, new Vector2(0, BouncyGordo.GordoGravity), 0).X;
                 }
                 else
                 {
                     velocity = shootFrom.DirectionTo(player.Center) * shootSpeed;
-                }
+                }*/
+
                 if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
                 {
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), shootFrom, velocity, ModContent.ProjectileType<BouncyGordo>(), 30 / 2, 4f, Main.myPlayer, 0, 0);
@@ -835,10 +938,27 @@ namespace KirboMod.NPCs
 
             if (timer >= 60 * (numberOfShots + 1) * phaseThreeAttackSpeed)
             {
-                animation = 0; //stand
+                ChooseAnimation(0); //stand
 
                 attack = 0;
             }
+        }
+        static float GetYVelForParabolaPeakToBeAt(float peakPosY, float gravityY, float fromY) //used for finding trajectory of gordo (courtesy of not me)
+        {
+            float result = MathF.Abs((peakPosY - fromY) * gravityY * 2);
+
+            return -MathF.Sqrt(result);
+        }
+
+        static float TimeToReachYPoint(float fromY, float toY, float accelY, float initialVelY) //used for finding trajectory of gordo (courtesy of not me)
+        {
+            bool hasSolution = Utils.SolveQuadratic(accelY * .5f, initialVelY, fromY - toY, out float result1, out float result2);
+            if (!hasSolution)
+            {
+                return 60f; //just return a second
+            }
+            float time = MathF.Max(result2, result1);
+            return time;
         }
 
         void AttackDecideNext()
@@ -859,7 +979,7 @@ namespace KirboMod.NPCs
             lastattacktype = attacktype;
         }
 
-        void launchDropStars()
+        void LaunchDropStars()
         {
             SoundEngine.PlaySound(SoundID.Item9, NPC.Center); //star swoosh
 
@@ -869,9 +989,9 @@ namespace KirboMod.NPCs
             {
                 if (repeathammer > -1)
                 {
-                    for (int i = 0; i < 6; i++)
+                    for (int i = 0; i < 5; i++)
                     {
-                        Vector2 velocity = new Vector2(NPC.direction * (4f * i + (3 - repeathammer) * 6f - 9), -25);// 25 is upward velocity of stars from hammer slam
+                        Vector2 velocity = new Vector2(NPC.direction * (4f * i + (3 - repeathammer) * 2), -15); //go up evenly in a uneven spread (each extra slam making them go further ahead)
 
                         if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
                         {
@@ -882,9 +1002,9 @@ namespace KirboMod.NPCs
                 }
                 else
                 {
-                    for (int i = 0; i < 12; i++)
+                    for (int i = 0; i < 10; i++)
                     {
-                        Vector2 velocity = new Vector2(NPC.direction * (2f * i - 9), -25);// 25 is upward velocity of stars from hammer slam
+                        Vector2 velocity = new Vector2(NPC.direction * 2f * i, -15); //go up evenly in a uneven spread
 
                         if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
                         {
@@ -970,42 +1090,109 @@ namespace KirboMod.NPCs
             }
         }
 
-        public override void FindFrame(int frameHeight) // animation
+        public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            if (animation == 0) //stance
+            Texture2D dedede = TextureAssets.Npc[Type].Value; //get the texture
+
+            SpriteEffects direction = SpriteEffects.FlipHorizontally; //face right
+
+            if (NPC.direction == -1)
+            {
+                direction = SpriteEffects.None; //face left
+            }
+
+            Rectangle frame = Animation(dedede.Width, dedede.Height);
+
+            //draw!
+            spriteBatch.Draw(dedede, NPC.Center - Main.screenPosition - new Vector2(0, 18), frame, drawColor, NPC.rotation,
+                frame.Size() / 2, NPC.scale, direction, 0f);
+
+            return false;
+        }
+
+        public void ChooseAnimation(int selectAnimation)
+        {
+            animation = selectAnimation;
+
+            //animations with concrete beginnings
+            if (selectAnimation == 2 || selectAnimation == 3 || (selectAnimation >= 6 && selectAnimation <= 11)
+                || selectAnimation == 14 || (selectAnimation >= 16 && selectAnimation <= 19))
+            {
+                NPC.frameCounter = 0; //reset animation counter
+            }
+        }
+
+        private Rectangle Animation(int textureWidth, int textureHeight) //make the dimensions for the frames
+        {
+
+            if (!Main.gamePaused && Main.hasFocus) //not paused or tabbed out
             {
                 NPC.frameCounter++;
-                if (NPC.frameCounter < 30)
+            }
+
+            if (animation == 0) //stance
+            {
+                if (NPC.frameCounter < 10)
                 {
-                    NPC.frame.Y = 0;
+                    Xframe = 0;
+                    Yframe = 0;
+                }
+                else if (NPC.frameCounter < 20)
+                {
+                    Xframe = 1;
+                    Yframe = 0;
+                }
+                else if (NPC.frameCounter < 30)
+                {
+                    Xframe = 2;
+                    Yframe = 0;
                 }
                 else
-                {
-                    NPC.frame.Y = frameHeight;
-                }
-                if (NPC.frameCounter >= 60)
                 {
                     NPC.frameCounter = 0;
                 }
             }
             if (animation == 1) //run
             {
-                NPC.frameCounter++;
-                if (NPC.frameCounter < 15)
+                if (NPC.frameCounter < 5)
                 {
-                    NPC.frame.Y = frameHeight * 2; //right leg forward
+                    Xframe = 3;
+                    Yframe = 0;
+                }
+                else if (NPC.frameCounter < 10)
+                {
+                    Xframe = 4;
+                    Yframe = 0;
+                }
+                else if (NPC.frameCounter < 15)
+                {
+                    Xframe = 5;
+                    Yframe = 0;
+                }
+                else if (NPC.frameCounter < 20)
+                {
+                    Xframe = 6;
+                    Yframe = 0;
+                }
+                else if (NPC.frameCounter < 25)
+                {
+                    Xframe = 7;
+                    Yframe = 0;
                 }
                 else if (NPC.frameCounter < 30)
                 {
-                    NPC.frame.Y = frameHeight * 3; //even out
+                    Xframe = 6;
+                    Yframe = 0;
                 }
-                else if (NPC.frameCounter < 45)
+                else if (NPC.frameCounter < 35)
                 {
-                    NPC.frame.Y = frameHeight * 4; //left leg forward
+                    Xframe = 5;
+                    Yframe = 0;
                 }
-                else if (NPC.frameCounter < 60)
+                else if (NPC.frameCounter < 40)
                 {
-                    NPC.frame.Y = frameHeight * 3; //even out
+                    Xframe = 4;
+                    Yframe = 0;
                 }
                 else
                 {
@@ -1014,167 +1201,501 @@ namespace KirboMod.NPCs
             }
             if (animation == 2) //dive
             {
-                NPC.frame.Y = frameHeight * 5; //faceplant
-                NPC.frameCounter = 0;
+                if (NPC.frameCounter < 10)
+                {
+                    Xframe = 0;
+                    Yframe = 1;
+                }
+                else if (NPC.frameCounter < 20)
+                {
+                    Xframe = 1;
+                    Yframe = 1;
+                }
+                else
+                {
+                    Xframe = 2;
+                    Yframe = 1;
+                }
             }
             if (animation == 3) //pull hammer
             {
-                NPC.frame.Y = frameHeight * 6; // :D
-                NPC.frameCounter = 0;
+                if (NPC.frameCounter < 10)
+                {
+                    Xframe = 3;
+                    Yframe = 1;
+                }
+                else if (NPC.frameCounter < 20)
+                {
+                    Xframe = 4;
+                    Yframe = 1;
+                }
+                else
+                {
+                    Xframe = 5;
+                    Yframe = 1;
+                }
             }
             if (animation == 4) //run with hammer
             {
-                NPC.frameCounter++;
-                if (NPC.frameCounter < 15)
+                if (NPC.frameCounter < 5)
                 {
-                    NPC.frame.Y = frameHeight * 7; //right leg forward
+                    Xframe = 6;
+                    Yframe = 1;
+                }
+                else if (NPC.frameCounter < 10)
+                {
+                    Xframe = 7;
+                    Yframe = 1;
+                }
+                else if (NPC.frameCounter < 15)
+                {
+                    Xframe = 0;
+                    Yframe = 2;
+                }
+                else if (NPC.frameCounter < 20)
+                {
+                    Xframe = 1;
+                    Yframe = 2;
+                }
+                else if (NPC.frameCounter < 25)
+                {
+                    Xframe = 2;
+                    Yframe = 2;
                 }
                 else if (NPC.frameCounter < 30)
                 {
-                    NPC.frame.Y = frameHeight * 8; //even out
+                    Xframe = 1;
+                    Yframe = 2;
                 }
-                else if (NPC.frameCounter < 45)
+                else if (NPC.frameCounter < 35)
                 {
-                    NPC.frame.Y = frameHeight * 9; //left leg forward
+                    Xframe = 0;
+                    Yframe = 2;
                 }
-                else if (NPC.frameCounter < 60)
+                else if (NPC.frameCounter < 40)
                 {
-                    NPC.frame.Y = frameHeight * 8; //even out
+                    Xframe = 7;
+                    Yframe = 1;
                 }
                 else
                 {
                     NPC.frameCounter = 0;
                 }
             }
-            if (animation == 5) //ready swing
+            if (animation == 5) //ready swing hammer
             {
-                NPC.frame.Y = frameHeight * 10; //ready swing
-                NPC.frameCounter = 0;
+                if (NPC.frameCounter < 2)
+                {
+                    Xframe = 3;
+                    Yframe = 2;
+                }
+                else if (NPC.frameCounter < 4)
+                {
+                    Xframe = 4;
+                    Yframe = 2;
+                }
+                else
+                {
+                    NPC.frameCounter = 0;
+                }
             }
-            if (animation == 6) //swing
+            if (animation == 6) //swing hammer
             {
-                NPC.frame.Y = frameHeight * 11; //swing
-                NPC.frameCounter = 0;
+                if (NPC.frameCounter < 5)
+                {
+                    Xframe = 5;
+                    Yframe = 2;
+                }
+                else
+                {
+                    Xframe = 6;
+                    Yframe = 2;
+                }
             }
             if (animation == 7) //ready swing gordo
             {
-                NPC.frame.Y = frameHeight * 12; //ready swing gordo
-                NPC.frameCounter = 0;
+                if (NPC.frameCounter < 4)
+                {
+                    Xframe = 7;
+                    Yframe = 2;
+                }
+                else if (NPC.frameCounter < 8)
+                {
+                    Xframe = 0;
+                    Yframe = 3;
+                }
+                else
+                {
+                    Xframe = 1;
+                    Yframe = 3;
+                }
             }
             if (animation == 8) //swing gordo
             {
-                NPC.frame.Y = frameHeight * 13; //swing gordo
-                NPC.frameCounter = 0;
+                if (NPC.frameCounter < 5)
+                {
+                    Xframe = 2;
+                    Yframe = 3;
+                }
+                else if (NPC.frameCounter < 10)
+                {
+                    Xframe = 3;
+                    Yframe = 3;
+                }
+                else if (NPC.frameCounter < 15)
+                {
+                    Xframe = 4;
+                    Yframe = 3;
+                }
+                else if (NPC.frameCounter < 20)
+                {
+                    Xframe = 5;
+                    Yframe = 3;
+                }
+                else
+                {
+                    Xframe = 6;
+                    Yframe = 3;
+                }
             }
             if (animation == 9) //slam
             {
-                NPC.frame.Y = frameHeight * 14; //slam
-                NPC.frameCounter = 0;
+                if (NPC.frameCounter < 10)
+                {
+                    Xframe = 7;
+                    Yframe = 3;
+                }
+                else
+                {
+                    Xframe = 0;
+                    Yframe = 4;
+                }
             }
             if (animation == 10) //rise
             {
-                NPC.frame.Y = frameHeight * 15; //rise
+                if (NPC.frameCounter < 10)
+                {
+                    Xframe = 1;
+                    Yframe = 4;
+                }
+                else
+                {
+                    Xframe = 2;
+                    Yframe = 4;
+                }
+            }
+            if (animation == 11) //swing gordo fast
+            {
+                if (NPC.frameCounter < 2)
+                {
+                    Xframe = 2;
+                    Yframe = 3;
+                }
+                else if (NPC.frameCounter < 4)
+                {
+                    Xframe = 3;
+                    Yframe = 3;
+                }
+                else if (NPC.frameCounter < 6)
+                {
+                    Xframe = 4;
+                    Yframe = 3;
+                }
+                else if (NPC.frameCounter < 8)
+                {
+                    Xframe = 5;
+                    Yframe = 3;
+                }
+                else
+                {
+                    Xframe = 6;
+                    Yframe = 3;
+                }
+            }
+            if (animation == 12) //ouch!
+            {
+                Xframe = 3;
+                Yframe = 4;
                 NPC.frameCounter = 0;
             }
-            if (animation == 11) //ouch!
+            if (animation == 13) //possessed float
             {
-                NPC.frame.Y = frameHeight * 16; //ouch!
-                NPC.frameCounter = 0;
-            }
-            if (animation == 12) //possessed float
-            {
-                NPC.frameCounter++;
                 if (NPC.frameCounter < 15)
                 {
-                    NPC.frame.Y = frameHeight * 18; //inhale
+                    Xframe = 4;
+                    Yframe = 4;
                 }
                 else if (NPC.frameCounter < 30)
                 {
-                    NPC.frame.Y = frameHeight * 17; //exhale
+                    Xframe = 5;
+                    Yframe = 4;
+                }
+                else if (NPC.frameCounter < 45)
+                {
+                    Xframe = 6;
+                    Yframe = 4;
+                }
+                else if (NPC.frameCounter < 60)
+                {
+                    Xframe = 5;
+                    Yframe = 4;
                 }
                 else
                 {
                     NPC.frameCounter = 0;
                 }
             }
-            if (animation == 13) //possessed open maw
+            if (animation == 14) //possessed open maw
             {
-                NPC.frameCounter++;
-                if (NPC.frameCounter < 5)
+                if (NPC.frameCounter < 3)
                 {
-                    NPC.frame.Y = frameHeight * 19; //stance up
+                    Xframe = 7;
+                    Yframe = 4;
                 }
-                else if (NPC.frameCounter < 10)
+                else if (NPC.frameCounter < 6)
                 {
-                    NPC.frame.Y = frameHeight * 20; //reveal
+                    Xframe = 0;
+                    Yframe = 5;
                 }
-                else
+                else if (NPC.frameCounter < 9)
                 {
-                    NPC.frame.Y = frameHeight * 21; //fully open
+                    Xframe = 1;
+                    Yframe = 5;
+                }
+                else if (NPC.frameCounter < 12)
+                {
+                    Xframe = 2;
+                    Yframe = 5;
+                }
+                else if (NPC.frameCounter < 15)
+                {
+                    Xframe = 3;
+                    Yframe = 5;
+                }
+                else if (NPC.frameCounter < 18)
+                {
+                    Xframe = 4;
+                    Yframe = 5;
                 }
             }
-            if (animation == 14) //possessed chomp loop
+            if (animation == 15) //possessed chomp loop
             {
-                NPC.frameCounter++;
-                if (NPC.frameCounter < 5)
+                if (NPC.frameCounter < 2)
                 {
-                    NPC.frame.Y = frameHeight * 20; //close
+                    Xframe = 3;
+                    Yframe = 5;
                 }
-                else if (NPC.frameCounter < 10)
+                else if (NPC.frameCounter < 4)
                 {
-                    NPC.frame.Y = frameHeight * 21; //open
+                    Xframe = 4;
+                    Yframe = 5;
+                }
+                else if (NPC.frameCounter < 6)
+                {
+                    //clamp
+                    Xframe = 2;
+                    Yframe = 5;
                 }
                 else
                 {
                     NPC.frameCounter = 0;
                 }
             }
-            if (animation == 15) //possessed close maw
+            if (animation == 16) //possessed close maw
             {
-                NPC.frameCounter++;
-                if (NPC.frameCounter < 5)
+                if (NPC.frameCounter < 3)
                 {
-                    NPC.frame.Y = frameHeight * 21; //fully open
+                    Xframe = 3;
+                    Yframe = 5;
                 }
-                else if (NPC.frameCounter < 10)
+                else if (NPC.frameCounter < 6)
                 {
-                    NPC.frame.Y = frameHeight * 20; //reveal
+                    Xframe = 2;
+                    Yframe = 5;
                 }
-                else
+                else if (NPC.frameCounter < 9)
                 {
-                    NPC.frame.Y = frameHeight * 19; //normal
+                    Xframe = 1;
+                    Yframe = 5;
+                }
+                else if (NPC.frameCounter < 12)
+                {
+                    Xframe = 0;
+                    Yframe = 5;
+                }
+                else if (NPC.frameCounter < 15)
+                {
+                    Xframe = 7;
+                    Yframe = 4;
                 }
             }
-            if (animation == 16) //possessed open eye
+            if (animation == 17) //possessed open eye
             {
-                NPC.frameCounter++;
-                if (NPC.frameCounter < 5)
+                if (NPC.frameCounter < 2)
                 {
-                    NPC.frame.Y = frameHeight * 22; //squint
+                    Xframe = 7;
+                    Yframe = 4;
+                }
+                else if (NPC.frameCounter < 4)
+                {
+                    Xframe = 0;
+                    Yframe = 5;
+                }
+                else if (NPC.frameCounter < 6)
+                {
+                    Xframe = 5;
+                    Yframe = 5;
+                }
+                else if (NPC.frameCounter < 8)
+                {
+                    Xframe = 6;
+                    Yframe = 5;
                 }
                 else if (NPC.frameCounter < 10)
                 {
-                    NPC.frame.Y = frameHeight * 23; //neutral
+                    Xframe = 7;
+                    Yframe = 5;
                 }
-                else
+                else if (NPC.frameCounter < 30)
                 {
-                    NPC.frame.Y = frameHeight * 24; //big ol eyes
+                    Xframe = 0;
+                    Yframe = 6;
+                }
+                else if (NPC.frameCounter < 32)
+                {
+                    Xframe = 1;
+                    Yframe = 6;
+                }
+                else if (NPC.frameCounter < 34)
+                {
+                    Xframe = 2;
+                    Yframe = 6;
+                }
+                else if (NPC.frameCounter < 36)
+                {
+                    Xframe = 3;
+                    Yframe = 6;
                 }
             }
-            if (animation == 17) //possessed close eye
+            if (animation == 18) //possessed close eye
             {
-                NPC.frameCounter++;
-                if (NPC.frameCounter < 5)
+                if (NPC.frameCounter < 2)
                 {
-                    NPC.frame.Y = frameHeight * 23; //neutral
+                    Xframe = 2;
+                    Yframe = 6;
                 }
-                else if (NPC.frameCounter < 10)
+                else if (NPC.frameCounter < 4)
                 {
-                    NPC.frame.Y = frameHeight * 22; //squint
+                    Xframe = 1;
+                    Yframe = 6;
+                }
+                else if (NPC.frameCounter < 6)
+                {
+                    Xframe = 0;
+                    Yframe = 6;
+                }
+                else if (NPC.frameCounter < 16)
+                {
+                    Xframe = 7;
+                    Yframe = 5;
+                }
+                else if (NPC.frameCounter < 18)
+                {
+                    Xframe = 5;
+                    Yframe = 5;
+                }
+                else if (NPC.frameCounter < 20)
+                {
+                    Xframe = 0;
+                    Yframe = 5;
                 }
                 else
                 {
-                    NPC.frame.Y = frameHeight * 19; //normal
+                    Xframe = 7;
+                    Yframe = 4;
+                }
+            }
+            if (animation == 19) //ready swing gordo (fast)
+            {
+                if (NPC.frameCounter < 2)
+                {
+                    Xframe = 7;
+                    Yframe = 2;
+                }
+                else if (NPC.frameCounter < 4)
+                {
+                    Xframe = 0;
+                    Yframe = 3;
+                }
+                else
+                {
+                    Xframe = 1;
+                    Yframe = 3;
+                }
+            }
+
+            int frameWidth = textureWidth / 8;
+            int frameHeight = textureHeight / 7;
+
+            return new Rectangle(Xframe * frameWidth, Yframe * frameHeight, frameWidth, frameHeight);
+        }
+
+        public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+        {
+            Texture2D gordo = TextureAssets.Projectile[ModContent.ProjectileType<Gordo>()].Value;
+
+
+            float xOffset = NPC.direction * 100;
+            Vector2 position = NPC.Center - Main.screenPosition + new Vector2(xOffset, -100);
+
+            Vector2 origin = gordo.Size() / 2;
+
+            //only draw if in holding up while holding hammer frame or the first part of the swinging frames
+
+            if (animation == 7 && NPC.frameCounter >= 8)
+            {
+                Main.EntitySpriteDraw(gordo, position, null, drawColor, 0, origin, 1, SpriteEffects.None);
+            }
+            else if (animation == 8) 
+            {
+                if (NPC.frameCounter >= 0 && NPC.frameCounter < 5)
+                {
+                    position = NPC.Center - Main.screenPosition + new Vector2(xOffset, -80);
+
+                    Main.EntitySpriteDraw(gordo, position, null, drawColor, MathHelper.PiOver2 / 8, origin, 1, SpriteEffects.None);
+                }
+                else if (NPC.frameCounter >= 5 && NPC.frameCounter < 10)
+                {
+                    position = NPC.Center - Main.screenPosition + new Vector2(xOffset, -65);
+
+                    Main.EntitySpriteDraw(gordo, position, null, drawColor, MathHelper.PiOver2 / 6, origin, 1, SpriteEffects.None);
+                }
+                else if (NPC.frameCounter >= 10 && NPC.frameCounter < 15)
+                {
+                    position = NPC.Center - Main.screenPosition + new Vector2(xOffset, -30);
+
+                    Main.EntitySpriteDraw(gordo, position, null, drawColor, MathHelper.PiOver2 / 4, origin, 1, SpriteEffects.None);
+                }
+            }
+            else if (animation == 11) //same thing as previous except faster
+            {
+                if (NPC.frameCounter >= 0 && NPC.frameCounter < 2)
+                {
+                    position = NPC.Center - Main.screenPosition + new Vector2(xOffset, -80);
+
+                    Main.EntitySpriteDraw(gordo, position, null, drawColor, MathHelper.PiOver2 / 8, origin, 1, SpriteEffects.None);
+                }
+                else if (NPC.frameCounter >= 2 && NPC.frameCounter < 4)
+                {
+                    position = NPC.Center - Main.screenPosition + new Vector2(xOffset, -65);
+
+                    Main.EntitySpriteDraw(gordo, position, null, drawColor, MathHelper.PiOver2 / 6, origin, 1, SpriteEffects.None);
+                }
+                else if (NPC.frameCounter >= 4 && NPC.frameCounter < 6)
+                {
+                    position = NPC.Center - Main.screenPosition + new Vector2(xOffset, -30);
+
+                    Main.EntitySpriteDraw(gordo, position, null, drawColor, MathHelper.PiOver2 / 4, origin, 1, SpriteEffects.None);
                 }
             }
         }
@@ -1285,18 +1806,6 @@ namespace KirboMod.NPCs
         public override void ModifyHoverBoundingBox(ref Rectangle boundingBox)
         {
             boundingBox = NPC.Hitbox;
-        }
-
-        public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
-        {
-            if (animation == 7) //draw gordo on gordo prep
-            {
-                Texture2D gordo = ModContent.Request<Texture2D>("KirboMod/Projectiles/Gordo").Value;
-                Vector2 position = NPC.Center + new Vector2(NPC.direction * 100, -10);
-                Vector2 origin = gordo.Size() / 2;
-
-                Main.EntitySpriteDraw(gordo, position - Main.screenPosition, null, drawColor, 0, origin, 1f, SpriteEffects.None);
-            }
         }
     }
 }

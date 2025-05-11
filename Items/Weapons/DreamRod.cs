@@ -27,7 +27,7 @@ namespace KirboMod.Items.Weapons
 			Item.width = 22; //make small for better world hitbox
 			Item.height = 22;
 			Item.useTime = 5;
-			Item.useAnimation = 5;
+			Item.useAnimation = 30;
 			Item.useStyle = ItemUseStyleID.HoldUp;
 			Item.knockBack = 6;
             Item.value = Item.buyPrice(0, 25, 0, 0);

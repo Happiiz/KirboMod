@@ -31,7 +31,7 @@ namespace KirboMod.Items.RainbowDrops
 		public override void AddRecipes()
 		{
 			Recipe recipe = CreateRecipe();
-			recipe.AddIngredient(ModContent.ItemType<Starbit>(), 10);
+			recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
 			recipe.AddIngredient(ModContent.ItemType<HeartMatter>(), 2);
 			recipe.AddIngredient(ItemID.Waterleaf, 3);
 			recipe.AddIngredient(ItemID.FossilOre, 5);
