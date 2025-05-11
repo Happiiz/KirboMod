@@ -131,7 +131,7 @@ namespace KirboMod.Projectiles.HammerSwings
                     origin = new Vector2(tex.Width, tex.Height / 2);
                 }
                 float rotationOffset = MathF.Sin(Projectile.localAI[1] * .2f) * .2f;
-                Main.EntitySpriteDraw(tex, drawPos + new Vector2(timer * 10, -2), null, Color.White * Projectile.Opacity, Projectile.rotation + rotationOffset, origin, scale, fx);
+                Main.EntitySpriteDraw(tex, drawPos + new Vector2(timer * 10, -2), null, Color.White * Projectile.Opacity, Projectile.rotation + rotationOffset, origin, scale * 0.3f, fx);
             }
         }
     }
