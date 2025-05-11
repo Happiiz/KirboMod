@@ -43,6 +43,7 @@ namespace KirboMod.NPCs
                 PortraitPositionXOverride = 50,
                 Position = new Vector2(40, 30),
 				Scale = 0.8f,
+				Hide = true,
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
 
