@@ -94,8 +94,7 @@ namespace KirboMod.NPCs
         public override void SetDefaults()
         {
             NPC.width = 100;
-            NPC.height = 150;
-            DrawOffsetY = 72;
+            NPC.height = 100;
             NPC.damage = 50;
             NPC.noTileCollide = false;
             NPC.defense = 16;
@@ -199,7 +198,7 @@ namespace KirboMod.NPCs
                 if (!TileID.Sets.Platforms[tile.TileType])
                     onplatform = false;
             }
-            if (onplatform && (NPC.Center.Y < player.position.Y - 100)) //if they are and the player is lower than the boss, temporarily let the boss ignore tiles to go through them
+            if (onplatform && (NPC.Bottom.Y < player.Bottom.Y - 100)) //if they are and the player is lower than the boss, temporarily let the boss ignore tiles to go through them
             {
                 NPC.noTileCollide = true;
             }
@@ -290,7 +289,7 @@ namespace KirboMod.NPCs
                 if (attacktype == DededeAttackType.Slam)
                 {
                     NPC.noGravity = true;
-                    NPC.GravityMultiplier *= MultipliableFloat.One * 2;
+                    NPC.GravityMultiplier *= MultipliableFloat.One * 1.5f;
                     AttackSlam(phaseThreeSpeedUp, player, distance);
                     NPC.velocity.Y += NPC.gravity;
                 }
@@ -596,7 +595,7 @@ namespace KirboMod.NPCs
 
                 SoundEngine.PlaySound(HammerWindUp, NPC.Center);
 
-                NPC.velocity.X *= 0f;
+                NPC.velocity.X *= 0.001f;
                 ChooseAnimation(5); //ready swing   
             }
 
@@ -616,7 +615,7 @@ namespace KirboMod.NPCs
                 {
                     if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
                     {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity *= 0.01f, ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI);
+                        SummonSmash();
                     }
                     NPC.velocity.Y = -4; // stop rising
                     ChooseAnimation(6); //swing	
@@ -635,7 +634,7 @@ namespace KirboMod.NPCs
                     {
                         if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
                         {
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity *= 0.01f, ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI);
+                            SummonSmash();
                         }
 
                         LaunchDropStars();
@@ -659,7 +658,7 @@ namespace KirboMod.NPCs
             {
                 if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
                 {
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity *= 0.01f, ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI);
+                    SummonSmash();
                 }
                 ChooseAnimation(6); //swing
             }
@@ -677,7 +676,7 @@ namespace KirboMod.NPCs
                 {
                     if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
                     {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity *= 0.01f, ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI);
+                        SummonSmash();
                     }
 
                     LaunchDropStars();
@@ -700,7 +699,7 @@ namespace KirboMod.NPCs
                 {
                     if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
                     {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity *= 0.01f, ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI);
+                        SummonSmash();
                     }
 
                     LaunchDropStars();
@@ -718,7 +717,7 @@ namespace KirboMod.NPCs
                 {
                     if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
                     {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity *= 0.01f, ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI);
+                        SummonSmash();
                     }
 
                     LaunchDropStars();
@@ -759,7 +758,7 @@ namespace KirboMod.NPCs
 
         private void AttackSlam(int phaseThreeSpeedUp, Player player, Vector2 distance)
         {
-            Vector2 predictDistance = player.Center + player.velocity * 10 - NPC.Center;
+            Vector2 predictDistance = player.Center + player.velocity * 5 - NPC.Center;
 
             if (attack >= 60 - phaseThreeSpeedUp && attack < (phase == 3 ? 90: 120) - phaseThreeSpeedUp)
             {
@@ -790,7 +789,7 @@ namespace KirboMod.NPCs
 
                 ChooseAnimation(10); //jump
 
-                if (NPC.Bottom.Y < player.Bottom.Y - 200 || NPC.velocity.Y < 0) //higher than player or going up
+                if (NPC.Bottom.Y < player.Top.Y - 100 || NPC.velocity.Y < 0) //higher than player (adjusts to velocity) or going up
                 {
                     NPC.noTileCollide = true; //don't collide with tiles
                 }
@@ -918,17 +917,6 @@ namespace KirboMod.NPCs
                 float time = TimeToReachYPoint(shootFrom.Y, player.Center.Y, BouncyGordo.GordoGravity, velocity.Y);
                 velocity.X = distance.X / time;
 
-                /*Utils.ChaseResults results = Utils.GetChaseResults(shootFrom, shootSpeed, player.Center, player.velocity);
-
-                if (results.InterceptionHappens && phase < 3) //predict location if phase is less than 3
-                {
-                    velocity.X = Utils.FactorAcceleration(results.ChaserVelocity, results.InterceptionTime, new Vector2(0, BouncyGordo.GordoGravity), 0).X;
-                }
-                else
-                {
-                    velocity = shootFrom.DirectionTo(player.Center) * shootSpeed;
-                }*/
-
                 if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
                 {
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), shootFrom, velocity, ModContent.ProjectileType<BouncyGordo>(), 30 / 2, 4f, Main.myPlayer, 0, 0);
@@ -943,6 +931,12 @@ namespace KirboMod.NPCs
                 attack = 0;
             }
         }
+        private void SummonSmash()
+        {
+            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.direction * 130, NPC.Center.Y + 20, NPC.direction * 0.1f, 0,
+                ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI, 0);
+        }
+
         static float GetYVelForParabolaPeakToBeAt(float peakPosY, float gravityY, float fromY) //used for finding trajectory of gordo (courtesy of not me)
         {
             float result = MathF.Abs((peakPosY - fromY) * gravityY * 2);
@@ -1104,7 +1098,7 @@ namespace KirboMod.NPCs
             Rectangle frame = Animation(dedede.Width, dedede.Height);
 
             //draw!
-            spriteBatch.Draw(dedede, NPC.Center - Main.screenPosition - new Vector2(0, 18), frame, drawColor, NPC.rotation,
+            spriteBatch.Draw(dedede, NPC.Center - Main.screenPosition - new Vector2(0, 44), frame, drawColor, NPC.rotation,
                 frame.Size() / 2, NPC.scale, direction, 0f);
 
             return false;

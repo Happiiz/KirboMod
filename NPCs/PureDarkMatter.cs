@@ -222,7 +222,7 @@ namespace KirboMod.NPCs
             }
 
             //reset
-            if (NPC.ai[0] >= 270 && phase == 1)
+            if (NPC.ai[0] >= 320 && phase == 1)
             {
                 NPC.ai[0] = 29;
             }
