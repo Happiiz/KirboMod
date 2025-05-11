@@ -469,24 +469,36 @@ namespace KirboMod.NPCs
             {
                 VFX.DrawGlowBallDiffuse(NPC.Center + new Vector2(0, 84), 4f, VFX.RndElectricCol * darkness, Color.White);
             }
+            float scaleMult = 1f;
             Player player = Main.player[NPC.target];
             bool drawEyelid = (transitioning && NPC.ai[2] > 0 && NPC.ai[2] <= 180) || frenzy;
             float offsetLength = 6.5f;
             Vector2 pupilOffset = Vector2.Normalize(player.Center - NPC.Center) * offsetLength;//the multipier is just what looks good
-            Texture2D texture = TextureAssets.Npc[Type].Value;
-            spriteBatch.Draw(texture, NPC.Center - screenPos, NPC.frame, GetAlpha(Color.White).Value, NPC.rotation, NPC.frame.Size() / 2, 1f, SpriteEffects.None, 0f);
-            spriteBatch.Draw(spikes.Value, NPC.Center - screenPos, NPC.frame, new Color(255, 255, 255), NPC.rotation, NPC.frame.Size() / 2, 1f, SpriteEffects.None, 0f);
-            if ((transitioning == true && NPC.ai[2] > 0 && NPC.ai[2] <= 180) || NPC.IsABestiaryIconDummy)
+         
+            if ((transitioning == true && NPC.ai[2] > 0 && NPC.ai[2] <= 180))
             {
                 pupilOffset = Vector2.Zero;
             }
+            if (NPC.IsABestiaryIconDummy)
+            {
+                scaleMult = 0.6f;
+                pupilOffset = (Main.MouseScreen - NPC.Center);//the multipier is just what looks good
+                if(pupilOffset.Length() > offsetLength)
+                {
+                    pupilOffset.Normalize();
+                    pupilOffset *= offsetLength;
+                }
+            }
             pupilOffset /= 2;
             pupilOffset = pupilOffset.Floor() * 2 + Vector2.One;
-
-            spriteBatch.Draw(eyeBase.Value, NPC.Center - screenPos, null, new Color(255, 255, 255), 0, eyeBase.Size() / 2, 1f, SpriteEffects.None, 0f);
-            spriteBatch.Draw(pupil.Value, NPC.Center - screenPos + pupilOffset, null, Color.White, 0, pupil.Size() / 2, 1, SpriteEffects.None, 0);
+            pupilOffset *= scaleMult;
+            Texture2D texture = TextureAssets.Npc[Type].Value;
+            spriteBatch.Draw(texture, NPC.Center - screenPos, NPC.frame, GetAlpha(Color.White).Value, NPC.rotation, NPC.frame.Size() / 2, scaleMult, SpriteEffects.None, 0f);
+            spriteBatch.Draw(spikes.Value, NPC.Center - screenPos, NPC.frame, new Color(255, 255, 255), NPC.rotation, NPC.frame.Size() / 2, scaleMult, SpriteEffects.None, 0f);
+            spriteBatch.Draw(eyeBase.Value, NPC.Center - screenPos, null, new Color(255, 255, 255), 0, eyeBase.Size() / 2, scaleMult, SpriteEffects.None, 0f);
+            spriteBatch.Draw(pupil.Value, NPC.Center - screenPos + pupilOffset, null, Color.White, 0, pupil.Size() / 2, scaleMult, SpriteEffects.None, 0);
             if (drawEyelid)
-                spriteBatch.Draw(eyelid.Value, NPC.Center - screenPos, null, Color.White, 0, eyelid.Size() / 2, 1, SpriteEffects.None, 0);
+                spriteBatch.Draw(eyelid.Value, NPC.Center - screenPos, null, Color.White, 0, eyelid.Size() / 2, scaleMult, SpriteEffects.None, 0);
            
             return false;
         }

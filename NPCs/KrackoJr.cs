@@ -56,13 +56,11 @@ namespace KirboMod.NPCs
             Main.npcFrameCount[NPC.type] = 1;
             // Add this in for bosses(in this case minibosses) that have a summon item, requires corresponding code in the item
             NPCID.Sets.MPAllowedEnemies[Type] = true;
-            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers()
+            NPCID.Sets.NPCBestiaryDrawModifiers value = new()
             {
-                CustomTexturePath = "KirboMod/NPCs/BestiaryTextures/KrackoJrPortrait",
-                PortraitPositionYOverride = 0,
-                Position = new(0, 0),
+                Hide = true // Hides this NPC from the Bestiary, useful for multi-part NPCs whom you only want one entry.
             };
-            NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
+            NPCID.Sets.NPCBestiaryDrawOffset.Add(NPC.type, value);
         }
 
         public override void SetDefaults()
@@ -319,7 +317,7 @@ namespace KirboMod.NPCs
             {
                 trail[i].Draw(clouds);
             }
-            spriteBatch.Draw(clouds, NPC.Center - Main.screenPosition, null, new Color(255, 255, 255), NPC.rotation, new Vector2(55, 55), 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(clouds, NPC.Center - screenPos, null, new Color(255, 255, 255), NPC.rotation, new Vector2(55, 55), 1f, SpriteEffects.None, 0f);
             Texture2D eye = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoEyeBase").Value;
             Texture2D pupil = ModContent.Request<Texture2D>("KirboMod/NPCs/KrackoEyePupil").Value;
             Player player = Main.player[NPC.target];
@@ -328,11 +326,17 @@ namespace KirboMod.NPCs
 
             if (NPC.IsABestiaryIconDummy)
             {
-                pupilOffset = Vector2.Zero;
+                pupilOffset = (Main.MouseScreen - NPC.Center);//the multipier is just what looks good
+                if(pupilOffset.Length() > offsetLength)
+                {
+                    pupilOffset.Normalize();
+                    pupilOffset *= offsetLength;
+                }
             }
-
-            spriteBatch.Draw(eye, NPC.Center - Main.screenPosition, null, new Color(255, 255, 255), 0, new Vector2(29, 29), 1f, SpriteEffects.None, 0f);
-            spriteBatch.Draw(pupil, NPC.Center - Main.screenPosition + pupilOffset, null, Color.White, 0, pupil.Size() / 2, 1, SpriteEffects.None, 0);
+            pupilOffset /= 2;
+            pupilOffset = pupilOffset.Floor() * 2 + Vector2.One;
+            spriteBatch.Draw(eye, NPC.Center - screenPos, null, new Color(255, 255, 255), 0, new Vector2(29, 29), 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(pupil, NPC.Center - screenPos + pupilOffset, null, Color.White, 0, pupil.Size() / 2, 1, SpriteEffects.None, 0);
             return false;
         }
 
@@ -340,7 +344,8 @@ namespace KirboMod.NPCs
         {
             if (NPC.IsABestiaryIconDummy)
             {
-                MakeClouds();
+                NPC.rotation += .1f;
+                //MakeClouds();
             }
         }
 

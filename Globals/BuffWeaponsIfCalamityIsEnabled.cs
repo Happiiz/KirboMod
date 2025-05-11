@@ -70,19 +70,6 @@ namespace KirboMod.Globals
             {
                 entity.damage = (int)(entity.damage * 1.2f);
             }
-            if(entity.type == ModContent.ItemType<MasterSword>())
-            {
-                entity.damage = 1000;
-            }else if(entity.type == ModContent.ItemType<DreamRod>())
-            {
-                entity.damage = 1000;
-            }else if(entity.type == ModContent.ItemType<LoveLoveStick>())
-            {
-                entity.damage = 1400;
-            }else if(entity.type == ModContent.ItemType<CrystalGun>())
-            {
-                entity.damage = 3500;
-            }
         }
     }
 }

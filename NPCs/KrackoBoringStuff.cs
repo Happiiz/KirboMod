@@ -154,16 +154,6 @@ namespace KirboMod.NPCs
 			// DisplayName.SetDefault("Kracko");
 			Main.npcFrameCount[NPC.type] = 2;
 
-			NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers()
-			{
-				CustomTexturePath = "KirboMod/NPCs/BestiaryTextures/KrackoPortrait",
-				PortraitScale = 0.5f, // Portrait refers to the full picture when clicking on the icon in the bestiary
-				PortraitPositionYOverride = 0f,
-				Scale = 1f,
-                Position = new(2, 6),
-            };
-			NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
-
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true; //immune to not mess up movement
         }
 
