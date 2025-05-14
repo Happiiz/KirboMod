@@ -435,7 +435,7 @@ namespace KirboMod.NPCs
                         {
                             if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
                             {
-                                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.direction * 150, NPC.Center.Y, NPC.velocity.X * 0, NPC.velocity.Y * 0, ModContent.ProjectileType<Projectiles.DarkOrb>(), 50 / 2, 10f, Main.myPlayer, 0, NPC.target, 1);
+                                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.direction * 150, NPC.Center.Y - 30, NPC.velocity.X * 0, NPC.velocity.Y * 0, ModContent.ProjectileType<Projectiles.DarkOrb>(), 50 / 2, 10f, Main.myPlayer, 0, NPC.target, 1);
                             }
 
                             SoundEngine.PlaySound(OrbCharge, NPC.Center);

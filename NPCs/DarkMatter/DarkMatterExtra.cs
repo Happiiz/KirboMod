@@ -43,6 +43,7 @@ namespace KirboMod.NPCs.DarkMatter
             {
                 ImmuneToAllBuffsThatAreNotWhips = true,
             };
+            NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true; //immune to not mess up movement
 
             //for drawing afterimages and stuff alike
             ProjectileID.Sets.TrailCacheLength[NPC.type] = 5; // The length of old position to be recorded

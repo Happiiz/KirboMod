@@ -5,6 +5,7 @@ Mods: {
 			DefensePenetration: Ignores {0} points of enemy defense
 			IgnoresDefense: Ignores enemy defense completely
 			MusicBoxTitle: Music Box
+			ShroomiteHelmetBenefitDowngrades: This weapon and its downgrades benefit from the [i:1548] Shroomite Helmet
 		}
 
 		ProgressionDescription: {
@@ -139,8 +140,8 @@ Mods: {
 					'''
 					Summons homing stars when hit, their numbers based on damage taken
 					The stars have a combined damage value of 3x the damage taken
-					The stars ignore 40 defense each
-					In PVP, all stars spawn with 3x damage taken.
+					Each star ignores 40 defense each
+					In PVP, all stars spawn only with 3x damage taken.
 					Stars spawned from PVP cannot hit enemies and vice-versa.
 					Does not activate from damage taken from spikes, lava, and using a regular bug net on hell critters.
 					'''
@@ -623,7 +624,7 @@ Mods: {
 					'''
 					Shoots flying sawblades that bounce off walls and grind against enemies
 					{$CommonItemTooltip.IgnoresDefense}
-					This weapon and its downgrades benefit from the [i:1548] Shroomite Helmet
+					{$CommonItemTooltip.ShroomiteHelmetBenefitDowngrades}
 					'''
 			}
 
@@ -706,7 +707,7 @@ Mods: {
 					'''
 					Leaves crystals along the ground
 					Shoots crystal spikes out when expired
-					This weapon and its downgrades benefit from the [i:1548] Shroomite Helmet
+					{$CommonItemTooltip.ShroomiteHelmetBenefitDowngrades}
 					'''
 			}
 
@@ -733,7 +734,7 @@ Mods: {
 
 			DarkSword: {
 				DisplayName: Dark Sword
-				Tooltip: Fires dark beams, dark orbs, and large dark Waves
+				Tooltip: Fires dark beams, dark orbs, and large dark waves
 			}
 
 			DooStaff: {
@@ -750,7 +751,7 @@ Mods: {
 				Tooltip:
 					'''
 					Unleashes a flurry of shadow flames
-					Enemies hit by one will be set on shadow fire
+					Enemies hit by them will be set on shadow fire
 					{$CommonItemTooltip.DefensePenetration}
 					'''
 			}
@@ -770,8 +771,8 @@ Mods: {
 					'''
 					Land punches to build up charge
 					Right click to use all stored charge and perform an uppercut
+					The uppercut deals more damage the more charge you use
 					If you use more than half of the maximum charge at once, the uppercut will travel further and make you invincible
-					The uppercut deals more damage the more chare you use.
 					{$CommonItemTooltip.DefensePenetration}
 					'''
 			}
@@ -781,7 +782,7 @@ Mods: {
 				Tooltip:
 					'''
 					Flies in the opposite direction
-					This weapon and its downgrades benefit from the [i:1548] Shroomite Helmet
+					{$CommonItemTooltip.ShroomiteHelmetBenefitDowngrades}
 					'''
 			}
 
@@ -790,7 +791,7 @@ Mods: {
 				Tooltip:
 					'''
 					Sprays a flurry of fireballs
-					Enemies hit by one will catch on fire
+					Enemies hit by them will catch on fire
 					'''
 			}
 
@@ -809,8 +810,8 @@ Mods: {
 				DisplayName: Frosty Ice Pot
 				Tooltip:
 					'''
-					Sprays a flurry of snowballs that form snowmen
-					Enemies killed by one condense into an ice cube
+					Sprays a flurry of snow that forms snowmen
+					Enemies killed by the snow condense into an ice cube
 					'''
 			}
 
@@ -843,11 +844,7 @@ Mods: {
 
 			HardenedFighter: {
 				DisplayName: Hardened Fighter Glove
-				Tooltip:
-					'''
-					Right click to slam the ground and shoot rocks
-					Slam onto enemies to boost yourself
-					'''
+				Tooltip: Uppercutting releases a barrage of bouncing rocks
 			}
 
 			HeroSword: {
@@ -862,7 +859,7 @@ Mods: {
 					Activates homing capabilities after landing
 					Chases after enemies before detonation
 					Sets off other nearby homing bombs when detonated
-					This weapon and its downgrades benefit from the [i:1548] Shroomite Helmet
+					{$CommonItemTooltip.ShroomiteHelmetBenefitDowngrades}
 					'''
 			}
 
@@ -879,8 +876,8 @@ Mods: {
 				DisplayName: Ice Pot
 				Tooltip:
 					'''
-					Sprays a flurry of snowballs
-					Enemies killed by one condense into an ice cube
+					Sprays a flurry of snow
+					Enemies killed by it condense into an ice cube
 					'''
 			}
 
@@ -924,7 +921,7 @@ Mods: {
 				Tooltip:
 					'''
 					While airborne, right-click a direction to do a powerful dash
-					Dashing reduces damage by 50%
+					Dashing reduces damage taken by 50%
 					'The sword that seals a different kind of darkness'
 					'''
 			}
@@ -938,9 +935,7 @@ Mods: {
 				DisplayName: Metal Fighter Glove
 				Tooltip:
 					'''
-					Right click and hold up to uppercut!
-					Land punches to make uppercuts stronger!
-					Spike on the ground and in the air by just holding right click!
+					Right click while holding down instead to do a dive kick move
 					'Float like a ballistic missile, sting like a ballistic missile'
 					'''
 			}
@@ -955,7 +950,7 @@ Mods: {
 				Tooltip:
 					'''
 					Swing on the ground to cause shockwaves and right click to fire homing missiles
-					Shockwaves deal 2x damage, missiles deal 4.5x damage
+					Shockwaves deal 2x the damage and missiles deal 4.5x the damage
 					'Now with 2x the clobbering power!'
 					'''
 			}
@@ -973,8 +968,8 @@ Mods: {
 				DisplayName: Ornate Chest
 				Tooltip:
 					'''
-					Contains dark secrets
-					Use to unleash the dark fragments within
+					Contains writhing dark secrets...
+					Use to unleash the darkness within
 					'''
 			}
 
@@ -1004,7 +999,7 @@ Mods: {
 					'''
 					Converts all bullets into star bubbles
 					Converts star bullets into giant star bubbles
-					Contrary to its name, it does not use fallen stars as ammo
+					'Contrary to its name, it does not use fallen stars as ammo'
 					'''
 			}
 
@@ -1036,7 +1031,7 @@ Mods: {
 				DisplayName: Star Rod
 				Tooltip:
 					'''
-					Ignores 60 defense
+					{$CommonItemTooltip.DefensePenetration}
 					'No, I'll give you a house... in Boca Raton!'
 					'''
 			}
@@ -1091,11 +1086,11 @@ Mods: {
 				DisplayName: Triple Star
 				Tooltip:
 					'''
-					Ignores 60 defense
+					{$CommonItemTooltip.DefensePenetration}
 					Shoots out a maximum of three ricocheting stars that hit any enemies in their paths
 					Right click to shoot all three stars out at once at the cost of more mana
-					Stars not shot out will rotate around the player and deal damage to nearby enemies
-					Except in multiplayer because brother in christ this functionality does not like multiplayer, so I opted to make a damaging aura instead
+					Stars not shot out will rotate around the player and deal damage to nearby enemies...
+					...Except in multiplayer because brother in christ this functionality does not like multiplayer, so it makes a damaging aura instead
 					'''
 			}
 
@@ -1481,7 +1476,7 @@ Mods: {
 			WildHammerSwing.DisplayName: Wild Hammer Swing
 			StormTornadoLightning.DisplayName: Storm Tornado Lightning
 			MidbossRift.DisplayName: Midboss Rift
-			TripleStarStarForMultiplayer.DisplayName: Triple Star Star For Multiplayer
+			TripleStarStarForMultiplayer.DisplayName: Triple Star
 			FireApple.DisplayName: Fire Apple
 			NewWhispyBlado.DisplayName: Blado
 			NewWhispyFireApple.DisplayName: Fire Apple
@@ -1492,7 +1487,7 @@ Mods: {
 			NewWhispySpiralingWind.DisplayName: Wind
 			NewWhispySplittingWind.DisplayName: Wind
 			NewWhispySummonTileDustGenerator.DisplayName: New Whispy Summon Tile Dust Generator
-			NewWhispyAppleMedium.DisplayName: New Whispy Apple Medium
+			NewWhispyAppleMedium.DisplayName: Apple
 			HardenedFighterUppercut.DisplayName: Hardened Fighter Uppercut
 			MetalKick.DisplayName: Metal Kick
 			NightmareOrbFirstHitShine.DisplayName: Nightmare Orb First Hit Shine

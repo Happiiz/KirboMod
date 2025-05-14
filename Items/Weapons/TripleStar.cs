@@ -9,6 +9,7 @@ using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using static KirboMod.Projectiles.TripleStarStar;
 
@@ -24,7 +25,10 @@ namespace KirboMod.Items.Weapons
             ItemID.Sets.ItemsThatAllowRepeatedRightClick[Type] = true;
         }
 
-		public override void SetDefaults()
+        static int ArmPen = 60;
+        public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(ArmPen);
+
+        public override void SetDefaults()
 		{
 			Item.damage = 120;
 			Item.noMelee = true;
@@ -44,7 +48,7 @@ namespace KirboMod.Items.Weapons
 			Item.shoot = ModContent.ProjectileType<Projectiles.TripleStarStar>();
 			Item.shootSpeed = 32f;
 			Item.crit += 24; //same as star rod
-			Item.ArmorPenetration = 60;
+			Item.ArmorPenetration = ArmPen;
 		}
 
         public override bool AltFunctionUse(Player player)

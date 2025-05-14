@@ -67,6 +67,7 @@ namespace KirboMod.NPCs
             {
                 NPC.ai[2]++;
                 NPC.velocity *= 0.0001f; //stop
+                NPC.dontTakeDamage = true;
 
                 if (NPC.ai[2] < 180)
                 {
@@ -86,6 +87,7 @@ namespace KirboMod.NPCs
                 else
                 {
                     NPC.rotation = 0;
+                    NPC.dontTakeDamage = false;
                     transitioning = false;
                     frenzy = true;
                 }

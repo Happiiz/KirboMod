@@ -5,6 +5,7 @@ using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace KirboMod.Items.Weapons
@@ -17,7 +18,10 @@ namespace KirboMod.Items.Weapons
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research
         }
 
-		public override void SetDefaults()
+        static int ArmPen = 5;
+        public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(ArmPen);
+
+        public override void SetDefaults()
 		{
 			Item.damage = 80; 
 			Item.noMelee = true;

@@ -87,7 +87,9 @@ namespace KirboMod.Items.Weapons
 
         public override void UpdateInventory(Player player)
         {
-            if (Main.mouseRight == true && player.ItemTimeIsZero) //holding right & not attacking
+            KirbPlayer kplr = player.GetModPlayer<KirbPlayer>();
+
+            if (kplr.RightClicking == true && player.ItemTimeIsZero) //holding right & not attacking
             {
                 player.endurance += 0.35f; //damage reduction of 35% (put it here since it won't work in HoldItem()
             }

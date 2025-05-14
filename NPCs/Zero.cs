@@ -81,6 +81,7 @@ namespace KirboMod.NPCs
             {
                 ImmuneToAllBuffsThatAreNotWhips = true,
             };
+            NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true; //immune to not mess up movement
 
         }
 
@@ -552,6 +553,8 @@ namespace KirboMod.NPCs
                         Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, default, dmgHitboxType, DashDamage, 0, Main.myPlayer, NPC.whoAmI);
                     }
                     NPC.velocity *= 0.01f; //freeze to warn player (but not too much else it might disappear)
+
+                    SoundEngine.PlaySound(SoundID.Item113.WithPitchOffset(-0.5f).WithVolumeScale(6f), NPC.Center); //deep, loud roaaar
                 }
                 else
                 {

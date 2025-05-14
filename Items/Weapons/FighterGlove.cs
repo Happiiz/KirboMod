@@ -5,6 +5,7 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace KirboMod.Items.Weapons
@@ -20,6 +21,9 @@ namespace KirboMod.Items.Weapons
         }
         static int UseTime => 5;
         static float ShootSpeed => 20f;
+
+        static int ArmPen = 5;
+        public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(ArmPen);
         public override void SetDefaults()
         {
             Item.damage = 10;
@@ -38,7 +42,7 @@ namespace KirboMod.Items.Weapons
             Item.autoReuse = true;
             Item.shoot = ModContent.ProjectileType<Projectiles.FlyingPunch>();
             Item.shootSpeed = ShootSpeed;
-            Item.ArmorPenetration = 5;
+            Item.ArmorPenetration = ArmPen;
         }
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
