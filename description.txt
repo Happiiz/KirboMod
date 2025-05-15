@@ -6,6 +6,10 @@ This mod contains:
 - 6 familiar bosses spread throughout all of progression!
 - Multiple materials and accessories to obtain!
 
+Patch 1.2.0.1 of 5/15/2025:
+
+- Made Nightmare Crown into an accessory instead of a helmet, and consequently reduced its defense from 15 to 3
+
 Update 1.2 of 5/15/2025:
 
 The mod is finally on version 1.4.4, and with it has received multiple overhauls to its various content!
