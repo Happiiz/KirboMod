@@ -75,7 +75,8 @@ namespace KirboMod.Items.Weapons
         {
             Item.noMelee = player.ownedProjectileCounts[ModContent.ProjectileType<Projectiles.MaskedFireTornado>()] > 0;
             KirbPlayer kplr = player.GetModPlayer<KirbPlayer>();
-            if (kplr.RightClicking && player.ItemTimeIsZero) //holding right & not attacking
+
+            if (kplr.hammerCharge > 0) //charging up
             {
                 player.endurance += 0.35f; //damage reduction of 35% (put it here since it won't work in HoldItem()
             }

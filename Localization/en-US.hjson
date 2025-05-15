@@ -1251,6 +1251,11 @@ Mods: {
 				DisplayName: Photonic0's Boots
 				Tooltip: "'Because there were no boots that matched how your arms look while wearing Dark Artist's robes'"
 			}
+
+			ZeroMusicBox: {
+				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Zero)"
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {
@@ -1600,6 +1605,7 @@ Mods: {
 			DededeMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
 			DarkMatterMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
 			DreamLandBossMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
+			ZeroMusicBoxTile.MapEntry: Zero Music Box Tile
 		}
 
 		Configs: {

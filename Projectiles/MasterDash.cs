@@ -37,15 +37,17 @@ namespace KirboMod.Projectiles
         }
 
 		public override void AI()
-		{
-			//part of spear ai
-			Vector2 rotato = Main.player[Projectile.owner].RotatedRelativePoint(Main.player[Projectile.owner].MountedCenter);
+        {
+            Player player = Main.player[Projectile.owner];
+
+            //part of spear ai
+            Vector2 rotato = Main.player[Projectile.owner].RotatedRelativePoint(Main.player[Projectile.owner].MountedCenter);
 			Projectile.direction = Main.player[Projectile.owner].direction;
 
 			Projectile.position.X = rotato.X - (Projectile.width / 2);
 			Projectile.position.Y = rotato.Y - (Projectile.height / 2);
 
-			Projectile.rotation = Projectile.velocity.ToRotation(); //point direction it's going
+			Projectile.rotation = player.velocity.ToRotation(); //point direction player is going
 
 			//animation
 			if (++Projectile.frameCounter >= 2) //changes frames every 2 ticks 
@@ -56,8 +58,6 @@ namespace KirboMod.Projectiles
 					Projectile.frame = 0;
 				}
 			}
-
-			Player player = Main.player[Projectile.owner];
 
 			//two groups of dust
 			for (int i = 0; i < 6; ++i)

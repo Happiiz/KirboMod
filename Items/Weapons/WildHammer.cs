@@ -89,7 +89,7 @@ namespace KirboMod.Items.Weapons
         {
             KirbPlayer kplr = player.GetModPlayer<KirbPlayer>();
 
-            if (kplr.RightClicking == true && player.ItemTimeIsZero) //holding right & not attacking
+            if (meleeCharge > 0) //preparing attack
             {
                 player.endurance += 0.35f; //damage reduction of 35% (put it here since it won't work in HoldItem()
             }

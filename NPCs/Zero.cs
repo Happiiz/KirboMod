@@ -116,7 +116,7 @@ namespace KirboMod.NPCs
             /*Music = MusicID.Boss2;*/
             if (!Main.dedServ)
             {
-                Music = MusicLoader.GetMusicSlot(Mod, "Music/Happiz_PlaceholderZero");
+                Music = MusicLoader.GetMusicSlot(Mod, "Music/Photonic0_ZeroTwo");
                 //Music = MusicID.Boss2;
             }
 

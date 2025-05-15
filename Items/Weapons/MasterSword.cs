@@ -119,7 +119,7 @@ namespace KirboMod.Items.Weapons
             if (player.itemAnimation >= player.itemAnimationMax / 2 && player.altFunctionUse == 2)
             {
                 //damage reduction
-                player.endurance += 0.5f; //+50%
+               player.endurance += 0.5f; //+50%
 
                 DisableExtraMovement(player);
             }
@@ -151,7 +151,7 @@ namespace KirboMod.Items.Weapons
                 {
                     dash = Main.MouseWorld - player.Center;
                     dash.Normalize(); //reduce to a unit of 1
-                    dash *= 24; //make a speed of 24
+                    dash *= 48; //make a speed of 48
                     player.velocity = dash;
 
                     player.immuneTime = player.itemAnimationMax / 2; //for invincibility timer
@@ -200,7 +200,7 @@ namespace KirboMod.Items.Weapons
                         player.dash = 0; //disable dashing
                     }
 
-                    player.maxFallSpeed = 24;
+                    player.maxFallSpeed = 48;
 
                     if (player.itemAnimation % 5 == 0) //every multiple of 5
                     {
@@ -233,8 +233,6 @@ namespace KirboMod.Items.Weapons
             //disable double jump effects
             player.blockExtraJumps = true;
             player.GetModPlayer<KirbPlayer>().blockAirWalkerJump = true;
-
-            player.DryCollision(true, true); //fall through platforms
 
             player.mount.Dismount(player); //dismount mounts
 
