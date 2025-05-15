@@ -1,21 +1,50 @@
-A terraria mod based off of the Kirby series!
+A terraria mod based off of the Kirby series, integrating numerous elements from various games into Terraria!
 
 This mod contains:
-- over 60 weapons from the series and original to the mod!
-- around 20 enemies to fight!
-- 6 bosses spread throughout the game!
-- Multiple materials and accesories to find!
+- Over 60 weapons from the series and original to the mod!
+- Many enemies to find and fight!
+- 6 familiar bosses spread throughout all of progression!
+- Multiple materials and accessories to obtain!
 
-Patch 1.1.2.2 of 3/30/2023:
+Update 1.2 of 5/15/2025:
 
-New mod icon courtesy of GollossalKitty on Steam(slightly edited from the original submission)!
-Yeah that's about it I just wanted to update the icon
+The mod is finally on version 1.4.4, and with it has received multiple overhauls to its various content!
 
-Update 1.1.2 of 3/19/2023:
+- Shifted all 3rd-tier evolution weapons to post-Golem tier
+- Rare Stones are now only collectable through Mid-Bosses, which are now only summoned through the new Dimensional Destabilizer item
+- Changed up many enemy AIs and gave some expert mode changes
+- Overhauled all bosses to have entirely new attack patterns and attacks or just readjusted ones
+- 4 new music tracks for bosses by DeathZman, Evobyte, Happiz and Photonic0
+- Every weapon has been balanced, and/or overhauled
+- All minions are now a lot better at chasing enemies and dealing damage
+- Tons of sprite and visual overhauls
 
-Many things have been changed or reworked in this update, along with some multiplayer syncronization (finally!).
-Now you can play Kirby's Terraria Mod with a fresh coat of paint!
+View the full changelog on the mod discord!
 
-Poyo!
+Credits:
+
+Happiz:
+- Creator of the mod
+- Programming & spritework
+- Composed the King Dedede remix
+
+Photonic0:
+- Additional programming & spritework
+- Composed the Zero remix
+
+Evobyte:
+- Composed the Dream Land Boss remix
+
+DeathZman:
+- Composed the Dark Matter Swordsman remix
+
+
+Kirby series by HAL Laboratory!
+
+
+Join the Discord server for all my mods: https://discord.gg/nydhtpMuer
+
+
+Can YOU kirb your bee?
 
 
