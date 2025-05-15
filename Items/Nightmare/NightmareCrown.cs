@@ -6,7 +6,7 @@ using Terraria.Utilities;
 
 namespace KirboMod.Items.Nightmare
 {
-	[AutoloadEquip(EquipType.Head)]
+	//[AutoloadEquip(EquipType.Head)]
 	public class NightmareCrown : ModItem
 	{
 		public override void SetStaticDefaults() 
@@ -21,7 +21,8 @@ namespace KirboMod.Items.Nightmare
 			Item.value = Item.sellPrice(0, 0, 15, 0);
 			Item.rare = ItemRarityID.Blue;
 			Item.expert = true; //gives the accesory its permenant rainbow color
-			Item.defense = 15;
+			Item.defense = 3;
+			Item.accessory = true;
 		}
 
         public override void UpdateEquip(Player player)
