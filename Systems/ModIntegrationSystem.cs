@@ -1,5 +1,6 @@
 using KirboMod.NPCs;
 using KirboMod.NPCs.DarkMatter;
+using KirboMod.NPCs.NewWhispy;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -47,7 +48,12 @@ namespace KirboMod.Systems
 
 
             //WHISPY
-            
+
+            var whispyPortrait = (SpriteBatch sb, Rectangle rect, Color color) => {
+                Texture2D texture = ModContent.Request<Texture2D>("KirboMod/NPCs/BestiaryTextures/WhispyBossChecklistPortrait").Value;
+                Vector2 centered = new Vector2(rect.X + (rect.Width / 2), rect.Y + (rect.Height / 2));
+                sb.Draw(texture, centered, null, color, 0, texture.Size() / 2, 0.6f, SpriteEffects.None, 0);
+            };
 
             List<int> whispycollectibles = new List<int>()
             {
@@ -62,16 +68,17 @@ namespace KirboMod.Systems
             bossChecklistMod.Call(
                 "LogBoss",
                 Mod,
-                nameof(Whispy),
+                nameof(NewWhispyBoss),
                 0.75f, //before King Slime
                 () => DownedBossSystem.downedWhispyBoss,
-                ModContent.NPCType<NPCs.Whispy>(),
+                ModContent.NPCType<NPCs.NewWhispy.NewWhispyBoss>(),
                 new Dictionary<string, object>()
                 {
                     ["spawnInfo"] = Language.GetText($"Mods.KirboMod.ProgressionDescription.Whispy").WithFormatArgs(summonItem),
                     ["spawnItems"] = ModContent.ItemType<Items.WhispySeed>(),
                     ["despawnMessage"] = Language.GetText("Mods.KirboMod.DespawnMessage.Whispy"),
-                    ["collectibles"] = whispycollectibles
+                    ["collectibles"] = whispycollectibles,
+                    ["customPortrait"] = whispyPortrait,
                 }
             );
 
@@ -156,6 +163,12 @@ namespace KirboMod.Systems
 
             //NIGHTMARE
 
+            var nightmarePortrait = (SpriteBatch sb, Rectangle rect, Color color) => {
+                Texture2D texture = ModContent.Request<Texture2D>("KirboMod/NPCs/Nightmare/NightmareOrb").Value;
+                Vector2 centered = new Vector2(rect.X + (rect.Width / 2), rect.Y + (rect.Height / 2));
+                Rectangle frame = new(0, 0, texture.Width, texture.Height / 4);
+                sb.Draw(texture, centered, frame, color, 0, frame.Size() / 2, 1f, SpriteEffects.None, 0);
+            };
 
             List<int> nightmareCollectibles = new List<int>()
             {
@@ -179,7 +192,8 @@ namespace KirboMod.Systems
                     ["spawnInfo"] = Language.GetText($"Mods.KirboMod.ProgressionDescription.Nightmare").WithFormatArgs(summonItem),
                     ["spawnItems"] = ModContent.ItemType<Items.Weapons.StarRod>(),
                     ["despawnMessage"] = Language.GetText("Mods.KirboMod.DespawnMessage.Nightmare"),
-                    ["collectibles"] = nightmareCollectibles
+                    ["collectibles"] = nightmareCollectibles,
+                    ["customPortrait"] = nightmarePortrait,
                 }
             );
 

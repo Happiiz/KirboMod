@@ -141,6 +141,7 @@ namespace KirboMod.Items.NewWhispy
                 NetMethods.SpawnWhispy(i, j);
             }
             SoundEngine.PlaySound(SoundID.Roar, player.position);
+            curTile.HasTile = false;
 
             return true;
         }
@@ -151,7 +152,13 @@ namespace KirboMod.Items.NewWhispy
             int spawnX = i * 16 + 8;
             int spawnY = j * 16 + 16;
             RemoveWhispyDustIndicatorProjs(ref unused);
-            NPC.NewNPC(new EntitySource_TileInteraction(Main.player[playerIndex], i, j), spawnX, spawnY, ModContent.NPCType<NewWhispyBoss>());
+            int npc = NPC.NewNPC(new EntitySource_TileInteraction(Main.player[playerIndex], i, j), spawnX, spawnY, ModContent.NPCType<NewWhispyBoss>());
+
+            for (int k = 0; k < 200; k++)
+            {
+                Vector2 dustSpawn = Main.rand.NextVector2FromRectangle(Main.npc[npc].Hitbox);
+                Gore g = Gore.NewGoreDirect(new EntitySource_TileInteraction(Main.player[playerIndex], i, j), dustSpawn, Vector2.Zero, GoreID.TreeLeaf_Normal);
+            }
         }
 
         public static int RemoveWhispyDustIndicatorProjs(ref bool disabledEffect)
