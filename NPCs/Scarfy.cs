@@ -46,7 +46,6 @@ namespace KirboMod.NPCs
             NPC.aiStyle = -1;
             NPC.noGravity = true;
             NPC.noTileCollide = false;
-            NPC.direction = Main.rand.Next(0, 1 + 1) == 1 ? 1 : -1; //determines whether to go left or right initally
             NPC.chaseable = false; //initally
 
             //Prevent becoming angry due to flying in lava, but also be able to easily travel through lava when angry
@@ -81,7 +80,20 @@ namespace KirboMod.NPCs
         }
         public override void AI() //constantly cycles each time
         {
-            NPC.spriteDirection = NPC.direction;
+            if (NPC.localAI[0] == 0)
+            {
+                NPC.TargetClosest();
+                if (NPC.HasValidTarget)
+                {
+                    NPC.direction = MathF.Sign(Main.player[NPC.target].Center.X - NPC.Center.X);
+                }
+                else
+                {
+                    NPC.direction = Main.rand.NextBool() ? 1 : -1;
+                    NPC.netUpdate = true;
+                }
+                NPC.localAI[0] = 1;
+            }
             CheckPlatform();
 
             if (Angry == false) //if neutral
@@ -223,7 +235,7 @@ namespace KirboMod.NPCs
             NPC.active = false;
             SoundEngine.PlaySound(SoundID.Item38 with { MaxInstances = 0 }, NPC.Center);
             NPC.Hitbox = Utils.CenteredRectangle(NPC.Center, NPC.Size * GetExplosionSizeMultiplier());
-            int dmg = NPC.GetAttackDamage_ScaledByStrength(100);
+            int dmg = NPC.GetAttackDamage_ScaledByStrength(50);
             for (int i = 0; i < Main.maxPlayers; i++)
             {
                 Player plr = Main.player[i];

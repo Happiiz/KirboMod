@@ -67,7 +67,7 @@ namespace KirboMod.NPCs
         {
             NPC.width = 58;
             NPC.height = 58;
-            NPC.damage = 60;
+            NPC.damage = 26;
             NPC.defense = 6;
             NPC.noTileCollide = true;
             NPC.lifeMax = 800;
@@ -94,7 +94,7 @@ namespace KirboMod.NPCs
             //if player is within space height, not in hardmode, defeated evil boss but not Kracko
             if (spawnInfo.Player.ZoneSkyHeight && NPC.downedBoss2 && !DownedBossSystem.downedKrackoBoss && !Main.hardMode) 
             {
-                return (NPC.AnyNPCs(ModContent.NPCType<KrackoJr>()) || NPC.AnyNPCs(ModContent.NPCType<NPCs.Kracko>())) ? 0 : 0.01f; //return spawn rate if kracko isn't here
+                return (NPC.AnyNPCs(ModContent.NPCType<KrackoJr>()) || NPC.AnyNPCs(ModContent.NPCType<NPCs.Kracko>())) ? 0 : 0.05f; //return spawn rate if kracko isn't here
             }
             else
             {
@@ -279,16 +279,7 @@ namespace KirboMod.NPCs
                 }
 
                 //summon kracko
-                int boss = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y + 3, ModContent.NPCType<NPCs.Kracko>(), 0, 0, 0, 0, 0, NPC.target);
-
-                if (Main.netMode == NetmodeID.SinglePlayer)
-                {
-                    Main.NewText(Language.GetTextValue("Announcement.HasAwoken", Main.npc[boss].TypeName), 175, 75);
-                }
-                else if (Main.netMode == NetmodeID.Server)
-                {
-                    ChatHelper.BroadcastChatMessage(NetworkText.FromKey("Announcement.HasAwoken", Main.npc[boss].GetTypeNetName()), new Color(175, 75, 255));
-                }
+               
             }
             else
             {
@@ -347,6 +338,7 @@ namespace KirboMod.NPCs
                 NPC.rotation += .1f;
                 //MakeClouds();
             }
+
         }
 
         bool CheckShouldShoot(int fireRate, int numberOfShots, int start)
@@ -357,29 +349,39 @@ namespace KirboMod.NPCs
         {
             float numCannonballs = 5;
             if (Main.expertMode)
-                numCannonballs++;
+            {
+                numCannonballs += 2;
+            }
             if (Main.getGoodWorld)
-                numCannonballs++;
+            {
+                numCannonballs += 2;
+            }
 
             float totalSpread = 2.5f;
             float shootSpeed = 7;
             if (Main.getGoodWorld)
-                shootSpeed *= 1.5f;
-            if (Main.expertMode)
-                shootSpeed *= 1.5f;
-            Player plr = Main.player[NPC.target];
-            for (float i = 0; i < 1 - (.5f / numCannonballs); i += 1 / numCannonballs)
             {
+                shootSpeed *= 1.15f;
+            }
+            if (Main.expertMode)
+            {
+                shootSpeed *= 1.5f;
+            }
+            Player plr = Main.player[NPC.target];
+            for (float i = 0; i < numCannonballs; i ++)
+            {
+                float t = i / (numCannonballs - 1);
                 Vector2 velocity = NPC.DirectionTo(plr.Center);
-                velocity = velocity.RotatedBy(MathHelper.Lerp(-totalSpread / 2, totalSpread / 2, i)) * shootSpeed;
+                velocity = velocity.RotatedBy(MathHelper.Lerp(-totalSpread / 2, totalSpread / 2, t)) * shootSpeed;
                 for (int j = 0; j < 20; j++)
                 {
                     Dust dust = Dust.NewDustPerfect(NPC.Center + Main.rand.NextVector2Circular(32, 32), DustID.Asphalt, velocity.RotatedByRandom(.1f) * Utils.Remap(j, 0, 20, 3, 6), 0, default, 1.4f);
                     dust.noGravity = true;
                     dust.velocity *= Main.rand.NextFloat() * .2f + .2f;
                 }
+
                 if (Main.netMode != NetmodeID.MultiplayerClient)
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, velocity, ModContent.ProjectileType<KrackoJrCannonball>(), 30 / 2, 0);
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, velocity, ModContent.ProjectileType<KrackoJrCannonball>(), 26 / 2, 0);
             }
         }
         int GetExtraAttackWaitTime()
@@ -413,33 +415,20 @@ namespace KirboMod.NPCs
                 }
             }
         }
-
-        private void BombToNearestPlayer()
+        public override bool CheckDead()
         {
-            if (Main.netMode != NetmodeID.MultiplayerClient)
+            int boss = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y + 3, ModContent.NPCType<NPCs.Kracko>(), 0, 0, 0, 0, 0, NPC.target);
+            //TEST IF NEEDS SYNCNPC MESSAGE TO WORK ON MP
+            if (Main.netMode == NetmodeID.SinglePlayer)
             {
-                Vector2 center = NPC.Center;
-                Player plr = Main.player[0];
-                Main.NewText($"myplayer: {Main.myPlayer}");
-                for (int i = 1; i < Main.maxPlayers; i++)
-                {
-                    Player possibleTarget = Main.player[i];
-                    if (possibleTarget.dead || !possibleTarget.active)
-                    {
-                        continue;
-                    }
-                    Main.NewText($"targeted: {i}");
-                    if (plr.DistanceSQ(center) > possibleTarget.DistanceSQ(center))
-                    {
-                        plr = possibleTarget;
-                    }
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<KrackoJrBomb>(), 40, 0, Main.myPlayer, plr.whoAmI);
-                }
-                if (plr.active && !plr.dead && plr.Distance(NPC.Center) < 5000)
-                {
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<KrackoJrBomb>(), 40, 0, Main.myPlayer, plr.whoAmI);
-                }
+                Main.NewText(Language.GetTextValue("Announcement.HasAwoken", Main.npc[boss].TypeName), 175, 75);
             }
+            else if (Main.netMode == NetmodeID.Server)
+            {
+                ChatHelper.BroadcastChatMessage(NetworkText.FromKey("Announcement.HasAwoken", Main.npc[boss].GetTypeNetName()), new Color(175, 75, 255));
+            }
+            NPC.active = false;
+            return false;
         }
     }
 }

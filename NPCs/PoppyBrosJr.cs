@@ -33,9 +33,9 @@ namespace KirboMod.NPCs
 			NPC.width = 50;
 			NPC.height = 54;
 			DrawOffsetY = -2; //make sprite line up with hitbox
-			NPC.damage = 4;
-			NPC.defense = 0;
-			NPC.lifeMax = 70;
+			NPC.damage = 10;
+			NPC.defense = 5;
+			NPC.lifeMax = 60;
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
 			NPC.value = Item.buyPrice(0, 0, 0, 5);
@@ -265,7 +265,7 @@ namespace KirboMod.NPCs
 
                     float timeToReach = TimeToReachYPoint(NPC.Center.Y, player.Center.Y, Projectiles.PoppyBomb.BombAcceleration, BombYLaunchVelocity);
                     Xprojshoot /= timeToReach;
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, Xprojshoot, 0, ModContent.ProjectileType<PoppyBomb>(), 10, 0, Main.myPlayer, 0, BombYLaunchVelocity);
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, Xprojshoot, 0, ModContent.ProjectileType<PoppyBomb>(), 20 / 2, 0, Main.myPlayer, 0, BombYLaunchVelocity);
                 }
             }
             

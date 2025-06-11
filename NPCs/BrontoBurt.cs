@@ -29,9 +29,10 @@ namespace KirboMod.NPCs
 			NPC.height = 32;
 			NPC.lifeMax = 20;
 			NPC.damage = 10;
+			NPC.defense = 3;
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
-			NPC.value = 0f; // money it drops
+			NPC.value = 40; // money it drops
 			NPC.knockBackResist = 0.6f; //how much knockback applies
 			Banner = NPC.type;
 			BannerItem = ModContent.ItemType<Items.Banners.BrontoBurtBanner>();
@@ -73,13 +74,22 @@ namespace KirboMod.NPCs
 
         public override void AI() //constantly cycles each time
         {
-			NPC.TargetClosest(false);
-			if (NPC.localAI[0] == 0)
-			{
-				NPC.direction = MathF.Sign(Main.player[NPC.target].Center.X - NPC.Center.X); 
-			}
-			NPC.spriteDirection = NPC.direction;
-			CheckPlatform();
+            NPC.TargetClosest(false);
+            if (NPC.localAI[0] == 0)
+            {
+                if (NPC.HasValidTarget)
+                {
+                    NPC.direction = MathF.Sign(Main.player[NPC.target].Center.X - NPC.Center.X);
+                }
+                else
+                {
+                    NPC.direction = Main.rand.NextBool() ? 1 : -1;
+                    NPC.netUpdate = true;
+                }
+                NPC.localAI[0] = 1;
+            }
+            NPC.spriteDirection = NPC.direction;
+            CheckPlatform();
 
 			NPC.ai[0]++;
 

@@ -30,20 +30,11 @@ namespace KirboMod.NPCs
 
 		public override void SetDefaults()
         {
-            NPC.width = 36;
-            NPC.height = 32;
-            NPC.damage = 5;
-			NPC.defense = 1; 
-			NPC.lifeMax = 20;
-			NPC.HitSound = SoundID.NPCHit1;
-			NPC.DeathSound = SoundID.NPCDeath1;
-			NPC.value = 0f;
-			NPC.knockBackResist = 1f;
+            NPC.CloneDefaults(ModContent.NPCType<WaddleDee>());
 			Banner = NPC.type;
 			BannerItem = ModContent.ItemType<Items.Banners.ParosolWaddleDeeBanner>();
 			NPC.aiStyle = -1;
 			NPC.noGravity = false;
-            NPC.direction = Main.rand.NextBool(2) == true ? 1 : -1;
         }
 
 		public override float SpawnChance(NPCSpawnInfo spawnInfo)
@@ -92,8 +83,21 @@ namespace KirboMod.NPCs
 
         public override void AI() //constantly cycles each time
         {
-			NPC.spriteDirection = NPC.direction;
-
+            NPC.TargetClosest(false);
+            if (NPC.localAI[0] == 0)
+            {
+                if (NPC.HasValidTarget)
+                {
+                    NPC.direction = MathF.Sign(Main.player[NPC.target].Center.X - NPC.Center.X);
+                }
+                else
+                {
+                    NPC.direction = Main.rand.NextBool() ? 1 : -1;
+                    NPC.netUpdate = true;
+                }
+                NPC.localAI[0] = 1;
+            }
+            NPC.spriteDirection = NPC.direction;
             //reduce gravity by one fourth 
             NPC.GravityMultiplier /= 4; 
 			NPC.MaxFallSpeedMultiplier /= 4;

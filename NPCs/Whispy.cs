@@ -15,6 +15,9 @@ using Terraria.DataStructures;
 namespace KirboMod.NPCs
 { 
 
+	/// <summary>
+	/// THIS IS THE OLD VERSION OF WHISPY
+	/// </summary>
 	[AutoloadBossHead]
 	public class Whispy : ModNPC
 	{ 

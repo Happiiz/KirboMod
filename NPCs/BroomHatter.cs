@@ -25,12 +25,13 @@ namespace KirboMod.NPCs
             NPCID.Sets.NPCBestiaryDrawOffset.Add(NPC.type, value);
         }
 
-		public override void SetDefaults() {
+		public override void SetDefaults()
+        {
 			NPC.width = 28;
 		    NPC.height = 28;
-			NPC.damage = 1;
+			NPC.damage = 10;
 			NPC.defense = 6; 
-			NPC.lifeMax = 40;
+			NPC.lifeMax = 30;
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
 			NPC.value = 0f;
@@ -117,15 +118,23 @@ namespace KirboMod.NPCs
 
         public override void AI() //constantly cycles each time
         {
+            NPC.TargetClosest(false);
             if (NPC.localAI[0] == 0)
             {
-                NPC.direction = MathF.Sign(Main.player[NPC.target].Center.X - NPC.Center.X);
+                if (NPC.HasValidTarget)
+                {
+                    NPC.direction = MathF.Sign(Main.player[NPC.target].Center.X - NPC.Center.X);
+                }
+                else
+                {
+                    NPC.direction = Main.rand.NextBool() ? 1 : -1;
+                }
                 NPC.localAI[0] = 1;
             }
-			NPC.spriteDirection = NPC.direction;
-			//movement
+            NPC.spriteDirection = NPC.direction;
+            //movement
 
-			if (AttackTimer == 0) //switch directions
+            if (AttackTimer == 0) //switch directions
 			{
                 Ranan = Main.rand.Next(0, 10);
 				NPC.netUpdate = true;
@@ -155,7 +164,7 @@ namespace KirboMod.NPCs
                 if (Main.netMode != NetmodeID.MultiplayerClient) 
                 {
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + (NPC.direction * 25), NPC.Center.Y - 20, NPC.velocity.X, 0,
-                        ModContent.ProjectileType<Projectiles.BroomHatterDustCloud>(), 20, 4, Main.myPlayer);
+                        ModContent.ProjectileType<Projectiles.BroomHatterDustCloud>(), 20 / 2, 4, Main.myPlayer);
                 }
             }
 			else

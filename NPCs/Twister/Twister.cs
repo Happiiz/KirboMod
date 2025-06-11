@@ -41,7 +41,7 @@ namespace KirboMod.NPCs.Twister
             NPC.lifeMax = 74;
             NPC.HitSound = SoundID.NPCHit4; //metal
             NPC.DeathSound = SoundID.NPCDeath14; //also metal
-            NPC.value = Item.buyPrice(0, 0, 0, 10);
+            NPC.value = Item.buyPrice(0, 0, 4, 0);
             NPC.knockBackResist = 0f;
             Banner = NPC.type;
             BannerItem = ModContent.ItemType<Items.Banners.TwisterBanner>();

@@ -42,10 +42,9 @@ namespace KirboMod.Projectiles
 			}
 			Lighting.AddLight(Projectile.position, 0.2f, 0f, 0f); //red
         }
-
-		public override Color? GetAlpha(Color lightColor)
-		{
-			return Color.White; // Makes it uneffected by light
-		}
+        public override bool PreDraw(ref Color lightColor)
+        {
+			return Projectile.DrawSelf();
+        }
 	}
 }

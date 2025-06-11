@@ -30,8 +30,8 @@ namespace KirboMod.NPCs
 		{
 			NPC.width = 28;
 			NPC.height = 42;
-			NPC.damage = 15;
-			NPC.defense = 0;
+			NPC.damage = 16;
+			NPC.defense = 7;
 			NPC.lifeMax = 70;
 			NPC.HitSound = SoundID.NPCHit11;
 			NPC.DeathSound = SoundID.NPCDeath15;
@@ -220,8 +220,8 @@ namespace KirboMod.NPCs
 				if (Main.netMode != NetmodeID.MultiplayerClient)
 				{
 					if(Main.expertMode)
-						Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projshoot.RotatedByRandom(MathF.Tau), ModContent.ProjectileType<Projectiles.BadIce>(), 40 / 2, 1, Main.myPlayer, 0, 0);
-					Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projshoot.RotatedByRandom(MathF.Tau), ModContent.ProjectileType<Projectiles.BadIce>(), 40 / 2, 1, Main.myPlayer, 0, 0);
+						Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projshoot.RotatedByRandom(MathF.Tau), ModContent.ProjectileType<Projectiles.BadIce>(), 20 / 2, 1, Main.myPlayer, 0, 0);
+					Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projshoot.RotatedByRandom(MathF.Tau), ModContent.ProjectileType<Projectiles.BadIce>(), 20 / 2, 1, Main.myPlayer, 0, 0);
 				}
 				Dust.NewDustPerfect(NPC.Center + Main.rand.NextVector2Circular(16, 16), DustID.WhiteTorch, -Vector2.UnitY);
 				if (attackTimer % 10 == 0) //every 10th tick

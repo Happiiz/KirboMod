@@ -53,7 +53,7 @@ namespace KirboMod.Projectiles
 			Projectile.rotation += 0.2f * Projectile.direction; // rotates projectile
 			Projectile.frame++;
 			Projectile.frame %= Main.projFrames[Type];
-			RotationOffset += (!Main.expertMode ? 0.012f : 0.024f) * rotationSpeedMultipler;//spin faster on expert, just enough to complete 1 rotation, 2 on expert
+			RotationOffset += (!Main.expertMode ? 0.012f : 0.018f) * rotationSpeedMultipler;//spin faster on expert, just enough to complete 1 rotation, 2 on expert
 
 			Vector2 offset = RotationOffset.ToRotationVector2() * DistanceFromCenter;
 			Projectile.Center = Kracko.Center + offset;
@@ -98,15 +98,7 @@ namespace KirboMod.Projectiles
         }
         public override void OnHitPlayer(Player target, Player.HurtInfo info)
         {
-			int duration = 120;
-			if (Main.masterMode)
-			{
-				duration *= 3;
-			}else if (Main.expertMode)
-			{
-				duration *= 2;
-			}
-			target.AddBuff(BuffID.Electrified, duration);
+			NPCs.Kracko.AddElectrifiedDebuff(target);
         }
     }
 }

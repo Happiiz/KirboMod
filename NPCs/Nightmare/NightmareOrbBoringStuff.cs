@@ -69,6 +69,10 @@ namespace KirboMod.NPCs
             Music = MusicID.Boss3;
             NPC.npcSlots = 6;
             NPC.dontTakeDamage = true;
+            if (!Main.dedServ)//if not dedicated server
+            {
+                Music = MusicLoader.GetMusicSlot("KirboMod/Music/Photonic0_NightmareOrb");
+            }
         }
 
         public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */

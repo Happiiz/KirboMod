@@ -20,16 +20,15 @@ namespace KirboMod.NPCs
 			NPC.width = 36;
 			NPC.height = 32;
 			NPC.lifeMax = 20;
-			NPC.damage = 5;
+			NPC.damage = 8;
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
-			NPC.value = 0f; // money it drops
+			NPC.value = 20; // money it drops
 			NPC.knockBackResist = 1f; //How much of the knockback it receives will actually apply
 			Banner = NPC.type;
 			BannerItem = ModContent.ItemType<Items.Banners.WaddleDeeBanner>();
 			NPC.aiStyle = -1;
 			NPC.noGravity = false;
-			NPC.direction = Main.rand.NextBool(2) == true ? 1 : -1;
 		}
 
 		public override float SpawnChance(NPCSpawnInfo spawnInfo) 
@@ -38,15 +37,15 @@ namespace KirboMod.NPCs
 			{
 				if (spawnInfo.Player.ZoneJungle)
 				{
-					return spawnInfo.SpawnTileType == TileID.JungleGrass || spawnInfo.SpawnTileType == TileID.Mud ? 0.1f : 0f; //functions like a mini if else statement
+					return spawnInfo.SpawnTileType == TileID.JungleGrass || spawnInfo.SpawnTileType == TileID.Mud ? 0.075f : 0f; //functions like a mini if else statement
 				}
 				else if (spawnInfo.Player.ZoneSnow)
 				{
-					return spawnInfo.SpawnTileType == TileID.SnowBlock ? .25f : 0f; //functions like a mini if else statement
+					return spawnInfo.SpawnTileType == TileID.SnowBlock ? .15f : 0f; //functions like a mini if else statement
 				}
 				else if (spawnInfo.Player.ZoneForest) //if forest
                 {
-                    return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? 0.2f : 0f; //functions like a mini if else statement
+                    return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? 0.1f : 0f; //functions like a mini if else statement
                 }
 				else
 				{
@@ -78,8 +77,21 @@ namespace KirboMod.NPCs
 
         public override void AI() //constantly cycles each time
         {
-			NPC.spriteDirection = NPC.direction;
-
+            NPC.TargetClosest(false);
+            if (NPC.localAI[0] == 0)
+            {
+                if (NPC.HasValidTarget)
+                {
+                    NPC.direction = MathF.Sign(Main.player[NPC.target].Center.X - NPC.Center.X);
+                }
+                else
+                {
+                    NPC.direction = Main.rand.NextBool() ? 1 : -1;
+                    NPC.netUpdate = true;
+                }
+                NPC.localAI[0] = 1;
+            }
+            NPC.spriteDirection = NPC.direction;
             //reroll direction
             ++NPC.ai[0];
 

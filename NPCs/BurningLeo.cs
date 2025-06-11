@@ -35,7 +35,7 @@ namespace KirboMod.NPCs
 			NPC.width = 50;
 			NPC.height = 46;
 			NPC.damage = 15;
-			NPC.defense = 10;
+			NPC.defense = 17;
 			NPC.lifeMax = 70;
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
@@ -84,6 +84,8 @@ namespace KirboMod.NPCs
 
         public override void AI() //constantly cycles each time
 		{
+			NPC.TargetClosest();
+
 			NPC.spriteDirection = NPC.direction;
 			Player player = Main.player[NPC.target];
 			Vector2 distance = player.Center - NPC.Center;

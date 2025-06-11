@@ -68,7 +68,7 @@ namespace KirboMod.Projectiles
 			time += timeToStartDecelerating;
 			return time;
 		}
-		public static void ShootBadCutter(NPC kibble, float maxSpeed = 20, float acceleration = .25f, int damage = 12)
+		public static void ShootBadCutter(NPC kibble, float maxSpeed = 20, float acceleration = .25f, int damageBeforeHalving = 12)
         {
 			if(Main.netMode == NetmodeID.MultiplayerClient)
             {
@@ -77,7 +77,7 @@ namespace KirboMod.Projectiles
 			SirKibble kib = (SirKibble)kibble.ModNPC;
 			Vector2 velocity = new Vector2(maxSpeed * kibble.spriteDirection, 0);
 			velocity.Y = GetCutterYVelocity(Main.player[kibble.target].MountedCenter, kibble.Center, maxSpeed, acceleration);
-			Projectile.NewProjectile(kibble.GetSource_FromAI(), kibble.Center, velocity, ModContent.ProjectileType<BadCutter>(), damage / 2, 10, -1, kibble.whoAmI, maxSpeed, acceleration);
+			Projectile.NewProjectile(kibble.GetSource_FromAI(), kibble.Center, velocity, ModContent.ProjectileType<BadCutter>(), damageBeforeHalving / 2, 10, -1, kibble.whoAmI, maxSpeed, acceleration);
 			float maxUpdates = ContentSamples.ProjectilesByType[ModContent.ProjectileType<BadCutter>()].MaxUpdates;
 			kib.TimeWhenCutterBladeReachesKibbleAgain = GetTimeToGoBackToKibble(kib, maxSpeed * maxUpdates, acceleration * maxUpdates);
 			kib.MostRecentCutterYVelocity = velocity.Y * kib.TimeWhenCutterBladeReachesKibbleAgain + kib.NPC.Center.Y;

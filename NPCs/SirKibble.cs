@@ -34,10 +34,10 @@ namespace KirboMod.NPCs
 			NPC.height = 48;
 			NPC.damage = 6;
 			NPC.defense = 4;
-			NPC.lifeMax = 40;
+			NPC.lifeMax = 30;
 			NPC.HitSound = SoundID.NPCHit4; //metal
 			NPC.DeathSound = SoundID.NPCDeath14; //explosive metal
-			NPC.value = Item.buyPrice(0, 0, 0, 5); // money it drops
+			NPC.value = Item.buyPrice(0, 0, 1, 0); // money it drops
 			NPC.knockBackResist = 0.5f; //how much knockback applies
 			Banner = NPC.type;
 			BannerItem = ModContent.ItemType<Items.Banners.SirKibbleBanner>();
@@ -226,7 +226,7 @@ namespace KirboMod.NPCs
 				if (Main.expertMode)
 					shotVelocity *= 1.333f;
 				//this also sets TimeWhenCutterBladeReachesKibbleAgain
-				BadCutter.ShootBadCutter(NPC, shotVelocity, cutterAcceleration);
+				BadCutter.ShootBadCutter(NPC, shotVelocity, cutterAcceleration, 12);
 			}
 			float heightWhenReachesKibbleAgain = MostRecentCutterYVelocity;
 			float relativeHeightWhenReachesKibbleAgain = heightWhenReachesKibbleAgain - NPC.Center.Y;

@@ -27,12 +27,12 @@ namespace KirboMod.NPCs
             NPC.width = 54;
             NPC.height = 40;
             DrawOffsetY = 4; //make sprite line up with hitbox
-            NPC.damage = 70;
+            NPC.damage = 60;
             NPC.defense = 35;
             NPC.lifeMax = 650;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath1;
-            NPC.value = Item.buyPrice(0, 0, 2, 50); // money it drops
+            NPC.value = Item.buyPrice(0, 5, 0, 0); // money it drops
             NPC.knockBackResist = 0f; //how much knockback applies
             Banner = NPC.type;
             BannerItem = ModContent.ItemType<Items.Banners.BioSparkBanner>();
@@ -238,7 +238,7 @@ namespace KirboMod.NPCs
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
                         //hitbox
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<BioSparkSlashHitbox>(), 70 / 2, 8, Main.myPlayer, NPC.whoAmI, 0);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<BioSparkSlashHitbox>(), 55 / 2, 8, Main.myPlayer, NPC.whoAmI, 0);
                     }
                     float moveSpeed = 25;
                     NPC.velocity.X = NPC.direction * moveSpeed;

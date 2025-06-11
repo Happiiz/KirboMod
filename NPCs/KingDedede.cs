@@ -138,8 +138,8 @@ namespace KirboMod.NPCs
         public override void SendExtraAI(BinaryWriter writer) //for syncing non NPC.ai[] stuff
         {
             writer.Write(animation);
-            writer.Write((byte)lastattacktype);
-            writer.Write((byte)attacktype);
+            writer.Write((sbyte)lastattacktype);
+            writer.Write((sbyte)attacktype);
             writer.Write((sbyte)repeathammer);
             writer.Write((sbyte)phase);
         }
@@ -934,7 +934,7 @@ namespace KirboMod.NPCs
         private void SummonSmash()
         {
             Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + NPC.direction * 130, NPC.Center.Y + 20, NPC.direction * 0.1f, 0,
-                ModContent.ProjectileType<BonkersSmash>(), 60 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI, 0);
+                ModContent.ProjectileType<BonkersSmash>(), 40 / 2, 8f, Main.myPlayer, 0, NPC.whoAmI, 0);
         }
 
         static float GetYVelForParabolaPeakToBeAt(float peakPosY, float gravityY, float fromY) //used for finding trajectory of gordo (courtesy of not me)

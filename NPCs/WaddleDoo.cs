@@ -39,7 +39,7 @@ namespace KirboMod.NPCs
             NPC.lifeMax = 30;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath1;
-            NPC.value = Item.buyPrice(0, 0, 0, 5); // money it drops
+            NPC.value = Item.buyPrice(0, 0, 1, 0); // money it drops
             NPC.knockBackResist = 1f;
             Banner = NPC.type;
             BannerItem = ModContent.ItemType<Items.Banners.WaddleDooBanner>();
@@ -95,8 +95,21 @@ namespace KirboMod.NPCs
         public bool SpawnedFromKracko { get => NPC.ai[1] == 1; }
         public override void AI() //constantly cycles each time
         {
-            NPC.spriteDirection = NPC.direction;
-            Player player = Main.player[NPC.target];
+            NPC.TargetClosest(false);
+            if (NPC.localAI[0] == 0)
+            {
+                if (NPC.HasValidTarget)
+                {
+                    NPC.direction = MathF.Sign(Main.player[NPC.target].Center.X - NPC.Center.X);
+                }
+                else
+                {
+                    NPC.direction = Main.rand.NextBool() ? 1 : -1;
+                    NPC.netUpdate = true;
+                }
+                NPC.localAI[0] = 1;
+            }
+            NPC.spriteDirection = NPC.direction; Player player = Main.player[NPC.target];
             Vector2 distance = player.Center - NPC.Center;
 
             if (SpawnedFromKracko) //kracko doo

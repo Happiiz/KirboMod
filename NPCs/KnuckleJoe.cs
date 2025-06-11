@@ -37,7 +37,7 @@ namespace KirboMod.NPCs
             NPC.lifeMax = 320;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath1;
-            NPC.value = Item.buyPrice(0, 0, 0, 10);
+            NPC.value = Item.buyPrice(0, 5, 0, 0);
             NPC.knockBackResist = 0f; //how much knockback applies
             Banner = NPC.type;
             BannerItem = ModContent.ItemType<Items.Banners.KnuckleJoeBanner>();
@@ -121,9 +121,9 @@ namespace KirboMod.NPCs
         static float BlastRate => 35;
         static float WalkSpeed => 3;
         static float JumpSpeed => -8;
-        static int VulcanJabDamage => 60 / 2;
+        static int VulcanJabDamage => 40 / 2;
         static int BlastShotCount => Main.getGoodWorld ? 3 : Main.expertMode ? 2 : 1;
-        static int BlastDamage => 100 / 2;
+        static int BlastDamage => 56 / 2;
         public static float BlastRange => 1000;
         public static float BlastVelocityPublic => BlastVelocity;
 

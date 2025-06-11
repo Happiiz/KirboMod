@@ -19,13 +19,13 @@ namespace KirboMod.NPCs.NewWhispy
         public const int FightAreaHeight = 448;// maybe set it as 480?
         public const int FightAreaWidth = 16 * 42 + 272 / 2;
         public const int CanopyWidth = FightAreaWidth + 16 * 6;
-        static int FireAppleDamage => 60 / 2;
-        static int GordoDamage => 40 / 2;
-        static int AppleDamage => 40 / 2;
-        static int BladoDamage => 46 / 2;
-        static int CloseSpikeDamage => 50 / 2;
-        static int SpikeDamage => 40 / 2;
-        static int WindDamage => 40 / 2;
+        static int FireAppleDamage => 35 / 2;
+        static int GordoDamage => 20 / 2;
+        static int AppleDamage => 18 / 2;
+        static int BladoDamage => 24 / 2;
+        static int CloseSpikeDamage => 20 / 2;
+        static int SpikeDamage => 20 / 2;
+        static int WindDamage => 20 / 2;
         static float SplittingWindSpeed => 12f;
         //splitting wind splits into a 7 armed spiral on ftw, 6 armed spiral on expert, and 5 armed spiral on classic
         public static int SplittingWindSplitCount => Main.getGoodWorld ? 7 : Main.expertMode ? 6 : 5;
@@ -80,7 +80,7 @@ namespace KirboMod.NPCs.NewWhispy
             NPC.immortal = true;//for intro
             NPC.width = 272;
             NPC.height = 448-16 * 4;
-            NPC.damage = 50;
+            NPC.damage = 36;
             NPC.noTileCollide = false;
             NPC.defense = 14;
             NPC.lifeMax = 3200;

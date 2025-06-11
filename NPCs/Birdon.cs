@@ -27,7 +27,7 @@ namespace KirboMod.NPCs
             NPC.defense = 18;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath1;
-            NPC.value = Item.buyPrice(0, 0, 2, 50); // money it drops
+            NPC.value = Item.buyPrice(0, 0, 6, 0); // money it drops
             NPC.knockBackResist = 0.5f; //How much of the knockback it receives will actually apply
             Banner = NPC.type;
             BannerItem = ModContent.ItemType<Items.Banners.BirdonBanner>();

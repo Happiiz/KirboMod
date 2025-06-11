@@ -33,16 +33,7 @@ namespace KirboMod.Projectiles.Lightnings
         }
         public override void OnHitPlayer(Player target, Player.HurtInfo info)
         {
-            int duration = 120;
-            if (Main.masterMode)
-            {
-                duration *= 3;
-            }
-            else if (Main.expertMode)
-            {
-                duration *= 2;
-            }
-            target.AddBuff(BuffID.Electrified, duration);
+            NPCs.Kracko.AddElectrifiedDebuff(target);
         }
     }
 }

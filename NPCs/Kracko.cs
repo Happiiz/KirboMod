@@ -134,11 +134,11 @@ namespace KirboMod.NPCs
         {
             if (NPC.ai[0] == (!frenzy ? 15 : 60)) //changes depending or not in frenzy
             {
-                int dooThreshold = 3;
+                int dooThreshold = 5;
                 int maxDoos = 2;// won't summon any more if there are more than this alive
                 if (Main.getGoodWorld)
                 {
-                    maxDoos = int.MaxValue;//infinite!!!
+                    maxDoos = 6;
                 }
                 else if (Main.expertMode)
                 {
@@ -212,21 +212,21 @@ namespace KirboMod.NPCs
 
             if (Main.expertMode)
             {
-                sweepDuration *= 0.85f;
-                speed *= 1.15f;
-                inertia *= 1.15f;
+                sweepDuration *= 0.9f;
+                speed *= 1.1f;
+                inertia *= 1.1f;
                 if (frenzy)
                 {
-                    speed *= 1.15f;
-                    inertia *= 1.15f;
-                    sweepDuration *= 0.85f;
+                    speed *= 1.1f;
+                    inertia *= 1.1f;
+                    sweepDuration *= 0.9f;
                 }
                 sweepEnd = sweepStart + sweepDuration;
             }
             sweepY /= sweepDuration;
             sweepX /= sweepDuration;
                                                                                                       //compensate for it losing overall distance travelled by accelerating and decelerating
-            Vector2 targetPos = player.Center + new Vector2(sweepX * sweepDuration * 0.5f * AttackDirection - (AttackDirection * sweepX * 5), -400);
+            Vector2 targetPos = player.Center + new Vector2(sweepX * sweepDuration * 0.5f * AttackDirection - (AttackDirection * sweepX * 5), -340);
             float sweepProgress = Utils.GetLerpValue(sweepStart, sweepEnd, NPC.ai[0]);
             if (NPC.ai[0] >= moveStart && NPC.ai[0] < moveEnd) //go to top left or right
             {
@@ -275,7 +275,7 @@ namespace KirboMod.NPCs
                 moveStart = 0;
                 moveStop = 50;
                 beamStart = 50;
-                beamEnd = 350;
+                beamEnd = 360;
             }
             if (NPC.ai[0] >= moveStart && NPC.ai[0] < moveStop)
             {
@@ -322,10 +322,10 @@ namespace KirboMod.NPCs
             float dashDuration = dashEnd - dashStart;
             if (frenzy)
             {
-                dashDuration = MathF.Round(dashDuration * 0.85f);
+                dashDuration = MathF.Round(dashDuration * 0.9f);
                 dashEnd = dashStart + dashDuration;
             }
-            float dashDistanceY = 1400;
+            float dashDistanceY = 1450;
             float dashDistanceX = 9000;
             dashDistanceX /= dashDuration;
             dashDistanceY /= dashDuration;
@@ -447,7 +447,7 @@ namespace KirboMod.NPCs
         }
         void SpawnBeam(int numberOfBeams, float timeToCheck)
         {
-            float numberOfSpirals = frenzy ? 4 : 2;
+            float numberOfSpirals = frenzy ? 3 : 2;
             numberOfSpirals += Main.getGoodWorld ? 2 : 0;//add 2 on for the worthy
             if (NPC.ai[0] == timeToCheck && Main.netMode != NetmodeID.MultiplayerClient) //inital
             {
@@ -455,7 +455,7 @@ namespace KirboMod.NPCs
                 {                 
                     for (float j = 0; j < numberOfSpirals; j++)
                     {
-                       Projectile.NewProjectileDirect(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<BeamBig>(), 40 / 2, 8f, Main.myPlayer, NPC.whoAmI, j * (MathF.Tau / numberOfSpirals) - i * beamCurvingAngleMultiplier, i * 70 + 100);
+                       Projectile.NewProjectileDirect(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<BeamBig>(), 20 / 2, 8f, Main.myPlayer, NPC.whoAmI, j * (MathF.Tau / numberOfSpirals) - i * beamCurvingAngleMultiplier, i * 70 + 100);
                     }
                 }
             }

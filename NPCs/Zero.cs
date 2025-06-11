@@ -727,7 +727,7 @@ namespace KirboMod.NPCs
 
         public override bool CheckDead()
         {
-            if (deathcounter < 300)
+            if (deathcounter <= 100000)
             {
                 NPC.active = true;
                 NPC.life = 1;
@@ -792,10 +792,7 @@ namespace KirboMod.NPCs
             }
             else if (deathcounter > 0)
             {
-                NPC.dontTakeDamage = false;
-                NPC.HideStrikeDamage = true;
-                NPC.SimpleStrikeNPC(999999, 1, false, 0, null, false, 0, false);
-
+                deathcounter = 99999999;
                 if (Main.expertMode)
                 {
                     for (int i = 0; i < 40; i++)
@@ -804,20 +801,13 @@ namespace KirboMod.NPCs
                         Dust d = Dust.NewDustPerfect(NPC.Center + new Vector2(0, -200), ModContent.DustType<Dusts.Redsidue>(), speed * 20, Scale: 4); //Makes dust in a messy circle
                         d.noGravity = true;
                     }
-
                     Dust.NewDustPerfect(NPC.position + new Vector2(-200, -200), ModContent.DustType<Dusts.ZeroEyeless>(), new Vector2(0, 5), 0);
-                    //sometimes this works, sometimes it doesn't???
                     if (Main.netMode != NetmodeID.MultiplayerClient) //don't use SpawnBoss() as we need the special status message
                     {
                         ZeroEye.GetAIValues(out float[] ai2s);
                         for (int i = 0; i < ai2s.Length; i++)
                         {
-                            int index = NPC.NewNPC(NPC.GetSource_FromThis(), (int)NPC.Center.X, (int)NPC.Center.Y - 15, ModContent.NPCType<ZeroEye>(), ai2: ai2s[i]);
-
-                            if (Main.netMode == NetmodeID.Server && index < Main.maxNPCs)
-                            {
-                                NetMessage.SendData(MessageID.SyncNPC, number: index);
-                            }
+                            NPC.NewNPC(NPC.GetSource_FromThis(), (int)NPC.Center.X, (int)NPC.Center.Y - 15, ModContent.NPCType<ZeroEye>(), ai2: ai2s[i]);
                         }
 
                         if (Main.netMode == NetmodeID.SinglePlayer)
@@ -830,6 +820,9 @@ namespace KirboMod.NPCs
                         }
                     }
                 }
+                NPC.dontTakeDamage = false;
+                NPC.HideStrikeDamage = true;
+                NPC.SimpleStrikeNPC(999999, 1, false, 0, null, false, 0, false);
             }
         }
 

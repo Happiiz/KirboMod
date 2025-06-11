@@ -2,7 +2,6 @@ using KirboMod.Projectiles.Lightnings;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles.Flames
 {
@@ -25,7 +24,10 @@ namespace KirboMod.Projectiles.Flames
             fadeOutDuration /= 4;
             whiteInsideOpacity = 1;         
         }
-
+        public override void OnHitPlayer(Player target, Player.HurtInfo info)
+        {
+            target.AddBuff(BuffID.OnFire, 60 * 5);
+        }
         public override void SetDefaults()
         {
             base.SetDefaults();

@@ -30,12 +30,12 @@ namespace KirboMod.NPCs
 			NPC.width = 33;
 			NPC.height = 33;
 			DrawOffsetY = 6;
-			NPC.damage = 4;
+			NPC.damage = 10;
 			NPC.defense = 4;
-			NPC.lifeMax = 40;
+			NPC.lifeMax = 30;
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
-			NPC.value = Item.buyPrice(0, 0, 0, 5);
+			NPC.value = Item.buyPrice(0, 0, 0, 75);
 			NPC.knockBackResist = .3f;
 			Banner = NPC.type;
 			BannerItem = ModContent.ItemType<Items.Banners.BladeKnightBanner>();
