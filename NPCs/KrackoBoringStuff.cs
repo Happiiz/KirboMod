@@ -37,7 +37,7 @@ namespace KirboMod.NPCs
             }
             plr.AddBuff(BuffID.Electrified, duration);
         }
-        public static SoundStyle ElecOrbsSFX = new SoundStyle("KirboMod/Sounds/NPC/Kracko/KrackoElecOrbs").WithVolumeScale(0.3f);
+        public static SoundStyle ElecOrbsSFX => new SoundStyle("KirboMod/Sounds/NPC/Kracko/KrackoElecOrbs").WithVolumeScale(0.3f);
         public override void FindFrame(int frameHeight) // animation
         {
             if (animation == 0) //slow

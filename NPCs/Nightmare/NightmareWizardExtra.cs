@@ -69,11 +69,21 @@ namespace KirboMod.NPCs
             NPC.boss = true;
             NPC.noGravity = true;
             NPC.lavaImmune = true;
-            Music = MusicID.Boss1;
             NPC.friendly = false;
             NPC.dontTakeDamage = true;
             NPC.npcSlots = 6;
             NPC.buffImmune[BuffID.Confused] = true;
+            if (!Main.dedServ)//if not dedicated server
+            {
+                int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/NightmareWizardWithLoopMetadata");
+                Music = musicSlot;
+                Main.musicFade[musicSlot] = 1;
+                Main.musicNoCrossFade[musicSlot] = true;
+
+                musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Photonic0_NightmareOrb");
+                Main.musicFade[musicSlot] = 0;
+
+            }
         }
 
         public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */
