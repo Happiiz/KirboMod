@@ -1,13 +1,9 @@
 using KirboMod.Bestiary;
 using KirboMod.Items.KingDedede;
-using KirboMod.Items.Weapons;
 using KirboMod.Projectiles;
 using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using rail;
-using ReLogic.Content;
-using Stubble.Core.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,7 +14,6 @@ using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.ModLoader;
-using static KirboMod.NPCs.Zero;
 
 namespace KirboMod.NPCs
 {
@@ -66,7 +61,7 @@ namespace KirboMod.NPCs
 
         public static SoundStyle Possession => new SoundStyle("KirboMod/Sounds/NPC/KingDedede/possession") with { Volume = 0.8f };
 
-        public static SoundStyle OrbCharge => new SoundStyle("KirboMod/Sounds/NPC/DarkMatter/DarkMatterSwordsmanSwordBallCharge2");
+        public static SoundStyle OrbCharge => new("KirboMod/Sounds/NPC/DarkMatter/DarkMatterSwordsmanSwordBallCharge2");
 
         public static SoundStyle Defeat => new SoundStyle("KirboMod/Sounds/NPC/KingDedede/defeat") with { Volume = 0.8f };
 
@@ -78,7 +73,7 @@ namespace KirboMod.NPCs
             // Add this in for bosses that have a summon item, requires corresponding code in the item
             NPCID.Sets.MPAllowedEnemies[Type] = true;
 
-            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers()
+            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new()
             {
                 CustomTexturePath = "KirboMod/NPCs/BestiaryTextures/KingDededePortrait",
                 PortraitScale = 1f, // Portrait refers to the full picture when clicking on the icon in the bestiary
@@ -109,7 +104,9 @@ namespace KirboMod.NPCs
             NPC.lavaImmune = true;
             if (!Main.dedServ)
             {
-                Music = MusicLoader.GetMusicSlot(Mod, "Music/Happiz_KingDedede");
+                int slot = MusicLoader.GetMusicSlot(Mod, "Music/Photonic0_DededeStarStackerWithLoopMetadata");
+                Music = slot;
+                Main.musicFade[slot] = 1f;
             }
 
             NPC.friendly = false;
@@ -192,13 +189,13 @@ namespace KirboMod.NPCs
         private void CheckPlatform(Player player) //referenced from Spirit mod's public source code
         {
             bool onplatform = true;
-            for (int i = (int)NPC.position.X; i < NPC.position.X + NPC.width; i += NPC.width / 4)
+            for (int i = (int)NPC.position.X; i <= NPC.position.X + NPC.width; i += 16)
             { //check tiles beneath the boss to see if they are all platforms
                 Tile tile = Framing.GetTileSafely(new Point((int)NPC.position.X / 16, (int)(NPC.position.Y + NPC.height + 8) / 16));
                 if (!TileID.Sets.Platforms[tile.TileType])
                     onplatform = false;
             }
-            if (onplatform && (NPC.Bottom.Y < player.Bottom.Y - 100)) //if they are and the player is lower than the boss, temporarily let the boss ignore tiles to go through them
+            if (onplatform && ((NPC.Bottom.Y + NPC.velocity.Y) < player.position.Y)) //if they are and the player is lower than the boss, temporarily let the boss ignore tiles to go through them
             {
                 NPC.noTileCollide = true;
             }
@@ -207,7 +204,17 @@ namespace KirboMod.NPCs
                 NPC.noTileCollide = false;
             }
         }
-
+        //phase chart:
+        //expert:
+        //
+        //skips phase 1
+        // 60% < HP <= 100% = phase 2
+        // 30% < HP < 60% = phase 3
+        // 30% < HP       = phase 4
+        //classic:
+        // 60% < HP = phase 1
+        // 25% < HP < 60% = phase 2
+        // 0% < HP < 25% = phase 3
         private void AttackPattern(int phaseThreeSpeedUp)
         {
             Player player = Main.player[NPC.target];
@@ -255,7 +262,7 @@ namespace KirboMod.NPCs
 
                         if (shouldSlam)
                         {
-                            attacktype = DededeAttackType.Slam; //slam
+                            attacktype = DededeAttackType.Slam;
                             lastattacktype = DededeAttackType.Slam;
 
                             attack = phase == 3 ? 60 : 90;
@@ -289,9 +296,11 @@ namespace KirboMod.NPCs
                 if (attacktype == DededeAttackType.Slam)
                 {
                     NPC.noGravity = true;
-                    NPC.GravityMultiplier *= MultipliableFloat.One * 1.5f;
+             
+                    NPC.GravityMultiplier = MultipliableFloat.One * 3f;
                     AttackSlam(phaseThreeSpeedUp, player, distance);
                     NPC.velocity.Y += NPC.gravity;
+
                 }
             }
 
@@ -758,9 +767,11 @@ namespace KirboMod.NPCs
 
         private void AttackSlam(int phaseThreeSpeedUp, Player player, Vector2 distance)
         {
-            Vector2 predictDistance = player.Center + player.velocity * 5 - NPC.Center;
+            float slamDuration = 50;
+            Vector2 predictDistance = player.Center + new Vector2(player.velocity.X, 0) * (MathF.Abs(player.Center.X - NPC.Center.X) / slamDuration) - NPC.Center;
+            predictDistance.X /= slamDuration;
 
-            if (attack >= 60 - phaseThreeSpeedUp && attack < (phase == 3 ? 90: 120) - phaseThreeSpeedUp)
+            if (attack >= 60 - phaseThreeSpeedUp && attack < (phase == 3 ? 90 : 120) - phaseThreeSpeedUp)
             {
                 ChooseAnimation(9); //ready jump
                 NPC.TargetClosest(true); //face player
@@ -770,13 +781,14 @@ namespace KirboMod.NPCs
                     SoundEngine.PlaySound(Dive, NPC.Center);
                 }
             }
+            NPC.MaxFallSpeedMultiplier = MultipliableFloat.One;
 
+         //   NPC.noTileCollide = (NPC.Bottom.Y + NPC.velocity.Y * 2) < player.position.Y;
             if (attack == (phase == 3 ? 90 : 120) - phaseThreeSpeedUp)
             {
-                NPC.noTileCollide = true; //don't collide with tiles
 
-                NPC.velocity.Y = MathHelper.Clamp(predictDistance.Y / 2, -35, -30);
-                NPC.velocity.X = MathHelper.Clamp(predictDistance.X / 90, -30, 30);
+                NPC.velocity.Y = MathHelper.Clamp(predictDistance.Y, -35, -30);
+                NPC.velocity.X = MathHelper.Clamp(predictDistance.X, -30, 30);
                 ChooseAnimation(10); //jump
 
                 SoundEngine.PlaySound(SuperJumpRise, NPC.Center);
@@ -789,14 +801,17 @@ namespace KirboMod.NPCs
 
                 ChooseAnimation(10); //jump
 
-                if (NPC.Bottom.Y < player.Top.Y - 100 || NPC.velocity.Y < 0) //higher than player (adjusts to velocity) or going up
+                if ((NPC.Bottom.Y + NPC.velocity.Y) < player.position.Y)/* (NPC.Bottom.Y < player.Top.Y - 100 || NPC.velocity.Y < 0) *///higher than player (adjusts to velocity) or going up
                 {
                     NPC.noTileCollide = true; //don't collide with tiles
                 }
                 else
                 {
-                    NPC.noTileCollide = false; //collide with tiles
-
+                    NPC.noTileCollide = false;
+                    if (NPC.velocity.Y > 16f)
+                    {
+                        NPC.velocity.Y = 16f;
+                    }
                     if (NPC.velocity.Y == 0 || NPC.oldVelocity.Y == 0) //on ground or stopped rising/falling midjump
                     {
                         NPC.velocity.X = 0;
@@ -830,7 +845,7 @@ namespace KirboMod.NPCs
                 attack = 0;
             }
         }
-
+        static float PhaseTreeGordoAttackSpeedMult => 0.85f;
         private void AttackGordo(int phaseThreeSpeedUp, Player player)
         {
             float timer = attack - 60;
@@ -842,7 +857,7 @@ namespace KirboMod.NPCs
             if (phase == 3)
             {
                 timer = attack - 30;
-                phaseThreeAttackSpeed = 0.5f;
+                phaseThreeAttackSpeed = PhaseTreeGordoAttackSpeedMult;
             }
 
             if (timer >= (60 - phaseThreeSpeedUp) * phaseThreeAttackSpeed)
@@ -968,6 +983,7 @@ namespace KirboMod.NPCs
             possibleAttacks.Remove(lastattacktype);
 
             attacktype = possibleAttacks[Main.rand.Next(possibleAttacks.Count)];
+          //  attacktype = DededeAttackType.Slam;//debug
             NPC.netUpdate = true;
 
             lastattacktype = attacktype;
@@ -978,14 +994,13 @@ namespace KirboMod.NPCs
             SoundEngine.PlaySound(SoundID.Item9, NPC.Center); //star swoosh
 
             SoundEngine.PlaySound(SoundID.Item14, NPC.Center); //bomb
-
             if (attacktype == DededeAttackType.Hammer)
             {
                 if (repeathammer > -1)
                 {
                     for (int i = 0; i < 5; i++)
                     {
-                        Vector2 velocity = new Vector2(NPC.direction * (4f * i + (3 - repeathammer) * 2), -15); //go up evenly in a uneven spread (each extra slam making them go further ahead)
+                        Vector2 velocity = new(NPC.direction * (4f * i + (3 - repeathammer) * 2), -16); //go up evenly in a uneven spread (each extra slam making them go further ahead)
 
                         if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
                         {
@@ -998,7 +1013,7 @@ namespace KirboMod.NPCs
                 {
                     for (int i = 0; i < 10; i++)
                     {
-                        Vector2 velocity = new Vector2(NPC.direction * 2f * i, -15); //go up evenly in a uneven spread
+                        Vector2 velocity = new(NPC.direction * 2f * i, -16); //go up evenly in a uneven spread
 
                         if (Main.netMode != NetmodeID.MultiplayerClient) //execute on server( or singleplayer) only
                         {
@@ -1010,11 +1025,22 @@ namespace KirboMod.NPCs
             }
             else if (attacktype == DededeAttackType.Slam)
             {
-                float maxNumber = 16 + phase * 8;
+                //prev: 16 + phase * 8
+                float maxNumber = 8 + phase * 4;
+                if (Main.getGoodWorld)
+                {
+                    maxNumber = 16 + phase * 8;
+                }
+                //phase 1 12
+                //phase 2: 16
+                //phase 3: 20
 
+                //old: phase 1: 24
+                //old: phase 2: 32
+                //old: phase 3: 40
                 for (int i = 0; i < maxNumber; i++)
                 {
-                    Vector2 velocity = new Vector2(MathF.Cos(MathF.Tau / maxNumber * i), MathF.Sin(MathF.Tau / maxNumber * i));
+                    Vector2 velocity = new(MathF.Cos(MathF.Tau / maxNumber * i), MathF.Sin(MathF.Tau / maxNumber * i));
                     velocity *= 10;
 
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Bottom,
@@ -1306,14 +1332,15 @@ namespace KirboMod.NPCs
                     Yframe = 2;
                 }
             }
-            if (animation == 7) //ready swing gordo
+            if (animation == 7 || animation == 19) //ready swing gordo, ready swing gordo (fast)
             {
-                if (NPC.frameCounter < 4)
+                float speedup = PhaseTreeGordoAttackSpeedMult;
+                if (NPC.frameCounter < 4 * speedup)
                 {
                     Xframe = 7;
                     Yframe = 2;
                 }
-                else if (NPC.frameCounter < 8)
+                else if (NPC.frameCounter < 8 * speedup)
                 {
                     Xframe = 0;
                     Yframe = 3;
@@ -1324,24 +1351,25 @@ namespace KirboMod.NPCs
                     Yframe = 3;
                 }
             }
-            if (animation == 8) //swing gordo
+            if (animation == 8 || animation == 11) //swing gordo, swing gordo (fast)
             {
-                if (NPC.frameCounter < 5)
+                float speedup = PhaseTreeGordoAttackSpeedMult;
+                if (NPC.frameCounter < 5 * speedup)
                 {
                     Xframe = 2;
                     Yframe = 3;
                 }
-                else if (NPC.frameCounter < 10)
+                else if (NPC.frameCounter < 10 * speedup)
                 {
                     Xframe = 3;
                     Yframe = 3;
                 }
-                else if (NPC.frameCounter < 15)
+                else if (NPC.frameCounter < 15 * speedup)
                 {
                     Xframe = 4;
                     Yframe = 3;
                 }
-                else if (NPC.frameCounter < 20)
+                else if (NPC.frameCounter < 20 * speedup)
                 {
                     Xframe = 5;
                     Yframe = 3;
@@ -1376,34 +1404,6 @@ namespace KirboMod.NPCs
                 {
                     Xframe = 2;
                     Yframe = 4;
-                }
-            }
-            if (animation == 11) //swing gordo fast
-            {
-                if (NPC.frameCounter < 2)
-                {
-                    Xframe = 2;
-                    Yframe = 3;
-                }
-                else if (NPC.frameCounter < 4)
-                {
-                    Xframe = 3;
-                    Yframe = 3;
-                }
-                else if (NPC.frameCounter < 6)
-                {
-                    Xframe = 4;
-                    Yframe = 3;
-                }
-                else if (NPC.frameCounter < 8)
-                {
-                    Xframe = 5;
-                    Yframe = 3;
-                }
-                else
-                {
-                    Xframe = 6;
-                    Yframe = 3;
                 }
             }
             if (animation == 12) //ouch!
@@ -1609,25 +1609,6 @@ namespace KirboMod.NPCs
                     Yframe = 4;
                 }
             }
-            if (animation == 19) //ready swing gordo (fast)
-            {
-                if (NPC.frameCounter < 2)
-                {
-                    Xframe = 7;
-                    Yframe = 2;
-                }
-                else if (NPC.frameCounter < 4)
-                {
-                    Xframe = 0;
-                    Yframe = 3;
-                }
-                else
-                {
-                    Xframe = 1;
-                    Yframe = 3;
-                }
-            }
-
             int frameWidth = textureWidth / 8;
             int frameHeight = textureHeight / 7;
 
@@ -1650,42 +1631,22 @@ namespace KirboMod.NPCs
             {
                 Main.EntitySpriteDraw(gordo, position, null, drawColor, 0, origin, 1, SpriteEffects.None);
             }
-            else if (animation == 8) 
+            else if (animation == 8 || animation == 11)
             {
-                if (NPC.frameCounter >= 0 && NPC.frameCounter < 5)
+                float speedup = PhaseTreeGordoAttackSpeedMult;
+                if (NPC.frameCounter >= 0 && NPC.frameCounter < 5 * speedup)
                 {
                     position = NPC.Center - Main.screenPosition + new Vector2(xOffset, -80);
 
                     Main.EntitySpriteDraw(gordo, position, null, drawColor, MathHelper.PiOver2 / 8, origin, 1, SpriteEffects.None);
                 }
-                else if (NPC.frameCounter >= 5 && NPC.frameCounter < 10)
+                else if (NPC.frameCounter >= 5 * speedup && NPC.frameCounter < 10 * speedup)
                 {
                     position = NPC.Center - Main.screenPosition + new Vector2(xOffset, -65);
 
                     Main.EntitySpriteDraw(gordo, position, null, drawColor, MathHelper.PiOver2 / 6, origin, 1, SpriteEffects.None);
                 }
-                else if (NPC.frameCounter >= 10 && NPC.frameCounter < 15)
-                {
-                    position = NPC.Center - Main.screenPosition + new Vector2(xOffset, -30);
-
-                    Main.EntitySpriteDraw(gordo, position, null, drawColor, MathHelper.PiOver2 / 4, origin, 1, SpriteEffects.None);
-                }
-            }
-            else if (animation == 11) //same thing as previous except faster
-            {
-                if (NPC.frameCounter >= 0 && NPC.frameCounter < 2)
-                {
-                    position = NPC.Center - Main.screenPosition + new Vector2(xOffset, -80);
-
-                    Main.EntitySpriteDraw(gordo, position, null, drawColor, MathHelper.PiOver2 / 8, origin, 1, SpriteEffects.None);
-                }
-                else if (NPC.frameCounter >= 2 && NPC.frameCounter < 4)
-                {
-                    position = NPC.Center - Main.screenPosition + new Vector2(xOffset, -65);
-
-                    Main.EntitySpriteDraw(gordo, position, null, drawColor, MathHelper.PiOver2 / 6, origin, 1, SpriteEffects.None);
-                }
-                else if (NPC.frameCounter >= 4 && NPC.frameCounter < 6)
+                else if (NPC.frameCounter >= 10 * speedup && NPC.frameCounter < 15 * speedup)
                 {
                     position = NPC.Center - Main.screenPosition + new Vector2(xOffset, -30);
 
@@ -1703,8 +1664,8 @@ namespace KirboMod.NPCs
         {
             npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<KingDededeBag>())); //only drops in expert
 
-            LeadingConditionRule notExpertRule = new LeadingConditionRule(new Conditions.NotExpert()); //checks if not expert
-            LeadingConditionRule masterMode = new LeadingConditionRule(new Conditions.IsMasterMode()); //checks if master mode
+            LeadingConditionRule notExpertRule = new(new Conditions.NotExpert()); //checks if not expert
+            LeadingConditionRule masterMode = new(new Conditions.IsMasterMode()); //checks if master mode
 
             notExpertRule.OnSuccess(new OneFromRulesRule(1, ItemDropRule.Common(ModContent.ItemType<Items.Weapons.NewHammer>(), 1)
                 , ItemDropRule.Common(ModContent.ItemType<Items.Weapons.Blado>(), 1, 300, 300)
@@ -1743,7 +1704,7 @@ namespace KirboMod.NPCs
                 for (int i = 0; i < 8; i++)
                 {
                     // go around in a octogonal pattern
-                    Vector2 speed = new Vector2((float)Math.Cos(MathHelper.ToRadians(i * 45)) * 25, (float)Math.Sin(MathHelper.ToRadians(i * 45)) * 25);
+                    Vector2 speed = new((float)Math.Cos(MathHelper.ToRadians(i * 45)) * 25, (float)Math.Sin(MathHelper.ToRadians(i * 45)) * 25);
 
                     Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.BoldStar>(), speed, Scale: 3f); //Makes dust in a messy circle
                     d.noGravity = true;

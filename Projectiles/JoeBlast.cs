@@ -1,6 +1,5 @@
 using KirboMod.NPCs;
 using Microsoft.Xna.Framework;
-using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -19,7 +18,7 @@ namespace KirboMod.Projectiles
 			Projectile.height = 50;
 			Projectile.friendly = false;
 			Projectile.hostile = true;
-			Projectile.timeLeft = (int)(KnuckleJoe.BlastRange / KnuckleJoe.BlastVelocityPublic);
+			Projectile.timeLeft = (int)(KnuckleJoe.BlastRange / KnuckleJoe.BlastVelocity);
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 			Projectile.scale = 1f;
@@ -39,13 +38,13 @@ namespace KirboMod.Projectiles
         {
 			if (Main.expertMode)
 			{
-				target.AddBuff(BuffID.OnFire, 120);
+				target.AddBuff(BuffID.Frostburn, 120);
 			}
 			else
 			{
 				if (Main.rand.NextBool(3)) //1/3
 				{
-					target.AddBuff(BuffID.OnFire, 120);
+					target.AddBuff(BuffID.Frostburn, 120);
 				}
 			}
 		

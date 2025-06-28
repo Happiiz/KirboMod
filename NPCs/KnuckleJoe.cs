@@ -109,23 +109,22 @@ namespace KirboMod.NPCs
 				new FlavorTextBestiaryInfoElement("Watch out! Knuckle Joe wants a challenge and you seem perfectly fit! They'll bombard you with a flurry of vulcan jabs and smash punches 'til you're down!")
             });
         }
-        static float AggroRange => 250;
+        static float AggroRange => 200;
         static float VulcanJabRate => 3;
-        public static float VulcanJabRange =>AggroRange + 16 * 3;
+        public static float VulcanJabRange => AggroRange + 16 * 3;
         public static float VulcanJabVelocity => 25;
         public static float VulcanJabSpread => 0.4f;
-        static float VulcanJabChargeup => 40;
+        static float VulcanJabChargeup => 80;
         static int VulcanJabShotCount => 30;
-        static float BlastChargeup => 25;
-        static float BlastVelocity => 20;
-        static float BlastRate => 35;
+        static float BlastChargeup => 70;
+        public static float BlastVelocity => 20;
+        static float BlastRate => 60;
         static float WalkSpeed => 3;
         static float JumpSpeed => -8;
-        static int VulcanJabDamage => 40 / 2;
+        static int VulcanJabDamage => 32 / 2;
         static int BlastShotCount => Main.getGoodWorld ? 3 : Main.expertMode ? 2 : 1;
-        static int BlastDamage => 56 / 2;
-        public static float BlastRange => 1000;
-        public static float BlastVelocityPublic => BlastVelocity;
+        static int BlastDamage => 44 / 2;
+        public static float BlastRange => 600;
 
         public override void AI() //constantly cycles each time
         {
@@ -203,7 +202,7 @@ namespace KirboMod.NPCs
             Player player = Main.player[NPC.target];
 
             Vector2 bottomLeft = NPC.BottomLeft;
-            if (bottomLeft.Y < player.BottomLeft.Y)//if above player then don't need to jump
+            if (bottomLeft.Y <= player.BottomLeft.Y)//if above player then don't need to jump
             {
                 return;
             }
@@ -273,7 +272,7 @@ namespace KirboMod.NPCs
             {
                 NPC.frameCounter += 1;
 
-                if (Timer >= BlastChargeup && (Timer - BlastChargeup) % BlastRate < 10) //blast
+                if ((Timer >= BlastChargeup && (Timer - BlastChargeup) % BlastRate < 10) || Timer >= BlastChargeup + BlastRate * (BlastShotCount - 1)) //blast
                 {
                     NPC.frame.Y = frameHeight * 9;
 
