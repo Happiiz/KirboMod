@@ -21,7 +21,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 17;
+			Item.damage = 90;
 			Item.DamageType = DamageClass.Ranged;
 			Item.noMelee = true;
 			Item.width = 48;
@@ -31,7 +31,7 @@ namespace KirboMod.Items.Weapons
 			Item.useStyle = ItemUseStyleID.Shoot;
 			Item.knockBack = 4;
 			Item.value = Item.buyPrice(0, 0, 45, 0);
-			Item.rare = ItemRarityID.LightRed;
+			Item.rare = ItemRarityID.LightRed; 
 			Item.UseSound = SoundID.Item5; //bow shot
 			Item.autoReuse = true;
 			Item.shoot = ItemID.JestersArrow;
@@ -45,16 +45,11 @@ namespace KirboMod.Items.Weapons
 			if (type != ModContent.ProjectileType<Projectiles.StarArrowProj>())
 			{
 				type = ProjectileID.JestersArrow;
-				if (ContentSamples.ProjectilesByType[type].localNPCHitCooldown == -2 || !ContentSamples.ProjectilesByType[type].usesLocalNPCImmunity)
-				{
-					//check if uses local because of some other mod
-					damage *= 3;//compensate for static/global immunity because relogic is STUPID
-				}
 			}
 			else
 			{
 				type = ModContent.ProjectileType<Projectiles.ChargedArrowProj>();
-				damage = (int)(damage * (3f/5f) * 1.2f);
+				damage = (int)(damage * (1f/5f) * 1.1f);
 				velocity *= 1.2f;
 			}
         }
