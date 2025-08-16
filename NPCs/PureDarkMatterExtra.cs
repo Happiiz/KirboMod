@@ -68,6 +68,18 @@ namespace KirboMod.NPCs
             NPC.buffImmune[BuffID.ShadowFlame] = true;
             Music = MusicID.Boss1;
             NPC.buffImmune[BuffID.Confused] = true;
+
+            if (!Main.dedServ)//if not dedicated server
+            {
+                int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Photonic0_PureDarkMatterWithLoopMetadata");
+                Music = musicSlot;
+                Main.musicFade[musicSlot] = 1;
+                Main.musicNoCrossFade[musicSlot] = true;
+
+                musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/DeathZ_DarkMatterSwordsman");
+                Main.musicFade[musicSlot] = 0;
+
+            }
         }
 
         public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */

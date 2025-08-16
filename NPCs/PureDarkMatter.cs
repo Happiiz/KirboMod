@@ -192,7 +192,11 @@ namespace KirboMod.NPCs
             {
                 xOffset = -250; // go behind player
             }
-
+            int fireRate = phase == 1 ? 90 : 80;
+            if (NPC.ai[0] / fireRate % 2 > 1)
+            {
+                xOffset *= 2.5f;
+            }
             //movement
             Vector2 playerXOffest = target.Center + new Vector2(xOffset, 0f); //go ahead of player
             Vector2 move = playerXOffest - NPC.Center;
@@ -206,7 +210,6 @@ namespace KirboMod.NPCs
             NPC.velocity = (NPC.velocity * (inertia - 1) + move) / inertia;
 
             //main attack
-            int fireRate = phase == 1 ? 90 : 80;
             if (NPC.ai[0] % fireRate == 0)
             {
                 if (Main.netMode != NetmodeID.MultiplayerClient)
