@@ -1256,6 +1256,21 @@ Mods: {
 				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Zero)"
 				Tooltip: ""
 			}
+
+			PureDarkMatterMusicBox: {
+				Tooltip: ""
+				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Pure Dark Matter)"
+			}
+
+			PowerOrbMusicBox: {
+				Tooltip: ""
+				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Power Orb)"
+			}
+
+			NightmareMusicBox: {
+				Tooltip: ""
+				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Nightmare)"
+			}
 		}
 
 		Projectiles: {
@@ -1606,6 +1621,9 @@ Mods: {
 			DarkMatterMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
 			DreamLandBossMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
 			ZeroMusicBoxTile.MapEntry: Zero Music Box Tile
+			NightmareMusicBoxTile.MapEntry: Nightmare Music Box Tile
+			PowerOrbMusicBoxTile.MapEntry: Power Orb Music Box Tile
+			PureDarkMatterMusicBoxTile.MapEntry: Pure Dark Matter Music Box Tile
 		}
 
 		Configs: {

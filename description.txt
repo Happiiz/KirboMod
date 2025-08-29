@@ -6,10 +6,6 @@ This mod contains:
 - 6 familiar bosses spread throughout all of progression!
 - Multiple materials and accessories to obtain!
 
-Patch 1.2.0.1 of 5/15/2025:
-
-- Made Nightmare Crown into an accessory instead of a helmet, and consequently reduced its defense from 15 to 3
-
 Update 1.2 of 5/15/2025:
 
 The mod is finally on version 1.4.4, and with it has received multiple overhauls to its various content!
@@ -23,18 +19,15 @@ The mod is finally on version 1.4.4, and with it has received multiple overhauls
 - All minions are now a lot better at chasing enemies and dealing damage
 - Tons of sprite and visual overhauls
 
-View the full changelog on the mod discord!
-
 Credits:
 
 Happiz:
 - Creator of the mod
 - Programming & spritework
-- Composed the King Dedede remix
 
 Photonic0:
 - Additional programming & spritework
-- Composed the Zero remix
+- Composed the Zero, King Dedede, Pure Dark Matter and Nightmare remixes
 
 Evobyte:
 - Composed the Dream Land Boss remix

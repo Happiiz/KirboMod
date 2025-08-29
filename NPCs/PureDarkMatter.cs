@@ -352,7 +352,7 @@ namespace KirboMod.NPCs
             {
                 targetRot += MathF.PI;
             }
-            NPC.rotation = targetRot + MathF.Sin((NPC.ai[0] - attackStart) * MathF.PI * .5f / attackRate - MathF.PI * .25f) * 0.4f;
+            NPC.rotation = /*targetRot + */MathF.Sin((NPC.ai[0] - attackStart) * MathF.PI * .5f / attackRate - MathF.PI * .25f) * 0.6f;
 
             float speed = 10f;
             float inertia = 10f;
