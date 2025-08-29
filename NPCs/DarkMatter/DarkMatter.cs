@@ -323,11 +323,11 @@ namespace KirboMod.NPCs.DarkMatter
 
             NPC.velocity *= 0.9f; //slow
 
-            if (NPC.ai[0] < 40)
+            if (NPC.ai[0] < 20)
             {
                 NPC.alpha += 30; //lemme be clear
             }
-            else if (NPC.ai[0] == 40)
+            else if (NPC.ai[0] == 20)
             {
                 playerTargetArea = player.Center; //set dash target 
 
@@ -344,17 +344,19 @@ namespace KirboMod.NPCs.DarkMatter
             }
 
 
-            if (NPC.ai[0] > 40)
+            if (NPC.ai[0] > 20)
             {
                 NPC.alpha -= 30;
             }
-
+            float shootingStart = 40;
+            float p2ShootingDuration = 90;
+            float extraWaitTime = 60;
             //normal mode above half
             if (phase == 1)
             {
-                if (NPC.ai[0] == 70) //shoot
+                if (NPC.ai[0] == shootingStart) //shoot
                 {
-                    Vector2 Yoffset = new(0, -170);
+                    Vector2 Yoffset = new(0, -150);
 
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
@@ -363,7 +365,7 @@ namespace KirboMod.NPCs.DarkMatter
                     PlayBallChargeSoundEffect(NPC.Center + Yoffset);
                 }
 
-                if (NPC.ai[0] > 130)
+                if (NPC.ai[0] > shootingStart + extraWaitTime)
                 {
                     NPC.alpha = 0;
                     NPC.ai[0] = 0;
@@ -372,7 +374,7 @@ namespace KirboMod.NPCs.DarkMatter
             //normal mode below half or expert mode above half
             else
             {
-                if (NPC.ai[0] >= 70 && NPC.ai[0] <= 160) //shoot
+                if (NPC.ai[0] >= shootingStart && NPC.ai[0] <= shootingStart + p2ShootingDuration) //shoot
                 {
                     if (NPC.ai[0] % 30 == 0) //shoot
                     {
@@ -385,7 +387,7 @@ namespace KirboMod.NPCs.DarkMatter
                     }
                 }
 
-                if (NPC.ai[0] > 190)
+                if (NPC.ai[0] > shootingStart + p2ShootingDuration + extraWaitTime)
                 {
                     NPC.alpha = 0;
                     NPC.ai[0] = 0;
@@ -426,9 +428,10 @@ namespace KirboMod.NPCs.DarkMatter
                 NPC.velocity = move2;
             }
             float start = 170;
+            float verticalMoveSpeedForBeamWall = Main.getGoodWorld ? 22 : Main.expertMode ? 27 : 32;
             if (NPC.ai[0] >= start && NPC.ai[0] < start + 50) //move down
             {
-                NPC.velocity.Y = 20;
+                NPC.velocity.Y = verticalMoveSpeedForBeamWall;
                 NPC.velocity.X *= 0.01f;
                 if (NPC.ai[0] % 5 == 0)
                 {
@@ -448,7 +451,7 @@ namespace KirboMod.NPCs.DarkMatter
 
             if (NPC.ai[0] >= 230 && NPC.ai[0] < 280) //move up
             {
-                NPC.velocity.Y = -20;
+                NPC.velocity.Y = -verticalMoveSpeedForBeamWall;
                 NPC.velocity.X *= 0.01f;
                 if (NPC.ai[0] % 5 == 0)
                 {
@@ -460,7 +463,7 @@ namespace KirboMod.NPCs.DarkMatter
                 }
             }
 
-            if (NPC.ai[0] > 280)
+            if (NPC.ai[0] > 260)
             {
                 NPC.ai[0] = 0; //restart
             }
@@ -534,22 +537,26 @@ namespace KirboMod.NPCs.DarkMatter
             animation = 0;
 
             NPC.velocity *= 0.9f; //slow
-
-            if (NPC.ai[0] < 40)
+            float tpTime = 20;
+            float orbShootRate = 20;
+            float orbShootCount = 9;
+            float orbShootStartTime = 70;
+            float extraWait = 40;
+            if (NPC.ai[0] < tpTime)
             {
                 NPC.alpha += 30; //lemme be clear
             }
-            else if (NPC.ai[0] < 100)
+            else if (NPC.ai[0] < orbShootStartTime)
             {
                 //teleport to left side of the player
                 NPC.Center = player.Center + new Vector2(500, 0);
             }
-            if (NPC.ai[0] >= 100 && NPC.ai[0] <= 280) //shoot
+            if (NPC.ai[0] >= orbShootStartTime && NPC.ai[0] <= orbShootStartTime + orbShootCount * orbShootRate) //shoot
             {
-                if (NPC.ai[0] % 20 == 0) //shoot
+                if ((NPC.ai[0] - orbShootStartTime) % orbShootRate == 0) //shoot
                 {
 
-                    Vector2 Yoffset = new(0, -170);
+                    Vector2 Yoffset = new(0, -150);
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
                         Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, default, 0, player.whoAmI, 0);
@@ -557,17 +564,17 @@ namespace KirboMod.NPCs.DarkMatter
                     PlayBallChargeSoundEffect(NPC.Center + Yoffset);
                 }
                 //spin around player
-                NPC.Center = player.Center + new Vector2(MathF.Cos((NPC.ai[0] - 100) / 30) * 500, MathF.Sin((NPC.ai[0] - 100) / 30) * 500);
+                NPC.Center = player.Center + new Vector2(MathF.Cos((NPC.ai[0] - orbShootStartTime) / 30) * 500, MathF.Sin((NPC.ai[0] - orbShootStartTime) / 30) * 500);
             }
 
             playerTargetArea = player.Center; //set dash target 
 
-            if (NPC.ai[0] > 40)
+            if (NPC.ai[0] > tpTime)
             {
                 NPC.alpha -= 30;
             }
 
-            if (NPC.ai[0] > 310)
+            if (NPC.ai[0] > orbShootStartTime + orbShootCount * orbShootRate + extraWait)
             {
                 NPC.alpha = 0;
                 NPC.ai[0] = 0;
@@ -720,19 +727,19 @@ namespace KirboMod.NPCs.DarkMatter
             //orb animation
             if (attacktype == DarkMatterAttackType.Orbs)
             {
-                if (phase == 3 && NPC.ai[0] >= 100) //second phase
+                if (phase == 3 && NPC.ai[0] >= 70) //second phase
                 {
                     rotation = 0;
                     direction = SpriteEffects.None;
                     offset = new Vector2(0, -20);
                 }
-                else if (phase == 2 && NPC.ai[0] >= 70 && NPC.ai[0] <= 190) //buffed phase
+                else if (phase == 2 && NPC.ai[0] >= 40 && NPC.ai[0] <= 190) //buffed phase
                 {
                     rotation = 0;
                     direction = SpriteEffects.None;
                     offset = new Vector2(0, -20);
                 }
-                else if (phase == 1 && NPC.ai[0] >= 70 && NPC.ai[0] <= 90)  //regular
+                else if (phase == 1 && NPC.ai[0] >= 40 && NPC.ai[0] <= 90)  //regular
                 {
                     rotation = 0;
                     direction = SpriteEffects.None;

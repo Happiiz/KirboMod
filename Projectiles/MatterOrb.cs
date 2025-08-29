@@ -29,7 +29,7 @@ namespace KirboMod.Projectiles
             Projectile.height = 32;
             Projectile.hostile = true;
             Projectile.DamageType = DamageClass.Ranged;
-            Projectile.timeLeft = 240;
+            Projectile.timeLeft = 240 + 200;
             Projectile.tileCollide = false;
             Projectile.penetrate = -1;
             Projectile.scale = 1f;
@@ -45,7 +45,7 @@ namespace KirboMod.Projectiles
         float ThrowTime => ThrowDelay + BallIndex * PerIndexExtraThrowDelay;
         static int FlyDuration => 30;
         float ExplodeTime => ThrowTime + FlyDuration;
-        static float ExplodeDuration => 35;
+        static float ExplodeDuration => 50;
         float DeathTime => ExplodeTime + ExplodeDuration;
         static float LaunchSpeed => 19;
         public static void GetAIValues(float directionSign, int bossWhoAmI, int i, out float ai0, out float ai1, out float ai2, out Vector2 velocity)
@@ -150,7 +150,9 @@ namespace KirboMod.Projectiles
                     {
                         Vector2 dustPos = Projectile.Center;
                         Vector2 dustVel = Projectile.velocity.Normalized((float)i / lineDustCount * 8f);
-                        Dust d = Dust.NewDustPerfect(dustPos + dustVel, ModContent.DustType<Dusts.DarkResidue>(), dustVel, 0, Color.White, 1f);
+                        Dust d = Dust.NewDustPerfect(dustPos + dustVel, DustID.GemDiamond, dustVel, 0, Color.White, 1f);
+                        d.noGravity = true;
+                        d.scale = 2f;
                         
                     }
                     for (int i = 0; i < dustCount; i++)
@@ -163,9 +165,10 @@ namespace KirboMod.Projectiles
                         dustVel.X += Main.rand.NextFloat(-deviation, deviation);
                         dustVel.Y += Main.rand.NextFloat(-deviation, deviation);
                         dustPos.Y += Main.rand.NextFloat(-deviation, deviation);
-                        Dust d = Dust.NewDustPerfect(dustPos, ModContent.DustType<Dusts.DarkResidue>(), dustVel, 0, Color.White, 1f);
+                        Dust d = Dust.NewDustPerfect(dustPos, DustID.GemDiamond, dustVel, 0, Color.White, 1f);
                         d.noGravity = true;
                         d.scale *= 1.3f;
+                        d.scale *= 2f;
                     }
                 }
                 //for (int i = 0; i < 2; i++)

@@ -18,7 +18,7 @@ namespace KirboMod.NPCs
     {
         private int phase = 1;
 
-        private Vector2 spot = new Vector2(0, 0);
+        private Vector2 spot = new(0, 0);
 
         private int attackTurn = 2; //start at two so last expert phase starts on spin move
 
@@ -98,12 +98,12 @@ namespace KirboMod.NPCs
                     }
 
                     //Enrage
-                    if (NPC.GetLifePercent() < 0.5f && Main.expertMode)
+                    if (NPC.GetLifePercent() < 0.66f && Main.expertMode)
                     {
                         phase = 3;
 
                         //Spin Move Percent
-                        if (NPC.GetLifePercent() < 0.25f && Main.expertMode)
+                        if (NPC.GetLifePercent() < 0.33f && Main.expertMode)
                         {
                             phase = 4;
                         }
@@ -220,7 +220,7 @@ namespace KirboMod.NPCs
                         MatterOrb.GetAIValues(dirSign, NPC.whoAmI, i, out float ai0, out float ai1, out float ai2, out Vector2 vel);
                         Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, vel,
                         ModContent.ProjectileType<MatterOrb>(), 60 / 2, 4, -1, ai0, ai1, ai2);
-                    }     
+                    }
                 }
             }
 
@@ -239,14 +239,19 @@ namespace KirboMod.NPCs
         {
             Player player = Main.player[NPC.target];
             Vector2 playerDistance = player.Center - NPC.Center;
-
+            int dashCount = 3;
+            int dashStartup = 30;
+            int dashDuration = 40;
+            int dashWaitAmount = 70;
+            int postDashWaitTime = 2;
+            float dashSpeed = 40;
             //set dash amount
-            if (NPC.ai[0] == 31 && phase != 1)
+            if (NPC.ai[0] == dashStartup - 1 && phase != 1)
             {
-                NPC.ai[1] = 2; //actually 3
+                NPC.ai[1] = dashCount - 1; //-1 because code checks for > 0 before decrease
             }
 
-            if (NPC.ai[0] < 150) //follow predicted player y for 120 ticks
+            if (NPC.ai[0] < dashStartup + dashWaitAmount) //follow predicted player y for 120 ticks
             {
                 NPC.TargetClosest(); //face player only for 60 ticks
 
@@ -256,15 +261,11 @@ namespace KirboMod.NPCs
                 }
 
                 //deciding which side
-                float xOffset = 400;
+                float xOffset = 500;
 
-                if (playerDistance.X <= 0) //if player is behind enemy
+                if (playerDistance.X > 0) //if player is behind enemy
                 {
-                    xOffset = 500; // go in front of player 
-                }
-                else
-                {
-                    xOffset = -500; // go behind player
+                    xOffset = -xOffset; // go behind player
                 }
                 //movement
                 Vector2 playerXOffest = player.Center + new Vector2(xOffset + ((NPC.ai[0] - 30) * -NPC.direction * 5), player.velocity.Y * 20); //go ahead of player and backup a bit
@@ -277,29 +278,28 @@ namespace KirboMod.NPCs
                 move *= speed;
                 NPC.velocity = (NPC.velocity * (inertia - 1) + move) / inertia;
             }
-            else if (NPC.ai[0] < 180) //go forth
+            else if (NPC.ai[0] < dashStartup + dashWaitAmount + dashDuration) //go forth
             {
-                NPC.velocity = new Vector2(NPC.velocity.X + (2.5f * NPC.direction), 0f);
+                NPC.velocity = new Vector2(dashSpeed * NPC.direction, 0f);
 
                 Dust.NewDust(NPC.position, NPC.width, NPC.height, ModContent.DustType<DarkResidue>());
 
-                if (NPC.ai[0] == 150)
+                if (NPC.ai[0] == dashStartup + dashWaitAmount)
                 {
                     PlayDashSFX();
-                    //SoundEngine.PlaySound(SoundID.Roar, NPC.Center); //OOooAAAHHRrrr
                 }
             }
             else //slow
             {
-                NPC.velocity.X *= 0.95f;
+                NPC.velocity.X *= 0.92f;
             }
 
-            if (NPC.ai[0] >= 210)
+            if (NPC.ai[0] >= dashStartup + dashWaitAmount + dashDuration + postDashWaitTime)
             {
                 if (NPC.ai[1] > 0) //can dash again
                 {
                     NPC.ai[1] -= 1;
-                    NPC.ai[0] = 90; //restart from attack beginning
+                    NPC.ai[0] = dashStartup; //restart from attack beginning
                 }
                 else
                 {
@@ -307,6 +307,12 @@ namespace KirboMod.NPCs
                     NPC.ai[1] = 0;
                 }
             }
+        }
+        static float VoidInitialAttackAngle(float progress)
+        {
+            float result = MathF.Sin(progress * progress * MathF.Tau) * MathF.PI;
+            result += (3 * progress * progress - 2 * progress * progress * progress) * (MathF.Tau * 4f / 3f);
+            return result;
         }
 
         void AttackLasers()
@@ -327,16 +333,27 @@ namespace KirboMod.NPCs
             {
                 xOffset = -500; // go behind player
             }
-
+            float attackStart = 90;
+            float attackRate = 30;
+            if (phase != 1)
+            {
+                attackRate = MathF.Round(attackRate * .6667f);
+            }
+            float attackEnd = 300;
+            float maxYOffset = 400;
             //movement
-            Vector2 playerXOffest = player.Center + new Vector2(xOffset, MathF.Sin((NPC.ai[0] - 30) / (10 * Helper.Phi)) * 500); //go ahead of player
+            Vector2 playerXOffest = player.Center + new Vector2(xOffset, Utils.Remap(NPC.ai[0], attackStart, attackEnd, maxYOffset, -maxYOffset)); //go ahead of player
             Vector2 move = playerXOffest - NPC.Center;
 
-            NPC.rotation = (player.Center - NPC.Center).ToRotation() + MathF.Sin((NPC.ai[0] - 30) / 10) * 0.2f;
-            if(NPC.direction == -1)
+            float targetRot = (player.Center - NPC.Center).ToRotation();
+
+
+            if (NPC.direction == -1)
             {
-                NPC.rotation += MathF.PI;
+                targetRot += MathF.PI;
             }
+            NPC.rotation = targetRot + MathF.Sin((NPC.ai[0] - attackStart) * MathF.PI * .5f / attackRate - MathF.PI * .25f) * 0.4f;
+
             float speed = 10f;
             float inertia = 10f;
 
@@ -344,38 +361,19 @@ namespace KirboMod.NPCs
             move *= speed;
             NPC.velocity = (NPC.velocity * (inertia - 1) + move) / inertia;
 
-            Vector2 turned = NPC.direction == 1 ? NPC.rotation.ToRotationVector2() : NPC.rotation.ToRotationVector2().RotatedBy(MathHelper.ToRadians(180));
+            Vector2 turned = NPC.direction == 1 ? NPC.rotation.ToRotationVector2() : (NPC.rotation + MathF.PI).ToRotationVector2();
             Vector2 posOffset = turned * 45;
             turned *= 20;
             //main attack
-            if (NPC.ai[0] >= 90)
+            if (NPC.ai[0] >= attackStart && NPC.ai[0] % attackRate == 0)
             {
-                if (phase == 1)
+                if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
-                    if (NPC.ai[0] % 40 == 0)
-                    {
-                        if (Main.netMode != NetmodeID.MultiplayerClient)
-                        {
-                            LightningProj.GetSpawningStats(turned, out float ai0, out float ai1);
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + posOffset, turned,
-                                ModContent.ProjectileType<DarkMatterLaser>(), 60 / 2, 4, default, ai0, ai1);
-                        }
-                        SoundEngine.PlaySound(LaserSFX, NPC.Center); //boss laser
-                    }
+                    LightningProj.GetSpawningStats(turned, out float ai0, out float ai1);
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + posOffset, turned,
+                        ModContent.ProjectileType<DarkMatterLaser>(), 60 / 2, 4, default, ai0, ai1);
                 }
-                else
-                {
-                    if (NPC.ai[0] % 20 == 0)
-                    {
-                        if (Main.netMode != NetmodeID.MultiplayerClient)
-                        {
-                            LightningProj.GetSpawningStats(turned, out float ai0, out float ai1);
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + posOffset, turned,
-                                ModContent.ProjectileType<DarkMatterLaser>(), 60 / 2, 4, default, ai0, ai1);
-                        }
-                        SoundEngine.PlaySound(LaserSFX, NPC.Center); //boss laser
-                    }
-                }
+                SoundEngine.PlaySound(LaserSFX, NPC.Center); //boss laser
             }
 
             Vector2 offset = new Vector2(45, 0).RotatedBy(NPC.rotation) * NPC.direction;
@@ -383,7 +381,7 @@ namespace KirboMod.NPCs
             Dust.NewDustPerfect(NPC.Center + offset, DustID.VilePowder, Main.rand.NextVector2Circular(10, 10));
 
             //reset
-            if (NPC.ai[0] >= 400)
+            if (NPC.ai[0] >= attackEnd)
             {
                 NPC.rotation = 0;
                 NPC.ai[0] = 29;
@@ -603,14 +601,14 @@ namespace KirboMod.NPCs
                 {
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        for (int i = -2; i < 1; i++) 
+                        for (int i = -2; i < 1; i++)
                         {
                             tradjectory = MathHelper.ToRadians(45 * i);
                             Vector2 vel = NPC.direction * tradjectory.ToRotationVector2().RotatedBy(MathHelper.ToRadians(45)) * 20;
 
                             LightningProj.GetSpawningStats(vel, out float ai0, out float ai1);
                             Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 45, 0), vel, ModContent.ProjectileType<DarkMatterLaser>(), 60 / 2, 4, -1, ai0, ai1);
-                            
+
                         }
                     }
                     NPC.ai[1] = 1;
@@ -656,10 +654,19 @@ namespace KirboMod.NPCs
             Vector2 move = player.Center + new Vector2(0, -200) - NPC.Center; //move above
 
             float rotationSpeed = 2.8f;
-            float rotationDuration = 720 / rotationSpeed;//2 full spins
+            float start = 90;
+            float stayStillDuration = 60;
+            float rotationDuration = 720f / rotationSpeed;//2 full spins
+            int ftwFireRate = 3;
+            float ftwTurns = 2f;
+            int ftwShotCount = 120;
+            if (Main.getGoodWorld)
+            {
+                rotationDuration = ftwShotCount * ftwFireRate;
+            }
             NPC.direction = -1;
 
-            if (NPC.ai[0] < 120)
+            if (NPC.ai[0] < start)
             {
                 NPC.rotation = MathHelper.ToRadians(90);
 
@@ -667,29 +674,49 @@ namespace KirboMod.NPCs
                 move *= speed;
                 NPC.velocity = (NPC.velocity * (inertia - 1) + move) / inertia;
             }
-            else if (NPC.ai[0] < 240)
+            else if (NPC.ai[0] < start + stayStillDuration)
             {
-                if (NPC.ai[0] < 180) //full rotation once
+                if (NPC.ai[0] < start + stayStillDuration - (360f * 2f / 30f)) //two full rotations
                 {
-                    NPC.rotation -= MathHelper.ToRadians(12f);
+                    NPC.rotation -= MathHelper.ToRadians(30);
                 }
 
                 NPC.velocity *= 0.01f;
             }
-            else if (NPC.ai[0] < 240 + rotationDuration)
+            else if (NPC.ai[0] < start + stayStillDuration + rotationDuration && (!Main.getGoodWorld || ((NPC.ai[0] - start - stayStillDuration) % ftwFireRate == 0)))
             {
+
                 NPC.rotation -= MathHelper.ToRadians(rotationSpeed);
 
+                if (Main.getGoodWorld)
+                {
+                    float atkProgress = (NPC.ai[0] - start - stayStillDuration) / (rotationDuration / ftwTurns);
+                    NPC.rotation = VoidInitialAttackAngle(atkProgress);
+                }
+
                 Vector2 velocity = NPC.rotation.ToRotationVector2() * 30;
+                if (Main.getGoodWorld)
+                {
+                    velocity = Vector2.Normalize(velocity) * 14;
+                }
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center - velocity, -velocity, ModContent.ProjectileType<AngledDarkBeam>(), 60 / 2, 4, Main.myPlayer);
+                    if (Main.getGoodWorld)
+                    {
+                        for (int i = 1; i < 4; i++)
+                        {
+                            velocity = velocity.RotatedBy(MathF.PI * .5f);
+                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center - velocity, -velocity, ModContent.ProjectileType<AngledDarkBeam>(), 60 / 2, 4, Main.myPlayer);
+                        }
+                    }
                 }
+
                 if (NPC.ai[0] % 3 == 0)
                 {
                     PlayBeamSFX();
                 }
-              //  SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
+                //  SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
             }
             else if (NPC.ai[0] > 240 + rotationDuration + 50) //reset with cooldown of 50 frames after finishing attack
             {
@@ -745,11 +772,11 @@ namespace KirboMod.NPCs
             }
 
             Texture2D telegraph = TextureAssets.Extra[ExtrasID.FairyQueenLance].Value;//the texture used for eol's ethereal lance telegraph
-            Vector2 origin = new Vector2(0, telegraph.Height / 2);
+            Vector2 origin = new(0, telegraph.Height / 2);
             Vector2 drawPos = NPC.Center + new Vector2(NPC.direction * 45, 0) - Main.screenPosition;
             float direction;
             float extraRot = NPC.direction == -1 ? 180 : 0;
-            Vector2 scale = new Vector2(4, 4);
+            Vector2 scale = new(4, 4);
             if (phase >= 3)
             {
                 if (NPC.ai[1] == 0)
@@ -776,7 +803,7 @@ namespace KirboMod.NPCs
             }
             direction = NPC.direction == 1 ? NPC.rotation : NPC.rotation + MathF.PI;
             drawPos = NPC.Center + direction.ToRotationVector2() * 45 - Main.screenPosition;
-          
+
             Main.EntitySpriteDraw(telegraph, drawPos, null, Color.Purple, direction, origin, scale, SpriteEffects.None);
             scale.Y *= .5f;
             Main.EntitySpriteDraw(telegraph, drawPos, null, Color.Black, direction, origin, scale, SpriteEffects.None);

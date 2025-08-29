@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
-using Terraria.GameContent;
 using Terraria.ModLoader;
 
 namespace KirboMod.Gores
@@ -15,7 +14,7 @@ namespace KirboMod.Gores
         {
             dust.customData = 0;
             dust.alpha = 0;
-            dust.frame = new Rectangle(0, 0, TextureX, TextureY);           
+            dust.frame = new Rectangle(0, 0, TextureX, TextureY);
         }
         public override bool PreDraw(Dust dust)
         {
@@ -69,17 +68,17 @@ namespace KirboMod.Gores
             return false;
         }
     }
-    public class VolcanoFireFragment2 : VolcanoFireFragment1 
+    public class VolcanoFireFragment2 : VolcanoFireFragment1
     {
         public override int TextureX => 32;
         public override int TextureY => 30;
     }
-    public class VolcanoFireFragment3 : VolcanoFireFragment1 
+    public class VolcanoFireFragment3 : VolcanoFireFragment1
     {
         public override int TextureX => 38;
         public override int TextureY => 32;
     }
-    public class VolcanoFireFragment4 : VolcanoFireFragment1 
+    public class VolcanoFireFragment4 : VolcanoFireFragment1
     {
         public override int TextureX => 30;
         public override int TextureY => 26;

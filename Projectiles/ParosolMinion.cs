@@ -230,9 +230,9 @@ namespace KirboMod.Projectiles
                         pseudoDirection = -1; //change direction so it will go towards enemy
                     }
                     //we put this instead of player.Center so it will always be moving top speed instead of slowing down when enemy is near but unreachable
-					//A "carrot on a stick" if you will
+                    //A "carrot on a stick" if you will
 
-                    Vector2 carrotDirection = Projectile.Center + new Vector2(pseudoDirection * 50, 0) - Projectile.Center; //start - end 
+                    Vector2 carrotDirection = new Vector2(pseudoDirection * 50, 0);
 					carrotDirection.Normalize();
 					carrotDirection *= speed;
 
@@ -417,7 +417,7 @@ namespace KirboMod.Projectiles
 			if (attack == 3)
 			{
 				Projectile.frame = 8; //attacks
-				Vector2 xoffset = new Vector2(Projectile.direction * 15, 0);
+				Vector2 xoffset = new Vector2(Projectile.direction * 25, 0);
                 Player player = Main.player[Projectile.owner];
                 Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + xoffset, xoffset * 0.01f, ModContent.ProjectileType<ParosolHitbox>(), Projectile.damage, 4, player.whoAmI);
 			}
@@ -446,7 +446,8 @@ namespace KirboMod.Projectiles
             Vector2 deltaPos = aggroTarget.Center - Projectile.Center;
             int dirSign = MathF.Sign(deltaPos.X);
             Vector2 targetPos = aggroTarget.Center;
-            targetPos -= new Vector2(dirSign * 46).RotatedBy((Projectile.identity * 0.1f) % 1);
+           
+            targetPos -= new Vector2(dirSign * 40, 0).RotatedBy((Projectile.identity * 0.05f) % .5f);
             Projectile.spriteDirection = dirSign;
             Projectile.velocity = Vector2.Lerp(Vector2.Normalize(targetPos - Projectile.Center) * 15f, Projectile.velocity, 0.95f);
         }

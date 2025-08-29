@@ -1,8 +1,5 @@
 ﻿using KirboMod.Items.Weapons;
 using KirboMod.NPCs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -13,22 +10,26 @@ namespace KirboMod.Globals
     {
         public override bool AppliesToEntity(Projectile entity, bool lateInstantiation)
         {
-            return ModLoader.TryGetMod("CalamityMod", out _) && entity.ModProjectile != null && entity.ModProjectile.Mod.Name == "KirboMod" ;
+            return ModLoader.TryGetMod("CalamityMod", out _) && entity.ModProjectile != null && entity.ModProjectile.Mod.Name == "KirboMod";
         }
         public override void SetDefaults(Projectile entity)
         {
             Helper.DealDefenseDamageInCalamity(entity);
-
         }
     }
     public class BuffNPCsIfCalamityIsEnabled : GlobalNPC
     {
         public override void SetDefaults(NPC entity)
-        {           
-            entity.lifeMax = (int)(entity.lifeMax * 1.35f);
-            entity.defense = (int)(entity.defense * 1.35f);
-            entity.knockBackResist = entity.knockBackResist / 1.35f;
-            entity.damage = (int)(entity.damage * 1.2f);
+        {
+            if (entity.type == ModContent.NPCType<ParosolDee>())
+            {
+                //parasol dee already clones normal waddle dee buffed stats using CloneDefaults, so do this to prevent the buff from applying twice
+                return;
+            }
+            entity.lifeMax = (int)(entity.lifeMax * 1.15f);
+            entity.defense = (int)(entity.defense * 1.15f);
+            entity.knockBackResist = entity.knockBackResist / 1.15f;
+            entity.damage = (int)(entity.damage * 1.15f);
             Helper.DealDefenseDamageInCalamity(entity);
         }
         public override bool AppliesToEntity(NPC entity, bool lateInstantiation)
@@ -43,7 +44,7 @@ namespace KirboMod.Globals
         private int IncreaseKirboModHostileProjDamage(On_Projectile.orig_NewProjectile_IEntitySource_float_float_float_float_int_int_float_int_float_float_float orig, Terraria.DataStructures.IEntitySource spawnSource, float X, float Y, float SpeedX, float SpeedY, int Type, int Damage, float KnockBack, int Owner, float ai0, float ai1, float ai2)
         {
             Projectile sample = ContentSamples.ProjectilesByType[Type];
-            if(sample.ModProjectile != null && sample.ModProjectile.Mod.Name == "KirboMod")
+            if (sample.hostile && !sample.friendly && sample.ModProjectile != null && sample.ModProjectile.Mod.Name == "KirboMod")
             {
                 Damage = (int)(Damage * 1.15f);
             }
@@ -56,7 +57,7 @@ namespace KirboMod.Globals
         {
             bool calam = ModLoader.TryGetMod("CalamityMod", out _);
             return entity.damage > 0 && calam && entity.ModItem != null && entity.ModItem.Mod.Name == "KirboMod";
-                
+
         }
         public override void SetDefaults(Item entity)
         {

@@ -76,6 +76,7 @@ namespace KirboMod.Projectiles
 
         public override void AI()
         {
+            Projectile.tileCollide = true;
             //continously go down
             jumpTimer--;
             daggerCoolDown--;
@@ -342,8 +343,6 @@ namespace KirboMod.Projectiles
             }
             else
             {
-                Projectile.tileCollide = true;
-                Projectile.ignoreWater = false;
                 Projectile.alpha = 0; //show projectile
                 Projectile.extraUpdates = 0;
             }
@@ -377,6 +376,7 @@ namespace KirboMod.Projectiles
         {
             Player player = Main.player[Projectile.owner];
             //SLASH
+            Projectile.tileCollide = false;
             if (attacktype == 0)
             {
                 attack++; //starts at 1
@@ -386,7 +386,6 @@ namespace KirboMod.Projectiles
                 {
                     Vector2 targetPos = aggroTarget.Center + aggroTarget.velocity * 5;
                     Vector2 tpPos = targetPos + new Vector2(120 * -Projectile.direction, 0).RotatedBy(Projectile.identity * 0.166f % 1 - 0.5f);
-                 
                     Projectile.frame = 7; //slash frame
                     Projectile.velocity = Vector2.Normalize(targetPos - tpPos) * 40f;
                     YellowDustBurst();

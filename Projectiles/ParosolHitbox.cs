@@ -18,7 +18,7 @@ namespace KirboMod.Projectiles
 		public override void SetDefaults()
 		{
 			Projectile.width = 90;
-			Projectile.height = 60;
+			Projectile.height = 90;
 			Projectile.friendly = true;
 			Projectile.timeLeft = 3;
 			Projectile.tileCollide = false;
