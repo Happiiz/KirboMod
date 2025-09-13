@@ -1256,8 +1256,6 @@ Mods: {
 				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Zero)"
 				Tooltip: ""
 			}
-
-<<<<<<< Updated upstream
 			PureDarkMatterMusicBox: {
 				Tooltip: ""
 				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Pure Dark Matter)"
@@ -1271,11 +1269,10 @@ Mods: {
 			NightmareMusicBox: {
 				Tooltip: ""
 				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Nightmare)"
-=======
+			}
 			AstronomerWaddleDeeBeret: {
-				DisplayName: Astronomer Waddle Dee Beret
+				DisplayName: Astronomer Beret
 				Tooltip: ""
->>>>>>> Stashed changes
 			}
 		}
 
