@@ -352,7 +352,8 @@ namespace KirboMod.NPCs
             {
                 targetRot += MathF.PI;
             }
-            NPC.rotation = /*targetRot + */MathF.Sin((NPC.ai[0] - attackStart) * MathF.PI * .5f / attackRate - MathF.PI * .25f) * 0.6f;
+            NPC.rotation = MathF.Sin((NPC.ai[0] - attackStart) * MathF.PI * .5f / attackRate - MathF.PI * .25f) * 0.6f;
+            //NPC.rotation += targetRot;
 
             float speed = 10f;
             float inertia = 10f;
@@ -718,7 +719,7 @@ namespace KirboMod.NPCs
                 }
                 //  SoundEngine.PlaySound(SoundID.Item33, NPC.Center); //boss laser
             }
-            else if (NPC.ai[0] > 240 + rotationDuration + 50) //reset with cooldown of 50 frames after finishing attack
+            else if (NPC.ai[0] > start + stayStillDuration + rotationDuration + 30) //cooldown of 30 frames after finishing attack
             {
                 NPC.rotation = 0;
                 NPC.ai[0] = 29;

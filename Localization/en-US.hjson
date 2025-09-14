@@ -1256,6 +1256,7 @@ Mods: {
 				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Zero)"
 				Tooltip: ""
 			}
+
 			PureDarkMatterMusicBox: {
 				Tooltip: ""
 				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Pure Dark Matter)"
@@ -1270,6 +1271,7 @@ Mods: {
 				Tooltip: ""
 				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Nightmare)"
 			}
+
 			AstronomerWaddleDeeBeret: {
 				DisplayName: Astronomer Beret
 				Tooltip: ""
@@ -1514,6 +1516,10 @@ Mods: {
 			HardenedFighterUppercut.DisplayName: Hardened Fighter Uppercut
 			MetalKick.DisplayName: Metal Kick
 			NightmareOrbFirstHitShine.DisplayName: Nightmare Orb First Hit Shine
+			KrackoBGOrbBig.DisplayName: Kracko B G Orb Big
+			KrackoCloud.DisplayName: Kracko Cloud
+			KrackoBGOrbBigFrag.DisplayName: Kracko B G Orb Big Frag
+			KrackoBGOrbSmall.DisplayName: Kracko B G Orb Small
 		}
 
 		NPCs: {

@@ -22,7 +22,10 @@ namespace KirboMod.NPCs
             SpinningBeamOrbs,//1
             Sweep,//2
             Dash,//3
-            Lightning//4
+            Lightning,//4
+            BGOrbs,//5
+            DashToScreen,//6
+            BGBigOrb,//7
         }
         public static void AddElectrifiedDebuff(Player plr)
         {
@@ -173,7 +176,7 @@ namespace KirboMod.NPCs
             NPC.damage = 27;
             NPC.defense = 12;
             NPC.noTileCollide = true;
-            NPC.lifeMax = 5000;
+            NPC.lifeMax = 4250;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath1;
             NPC.value = Item.buyPrice(0, 5, 0, 0); // money it drops

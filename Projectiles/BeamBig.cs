@@ -37,7 +37,7 @@ namespace KirboMod.Projectiles
                 Projectile.direction = Main.rand.NextBool() ? 1 : -1;
 
             }
-            if (Kracko.type != ModContent.NPCType<Kracko>() || !Kracko.active || (Kracko.ai[2] > 0 && Kracko.ai[2] < 180))
+            if (Kracko.type != ModContent.NPCType<Kracko>() || !Kracko.active || (Kracko.ai[2] > 0 && Kracko.ai[2] < NPCs.Kracko.PhaseTransitionAnimDuration))
 			{
 				for (int i = 0; i < 20; i++)
 				{

@@ -1,8 +1,8 @@
-﻿using System;
-using Terraria.ModLoader;
+﻿using Microsoft.Xna.Framework;
+using System;
 using Terraria;
 using Terraria.ID;
-using Microsoft.Xna.Framework;
+using Terraria.ModLoader;
 
 namespace KirboMod
 {
@@ -14,7 +14,7 @@ namespace KirboMod
         public const float Phi = 1.61803398875f;
         public static void DealDefenseDamageInCalamity(Projectile proj)
         {
-            if(proj.hostile && !proj.friendly && ModLoader.TryGetMod("CalamityMod", out Mod cal))
+            if (proj.hostile && !proj.friendly && ModLoader.TryGetMod("CalamityMod", out Mod cal))
             {
                 cal.Call("SetDefenseDamageProjectile", proj, true);
             }
@@ -30,13 +30,13 @@ namespace KirboMod
         {
             const float expertMultiplier = 1.5f;
             const float masterMultiplier = 2f;
-            if(Main.masterMode)
+            if (Main.masterMode)
             {
                 lifemax /= 3;
                 lifemax = (int)(lifemax * masterMultiplier * balance);
                 return;
             }
-            if(Main.expertMode)
+            if (Main.expertMode)
             {
                 lifemax /= 2;
                 lifemax = (int)(lifemax * expertMultiplier * balance);
@@ -118,13 +118,17 @@ namespace KirboMod
         {
             return Color.Lerp(toMin, toMax, Utils.GetLerpValue(fromMin, fromMax, fromValue, clamped));
         }
+        public static float Remap(float fromValue, float fromMin, float fromMax, float toMin, float toMax, bool clamped = true)
+        {
+            return MathHelper.Lerp(toMin, toMax, Utils.GetLerpValue(fromMin, fromMax, fromValue, clamped));
+        }
         public static float RemapEased(float fromValue, float fromMin, float fromMax, float toMin, float toMax, Func<float, float> easingFunction, bool clamp = true)
         {
             return MathHelper.Lerp(toMin, toMax, easingFunction(Utils.GetLerpValue(fromMin, fromMax, fromValue, clamp)));
         }
         public static void DustCircle(int dustAmount, float radius, Vector2 circleOrigin, int dustID = DustID.MagnetSphere)
         {
-            for (float i = 0; i < 1; i+= 1f / dustAmount)
+            for (float i = 0; i < 1; i += 1f / dustAmount)
             {
                 Dust.NewDustPerfect(circleOrigin + (i * MathF.Tau).ToRotationVector2() * radius, dustID, Vector2.Zero);
             }
@@ -184,7 +188,7 @@ namespace KirboMod
                 if (proj.usesLocalNPCImmunity)
                 {
                     npcImmuneToProj = proj.localNPCImmunity[npc.whoAmI] != 0;
-                
+
                 }
                 else if (proj.usesIDStaticNPCImmunity)
                 {
@@ -232,5 +236,19 @@ namespace KirboMod
             float z = MathF.PI + targetTraj - angleToTarget;
             return angleToTarget - MathF.Asin(aimedTargetVelLength * MathF.Sin(z) / shotVelLength);
         }
+
+
+        public static float InverseRemapEased(float result, float fromMin, float fromMax, float toMin, float toMax, Func<float, float> inverseEasingFunction)
+        {
+            // Normalize to easing space
+            float e = (result - toMin) / (toMax - toMin);
+
+            // Undo easing
+            float t = inverseEasingFunction(e);
+
+            // Back to original space
+            return fromMin + (fromMax - fromMin) * t;
+        }
+
     }
 }

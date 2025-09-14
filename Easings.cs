@@ -38,6 +38,8 @@ namespace KirboMod
         {
             return progress * progress * progress;
         }
+        public static float EaseInCubicInverse(float e) => (float)Math.Pow(e, 1f / 3f);
+
         public static float EaseIn(float progress, float exponent)
         {
             return MathF.Pow(progress, exponent);

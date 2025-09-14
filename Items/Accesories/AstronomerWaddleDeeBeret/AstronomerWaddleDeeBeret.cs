@@ -1,5 +1,6 @@
 ﻿using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria;
 
 namespace KirboMod.Items.Accesories.AstronomerWaddleDeeBeret
 {
@@ -16,7 +17,15 @@ namespace KirboMod.Items.Accesories.AstronomerWaddleDeeBeret
             Item.accessory = true;
             Item.width = 30;
             Item.height = 14;
+            Item.value = Item.buyPrice(0, 1, 0, 0);
         }
-
+        public override void AddRecipes()
+        {
+            CreateRecipe()
+                .AddIngredient(ItemID.Silk, 5)
+                .AddIngredient<Starbit>()
+                .AddTile(TileID.Loom)
+                .Register();
+        }
     }
 }
