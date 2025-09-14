@@ -199,11 +199,9 @@ namespace KirboMod.NPCs
             {
                 attacktype = nextAttackType;
                 attackDirection = Main.rand.NextBool(); //right or left (true for right, false for left)
-                List<KrackoAttackType> possibleAttacks = new() { /*KrackoAttackType.SpinningBeamOrbs, KrackoAttackType.Sweep,*/ KrackoAttackType.Dash, KrackoAttackType.BGOrbs, KrackoAttackType.BGBigOrb };
-                if (NPC.GetLifePercent() <= (Main.expertMode ? 1f : 0.5f))
-                {
-                 //  possibleAttacks.Add(KrackoAttackType.Lightning);
-                }
+                List<KrackoAttackType> possibleAttacks = new() { KrackoAttackType.SpinningBeamOrbs, KrackoAttackType.Sweep, KrackoAttackType.Dash, KrackoAttackType.BGOrbs, KrackoAttackType.BGBigOrb };
+		possibleAttacks.Add(KrackoAttackType.Lightning);
+                
                 if(attacktype == KrackoAttackType.DashToScreen)
                 {
                     possibleAttacks.Remove(KrackoAttackType.BGOrbs);
