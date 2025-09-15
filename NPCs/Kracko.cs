@@ -79,7 +79,6 @@ namespace KirboMod.NPCs
                 if (NPC.ai[2] < PhaseTransitionAnimDuration)
                 {
                     float transitionProgress = Utils.GetLerpValue(0, PhaseTransitionAnimDuration, NPC.ai[2]);
-                    Main.NewText(transitionProgress);
                     NPC.rotation = Easings.EaseInOutSine(transitionProgress) * 3 * MathF.Tau; //rotate (in degrees)
 
                     if (NPC.ai[2] % 5 == 0) //every multiple of 5
@@ -230,7 +229,7 @@ namespace KirboMod.NPCs
                 attackDirection = Main.rand.NextBool(); //right or left (true for right, false for left)
                 List<KrackoAttackType> possibleAttacks =
                 [
-                    /*KrackoAttackType.SpinningBeamOrbs, KrackoAttackType.Sweep,*/ KrackoAttackType.Dash, KrackoAttackType.BGOrbs, KrackoAttackType.BGBigOrb, //KrackoAttackType.Lightning,
+                    KrackoAttackType.SpinningBeamOrbs, KrackoAttackType.Sweep, KrackoAttackType.Dash, KrackoAttackType.BGOrbs, KrackoAttackType.BGBigOrb, KrackoAttackType.Lightning,
                 ];
 
                 if (attacktype == KrackoAttackType.DashToScreen)
