@@ -750,8 +750,8 @@ Mods: {
 				DisplayName: Dragon Pot
 				Tooltip:
 					'''
-					Unleashes a flurry of shadow flames
-					Enemies hit by them will be set on shadow fire
+					Unleashes a flurry of dragon flames
+					Enemies hit by them will be set on dragon fire
 					{$CommonItemTooltip.DefensePenetration}
 					'''
 			}
@@ -1276,6 +1276,20 @@ Mods: {
 				DisplayName: Astronomer Beret
 				Tooltip: ""
 			}
+
+			BirdonWings: {
+				DisplayName: Birdon Wings
+				Tooltip: Allows flight and slow fall
+			}
+
+			WingedBow: {
+				DisplayName: Winged Bow
+				Tooltip:
+					'''
+					Does not consume ammo
+					Has a chance to shoot a spinning condor slash
+					'''
+			}
 		}
 
 		Projectiles: {
@@ -1520,6 +1534,8 @@ Mods: {
 			KrackoCloud.DisplayName: Kracko Cloud
 			KrackoBGOrbBigFrag.DisplayName: Kracko B G Orb Big Frag
 			KrackoBGOrbSmall.DisplayName: Kracko B G Orb Small
+			WingedBullet.DisplayName: Winged Bullet
+			WingedSlash.DisplayName: Condor Slash
 		}
 
 		NPCs: {
