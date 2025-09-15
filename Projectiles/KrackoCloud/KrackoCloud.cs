@@ -20,6 +20,7 @@ namespace KirboMod.Projectiles.KrackoCloud
         {
             Projectile.width = Projectile.height = 70;
             Projectile.alpha = 255 - 255 / 15;
+            Projectile.tileCollide = false;
         }
         ref float Style => ref Projectile.ai[0];
         ref float Timer => ref Projectile.ai[1];

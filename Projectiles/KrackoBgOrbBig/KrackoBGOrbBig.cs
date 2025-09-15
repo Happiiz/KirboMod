@@ -1,5 +1,4 @@
 ﻿using KirboMod.NPCs;
-using KirboMod.Projectiles.KrackoBGOrbBigFrag;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -22,8 +21,9 @@ namespace KirboMod.Projectiles.KrackoBgOrbBig
         public override void SetDefaults()
         {
             Projectile.width = Projectile.height = 32;
-            //Projectile.hostile = true;
             Projectile.scale = 0;
+            Projectile.tileCollide = false;
+            Projectile.penetrate = -1;
         }
 
         int TargetPlayerIndex => (int)Projectile.ai[0];
@@ -33,7 +33,7 @@ namespace KirboMod.Projectiles.KrackoBgOrbBig
         static float TravelDuration => 60f;
         Vector2 FinalPos
         {
-            get => new Vector2(Projectile.ai[1], Projectile.ai[2]); set
+            get => new(Projectile.ai[1], Projectile.ai[2]); set
             {
                 {
                     Projectile.ai[1] = value.X;
@@ -47,7 +47,7 @@ namespace KirboMod.Projectiles.KrackoBgOrbBig
         public override void AI()
         {
             Timer++;
-            if(Timer == 1)
+            if (Timer == 1)
             {
                 ProjSpawnOffset = Projectile.velocity.X;//workaround for out of ai slots
                 Projectile.localAI[2] = Projectile.velocity.Y;//workaround for out of ai slots
@@ -59,29 +59,33 @@ namespace KirboMod.Projectiles.KrackoBgOrbBig
                 Projectile.frameCounter = 0;
                 Projectile.frame %= Main.projFrames[Type];
             }
-            if(Timer <= StayStillDuration + ScaleupDuration)
+            if (Timer <= StayStillDuration + ScaleupDuration)
             {
                 NPC kracko = Main.npc[KrackoIndex];
-                if(kracko.type == ModContent.NPCType<Kracko>() && kracko.active)
+                if (kracko.type == ModContent.NPCType<Kracko>() && kracko.active)
                 {
                     Projectile.Center = kracko.Center;
                 }
             }
             Projectile.scale = Utils.Remap(Timer, 0f, ScaleupDuration, 0f, 1.5f);
             float initialYVel = -20f;
-            if(Timer == StayStillDuration + ScaleupDuration && Main.netMode != NetmodeID.MultiplayerClient)
+            if (Timer == StayStillDuration + ScaleupDuration)
             {
-                Player target = Main.player[TargetPlayerIndex];
-                Vector2 targetPos = target.Center + new Vector2(target.velocity.X * TravelDuration, 0);
-                Projectile.velocity = (targetPos - Projectile.Center) / TravelDuration;
-                Projectile.velocity.Y += initialYVel;
-                FinalPos = targetPos;
-                Projectile.netUpdate = true;
+                SoundEngine.PlaySound(Kracko.BGBigOrbShot with { MaxInstances = 0 }, Projectile.Center);
+                if (Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    Player target = Main.player[TargetPlayerIndex];
+                    Vector2 targetPos = target.Center + new Vector2(target.velocity.X * TravelDuration, 0);
+                    Projectile.velocity = (targetPos - Projectile.Center) / TravelDuration;
+                    Projectile.velocity.Y += initialYVel;
+                    FinalPos = targetPos;
+                    Projectile.netUpdate = true;
+                }
             }
-            if (Timer > StayStillDuration + ScaleupDuration + TravelDuration)
+            if (Timer >= StayStillDuration + ScaleupDuration + TravelDuration)
             {
-                SoundEngine.PlaySound(SoundID.Item4, Projectile.Center);
-                if(Main.netMode != NetmodeID.MultiplayerClient)
+                SoundEngine.PlaySound(Kracko.BGBigOrbExplodeSFX, Projectile.Center);
+                if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
                     float projCount = 8f;
                     for (int i = 0; i < projCount; i++)
@@ -94,7 +98,7 @@ namespace KirboMod.Projectiles.KrackoBgOrbBig
                 }
                 Projectile.Kill();
             }
-            if(Timer > StayStillDuration + ScaleupDuration)
+            if (Timer > StayStillDuration + ScaleupDuration)
             {
                 float yAccel = 2 * initialYVel / TravelDuration;
                 Projectile.velocity.Y += -yAccel;
@@ -114,7 +118,7 @@ namespace KirboMod.Projectiles.KrackoBgOrbBig
             int maxAfterimages = ProjectileID.Sets.TrailCacheLength[Type];
             //It was delayed if I didn't subtract 1 and the afterimages started appearing earlier than they were supposed to
             AfterimageDrawCount = (int)(Timer - ScaleupDuration - StayStillDuration - 1);
-            if(AfterimageDrawCount > maxAfterimages - 1)
+            if (AfterimageDrawCount > maxAfterimages - 1)
             {
                 AfterimageDrawCount = maxAfterimages - 1;
             }
@@ -125,7 +129,7 @@ namespace KirboMod.Projectiles.KrackoBgOrbBig
                     Vector2 oldCenter = Projectile.oldPos[i] + Projectile.Size / 2;
                     float oldZPosScaleMult = GetScaleFor3D(-i - 1);
                     oldCenter = Vector2.Lerp(Main.screenPosition + new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f), oldCenter, oldZPosScaleMult);
-                    float opacityMult = 1f - (float)i / (ProjectileID.Sets.TrailCacheLength[Type] - 1f);
+                    float opacityMult = 1f - i / (ProjectileID.Sets.TrailCacheLength[Type] - 1f);
                     Main.EntitySpriteDraw(tex, oldCenter - Main.screenPosition, frame, col * Projectile.Opacity * opacityMult, Projectile.rotation, frame.Size() / 2, oldZPosScaleMult * Projectile.scale, fx);
                 }
             }
@@ -138,7 +142,10 @@ namespace KirboMod.Projectiles.KrackoBgOrbBig
             Projectile.scale = projScale;
 
             Vector2 finalPos = FinalPos;
-            VFX.DrawPrettyStarSparkle(1f, finalPos - Main.screenPosition, Color.White with { A = 0}, VFX.RndElectricCol, 2f, 0f, 1f, 3f, 4f, 0f, Vector2.One * 4f, Vector2.One);
+            Color elecCol = VFX.RndElectricCol with { A = 128 };
+            float sparkleTipLength = 4f;
+            VFX.DrawPrettyStarSparkle(1f, finalPos - Main.screenPosition, Color.White with { A = 0 }, elecCol, 2f, 0f, 1f, 3f, 4f, ProjSpawnOffset, Vector2.One * sparkleTipLength, Vector2.One);
+            VFX.DrawPrettyStarSparkle(1f, finalPos - Main.screenPosition, Color.White with { A = 0 }, elecCol, 2f, 0f, 1f, 3f, 4f, ProjSpawnOffset + MathF.PI * .25f, Vector2.One * sparkleTipLength, Vector2.One);
             return false;
         }
         public override void OnHitPlayer(Player target, Player.HurtInfo info)

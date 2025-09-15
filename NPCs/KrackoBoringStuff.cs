@@ -41,6 +41,43 @@ namespace KirboMod.NPCs
             plr.AddBuff(BuffID.Electrified, duration);
         }
         public static SoundStyle ElecOrbsSFX => new SoundStyle("KirboMod/Sounds/NPC/Kracko/KrackoElecOrbs").WithVolumeScale(0.3f);
+        public static SoundStyle BGBigOrbExplodeSFX => new SoundStyle("KirboMod/Sounds/NPC/Kracko/BGBigOrbExplode").WithVolumeScale(1f);
+        public static SoundStyle BGBigOrbAppear => new SoundStyle("KirboMod/Sounds/NPC/Kracko/BGBigOrbAppear").WithVolumeScale(.5f);
+        public static SoundStyle BGBigOrbShot => new SoundStyle("KirboMod/Sounds/NPC/Kracko/BGBigOrbShot").WithVolumeScale(0.6f);
+        public static SoundStyle Dash1SFX => new SoundStyle("KirboMod/Sounds/NPC/Kracko/KrackoDash1").WithVolumeScale(1f);
+        public static SoundStyle Dash2SFX => new SoundStyle("KirboMod/Sounds/NPC/Kracko/KrackoDash2").WithVolumeScale(1f);
+        public static SoundStyle Dash3SFX => new SoundStyle("KirboMod/Sounds/NPC/Kracko/KrackoDash3").WithVolumeScale(1f);
+        public static SoundStyle DashToBGSFX => new SoundStyle("KirboMod/Sounds/NPC/Kracko/KrackoDashToBG").WithPitchOffset(0.05f);
+        public static SoundStyle DashToScreenSFX => new SoundStyle("KirboMod/Sounds/NPC/Kracko/KrackoDashToScreen");
+        public static SoundStyle FlyDownDashToScreenSFX => new SoundStyle("KirboMod/Sounds/NPC/Kracko/FlyDownAfterDashToScreen");
+        public void PlayDashToScreenSFX()
+        {
+            SoundEngine.PlaySound(DashToScreenSFX with { MaxInstances = 0 }, NPC.Center);
+        }
+        public void PlayDashToBGSFX()
+        {
+            SoundEngine.PlaySound(DashToBGSFX with { MaxInstances = 0 }, NPC.Center);
+        }
+        public void PlayBigOrbAppearSFX()
+        {
+            SoundEngine.PlaySound(BGBigOrbAppear with { MaxInstances = 0 }, NPC.Center);
+        }
+        public void PlayDash1SFX()
+        {
+            soundsOnKracko.Add(SoundEngine.PlaySound(Dash1SFX, NPC.Center));
+        }
+        public void PlayDash2SFX()
+        {
+            soundsOnKracko.Add(SoundEngine.PlaySound(Dash2SFX, NPC.Center));
+        }
+        public void PlayDash3SFX()
+        {
+            soundsOnKracko.Add(SoundEngine.PlaySound(Dash3SFX, NPC.Center));
+        }
+        public void PlayFlyDOwnAfterDashToScreenSFX()
+        {
+            soundsOnKracko.Add(SoundEngine.PlaySound(FlyDownDashToScreenSFX, NPC.Center));
+        }
         public override void FindFrame(int frameHeight) // animation
         {
             if (animation == 0) //slow

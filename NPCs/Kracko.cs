@@ -6,6 +6,7 @@ using KirboMod.Projectiles.Lightnings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using ReLogic.Utilities;
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -31,9 +32,10 @@ namespace KirboMod.NPCs
         float zPos;
         public static float TargetZPosForBGAttacks => 16f;
         public static int PhaseTransitionAnimDuration => 60;
-
+        List<SlotId> soundsOnKracko;
         public override void AI() //constantly cycles each time
         {
+            ManageTrackedSFX();
             if (NPC.ai[0] >= 60 && NPC.ai[0] < 90 && frenzy) //be harmless upon spawn (or when moving during frenzy)
             {
                 NPC.damage = 0;
@@ -107,7 +109,34 @@ namespace KirboMod.NPCs
                 AttackPattern();
             }
         }
-
+        void ManageTrackedSFX()
+        {
+            if (soundsOnKracko == null)
+            {
+                soundsOnKracko = new();
+            }
+            if (soundsOnKracko.Count > 0)
+            {
+                for (int i = 0; i < soundsOnKracko.Count; i++)
+                {
+                    SlotId slot = soundsOnKracko[i];
+                    if (!slot.IsValid)
+                    {
+                        soundsOnKracko.RemoveAt(i);
+                        i--;
+                    }
+                    if (SoundEngine.TryGetActiveSound(slot, out ActiveSound result))
+                    {
+                        result.Position = NPC.Center;
+                    }
+                    else
+                    {
+                        soundsOnKracko.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+        }
         private void AttackPattern()
         {
             Player player = Main.player[NPC.target];
@@ -199,10 +228,12 @@ namespace KirboMod.NPCs
             {
                 attacktype = nextAttackType;
                 attackDirection = Main.rand.NextBool(); //right or left (true for right, false for left)
-                List<KrackoAttackType> possibleAttacks = new() { KrackoAttackType.SpinningBeamOrbs, KrackoAttackType.Sweep, KrackoAttackType.Dash, KrackoAttackType.BGOrbs, KrackoAttackType.BGBigOrb };
-		possibleAttacks.Add(KrackoAttackType.Lightning);
-                
-                if(attacktype == KrackoAttackType.DashToScreen)
+                List<KrackoAttackType> possibleAttacks =
+                [
+                    /*KrackoAttackType.SpinningBeamOrbs, KrackoAttackType.Sweep,*/ KrackoAttackType.Dash, KrackoAttackType.BGOrbs, KrackoAttackType.BGBigOrb, //KrackoAttackType.Lightning,
+                ];
+
+                if (attacktype == KrackoAttackType.DashToScreen)
                 {
                     possibleAttacks.Remove(KrackoAttackType.BGOrbs);
                     possibleAttacks.Remove(KrackoAttackType.BGBigOrb);
@@ -371,9 +402,25 @@ namespace KirboMod.NPCs
                     NPC.ai[0] = moveEnd;
                 }
             }
+            int soundTreshold = (int)(dashStart + dashDuration / 3);
+            int soundTreshold2 = (int)(dashStart + 2 * dashDuration / 3);
+
             if (dashProgress < 0)
                 return dashEnd;
             float easingMultiplier;
+            int sfxTimeOffset = 3;
+            if (NPC.ai[0] == dashStart + sfxTimeOffset)
+            {
+                PlayDash1SFX();
+            }
+            if (NPC.ai[0] == soundTreshold + sfxTimeOffset)
+            {
+                PlayDash2SFX();
+            }
+            if (NPC.ai[0] == soundTreshold2 + sfxTimeOffset)
+            {
+                PlayDash3SFX();//placehodler
+            }
             if (dashProgress < 0.33f)
             {
                 easingMultiplier = Utils.GetLerpValue(0, 0.5f, dashProgress * 3, true) * Utils.GetLerpValue(1, 0.5f, dashProgress * 3, true);
@@ -470,7 +517,7 @@ namespace KirboMod.NPCs
         }
         float AttackBGOrbs()
         {
-            int orbFireRate = 5;
+            int orbFireRate = frenzy ? 4 : 5;
             float moveToBGDuration = 50;
             float start = 10;
             int orbCount = 30;
@@ -479,6 +526,10 @@ namespace KirboMod.NPCs
             float moveSpeed = 25f;
             float acceleration = 0.03f;
             Vector2 targetPos = target.Center + new Vector2(0, -200);
+            if (NPC.ai[0] == 2)
+            {
+                PlayDashToBGSFX();
+            }
             //moveSpeed *= Utils.GetLerpValue(16f, 128f, NPC.Distance(target.Center));
             if (NPC.ai[0] <= moveToBGDuration)
             {
@@ -511,16 +562,20 @@ namespace KirboMod.NPCs
         }
         float AttackBGBigOrb()
         {
-            int orbFireRate = 50;
+            int orbFireRate = frenzy ? 30 : 50;
             float moveToBGDuration = 25;
             float start = 0;
-            int orbCount = 2;
+            int orbCount = frenzy ? 4 : 2;
             float extraWait = 20;
             Player target = Main.player[NPC.target];
             float moveSpeed = 25f;
             float acceleration = 0.03f;
             Vector2 targetPos = target.Center + new Vector2(0, -200);
             //moveSpeed *= Utils.GetLerpValue(16f, 128f, NPC.Distance(target.Center));
+            if (NPC.ai[0] == 2)
+            {
+                PlayDashToBGSFX();
+            }
             if (NPC.ai[0] < moveToBGDuration)
             {
                 zPos = Helper.RemapEased(NPC.ai[0], 0, moveToBGDuration - 1, 0, TargetZPosForBGAttacks, Easings.EaseInOutSine);
@@ -533,13 +588,17 @@ namespace KirboMod.NPCs
             {
                 moveSpeed *= 0;
                 float relativeTime = (NPC.ai[0] - moveToBGDuration - start);
-                if (relativeTime % orbFireRate == 0 && Main.netMode != NetmodeID.MultiplayerClient)
+                if (relativeTime % orbFireRate == 0)
                 {
-                    int attackIndex = (int)(NPC.ai[0] - moveToBGDuration - start) / orbFireRate;
-                    float angleOffset = attackIndex / 16f * MathF.Tau;
-                    foreach (Player orbTarget in Main.ActivePlayers)
+                    PlayBigOrbAppearSFX();
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, new Vector2(angleOffset, NPC.whoAmI) , ModContent.ProjectileType<KrackoBGOrbBig>(), 30, 0f, -1, orbTarget.whoAmI);
+                        int attackIndex = (int)(NPC.ai[0] - moveToBGDuration - start) / orbFireRate;
+                        float angleOffset = attackIndex / 16f * MathF.Tau;
+                        foreach (Player orbTarget in Main.ActivePlayers)
+                        {
+                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, new Vector2(angleOffset, NPC.whoAmI), ModContent.ProjectileType<KrackoBGOrbBig>(), 30, 0f, -1, orbTarget.whoAmI);
+                        }
                     }
                 }
             }
@@ -562,7 +621,10 @@ namespace KirboMod.NPCs
             float ascendMaxSpeed = 30;
             float pastGamePlaneDuration = 120;
             float dashPastGamePlaneDuration = totalDashDuration - dashToGamePlaneDuration;
-
+            if (NPC.ai[0] == 2)//starts at 2 for some reason???
+            {
+                PlayDashToScreenSFX();
+            }
             zPos = Helper.RemapEased(NPC.ai[0], dashStartTime, dashToGamePlaneDuration, TargetZPosForBGAttacks, 0f, Easings.EaseInCubic, false);
             NPC.rotation = Helper.RemapEased(NPC.ai[0], dashStartTime, dashToGamePlaneDuration + pastGamePlaneDuration + dashStartTime, 0f, MathF.Tau * 2f, Easings.EaseInOutSine);
             float cancelMult = Utils.GetLerpValue(dashToGamePlaneDuration + pastGamePlaneDuration * .5f, dashToGamePlaneDuration, NPC.ai[0] - dashStartTime, true);
@@ -586,20 +648,23 @@ namespace KirboMod.NPCs
                     KrackoCloud.SpawnCloudLine(NPC.GetSource_FromAI(), NPC.Center, vel, 5000, 20);
                 }
             }
+            if (NPC.ai[0] == dashStartTime + dashToGamePlaneDuration + pastGamePlaneDuration * .65f)
+            {
+                PlayFlyDOwnAfterDashToScreenSFX();
+            }
             return dashToGamePlaneDuration + pastGamePlaneDuration + 1 + dashStartTime;
         }
         float GetScaleFor3D()
         {
-            return GetScaleFor3D(zPos);  
+            return GetScaleFor3D(zPos);
         }
         public static float GetScaleFor3D(float zPos)
         {
-            float cameraPos = 0f;
             //lower camera pos = smaller
             //higher z pos = smaller
-            float safeDivisor = (zPos / 16f - cameraPos + 1f); ;
+            float safeDivisor = zPos / 16f + 1f;
 
-            if (safeDivisor == 0f)
+            if (safeDivisor == 0f || float.IsNaN(safeDivisor))
             {
                 return 0f;
             }
@@ -698,5 +763,6 @@ namespace KirboMod.NPCs
             eyelid = null;
             spikes = null;
         }
+
     }
 }
