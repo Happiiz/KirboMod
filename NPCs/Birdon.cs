@@ -164,6 +164,7 @@ namespace KirboMod.NPCs
             npcLoot.Add(ItemDropRule.NormalvsExpert(ItemID.SoulofFlight, 10, 5)); // 1 in 10 (10%) chance in Normal. 1 in 5 (20%) chance in Expert
 
             npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<DreamEssence>(), 1, 4, 8));
+            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<BirdonFeather>()));
 
             //more common in normal mode
             new DropBasedOnExpertMode(ItemDropRule.ByCondition(new Conditions.IsCrimsonAndNotExpert(), ModContent.ItemType<SkyBlanket>(), 100, 1, 1),
