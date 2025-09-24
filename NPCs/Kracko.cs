@@ -1,3 +1,4 @@
+using KirboMod.Dusts;
 using KirboMod.Projectiles;
 using KirboMod.Projectiles.KrackoBgOrbBig;
 using KirboMod.Projectiles.KrackoBGOrbSmall;
@@ -30,11 +31,14 @@ namespace KirboMod.NPCs
         private bool transitioning = false; //checks if going through expert mode exclusive phase
         private bool frenzy = false; //checks if going in frenzy mode in expert mode
         float zPos;
-        public static float TargetZPosForBGAttacks => 16f;
+        float oldZPos;
+        public static float TargetZPosForBGAttacks => 32f;
         public static int PhaseTransitionAnimDuration => 60;
         List<SlotId> soundsOnKracko;
+        ref int AfterimageDrawCount => ref NPC.soundDelay;
         public override void AI() //constantly cycles each time
         {
+            oldZPos = zPos;
             ManageTrackedSFX();
             if (NPC.ai[0] >= 60 && NPC.ai[0] < 90 && frenzy) //be harmless upon spawn (or when moving during frenzy)
             {
@@ -106,6 +110,13 @@ namespace KirboMod.NPCs
             {
                 NPC.TargetClosest(true);
                 AttackPattern();
+            }
+            if ((oldZPos - zPos) != 0)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    Spawn3DDust();
+                }
             }
         }
         void ManageTrackedSFX()
@@ -302,6 +313,7 @@ namespace KirboMod.NPCs
             }
             if (sweepProgress >= 0 && sweepProgress <= 1)
             {
+                SPawnMore3DDust();
                 Vector2 vel = new(-AttackDirection, MathF.Cos(sweepProgress * MathF.PI));
                 vel.Y *= sweepY;
                 vel.X *= sweepX;
@@ -422,16 +434,19 @@ namespace KirboMod.NPCs
             }
             if (dashProgress < 0.33f)
             {
+                Spawn3DDust();
                 easingMultiplier = Utils.GetLerpValue(0, 0.5f, dashProgress * 3, true) * Utils.GetLerpValue(1, 0.5f, dashProgress * 3, true);
                 NPC.velocity = new Vector2(dashDistanceX / 2 * AttackDirection, dashDistanceY) * easingMultiplier;
             }
             else if (dashProgress < 0.66f)
             {
+                SPawnMore3DDust();
                 easingMultiplier = Utils.GetLerpValue(0, 0.5f, (dashProgress - 0.33f) * 3, true) * Utils.GetLerpValue(1, 0.5f, (dashProgress - 0.33f) * 3, true);
                 NPC.velocity = new Vector2(dashDistanceX * -AttackDirection, 0) * easingMultiplier;
             }
             else if (dashProgress < 1)
             {
+                Spawn3DDust();
                 easingMultiplier = Utils.GetLerpValue(0, 0.5f, (dashProgress - 0.66f) * 3, true) * Utils.GetLerpValue(1, 0.5f, (dashProgress - 0.66f) * 3, true);
                 NPC.velocity = new Vector2(dashDistanceX / 2 * AttackDirection, -dashDistanceY) * easingMultiplier;
             }
@@ -525,6 +540,8 @@ namespace KirboMod.NPCs
             float moveSpeed = 25f;
             float acceleration = 0.03f;
             Vector2 targetPos = target.Center + new Vector2(0, -200);
+            //float xSlideDist = 400;
+            //targetPos.X = Utils.Remap(NPC.ai[0], 0, moveToBGDuration + start + orbCount * orbFireRate, -xSlideDist, xSlideDist);
             if (NPC.ai[0] == 2)
             {
                 PlayDashToBGSFX();
@@ -539,7 +556,7 @@ namespace KirboMod.NPCs
             }
             else if (NPC.ai[0] < moveToBGDuration + start + orbCount * orbFireRate)
             {
-                moveSpeed *= 0;
+                moveSpeed = 3f;
                 if ((NPC.ai[0] - moveToBGDuration - start) % orbFireRate == 0 && Main.netMode != NetmodeID.MultiplayerClient)
                 {
                     foreach (Player orbTarget in Main.ActivePlayers)
@@ -548,6 +565,7 @@ namespace KirboMod.NPCs
                         Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, velocity, ModContent.ProjectileType<KrackoBGOrbSmall>(), 30, 0f, -1, ai0, ai1, ai2);
                     }
                 }
+                targetPos = target.Center;
             }
             else
             {
@@ -581,11 +599,12 @@ namespace KirboMod.NPCs
             }
             else if (NPC.ai[0] < moveToBGDuration + start)
             {
-
+                moveSpeed *= .5f;
             }
             else if (NPC.ai[0] < moveToBGDuration + start + orbCount * orbFireRate)
             {
-                moveSpeed *= 0;
+                moveSpeed *= .5f;
+
                 float relativeTime = (NPC.ai[0] - moveToBGDuration - start);
                 if (relativeTime % orbFireRate == 0)
                 {
@@ -613,6 +632,7 @@ namespace KirboMod.NPCs
 
         float AttackDashToScreen()
         {
+            Spawn3DDust();
             float dashStartTime = 0f;//uhh changing this breaks stuff so, don't.
             float dashToGamePlaneDuration = 50;
             float totalDashDuration = Helper.InverseRemapEased(-16, dashStartTime, dashToGamePlaneDuration, TargetZPosForBGAttacks, 0f, Easings.EaseInCubicInverse);
@@ -663,15 +683,11 @@ namespace KirboMod.NPCs
             //higher z pos = smaller
             float safeDivisor = zPos / 16f + 1f;
 
-            if (safeDivisor == 0f || float.IsNaN(safeDivisor))
+            if (safeDivisor <= 0f || float.IsNaN(safeDivisor))
             {
                 return 0f;
             }
             float scale = 1f / safeDivisor;
-            if (scale < 0)
-            {
-                scale = 0;
-            }
             return scale;
         }
         void SpawnBeam(int numberOfBeams, float timeToCheck)
@@ -762,6 +778,17 @@ namespace KirboMod.NPCs
             eyelid = null;
             spikes = null;
         }
-
+        public void Spawn3DDust()
+        {
+            float velocityMult = 0.5f;
+            KrackoDust.NewKrackoDust(NPC.position, NPC.width, NPC.height, NPC.velocity.X * velocityMult, NPC.velocity.Y * velocityMult, 1f, (zPos - oldZPos) * velocityMult, zPos);
+        }
+        public void SPawnMore3DDust()
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                Spawn3DDust();
+            }
+        }
     }
 }

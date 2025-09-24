@@ -7,6 +7,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using KirboMod.Particles;
 using Terraria.DataStructures;
+using KirboMod.Projectiles.Marx.Cutter;
 
 namespace KirboMod.Items
 {
@@ -37,6 +38,7 @@ namespace KirboMod.Items
         }
         public override bool? UseItem(Player player)
         {
+
             if (player.altFunctionUse == 2)
             {
                 Main.getGoodWorld = !Main.getGoodWorld;

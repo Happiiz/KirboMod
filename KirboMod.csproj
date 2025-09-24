@@ -12,6 +12,8 @@
     <None Remove="ExtraTextures\RingShinePremultiplied.png" />
     <None Remove="ExtraTextures\WaddleDooBeam0.png" />
     <None Remove="ExtraTextures\WaddleDooBeam1.png" />
+    <None Remove="Items\Accesories\AstronomerWaddleDeeBeret\AstronomerWaddleDeeBeret.png" />
+    <None Remove="Items\Accesories\AstronomerWaddleDeeBeret\AstronomerWaddleDeeBeret_Head.png" />
     <None Remove="Items\Armor\Photonic0Boots\Photonic0Boots.png" />
     <None Remove="Items\Armor\Photonic0Boots\Photonic0BootsGlow.png" />
     <None Remove="Items\Armor\Photonic0Boots\Photonic0Boots_Legs.png" />
@@ -33,9 +35,15 @@
     <None Remove="NPCs\PlasmaWisp\PlasmaWispEyes.png" />
     <None Remove="NPCs\PlasmaWisp\PlasmaWispHand.png" />
     <None Remove="Projectiles\Flames\FlamesSprite.png" />
+    <None Remove="Projectiles\KrackoBgOrbBig\KrackoBGOrbBig.png" />
     <None Remove="Projectiles\KrackoJrBomb\KrackoJrBomb.png" />
     <None Remove="Projectiles\KrackoJrCannonball\KrackoJrCannonball.png" />
     <None Remove="Projectiles\Lightnings\twirl_03.png" />
+    <None Remove="Projectiles\Marx\IceBombFrag\MarxIceBombFrag.png" />
+    <None Remove="Projectiles\Marx\IceBomb\MarxIceBomb.png" />
+    <None Remove="Projectiles\Marx\MassiveLaser\MarxMassiveLaser.png" />
+    <None Remove="Projectiles\Marx\VineSeed\MarxVineSeed.png" />
+    <None Remove="Projectiles\Marx\Vine\MarxVine.png" />
     <None Remove="Projectiles\NewWhispy\FireApple.png" />
     <None Remove="Projectiles\NewWhispy\NewWhispySpikes\NewWhispySpike.png" />
     <None Remove="Projectiles\NewWhispy\NewWhispySpikes\NewWhispySpikeTip.png" />
@@ -57,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="NPCs\DarkMatter\NovaPasta\" />
+    <Folder Include="Projectiles\Marx\GiantBlackHoleOfDoom\" />
     <Folder Include="Projectiles\NewWhispy\NewWhispyAppleBig\" />
   </ItemGroup>
 </Project>

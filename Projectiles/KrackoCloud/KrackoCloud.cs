@@ -14,7 +14,7 @@ namespace KirboMod.Projectiles.KrackoCloud
         public override string Texture => "KirboMod/Projectiles/IceMist/IceMist1";
         public override void SetStaticDefaults()
         {
-
+            ProjectileID.Sets.CanHitPastShimmer[Type] = true;
         }
         public override void SetDefaults()
         {
