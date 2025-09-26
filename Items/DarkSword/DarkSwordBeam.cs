@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ModLoader;
 namespace KirboMod.Items.DarkSword
 {
@@ -31,6 +32,10 @@ namespace KirboMod.Items.DarkSword
                 Player player = Main.player[Projectile.owner];
                 Projectile.Center = player.RotatedRelativePoint(player.MountedCenter) - Projectile.velocity;
                 return;
+            }
+            if(Timer == 0)
+            {
+                SoundEngine.PlaySound(NPCs.DarkMatter.DarkMatter.DarkBeamShoot.WithVolumeScale(.4f), Projectile.Center);
             }
             Projectile.Opacity = Utils.GetLerpValue(0, 5, Timer, true);
             Projectile.rotation = Projectile.velocity.ToRotation();

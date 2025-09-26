@@ -26,7 +26,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 80;
+			Item.damage = 84;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 48;
@@ -44,6 +44,7 @@ namespace KirboMod.Items.Weapons
 			Item.shootSpeed = 30f;
 			Item.mana = 15;
 		}
+		//todo: make static
 		int FindTarget(Vector2 position)
         {
 			Rectangle areaToCheck = Utils.CenteredRectangle(position, new Vector2(200, 900));

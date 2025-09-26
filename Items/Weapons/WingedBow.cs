@@ -18,7 +18,7 @@ namespace KirboMod.Items.Weapons
 
         public override void SetDefaults()
         {
-            Item.damage = 35;
+            Item.damage = 40;
             Item.DamageType = DamageClass.Ranged;
             Item.noMelee = true;
             Item.width = 30;
@@ -37,6 +37,11 @@ namespace KirboMod.Items.Weapons
 
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
+            if(Main.myPlayer != player.whoAmI)
+            {
+                return false;
+            }
+
             if (Main.rand.NextBool(5))
             {
                 type = ModContent.ProjectileType<WingedSlash>();
@@ -44,10 +49,12 @@ namespace KirboMod.Items.Weapons
                 damage *= 3;
                 knockback /= 2;
 
-                int p = Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI);
+                int p = Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI, player.direction);
 
-                WingedSlash proj = Main.projectile[p].ModProjectile as WingedSlash;
-                proj.initialShootDirection = player.direction;
+                //this won't sync in multiplayer
+                //use AI slot instead
+                //WingedSlash proj = Main.projectile[p].ModProjectile as WingedSlash;
+                //proj.initialShootDirection = player.direction;
             }
             else
             {

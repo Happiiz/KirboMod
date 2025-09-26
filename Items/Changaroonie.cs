@@ -8,6 +8,8 @@ using Terraria.ModLoader;
 using KirboMod.Particles;
 using Terraria.DataStructures;
 using KirboMod.Projectiles.Marx.Cutter;
+using KirboMod.NPCs.Marx;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace KirboMod.Items
 {
@@ -19,7 +21,8 @@ namespace KirboMod.Items
                 "\nLeft click to cycle through difficulties" +
                 "\nRight click to cycle through progression");*/
         }
-
+        //here for testing
+        MarxWingRenderer wingRenderer;
 		public override void SetDefaults()
 		{
 			Item.width = 20;
@@ -31,6 +34,19 @@ namespace KirboMod.Items
             Item.useStyle = ItemUseStyleID.HoldUp;
 			Item.UseSound = SoundID.DD2_MonkStaffSwing;
             Item.consumable = false;
+            MarxWingRenderer.Initialize();
+        }
+        //here for testing
+        public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
+        {
+            if(wingRenderer == null)
+            {
+                wingRenderer = new();
+            }
+            wingRenderer.Update();
+            wingRenderer.RenderFrame(0, spriteBatch, Item.Center + new Vector2(0,-400), Main.screenPosition, 0, 1f);
+
+            return true;
         }
         public override bool AltFunctionUse(Player player)
         {

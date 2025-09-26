@@ -15,12 +15,13 @@ namespace KirboMod.Projectiles.WingedBow
 	public class WingedSlash : ModProjectile
 	{
         public int initialShootDirection;
-
+        int InitialShootDirection => (int)Projectile.ai[0];
+        ref float AfterimageDrawCount => ref Projectile.localAI[1];
 		public override void SetStaticDefaults()
 		{
             // DisplayName.SetDefault("Charged Star Arrow");
             ProjectileID.Sets.TrailCacheLength[Projectile.type] = 6; // The length of old position to be recorded
-            ProjectileID.Sets.TrailingMode[Projectile.type] = 0; // The recording mode
+            ProjectileID.Sets.TrailingMode[Projectile.type] = 2; // The recording mode
         }
 		public override void SetDefaults()
 		{
@@ -31,18 +32,16 @@ namespace KirboMod.Projectiles.WingedBow
 			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.timeLeft = 240; //4 seconds
 			Projectile.tileCollide = false;
-			Projectile.penetrate = -1;
+			Projectile.penetrate = 4;
 			Projectile.scale = 1f;
 			Projectile.ignoreWater = true;
             Projectile.usesLocalNPCImmunity = true;
-            Projectile.localNPCHitCooldown = 5;
+            Projectile.localNPCHitCooldown = 10;
 		}
 
 		public override void AI()
 		{
-			Projectile.rotation = Projectile.velocity.ToRotation();
-
-            Projectile.Opacity = Utils.Remap(Projectile.localAI[0], 0, 20, 0f, 1f, true) * Utils.Remap(Projectile.localAI[0], 220, 240, 1f, 0f, true);
+            Projectile.Opacity =/* Utils.Remap(Projectile.localAI[0], 0, 20, 0f, 1f, true) * */Utils.Remap(Projectile.localAI[0], 220, 240, 1f, 0f, true);
 
             int spinDuration = 50;
 
@@ -51,16 +50,20 @@ namespace KirboMod.Projectiles.WingedBow
 
             if (Projectile.localAI[0] > range1 && Projectile.localAI[0] <= range2)
             {
-                Projectile.velocity = Projectile.velocity.RotatedBy(MathF.Tau / spinDuration * -initialShootDirection);
+                Projectile.velocity = Projectile.velocity.RotatedBy(MathF.Tau / spinDuration * -InitialShootDirection);
             }
             else if (Projectile.localAI[0] > range2)
             {
-                Projectile.velocity = Projectile.velocity.RotatedBy(MathF.Tau / 600 * -initialShootDirection);
+                Projectile.velocity = Projectile.velocity.RotatedBy(MathF.Tau / 600 * -InitialShootDirection);
             }
 
+			Projectile.rotation = Projectile.velocity.ToRotation();
             Projectile.localAI[0]++;
         }
-
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            Projectile.damage = (int)(Projectile.damage * .5f);
+        }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
             SoundEngine.PlaySound(SoundID.Item10, Projectile.position); //impact
@@ -76,15 +79,21 @@ namespace KirboMod.Projectiles.WingedBow
             afterimage = ModContent.Request<Texture2D>(Texture);
             Texture2D texture = afterimage.Value;
 
-            for (int k = 1; k < Projectile.oldPos.Length; k++) //start at 1 so not ontop of actual projectile
+            for (int k = Projectile.oldPos.Length - 1; k >= 1; k--) //start at 1 so not ontop of actual projectile
             {
+
                 Vector2 drawOrigin = texture.Size() / 2;
-                Vector2 drawPos = (Projectile.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(-8f, Projectile.gfxOffY);
+                Vector2 oldPos = Projectile.oldPos[k];
+                if(oldPos == Vector2.Zero)
+                {
+                    continue;
+                }
+                Vector2 drawPos = (oldPos - Main.screenPosition) + Projectile.Size / 2f + new Vector2(0, Projectile.gfxOffY);
 
                 Color color = Color.White * Projectile.Opacity;
                 color.A = 128;//make it blend with the background a bit.
                 color *= ((Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);
-                Main.EntitySpriteDraw(texture, drawPos, null, color, Projectile.rotation, drawOrigin, 1, SpriteEffects.None, 0);
+                Main.EntitySpriteDraw(texture, drawPos, null, color, Projectile.oldRot[k], drawOrigin, 1, SpriteEffects.None, 0);
             }
             
             return Projectile.DrawSelf(Color.White * Projectile.Opacity);

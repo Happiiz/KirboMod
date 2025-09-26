@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
@@ -29,7 +30,6 @@ namespace KirboMod.Items.DarkSword
             Item.useTime = 30;
             Item.useAnimation = 30;
             Item.useStyle = ItemUseStyleID.Shoot; //gun/staff
-            Item.UseSound = SoundID.Item15; //phaseblade
             Item.knockBack = 9;
             Item.value = Item.buyPrice(0, 2, 75, 0);
             Item.rare = ItemRarityID.Yellow;
@@ -42,8 +42,7 @@ namespace KirboMod.Items.DarkSword
 
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
-            if (Main.myPlayer != player.whoAmI)
-                return false;
+
             KirbPlayer mPlayer = player.GetModPlayer<KirbPlayer>();
             mPlayer.GetDarkSwordSwingStats(out int direction, out ProjectileShootType projToShoot);
             Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI, player.itemAnimationMax, MathHelper.Lerp(6.15f, 4, Main.rand.NextFloat()), direction);
@@ -53,6 +52,9 @@ namespace KirboMod.Items.DarkSword
             switch (projToShoot)
             {
                 case ProjectileShootType.DarkOrb:
+                    SoundEngine.PlaySound(NPCs.DarkMatter.DarkMatter.OrbShoot, position);
+                    if (Main.myPlayer != player.whoAmI)
+                        return false;
                     int amountOfOrbs = 4;
                     delayMultiplier *= .5f; //orbs fire at a smaller angle so needs less delay to look smooth
                     for (float i = 0; i < 1.01f; i += 1f / amountOfOrbs)
@@ -65,6 +67,9 @@ namespace KirboMod.Items.DarkSword
                     }
                     break;
                 case ProjectileShootType.DarkBeam:
+                    //sfx played in beam AI
+                    if (Main.myPlayer != player.whoAmI)
+                        return false;
                     int amountOfBeams = 10;
                     for (float i = 0; i < 1.01f; i += 1f / amountOfBeams)
                     {
@@ -76,6 +81,13 @@ namespace KirboMod.Items.DarkSword
                     }
                     break;
                 case ProjectileShootType.DarkWave:
+                    SoundEngine.PlaySound(SoundID.Item79 with { Pitch = -1, MaxInstances = 0 }, position);
+                    SoundEngine.PlaySound(SoundID.Item79 with { Pitch = -0.5f, MaxInstances = 0 }, position);
+                    SoundEngine.PlaySound(SoundID.Item79 with { Pitch = 1.5f, MaxInstances = 0 }, position);
+                 //   SoundEngine.PlaySound(SoundID.Item15 with { Pitch = 1.5f, MaxInstances = 0 }, position);
+                    if (Main.myPlayer != player.whoAmI)
+                        return false;
+
                     Projectile.NewProjectile(source, position + velocity * .6f, velocity, ModContent.ProjectileType<DarkSwordWave>(), damage, knockback, player.whoAmI, -delayMultiplier / 3, direction);
                     break;
             }

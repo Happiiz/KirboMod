@@ -54,7 +54,7 @@ namespace KirboMod.Items.Weapons
 
         public override void AddRecipes()
 		{
-			Recipe recipe1 = CreateRecipe();//the result is gigantsword
+			Recipe recipe1 = CreateRecipe();//the result is laser beam staff
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.BeamStaff>()); //Beam Staff
 			recipe1.AddIngredient(ItemID.LaserRifle); //Laser Rifle
 			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 50); //50 starbits
