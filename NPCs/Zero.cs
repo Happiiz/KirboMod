@@ -52,7 +52,7 @@ namespace KirboMod.NPCs
 
         private int deathcounter = 0; //for death animation
 
-        private int backgroundAttackCountDown = 0; //cycles through background attack at 10% health every 3 attacks
+        private int backgroundAttackCountDown = 0; //cycles through background attack at x% health every x attacks
 
         private int animationXframeOffset = 0; //changes the sprite column depending on what animation is playing
 
@@ -267,7 +267,7 @@ namespace KirboMod.NPCs
 
                 if (NPC.ai[0] == AttackCooldown)
                 {
-                    if (NPC.GetLifePercent() <= 0.55) //50%
+                    if (NPC.GetLifePercent() <= 0.55) //55%
                     {
                         //background attack is done every 3 attacks when zero's health gets low enough
                         //(does it the next cycle upon initally dropping low enough)
@@ -276,7 +276,7 @@ namespace KirboMod.NPCs
                         {
                             attacktype = ZeroAttackType.BackgroundShots; //background attack
                             lastattacktype = ZeroAttackType.BackgroundShots;
-                            backgroundAttackCountDown = 2; //restart
+                            backgroundAttackCountDown = 5; //restart
                         }
                         else //do regular attack
                         {

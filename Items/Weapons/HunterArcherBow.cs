@@ -75,7 +75,7 @@ namespace KirboMod.Items.Weapons
             hunterArcherBow1.AddIngredient(ModContent.ItemType<Items.Weapons.ArcherBow>()); //Archer Bow
             hunterArcherBow1.AddIngredient(ItemID.TitaniumRepeater); //Titanium Repeater
             hunterArcherBow1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 50); //50 starbits
-            hunterArcherBow1.AddIngredient(ModContent.ItemType<RareStone>(), 1); //1 rare stone
+            hunterArcherBow1.AddIngredient(ModContent.ItemType<TreasureStone>(), 1); //1 rare stone
             hunterArcherBow1.AddTile(TileID.Anvils); //crafted at anvil
             hunterArcherBow1.Register(); //adds this recipe to the game
 
@@ -83,7 +83,7 @@ namespace KirboMod.Items.Weapons
             hunterArcherBow2.AddIngredient(ModContent.ItemType<Items.Weapons.ArcherBow>()); //Archer Bow
             hunterArcherBow2.AddIngredient(ItemID.AdamantiteRepeater); //Adamantite Repeater
             hunterArcherBow2.AddIngredient(ModContent.ItemType<Items.Starbit>(), 50); //50 starbits
-            hunterArcherBow2.AddIngredient(ModContent.ItemType<RareStone>(), 1); //1 rare stone
+            hunterArcherBow2.AddIngredient(ModContent.ItemType<TreasureStone>(), 1); //1 rare stone
             hunterArcherBow2.AddTile(TileID.Anvils); //crafted at anvil
             hunterArcherBow2.Register(); //adds this recipe to the game
         }

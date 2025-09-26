@@ -118,6 +118,21 @@ namespace KirboMod.Tiles
                     case 18:
                         type = ModContent.NPCType<NPCs.BroomHatter>();
                         break;
+                    case 19:
+                        type = ModContent.NPCType<NPCs.MidBosses.Bonkers>();
+                        break;
+                    case 20:
+                        type = ModContent.NPCType<NPCs.MidBosses.MrFrosty>();
+                        break;
+                    case 21:
+                        type = ModContent.NPCType<NPCs.Wheelie>();
+                        break;
+                    case 22:
+                        type = ModContent.NPCType<NPCs.Bomber>();
+                        break;
+                    case 23:
+                        type = ModContent.NPCType<NPCs.MidBosses.Batafire>();
+                        break;
                     default:
 						return;
 				}

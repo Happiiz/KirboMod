@@ -6,6 +6,7 @@ Mods: {
 			IgnoresDefense: Ignores enemy defense completely
 			MusicBoxTitle: Music Box
 			ShroomiteHelmetBenefitDowngrades: This weapon and its downgrades benefit from the [i:1548] Shroomite Helmet
+			ShroomiteHelmetBenefit: This weapon benefits from the [i:1548] Shroomite Helmet
 		}
 
 		ProgressionDescription: {
@@ -125,6 +126,11 @@ Mods: {
 			DragonFireDebuff: {
 				DisplayName: Dragon Fire Debuff
 				Description: Mods.KirboMod.Buffs.DragonFireDebuff.Description
+			}
+
+			WheelieBikeMount: {
+				DisplayName: Wheelie Bike
+				Description: No one said controlling a wheel would be easy
 			}
 		}
 
@@ -555,7 +561,7 @@ Mods: {
 
 			RareStone: {
 				DisplayName: Rare Stone
-				Tooltip: Used to evolve certain weapons
+				Tooltip: Used to evolve certain melee weapons
 			}
 
 			SkyBlanket: {
@@ -584,7 +590,11 @@ Mods: {
 
 			BallsofMatter: {
 				DisplayName: Dark Petal
-				Tooltip: Springs out then moves towards mouse position
+				Tooltip:
+					'''
+					Springs out then moves towards mouse position
+					{$CommonItemTooltip.ShroomiteHelmetBenefit}
+					'''
 			}
 
 			BeamStaff: {
@@ -770,7 +780,7 @@ Mods: {
 				Tooltip:
 					'''
 					Land punches to build up charge
-					Right click to use all stored charge and perform an uppercut
+					Right click to use all stored charge and perform an uppercut (has a cooldown only in the air)
 					The uppercut deals more damage the more charge you use
 					If you use more than half of the maximum charge at once, the uppercut will travel further and make you invincible
 					{$CommonItemTooltip.DefensePenetration}
@@ -844,7 +854,11 @@ Mods: {
 
 			HardenedFighter: {
 				DisplayName: Hardened Fighter Glove
-				Tooltip: Uppercutting releases a barrage of bouncing rocks
+				Tooltip:
+					'''
+					Uppercutting releases a barrage of bouncing rocks
+					Doesn't have a cooldown in the air
+					'''
 			}
 
 			HeroSword: {
@@ -883,7 +897,11 @@ Mods: {
 
 			KirbyBall: {
 				DisplayName: Friend Ball
-				Tooltip: Bounces up and down, reversing direction on any walls hit
+				Tooltip:
+					'''
+					Bounces up and down, reversing direction on any walls hit
+					{$CommonItemTooltip.ShroomiteHelmetBenefit}
+					'''
 			}
 
 			LaserBeam: {
@@ -1290,6 +1308,62 @@ Mods: {
 					Has a chance to shoot a spinning condor slash
 					'''
 			}
+
+			ArtistsBrush: {
+				DisplayName: Artist's Brush
+				Tooltip:
+					'''
+					Unleashes out globs of paint
+					Hitting enemies directly spawns drawings that home onto the closest enemy
+					'''
+			}
+
+			BomberRocket: {
+				DisplayName: Bomber Bomb
+				Tooltip:
+					'''
+					Shoots a high-velocity bomb that explodes in a large blast radius
+					Will not destroy tiles
+					'''
+			}
+
+			WheelieLicense: {
+				DisplayName: Wheelie License
+				Tooltip:
+					'''
+					Summons a Wheelie Bike
+					'Let's ride'
+					'''
+			}
+
+			MysticalStone: {
+				DisplayName: Mystical Stone
+				Tooltip: Used to evolve certain magic weapons
+			}
+
+			TreasureStone: {
+				DisplayName: Treasure Stone
+				Tooltip:
+					'''
+					Used to evolve certain ranged weapons
+					'Unfortunately, the ores on this stone are so compact that they're impossible to extract'
+					'''
+			}
+
+			BatafireBanner: {
+				DisplayName: Batafire Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Batafire"
+			}
+
+			BomberBanner: {
+				DisplayName: Bomber Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Bomber"
+			}
+
+			WheelieBanner: {
+				DisplayName: Wheelie Banner
+				Tooltip: "{$CommonItemTooltip.BannerBonus}Wheelie"
+			}
 		}
 
 		Projectiles: {
@@ -1536,6 +1610,10 @@ Mods: {
 			KrackoBGOrbSmall.DisplayName: Kracko B G Orb Small
 			WingedBullet.DisplayName: Winged Bullet
 			WingedSlash.DisplayName: Condor Slash
+			PaintBlob.DisplayName: Paint Blob
+			Paintings.DisplayName: Drawings
+			BomberRocketProj.DisplayName: Bomber Rocket
+			BatafireFire.DisplayName: Batafire Fire
 		}
 
 		NPCs: {
@@ -1635,6 +1713,11 @@ Mods: {
 					DespawnMessage: Whispy Woods blends back in with it's bretheren...
 				}
 			}
+
+			OrangeButterfly.DisplayName: Orange Butterfly
+			Bomber.DisplayName: Bomber
+			Wheelie.DisplayName: Wheelie
+			Batafire.DisplayName: Batafire
 		}
 
 		Tiles: {
@@ -1642,6 +1725,8 @@ Mods: {
 			EnemyBanner.MapEntry: Banner
 			FountainOfDreams.MapEntry: Fountain of Dreams
 			RareStone.MapEntry: Rare Stone
+			TreasureStone.MapEntry: Treasure Stone
+			MysticalStone.MapEntry: Mystical Stone
 			DededeMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
 			DarkMatterMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
 			DreamLandBossMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"

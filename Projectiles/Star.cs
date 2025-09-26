@@ -66,10 +66,7 @@ namespace KirboMod.Projectiles
 				if (Main.rand.NextBool(3))
 				{
 					Dust dust = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.BlueFairy, 0f, 0f, 127);
-					dust.velocity *= 0.25f;
-					dust.scale = 1.3f;
 					dust.noGravity = true;
-					dust.velocity += Projectile.velocity.RotatedBy(MathF.PI / 8f * (1f - (float)(2 * i))) * 0.2f;
 				}
 			}
         }

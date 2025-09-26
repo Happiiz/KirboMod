@@ -82,7 +82,34 @@ namespace KirboMod.Items.Weapons
 
         public override bool AltFunctionUse(Player player)
         {
+            KirbPlayer krbplr = player.GetModPlayer<KirbPlayer>();
+
+            if (player.velocity.Y != 0 && krbplr.fighterGloveLevelOneCooldown > 0) //in air on cooldown
+            {
+                return false;
+            }
+
             return true; //can right click
+        }
+
+        public override bool? UseItem(Player player)
+        {
+            KirbPlayer krbplr = player.GetModPlayer<KirbPlayer>();
+
+            if (player.altFunctionUse == 2)
+            {
+                if (krbplr.fighterGloveLevelOneCooldown > 0 && player.velocity.Y != 0) //in air on cooldown
+                {
+                    return false;
+                }
+                else
+                {
+                    krbplr.fighterGloveLevelOneCooldown = 150;
+                    return true;
+                }
+            }
+
+            return null;
         }
 
         public override bool CanUseItem(Player player)

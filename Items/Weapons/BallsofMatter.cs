@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using System;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
@@ -11,8 +12,7 @@ namespace KirboMod.Items.Weapons
     {
         public override void SetStaticDefaults()
         {
-            // DisplayName.SetDefault("Ball O' Matter"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
-            // Tooltip.SetDefault("Springs out then moves towards mouse position");
+            ItemID.Sets.IsRangedSpecialistWeapon[Type] = true;
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research
         }
 

@@ -65,16 +65,16 @@ namespace KirboMod.NPCs
                         index = NPC.NewNPC(Projectile.GetSource_FromThis(), (int)Projectile.Center.X, (int)Projectile.Center.Y,
                             ModContent.NPCType<MrFrosty>(), Target: Projectile.owner);
                     }
+                    if (player.ZoneJungle) //Batafire
+                    {
+                        index = NPC.NewNPC(Projectile.GetSource_FromThis(), (int)Projectile.Center.X, (int)Projectile.Center.Y,
+                            ModContent.NPCType<Batafire>(), Target: Projectile.owner);
+                    }
                     else //Bonkers
                     {
                         index = NPC.NewNPC(Projectile.GetSource_FromThis(), (int)Projectile.Center.X, (int)Projectile.Center.Y,
                             ModContent.NPCType<Bonkers>(), Target: Projectile.owner);
                     }
-
-                    //if (index < Main.maxNPCs && index >= 0)
-                    //{
-                    //    NetMessage.SendData(MessageID.SyncNPC, number: index);
-                    //}
                 }
 
                 for (int i = 0; i < 30; i++)

@@ -46,7 +46,6 @@ namespace KirboMod.NPCs
 			NPC.aiStyle = -1;
 			NPC.friendly = false;
 			NPC.noGravity = false;
-
         }
 
 		public override float SpawnChance(NPCSpawnInfo spawnInfo)

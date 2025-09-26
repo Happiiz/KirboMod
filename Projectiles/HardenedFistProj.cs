@@ -1,6 +1,8 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -37,10 +39,20 @@ namespace KirboMod.Projectiles
             Projectile.rotation = Projectile.velocity.ToRotation();
 		}
 
-        public override Color? GetAlpha(Color lightColor)
+        public override bool PreDraw(ref Color lightColor)
         {
-            return Color.White * Projectile.Opacity; //independent from light level while still being affected by opacity
+            Texture2D texture = TextureAssets.Projectile[Type].Value;
+            SpriteEffects dir = Projectile.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+            for (int i = Projectile.oldPos.Length - 1; i >= 0; i--)
+            {
+                float opacity = i / (float)Projectile.oldPos.Length;
+                opacity = Utils.GetLerpValue(0, .5f, i, true) * Utils.GetLerpValue(1f, .5f, opacity, true);
+                opacity *= 0.2f;
+                Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition - Projectile.velocity * (i - Projectile.oldPos.Length / 2) / 16f, null, Color.White * opacity, Projectile.rotation, texture.Size() / 2, Projectile.scale, dir);
+            }
+            return false;// Projectile.DrawSelf(Color.White);
         }
+
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             Projectile.damage = (int)(Projectile.damage * 0.5f);

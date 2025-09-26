@@ -21,7 +21,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults() 
 		{
-			Item.damage = 148;
+			Item.damage = 128;
 			Item.DamageType = DamageClass.Ranged;
 			Item.width = 50;
 			Item.height = 50;
@@ -55,7 +55,7 @@ namespace KirboMod.Items.Weapons
 			homingbombrecipe.AddIngredient(ItemID.ClusterRocketI, 5); // 5 Cluster Rockets
 			homingbombrecipe.AddIngredient(ItemID.ChlorophyteBullet, 5); //5 Chlorophyte Bullets
 			homingbombrecipe.AddIngredient(ModContent.ItemType<Items.Starbit>(), 30);
-			homingbombrecipe.AddIngredient(ModContent.ItemType<RareStone>(), 1); //1 rare stone
+			homingbombrecipe.AddIngredient(ModContent.ItemType<TreasureStone>(), 1); //1 rare stone
 			homingbombrecipe.AddTile(TileID.Anvils); //crafted at anvil
 			homingbombrecipe.Register(); //adds this recipe to the game
 		}
