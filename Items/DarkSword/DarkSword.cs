@@ -45,7 +45,10 @@ namespace KirboMod.Items.DarkSword
 
             KirbPlayer mPlayer = player.GetModPlayer<KirbPlayer>();
             mPlayer.GetDarkSwordSwingStats(out int direction, out ProjectileShootType projToShoot);
-            Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI, player.itemAnimationMax, MathHelper.Lerp(6.15f, 4, Main.rand.NextFloat()), direction);
+            if (Main.myPlayer == player.whoAmI)
+            {
+                Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI, player.itemAnimationMax, MathHelper.Lerp(6.15f, 4, Main.rand.NextFloat()), direction);
+            }
             float delayMultiplier = player.itemAnimationMax / 2f;
 
 

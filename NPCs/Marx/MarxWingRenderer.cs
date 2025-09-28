@@ -23,24 +23,22 @@ namespace KirboMod.NPCs.Marx
         public static readonly Color[] Palette = new Color[]
         {
             Color.Red,
-            Color.Green,
+            new(0,255,0),
             Color.Blue,
             Color.Magenta,
             Color.Cyan,
             Color.Yellow,
         };
         public static int FrameCount => 32;
-        MarxWingCell[] wingCellsFront;
         MarxWingCell[] wingCellsBack;
         List<int> freeOffsetIndicesBack;
-        List<int> freeOffsetIndicesFront;
-        static Vector2[][] drawOffsets = new Vector2[][]
+        static readonly Vector2[][] drawOffsets = new Vector2[][]
         {
         [
            new(170,70), new(150,104), new(110,104), new(190,104),
            new(130, 138), new(170,138), new(90,138), new(50,138),
                 new(30,172), new(70,172), new Vector2(110,172),
-                new(50,206), new Vector2(90,206)
+                new(50,206), new(90,206)
         ]
         };
         public void Update()
@@ -69,12 +67,12 @@ namespace KirboMod.NPCs.Marx
             }
             if (Main.rand.NextBool(duration / 2))
             {
-                if(freeOffsetIndicesBack.Count > wingCellsBack.Length - 5)
+                if (freeOffsetIndicesBack.Count > wingCellsBack.Length - 5)
                 {
                     AddRandomDotted();
                 }
             }
-           
+
         }
 
         private void AddRandomDotted()
@@ -92,18 +90,14 @@ namespace KirboMod.NPCs.Marx
         {
             int count = drawOffsets[0].Length;
             wingCellsBack = new MarxWingCell[count];
-            wingCellsFront = new MarxWingCell[count];
             for (int i = 0; i < count; i++)
             {
                 wingCellsBack[i] = new((byte)i);
-                wingCellsFront[i] = new((byte)i);
             }
             freeOffsetIndicesBack = new(count);
-            freeOffsetIndicesFront = new(count);
             for (int i = 0; i < count; i++)
             {
                 freeOffsetIndicesBack.Add(i);
-                freeOffsetIndicesFront.Add(i);
             }
         }
 
@@ -112,8 +106,8 @@ namespace KirboMod.NPCs.Marx
             RenderCellList(wingCellsBack, frameIndex, sb, marxCenter, screenPos, rotation, scale);
             //RenderCellList(wingCellsFront, frameIndex, sb, marxCenter, screenPos, rotation, scale);
             Vector2[] offsets = drawOffsets[frameIndex];
-            List<Vector2> randomlyChosenOffsets = new();
-            List<Vector2> remainingAVailable = offsets.ToList();
+            List<Vector2> randomlyChosenOffsets = [];
+            List<Vector2> remainingAVailable = [.. offsets];
             int amount = (int)(offsets.Length * 0.5f);
             for (int i = 0; i < amount; i++)
             {
@@ -121,7 +115,7 @@ namespace KirboMod.NPCs.Marx
                 randomlyChosenOffsets.Add(remainingAVailable[randIndex]);
                 remainingAVailable.RemoveAt(randIndex);
             }
-            offsets = randomlyChosenOffsets.ToArray();
+            offsets = [.. randomlyChosenOffsets];
             for (int i = 0; i < offsets.Length; i++)
             {
                 Rectangle frame = new(0, 0, MarxWingCell.FrameWidth, MarxWingCell.FrameHeight);
