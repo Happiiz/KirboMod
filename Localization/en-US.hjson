@@ -132,6 +132,16 @@ Mods: {
 				DisplayName: Wheelie Bike
 				Description: No one said controlling a wheel would be easy
 			}
+
+			BandanaDeeBuff: {
+				DisplayName: Bandana Dee
+				Description: His courage and bravery will show the way!
+			}
+
+			UFOMountBuff: {
+				DisplayName: UFO
+				Description: You are very lucky to have gotten this mount!
+			}
 		}
 
 		Items: {
@@ -147,9 +157,9 @@ Mods: {
 					Summons homing stars when hit, their numbers based on damage taken
 					The stars have a combined damage value of 3x the damage taken
 					Each star ignores 40 defense each
-					In PVP, all stars spawn only with 3x damage taken.
-					Stars spawned from PVP cannot hit enemies and vice-versa.
-					Does not activate from damage taken from spikes, lava, and using a regular bug net on hell critters.
+					In PVP, all stars spawn only with 3x damage taken
+					Stars spawned from PVP cannot hit enemies and vice-versa
+					Does not activate from damage taken from spikes, lava, and using a regular bug net on hell critters
 					'''
 			}
 
@@ -1364,6 +1374,33 @@ Mods: {
 				DisplayName: Wheelie Banner
 				Tooltip: "{$CommonItemTooltip.BannerBonus}Wheelie"
 			}
+
+			BandanaDeeSpear: {
+				DisplayName: Spear of Bravery
+				Tooltip:
+					'''
+					Summons a brave face to help you make a name for yourself
+					'I'm not just a pretty face!'
+					'''
+			}
+
+			UFOMountSummon: {
+				DisplayName: UFO Transmitter
+				Tooltip:
+					'''
+					Calls upon your own personal UFO
+					Extends build range and shoots lasers at enemies
+					'''
+			}
+
+			NightStarAmmo: {
+				DisplayName: Nightmare Star
+				Tooltip: 
+					'''
+					Shoots a fast-flying homing star
+					Used with star cannons
+					'''
+			}
 		}
 
 		Projectiles: {
@@ -1613,7 +1650,12 @@ Mods: {
 			PaintBlob.DisplayName: Paint Blob
 			Paintings.DisplayName: Drawings
 			BomberRocketProj.DisplayName: Bomber Rocket
-			BatafireFire.DisplayName: Batafire Fire
+			BatafireFire.DisplayName: Fireball
+			BandanaDeeSpearHeld.DisplayName: Bandana Dee Spear Held
+			BandanaWaddleDee.DisplayName: Bandana Waddle Dee
+			BandanaDeeSpearThrown.DisplayName: Bandana Dee Spear Thrown
+			UFOMountLaser.DisplayName: UFO Laser
+			CannonNightStar.DisplayName: Nightmare Star
 		}
 
 		NPCs: {

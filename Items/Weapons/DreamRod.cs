@@ -80,11 +80,10 @@ namespace KirboMod.Items.Weapons
         public override void AddRecipes()
 		{
 			Recipe recipe1 = CreateRecipe();//the result is dream rod
-			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.Parosol>()); //parosol dee
-			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.WeirdParosol>()); //gooey
-			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.ShinobiScroll>()); //bio spark
-			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.CrownOfClimate>()); //burning leo and chilly
-			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.DooStaff>()); //waddle doo
+			recipe1.AddIngredient(ModContent.ItemType<BandanaDeeSpear>()); //parosol dee, waddle doo and bandana dee
+            recipe1.AddIngredient(ModContent.ItemType<WeirdParosol>()); //gooey
+			recipe1.AddIngredient(ModContent.ItemType<ShinobiScroll>()); //bio spark
+			recipe1.AddIngredient(ModContent.ItemType<CrownOfClimate>()); //burning leo and chilly
 			recipe1.AddIngredient(ModContent.ItemType<MiracleMatter>()); //Zero material drop
 			recipe1.AddTile(TileID.LunarCraftingStation); //crafted at ancient manipulator
 			recipe1.Register(); //adds this recipe to the game

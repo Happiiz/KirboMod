@@ -108,6 +108,8 @@ namespace KirboMod
         public int finalCutterDamageCounter = 0;//should cap out at 5
         public List<int> currentFinalCutterTargets = new();
 
+        public int ufoMountShootTimer = 0;
+
 
         public override void ResetEffects() //restart accesory stats so if not wearing one then it stops doing the effects
         {
@@ -164,6 +166,15 @@ namespace KirboMod
             }
 
             fighterGloveLevelOneCooldown--;
+
+            if (Player.mount.Type == ModContent.MountType<UFOMount>() && Player.mount.Active)
+            {
+                ufoMountShootTimer++;
+            }
+            else
+            {
+                ufoMountShootTimer = 0;
+            }
 
         }
         public TripleStarStar GetAvailableTripleStarStar()
@@ -457,7 +468,8 @@ namespace KirboMod
                 else
                 {
                     //do air walker jump
-                    if (Player.controlJump && Player.releaseJump && airWalkerJump == true && blockAirWalkerJump == false)
+                    if (Player.controlJump && Player.releaseJump && airWalkerJump == true && blockAirWalkerJump == false 
+                        && !Player.blockExtraJumps && !(Player.mount.CanHover() && Player.mount.Active))
                     {
                         Player.velocity.Y = -7.5f;
                         airWalkerJump = false;

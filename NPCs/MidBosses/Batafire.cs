@@ -55,8 +55,9 @@ namespace KirboMod.NPCs.MidBosses
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
             bestiaryEntry.Info.AddRange([
+            BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.TheUnderworld,
             BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Jungle,
-            new FlavorTextBestiaryInfoElement("When this fiery fiend appeared from the star-shaped rift it immediately found solace where it made sense the most: the only other place with bats and heat!"),
+            new FlavorTextBestiaryInfoElement("When this fiery fiend appeared from the star-shaped rift it immediately found solace where it made sense the most: the only other places with bats and heat!"),
             ]);
         }
 
@@ -72,38 +73,45 @@ namespace KirboMod.NPCs.MidBosses
             int d = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Torch, Scale: 2f);
             Main.dust[d].noGravity = true;
 
-            if (attackType > 1)
+            if (player.active && !player.dead)
             {
-                attackType = 0;
-            }
-
-            if (attackTimer > 180)
-            {
-                if (attackType == 0)
+                if (attackType > 1)
                 {
-                    Dive(attackTimer - 180, player, distanceFromPlayer);
+                    attackType = 0;
                 }
 
-                if (attackType == 1)
+                if (attackTimer > 180)
                 {
-                    FireSpew(attackTimer - 180);
+                    if (attackType == 0)
+                    {
+                        Dive(attackTimer - 180, player, distanceFromPlayer);
+                    }
+
+                    if (attackType == 1)
+                    {
+                        FireSpew(attackTimer - 180);
+                    }
                 }
+                else if (attackTimer >= 0)
+                {
+                    animation = 0;
+                    NPC.TargetClosest(true);
+
+                    float speed = Main.hardMode ? (NPC.downedGolemBoss ? 20 : 12) : 8;
+                    float inertia = Main.hardMode ? (NPC.downedGolemBoss ? 40 : 30) : 20;
+
+                    distanceFromPlayer.Normalize();
+                    distanceFromPlayer *= speed;
+
+                    NPC.velocity = (NPC.velocity * (inertia - 1) + distanceFromPlayer) / inertia;
+                }
+
+                attackTimer++;
             }
-            else if (attackTimer >= 0)
+            else
             {
-                animation = 0;
-                NPC.TargetClosest(true); 
-
-                float speed = Main.hardMode ? (NPC.downedGolemBoss ? 20 : 12) : 8;
-                float inertia = Main.hardMode ? (NPC.downedGolemBoss ? 40 : 30) : 20;
-
-                distanceFromPlayer.Normalize();
-                distanceFromPlayer *= speed;
-
-                NPC.velocity = (NPC.velocity * (inertia - 1) + distanceFromPlayer) / inertia;
+                NPC.velocity.Y += 0.5f;
             }
-
-            attackTimer++;
         }
 
         void Dive(float timer, Player player, Vector2 distance)

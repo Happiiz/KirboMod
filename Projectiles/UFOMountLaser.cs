@@ -1,0 +1,53 @@
+using Microsoft.Xna.Framework;
+using System;
+using Terraria;
+using Terraria.Audio;
+using Terraria.ID;
+using Terraria.ModLoader;
+using SoundType = Terraria.Audio.SoundType;
+
+namespace KirboMod.Projectiles
+{
+	public class UFOMountLaser : ModProjectile
+	{
+		public override void SetStaticDefaults()
+		{
+			Main.projFrames[Projectile.type] = 1;
+		}
+
+        public override string Texture => "KirboMod/Projectiles/UFOLaser";
+
+		public override void SetDefaults()
+		{
+			Projectile.width = 9;
+			Projectile.height = 9;
+			DrawOffsetX = -32;
+			Projectile.friendly = true;
+			Projectile.hostile = false;
+			Projectile.extraUpdates = 2;
+			Projectile.tileCollide = false;
+			Projectile.penetrate = -1;
+			Projectile.aiStyle = 0;
+			Projectile.timeLeft = 300 * Projectile.MaxUpdates;
+			Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = 10;
+        }
+
+		public override void AI()
+		{
+			Projectile.rotation = Projectile.velocity.ToRotation() + MathF.PI;
+			Vector2 offset = Vector2.Normalize(Projectile.velocity) * 20;//spawn at the end of the laser
+            for (int i = 0; i < Projectile.MaxUpdates; i++)
+            {
+				Dust.NewDustPerfect(Projectile.Center - Projectile.velocity * i * .5f - offset, DustID.TheDestroyer, Vector2.Zero).noGravity = true;
+				Dust.NewDustPerfect(Projectile.Center - Projectile.velocity * i - offset, DustID.TheDestroyer, Vector2.Zero).noGravity = true;
+
+			}
+			Lighting.AddLight(Projectile.position, 0.2f, 0f, 0f); //red
+        }
+        public override bool PreDraw(ref Color lightColor)
+        {
+			return Projectile.DrawSelf();
+        }
+	}
+}

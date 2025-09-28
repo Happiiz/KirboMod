@@ -11,11 +11,9 @@ namespace KirboMod.Projectiles
 {
 	public class DreamedFriend : ModProjectile
     {
-        private List<float> Targetdistances = new List<float>(); //targeting
-        private NPC aggroTarget = null; //target the minion is currently focused on
         public override void SetStaticDefaults()
 		{
-			Main.projFrames[Projectile.type] = 6;
+			Main.projFrames[Projectile.type] = 7;
 
             //Cultist takes 75% damage from homing projectiles
             ProjectileID.Sets.CultistIsResistantTo[Projectile.type] = true;

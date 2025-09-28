@@ -27,7 +27,8 @@ namespace KirboMod.Items.Armor.AirWalker
 		public override void UpdateEquip(Player player) {
 			player.moveSpeed += 0.20f; // The acceleration multiplier of the player's movement speed
 			player.maxRunSpeed += 0.20f; //20%
-			player.jumpSpeedBoost += 0.20f;
+            player.accRunSpeed += 0.20f;
+            player.jumpSpeedBoost += 0.20f;
 		}
 	}
 }
