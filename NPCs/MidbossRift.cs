@@ -63,18 +63,18 @@ namespace KirboMod.NPCs
                     if (player.ZoneSnow) //Mr. Frosty
                     {
                         index = NPC.NewNPC(Projectile.GetSource_FromThis(), (int)Projectile.Center.X, (int)Projectile.Center.Y,
-                            ModContent.NPCType<MrFrosty>(), Target: Projectile.owner);
+                                ModContent.NPCType<MrFrosty>(), Target: Projectile.owner);
                     }
-                    else //Bonkers
+                    else if (player.ZoneJungle || player.ZoneUnderworldHeight) //Batafire
+                    {
+                        index = NPC.NewNPC(Projectile.GetSource_FromThis(), (int)Projectile.Center.X, (int)Projectile.Center.Y,
+                            ModContent.NPCType<Batafire>(), Target: Projectile.owner);
+                    }
+                    else //Bonkers is default
                     {
                         index = NPC.NewNPC(Projectile.GetSource_FromThis(), (int)Projectile.Center.X, (int)Projectile.Center.Y,
                             ModContent.NPCType<Bonkers>(), Target: Projectile.owner);
                     }
-
-                    //if (index < Main.maxNPCs && index >= 0)
-                    //{
-                    //    NetMessage.SendData(MessageID.SyncNPC, number: index);
-                    //}
                 }
 
                 for (int i = 0; i < 30; i++)

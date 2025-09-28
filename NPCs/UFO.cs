@@ -1,8 +1,10 @@
+using KirboMod.Items;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent.Bestiary;
+using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -208,24 +210,9 @@ namespace KirboMod.NPCs
             }
         }
 
-		/*public override void NPCLoot()
-		{
-			Item.NewItem(npc.getRect(), ModContent.ItemType<Items.DreamEssence>(), Main.rand.Next(2, 4));
-
-			if (Main.expertMode)
-			{
-				if (Main.rand.NextBool(2))
-				{
-					Item.NewItem(npc.getRect(), ItemID.SoulofFlight, 1);
-				}
-			}
-			else
-			{
-				if (Main.rand.NextBool(4))
-				{
-					Item.NewItem(npc.getRect(), ItemID.SoulofFlight, 1);
-				}
-			}
-		}*/
-	}
+        public override void ModifyNPCLoot(NPCLoot npcLoot)
+        {
+            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<Items.Accesories.UFOMountSummon>(), 3, 2));
+        }
+    }
 }

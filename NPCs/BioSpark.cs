@@ -44,7 +44,7 @@ namespace KirboMod.NPCs
         {
             if (spawnInfo.Player.ZoneRockLayerHeight && Main.hardMode) //if player is within cave height
             {
-                return spawnInfo.SpawnTileType == TileID.Dirt || spawnInfo.SpawnTileType == TileID.Stone ? .015f : 0f; //functions like a mini if else statement
+                return spawnInfo.SpawnTileType == TileID.Dirt || spawnInfo.SpawnTileType == TileID.Stone ? .03f : 0f;
             }
             else
             {

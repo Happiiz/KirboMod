@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using Terraria.GameContent.NetModules;
 using Microsoft.Xna.Framework.Input;
 using KirboMod.NPCs;
+using System.Collections.Generic;
 
 namespace KirboMod.Items
 {
@@ -45,13 +46,27 @@ namespace KirboMod.Items
         {
             Point mouselocation = Main.MouseWorld.ToTileCoordinates();
 
-            if (AnyProjs(ModContent.ProjectileType<MidbossRift>()) || NPC.AnyNPCs(ModContent.NPCType<NPCs.MidBosses.Bonkers>()) ||
-                NPC.AnyNPCs(ModContent.NPCType<NPCs.MidBosses.MrFrosty>())
-                 || player.CountItem(ModContent.ItemType<Starbit>()) < 25
-				 || WorldGen.SolidOrSlopedTile(Main.tile[mouselocation.X, mouselocation.Y]))
+			List<int> midbosses = [ModContent.NPCType<NPCs.MidBosses.Bonkers>(), ModContent.NPCType<NPCs.MidBosses.MrFrosty>()
+            ,ModContent.NPCType<NPCs.MidBosses.Batafire>()];
+
+			bool anyMidbossAlive = false;
+
+			for (int i = 0; i < midbosses.Count; i++)
 			{
-				return false;
-			}
+                anyMidbossAlive = NPC.AnyNPCs(i) && Main.npc[i].active;
+
+				if (anyMidbossAlive)
+				{
+					break;
+				}
+            }
+
+            if (AnyProjs(ModContent.ProjectileType<MidbossRift>()) || anyMidbossAlive
+                     || player.CountItem(ModContent.ItemType<Starbit>()) < 25
+                     || WorldGen.SolidOrSlopedTile(Main.tile[mouselocation.X, mouselocation.Y]))
+            {
+                return false;
+            }
 
             return true;
         }

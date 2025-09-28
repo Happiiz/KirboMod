@@ -58,21 +58,21 @@ namespace KirboMod.Items.Weapons
             return false;
 		}
 
-        public override void AddRecipes()
-		{
-			Recipe recipe = CreateRecipe();
-			recipe.AddIngredient(ModContent.ItemType<Starbit>(), 10);
-			recipe.AddIngredient(ItemID.GoldBar, 10);
-			recipe.AddIngredient(ModContent.ItemType<Fire>());
-			recipe.AddTile(TileID.Anvils);
-			recipe.Register();
+  //      public override void AddRecipes()
+		//{
+		//	Recipe recipe = CreateRecipe();
+		//	recipe.AddIngredient(ModContent.ItemType<Starbit>(), 10);
+		//	recipe.AddIngredient(ItemID.GoldBar, 10);
+		//	recipe.AddIngredient(ModContent.ItemType<Fire>());
+		//	recipe.AddTile(TileID.Anvils);
+		//	recipe.Register();
 
-			Recipe recipe2 = CreateRecipe();
-			recipe2.AddIngredient(ModContent.ItemType<Starbit>(), 10);
-			recipe2.AddIngredient(ItemID.PlatinumBar, 10);
-			recipe2.AddIngredient(ModContent.ItemType<Fire>());
-			recipe2.AddTile(TileID.Anvils);
-			recipe2.Register();
-		}
+		//	Recipe recipe2 = CreateRecipe();
+		//	recipe2.AddIngredient(ModContent.ItemType<Starbit>(), 10);
+		//	recipe2.AddIngredient(ItemID.PlatinumBar, 10);
+		//	recipe2.AddIngredient(ModContent.ItemType<Fire>());
+		//	recipe2.AddTile(TileID.Anvils);
+		//	recipe2.Register();
+		//}
 	}
 }

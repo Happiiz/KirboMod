@@ -64,7 +64,7 @@ namespace KirboMod.Items.Weapons
 			recipe1.AddIngredient(ItemID.CrystalShard, 5); //5 crystals
 			recipe1.AddIngredient(ItemID.BeetleHusk); //1 Beetle Husk
 			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 15); //15 starbits
-			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 1); //1 rare stone
+			recipe1.AddIngredient(ModContent.ItemType<Items.TreasureStone>(), 1); //1 rare stone
 			recipe1.AddTile(TileID.MythrilAnvil); //crafted at mythril/orichalcum anvil
 			recipe1.Register(); //adds this recipe to the game
 		}

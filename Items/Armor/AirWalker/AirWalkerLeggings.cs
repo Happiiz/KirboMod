@@ -24,6 +24,7 @@ namespace KirboMod.Items.Armor.AirWalker
 		public override void UpdateEquip(Player player) {
 			player.moveSpeed += 0.10f; //10%
 			player.maxRunSpeed += 0.10f; //10%
-		}
+            player.accRunSpeed += 0.10f;
+        }
 	}
 }

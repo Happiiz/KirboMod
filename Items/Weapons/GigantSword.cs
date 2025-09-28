@@ -39,7 +39,6 @@ namespace KirboMod.Items.Weapons
                 velocity *= 1.5f; //go 60 units per tick in shoot direction
                 damage = (int)(damage * 1.5);
             }
-            damage /= 2;
         }
 
         public override void AddRecipes()

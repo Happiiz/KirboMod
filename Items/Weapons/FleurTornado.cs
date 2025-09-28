@@ -61,7 +61,7 @@ namespace KirboMod.Items.Weapons
             recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.Tornado>()); //Tornado
             recipe1.AddIngredient(ItemID.CrystalVileShard); //Crystal Vile Shard
             recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 50); //50 starbits
-            recipe1.AddIngredient(ModContent.ItemType<RareStone>(), 1); //1 rare stone
+            recipe1.AddIngredient(ModContent.ItemType<MysticalStone>(), 1); //1 rare stone
             recipe1.AddTile(TileID.Anvils); //crafted at anvil
             recipe1.Register(); //adds this recipe to the game
         }

@@ -1,5 +1,7 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.GameContent.Creative;
 using Terraria.ModLoader;
 
@@ -16,7 +18,7 @@ namespace KirboMod.Projectiles
             Projectile.width = 40;
             Projectile.height = 40;
             Projectile.friendly = true;
-            Projectile.timeLeft = 7;
+            Projectile.timeLeft = 10; //a bit more than previous to account for extra update
             Projectile.extraUpdates = 1;
             Projectile.tileCollide = false;
             Projectile.penetrate = MaxPenetrate;
@@ -40,9 +42,18 @@ namespace KirboMod.Projectiles
             Projectile.damage = (int)(Projectile.damage * 0.7f);
         }
 
-        public override Color? GetAlpha(Color lightColor)
+        public override bool PreDraw(ref Color lightColor)
         {
-            return Color.White * Projectile.Opacity; //independent from light level while still being affected by opacity
+            Texture2D texture = TextureAssets.Projectile[Type].Value;
+            SpriteEffects dir = Projectile.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+            for (int i = Projectile.oldPos.Length - 1; i >= 0; i--)
+            {
+                float opacity = i / (float)Projectile.oldPos.Length;
+                opacity = Utils.GetLerpValue(0, .5f, i, true) * Utils.GetLerpValue(1f, .5f, opacity, true);
+                opacity *= 0.2f;
+                Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition - Projectile.velocity * (i - Projectile.oldPos.Length / 2) / 16f, null, Color.White * opacity, Projectile.rotation, texture.Size() / 2, Projectile.scale, dir);
+            }
+            return false;// Projectile.DrawSelf(Color.White);
         }
 
         public override bool? CanCutTiles() //only cut if player can "see" projectile (Hasn't gone through a wall)

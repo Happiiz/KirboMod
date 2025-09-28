@@ -52,7 +52,7 @@ namespace KirboMod.Items.Weapons
 			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.Needle>(), 5); // 5 Needle balls
 			recipe1.AddIngredient(ItemID.SpikyBall, 5); // 5 Spiky Balls
 			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 10); //10 starbits
-			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 1); //1 rare stone
+			recipe1.AddIngredient(ModContent.ItemType<Items.TreasureStone>(), 1); //1 rare stone
 			recipe1.AddTile(TileID.Anvils); //crafted at anvil
 			recipe1.Register(); //adds this recipe to the game
 		}

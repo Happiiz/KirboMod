@@ -1,5 +1,8 @@
+using KirboMod.Buffs;
+using KirboMod.Items.Accesories;
 using KirboMod.Items.Armor.Photonic0Boots;
 using KirboMod.Items.Weapons;
+using KirboMod.Mounts;
 using KirboMod.NPCs;
 using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
@@ -54,6 +57,11 @@ namespace KirboMod
         public const byte KickAndUppercutIDHardenedFighterUppercut = 1;
         public const byte KickAndUppercutIDMetalFighterUppercut = 2;
         public const byte KickAndUppercutIDMetalFighterKick = 3;
+        /// <summary>
+        /// Exists to prevent flying with Fighter Glove in Pre-Hardmode
+        /// </summary>
+        public int fighterGloveLevelOneCooldown = 0; //cooldown between fighter glove uses in the air for first level only
+
         public bool airWalkerSet = false;
         public bool airWalkerJump = false;
         public bool blockAirWalkerJump = false;
@@ -99,6 +107,8 @@ namespace KirboMod
         public int finalCutterAnimationCounter = 0;
         public int finalCutterDamageCounter = 0;//should cap out at 5
         public List<int> currentFinalCutterTargets = new();
+
+        public int ufoMountShootTimer = 0;
 
 
         public override void ResetEffects() //restart accesory stats so if not wearing one then it stops doing the effects
@@ -154,6 +164,18 @@ namespace KirboMod
             {
                 fighterComboCounter = 0;
             }
+
+            fighterGloveLevelOneCooldown--;
+
+            if (Player.mount.Type == ModContent.MountType<UFOMount>() && Player.mount.Active)
+            {
+                ufoMountShootTimer++;
+            }
+            else
+            {
+                ufoMountShootTimer = 0;
+            }
+
         }
         public TripleStarStar GetAvailableTripleStarStar()
         {
@@ -173,22 +195,22 @@ namespace KirboMod
         }
         public override void PostUpdate()
         {
-            Player player = Main.player[Main.myPlayer];
             //UpdateRightClicksArray();
             if (darkDashDelay < 0) //dashing
             {
-                player.armorEffectDrawShadow = true; //afterimages
+                Player.armorEffectDrawShadow = true; //afterimages
             }
 
             //ground pounding with royal slippers
-            if (dededeSlam == true)
+            if (dededeSlam == true || Player.mount.Type == ModContent.MountType<WheelieBike>())
             {
-                player.armorEffectDrawShadow = true; //afterimages
+                Player.armorEffectDrawShadow = true; //afterimages
             }
 
-            if (player.velocity.Y == 0) //reset
+            if (Player.velocity.Y == 0) //reset
             {
                 dededeSlam = false;
+                fighterGloveLevelOneCooldown = 0;
             }
 
 
@@ -198,15 +220,15 @@ namespace KirboMod
             int tripleStarID = ModContent.ItemType<TripleStar>();
             if (Main.netMode == NetmodeID.SinglePlayer)
             {
-                if (player.HeldItem.type == tripleStarID && !player.dead && player.active)
+                if (Player.HeldItem.type == tripleStarID && !Player.dead && Player.active)
                 {
-                    float finalDamage = player.GetTotalDamage(Player.HeldItem.DamageType).ApplyTo(Player.HeldItem.damage); //final damage calculated
+                    float finalDamage = Player.GetTotalDamage(Player.HeldItem.DamageType).ApplyTo(Player.HeldItem.damage); //final damage calculated
                     for (int i = 0; i < tripleStarIndexes.Length; i++)
                     {
                         if (tripleStarIndexes[i] == -1 || !Main.projectile[tripleStarIndexes[i]].active)
                         {
-                            tripleStarIndexes[i] = Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, Vector2.Zero,
-                                    ModContent.ProjectileType<TripleStarStar>(), (int)finalDamage, 0, player.whoAmI, 0, 0);
+                            tripleStarIndexes[i] = Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, Vector2.Zero,
+                                    ModContent.ProjectileType<TripleStarStar>(), (int)finalDamage, 0, Player.whoAmI, 0, 0);
                         }
                         else
                         {
@@ -227,23 +249,23 @@ namespace KirboMod
                     }
                 }
             }
-            else if (player.HeldItem.type == tripleStarID && !player.dead && player.active)
+            else if (Player.HeldItem.type == tripleStarID && !Player.dead && Player.active)
             {
-                if ((int)Main.timeForVisualEffects % 20 == 0 && player.whoAmI == Main.myPlayer)//hits are local anyway so
+                if ((int)Main.timeForVisualEffects % 20 == 0 && Player.whoAmI == Main.myPlayer)//hits are local anyway so
                 {
-                    int finalDamage = (int)player.GetTotalDamage(Player.HeldItem.DamageType).ApplyTo(Player.HeldItem.damage);
-                    bool crit = Main.rand.Next(100) < player.GetCritChance(Player.HeldItem.DamageType) + Player.HeldItem.crit;
-                    float kb = player.GetKnockback(player.HeldItem.DamageType).ApplyTo(player.HeldItem.knockBack);
+                    int finalDamage = (int)Player.GetTotalDamage(Player.HeldItem.DamageType).ApplyTo(Player.HeldItem.damage);
+                    bool crit = Main.rand.Next(100) < Player.GetCritChance(Player.HeldItem.DamageType) + Player.HeldItem.crit;
+                    float kb = Player.GetKnockback(Player.HeldItem.DamageType).ApplyTo(Player.HeldItem.knockBack);
                     for (int i = 0; i < Main.maxNPCs; i++)
                     {
                         NPC npc = Main.npc[i];
-                        if (Helper.CheckCircleCollision(npc.Hitbox, player.Center, 100))
+                        if (Helper.CheckCircleCollision(npc.Hitbox, Player.Center, 100))
                         {
-                            npc.SimpleStrikeNPC(finalDamage, MathF.Sign(npc.Center.X - Player.Center.X), crit, kb, player.HeldItem.DamageType, false, player.luck);
+                            npc.SimpleStrikeNPC(finalDamage, MathF.Sign(npc.Center.X - Player.Center.X), crit, kb, Player.HeldItem.DamageType, false, Player.luck);
                         }
                     }
                 }
-                Dust d = Dust.NewDustPerfect(player.Center + Main.rand.NextFloat(MathF.Tau).ToRotationVector2() * 100, DustID.BlueTorch, player.velocity, 0, default, 2);
+                Dust d = Dust.NewDustPerfect(Player.Center + Main.rand.NextFloat(MathF.Tau).ToRotationVector2() * 100, DustID.BlueTorch, Player.velocity, 0, default, 2);
                 d.noGravity = true;
             }
             //Plasma
@@ -269,9 +291,7 @@ namespace KirboMod
 
         public override void PostUpdateEquips()
         {
-            Player player = Main.player[Main.myPlayer];
-
-            bool airborne = player.velocity.Y != 0f;
+            bool airborne = Player.velocity.Y != 0f;
 
             if (Player.controlUseItem)
             {
@@ -281,21 +301,21 @@ namespace KirboMod
             DarkDashMovement(); //dark dash
 
             //KIRBY BALLOON (checks if already used all double jumps and rockets and player doesn't have mount)
-            if (kirbyballoon == true && airborne && player.AnyExtraJumpUsable() == false && !player.mount.CanHover())
+            if (kirbyballoon == true && airborne && Player.AnyExtraJumpUsable() == false && !Player.mount.CanHover())
             {
                 kirbyballoonwait -= 1; //go down
 
-                player.canRocket = false;
-                player.rocketTime = 0;
-                player.wingTime = 0;
-                player.noFallDmg = true;
+                Player.canRocket = false;
+                Player.rocketTime = 0;
+                Player.wingTime = 0;
+                Player.noFallDmg = true;
 
                 if (kirbyballoonwait <= 0)
                 {
-                    if (player.controlJump & player.releaseJump) //if jumped and wasn't holding space
+                    if (Player.controlJump && Player.releaseJump) //if jumped and wasn't holding space
                     {
-                        player.velocity.Y = -7.5f;
-                        SoundEngine.PlaySound(SoundID.SplashWeak, player.Center);
+                        Player.velocity.Y = -7.5f;
+                        SoundEngine.PlaySound(SoundID.SplashWeak, Player.Center);
                         kirbyballoonwait = 10;
                     }
                 }
@@ -303,23 +323,23 @@ namespace KirboMod
 
             }
             //disable personal cloud if die
-            if (personalcloud && (player.dead || !player.active))
+            if (personalcloud && (Player.dead || !Player.active))
             {
                 personalcloud = false;
             }
             //Personal Cloud
 
-            if (personalcloud && !player.dead && player.active && player.ownedProjectileCounts[ModContent.ProjectileType<PersonalCloud>()] == 0)
+            if (personalcloud && !Player.dead && Player.active && Player.ownedProjectileCounts[ModContent.ProjectileType<PersonalCloud>()] == 0)
             {
                 if (Main.myPlayer == Player.whoAmI)
                 {
-                    Projectile.NewProjectile(player.GetSource_FromThis(), player.Center + new Vector2(0, -50), player.velocity * 0, ModContent.ProjectileType<PersonalCloud>(), 0, 0, player.whoAmI);
+                    Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center + new Vector2(0, -50), Player.velocity * 0, ModContent.ProjectileType<PersonalCloud>(), 0, 0, Player.whoAmI);
                 }
             }
 
 
             // NIGHTMARE EFFECT
-            if (player.HasBuff(ModContent.BuffType<Buffs.Nightmare>()))
+            if (Player.HasBuff(ModContent.BuffType<Buffs.Nightmare>()))
             {
                 nightmareeffect = true;
             }
@@ -329,13 +349,13 @@ namespace KirboMod
             {
                 Point mouselocation = Main.MouseWorld.ToTileCoordinates();
 
-                Point playerlocation = player.position.ToTileCoordinates();
+                Point playerlocation = Player.position.ToTileCoordinates();
 
                 //teleport if no tiles under mouse and not on a mount and no lava or lihizhard brick wall
                 if (!NPC.downedGolemBoss)
                 {
-                    if (player.controlUp && player.releaseUp && WorldGen.SolidOrSlopedTile(Main.tile[mouselocation.X, mouselocation.Y]) == false
-                        && player.mount.Active == false
+                    if (Player.controlUp && Player.releaseUp && WorldGen.SolidOrSlopedTile(Main.tile[mouselocation.X, mouselocation.Y]) == false
+                        && Player.mount.Active == false
                         && (Main.tile[mouselocation.X, mouselocation.Y].LiquidType == LiquidID.Lava) == false
                         && (Main.tile[mouselocation.X, mouselocation.Y].WallType != WallID.LihzahrdBrickUnsafe))
                     {
@@ -344,8 +364,8 @@ namespace KirboMod
                 }
                 else //everything else but now you can teleport through lihizhard walls
                 {
-                    if (player.controlUp && player.releaseUp && WorldGen.SolidOrSlopedTile(Main.tile[mouselocation.X, mouselocation.Y]) == false
-                        && player.mount.Active == false
+                    if (Player.controlUp && Player.releaseUp && WorldGen.SolidOrSlopedTile(Main.tile[mouselocation.X, mouselocation.Y]) == false
+                        && Player.mount.Active == false
                         && (Main.tile[mouselocation.X, mouselocation.Y].LiquidType == LiquidID.Lava) == false)
                     {
                         NightCrownTeleport();
@@ -360,21 +380,21 @@ namespace KirboMod
             if (royalslippers == true)
             {
                 //pressed down, not holding up or jump, and in the air
-                if (Player.controlDown && Player.releaseDown && player.velocity.Y != 0 && player.controlUp == false && player.controlJump == false)
+                if (Player.controlDown && Player.releaseDown && Player.velocity.Y != 0 && Player.controlUp == false && Player.controlJump == false)
                 {
                     dededeSlam = true;
                 }
 
                 if (dededeSlam)
                 {
-                    player.velocity.Y = 20;
+                    Player.velocity.Y = 20;
                     Player.maxFallSpeed = 20;
-                    player.noFallDmg = true; //disable fall damage
+                    Player.noFallDmg = true; //disable fall damage
 
                     //stop grappling
                     for (int k = 0; k < 1000; k++)
                     {
-                        if (Main.projectile[k].active && Main.projectile[k].owner == player.whoAmI && Main.projectile[k].aiStyle == 7)
+                        if (Main.projectile[k].active && Main.projectile[k].owner == Player.whoAmI && Main.projectile[k].aiStyle == 7)
                         {
                             Main.projectile[k].Kill(); //kill grapple hook
                         }
@@ -382,23 +402,23 @@ namespace KirboMod
 
                     falltime++; //go up
 
-                    for (float i = 0; i < player.width; i++)
+                    for (float i = 0; i < Player.width; i++)
                     {
-                        Point belowplayer = new Vector2(player.position.X + i, player.position.Y + player.height).ToTileCoordinates(); //all tiles below npc
+                        Point belowPlayer = new Vector2(Player.position.X + i, Player.position.Y + Player.height).ToTileCoordinates(); //all tiles below npc
 
-                        Tile tile = Main.tile[belowplayer.X, belowplayer.Y];
+                        Tile tile = Main.tile[belowPlayer.X, belowPlayer.Y];
 
                         //touching ground while groundpounding
                         if ((WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType]) && falltime >= 5)
                         {
-                            Projectile.NewProjectile(player.GetSource_FromThis(), player.Center.X, player.position.Y + player.height, player.direction * 0.01f, 0, ModContent.ProjectileType<PlayerSlam>(), 100 + (falltime - 5), 8f, Main.myPlayer, 0, 0);
-                            SoundEngine.PlaySound(SoundID.Item14, player.Center); //bomb
+                            Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center.X, Player.position.Y + Player.height, Player.direction * 0.01f, 0, ModContent.ProjectileType<PlayerSlam>(), 100 + (falltime - 5), 8f, Main.myPlayer, 0, 0);
+                            SoundEngine.PlaySound(SoundID.Item14, Player.Center); //bomb
 
                             falltime = 0; //reset damage
                         }
                     }
 
-                    if (player.controlUp || player.controlJump) //cancel slam
+                    if (Player.controlUp || Player.controlJump) //cancel slam
                     {
                         dededeSlam = false;
                     }
@@ -410,19 +430,19 @@ namespace KirboMod
             if (badgeofgloom == true)
             {
                 //using item
-                if (player.controlUseItem && player.HeldItem.damage > 0 && player.itemTime != 0)
+                if (Player.controlUseItem && Player.HeldItem.damage > 0 && Player.itemTime != 0)
                 {
                     if (gloombadgeattackcount >= 10) //reset and shoot projectile
                     {
                         for (int i = 0; i < 5; i++)
                         {
-                            Dust d = Dust.NewDustPerfect(player.Center, Mod.Find<ModDust>("DarkResidue").Type, Main.rand.NextVector2Circular(5f, 5f), Scale: 1f); //Makes dust in a messy circle
+                            Dust d = Dust.NewDustPerfect(Player.Center, Mod.Find<ModDust>("DarkResidue").Type, Main.rand.NextVector2Circular(5f, 5f), Scale: 1f); //Makes dust in a messy circle
                             d.noGravity = true;
                         }
 
-                        int damage = 40 + player.statDefense / 2;
-                        Projectile.NewProjectile(player.GetSource_FromThis(), player.Center,
-                            Main.rand.NextVector2Circular(20, 20), ModContent.ProjectileType<SmallDarkMatterShot>(), damage, 8f, Main.myPlayer, 0, player.whoAmI);
+                        int damage = 40 + Player.statDefense / 2;
+                        Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center,
+                            Main.rand.NextVector2Circular(20, 20), ModContent.ProjectileType<SmallDarkMatterShot>(), damage, 8f, Main.myPlayer, 0, Player.whoAmI);
 
                         gloombadgeattackcount = 0;
                     }
@@ -441,32 +461,33 @@ namespace KirboMod
 
             if (airWalkerSet)
             {
-                if (player.velocity.Y == 0)
+                if (Player.velocity.Y == 0)
                 {
                     airWalkerJump = true;
                 }
                 else
                 {
                     //do air walker jump
-                    if (player.controlJump && player.releaseJump && airWalkerJump == true && blockAirWalkerJump == false)
+                    if (Player.controlJump && Player.releaseJump && airWalkerJump == true && blockAirWalkerJump == false 
+                        && !Player.blockExtraJumps && !(Player.mount.CanHover() && Player.mount.Active))
                     {
-                        player.velocity.Y = -7.5f;
+                        Player.velocity.Y = -7.5f;
                         airWalkerJump = false;
-                        player.blockExtraJumps = true; //temporarily disallow other jumps
+                        Player.blockExtraJumps = true; //temporarily disallow other jumps
 
                         for (int i = 0; i < 3; i++)
                         {
-                            Vector2 position = player.Bottom + new Vector2(-45 + 30 * i, 0); //circle
-                            Gore.NewGorePerfect(player.GetSource_FromThis(), position, Vector2.Zero, Main.rand.Next(11, 13), Scale: 1f); //double jump smoke
+                            Vector2 position = Player.Bottom + new Vector2(-45 + 30 * i, 0); //circle
+                            Gore.NewGorePerfect(Player.GetSource_FromThis(), position, Vector2.Zero, Main.rand.Next(11, 13), Scale: 1f); //double jump smoke
                         }
 
                         for (int i = 0; i < 12; i++)
                         {
-                            Vector2 position = player.Bottom + new Vector2(Main.rand.NextFloat(-50, 50), 0); //circle
+                            Vector2 position = Player.Bottom + new Vector2(Main.rand.NextFloat(-50, 50), 0); //circle
                             Dust.NewDustPerfect(position, DustID.Electric); //sparks
                         }
 
-                        SoundEngine.PlaySound(SoundID.DoubleJump, player.Center);
+                        SoundEngine.PlaySound(SoundID.DoubleJump, Player.Center);
                     }
                 }
             }
@@ -475,9 +496,9 @@ namespace KirboMod
 
             if (darkShield) //wearing dark shield (keep this at the bottom because it's small)
             {
-                if (player.dashType > 0) //this disables vanila dashes
+                if (Player.dashType > 0) //this disables vanila dashes
                 {
-                    player.dashType = 0;
+                    Player.dashType = 0;
                 }
             }
         }

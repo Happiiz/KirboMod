@@ -141,7 +141,7 @@ namespace KirboMod.Items.Weapons
             recipe1.AddIngredient(ModContent.ItemType<HeartMatter>(), 5); //5 Heart Matter
             recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 200); //200 starbits
 			recipe1.AddIngredient(ModContent.ItemType<DreamEssence>(), 50); //50 dream matter
-			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 3); //3 rare stones
+			recipe1.AddIngredient(ModContent.ItemType<Items.MysticalStone>(), 3); //3 rare stones
 			recipe1.AddTile(TileID.MythrilAnvil); //crafted at hardmode anvil
 			recipe1.Register(); //adds this recipe to the game
 		}

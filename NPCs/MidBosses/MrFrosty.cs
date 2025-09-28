@@ -46,7 +46,6 @@ namespace KirboMod.NPCs.MidBosses
 			NPC.width = 80;
 			NPC.height = 100;
             DrawOffsetY = 28;
-            NPC.damage = Main.hardMode ? (NPC.downedGolemBoss ? 150 : 100) : 50;
             NPC.defense = Main.hardMode ? 30 : 15;
             NPC.lifeMax = Main.hardMode ? (NPC.downedGolemBoss ? 32000 : 10000) : 1000;
             NPC.HitSound = SoundID.NPCHit14; //fishron squeal
@@ -455,7 +454,7 @@ namespace KirboMod.NPCs.MidBosses
 
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
-            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Items.Weapons.Ice>())); // Guaranteed
+            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Items.Weapons.CrownOfIce>())); // Guaranteed
             npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Starbit>(), 1, 24, 24));
 
             //1 for pre-Golem, 1 for post-Golem. Both in Hardmode
@@ -468,9 +467,9 @@ namespace KirboMod.NPCs.MidBosses
 
             //Drop two Rare Stones if post-Golem
 
-            HardmodePreGolem.OnSuccess(ItemDropRule.Common(ModContent.ItemType<RareStone>()));
+            HardmodePreGolem.OnSuccess(ItemDropRule.Common(ModContent.ItemType<MysticalStone>()));
 
-            HardmodePostGolem.OnSuccess(ItemDropRule.Common(ModContent.ItemType<RareStone>(), 1, 2, 2));
+            HardmodePostGolem.OnSuccess(ItemDropRule.Common(ModContent.ItemType<MysticalStone>(), 1, 2, 2));
 
             npcLoot.Add(HardmodePreGolem);
             npcLoot.Add(HardmodePostGolem);
