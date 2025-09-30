@@ -649,7 +649,7 @@ namespace KirboMod.NPCs
         private void AttackSpin() //"...Then I get it with my spin move"
         {
             Player player = Main.player[NPC.target];
-            float speed = 30f;
+            float speed = 34f;
             float inertia = 10f;
 
             Vector2 move = player.Center + new Vector2(0, -200) - NPC.Center; //move above
@@ -702,13 +702,14 @@ namespace KirboMod.NPCs
                 }
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center - velocity, -velocity, ModContent.ProjectileType<AngledDarkBeam>(), 60 / 2, 4, Main.myPlayer);
+                    int damage = 100 / 2;
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center - velocity, -velocity, ModContent.ProjectileType<AngledDarkBeam>(), damage, 4, Main.myPlayer);
                     if (Main.getGoodWorld)
                     {
                         for (int i = 1; i < 4; i++)
                         {
                             velocity = velocity.RotatedBy(MathF.PI * .5f);
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center - velocity, -velocity, ModContent.ProjectileType<AngledDarkBeam>(), 60 / 2, 4, Main.myPlayer);
+                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center - velocity, -velocity, ModContent.ProjectileType<AngledDarkBeam>(), damage, 4, Main.myPlayer);
                         }
                     }
                 }
