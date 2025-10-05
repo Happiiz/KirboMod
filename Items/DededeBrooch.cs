@@ -16,7 +16,7 @@ namespace KirboMod.Items
 			 // DisplayName.SetDefault("King's Brooch");
 			/* Tooltip.SetDefault("Summons King Dedede" +
 				"\nA phony of one of the king's life-saving pins"); */
-			ItemID.Sets.SortingPriorityBossSpawns[Item.type] = 0; //go to *this* spot in boss spawn group
+			ItemID.Sets.SortingPriorityBossSpawns[Item.type] = 3; //go to *this* spot in boss spawn group
 
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 3; // Configure the amount of this item that's needed to research it in Journey mode.
         }

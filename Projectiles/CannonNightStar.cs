@@ -106,15 +106,15 @@ namespace KirboMod.Projectiles
             }
         }
 
+        public override bool? CanCutTiles()
+        {
+            return null;
+        }
         public override bool CanHitPvp(Player target)
         {
             return true;
         }
         public override bool? CanHitNPC(NPC target)
-        {
-            return true;
-        }
-        public override bool? CanCutTiles()
         {
             return null;
         }

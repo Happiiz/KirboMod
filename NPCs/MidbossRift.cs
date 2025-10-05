@@ -28,11 +28,12 @@ namespace KirboMod.NPCs
         {
             Projectile.tileCollide = false;
         }
+
         public override void OnSpawn(IEntitySource source)
         {
             if (Projectile.ai[1] != 1) //spawned naturally instead of with DD
             {
-                string text = "A dimensional rift has appeared with a challenging foe!";
+                string text = "A dimensional rift has appeared...";
 
                 if (Main.netMode == NetmodeID.SinglePlayer)
                 {
@@ -54,27 +55,40 @@ namespace KirboMod.NPCs
 
             if (Projectile.ai[0] == 180) //summon
             {
-                int index;
+                int index = -1;
 
                 SoundEngine.PlaySound(SoundID.DD2_EtherianPortalSpawnEnemy, Projectile.Center);
 
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
-                    if (player.ZoneSnow) //Mr. Frosty
+                    if (Projectile.ai[1] == 1 || MarxSpawningSystem.MarxHasAppeared)
+                    {
+                        if (player.ZoneSnow) //Mr. Frosty
+                        {
+                            index = NPC.NewNPC(Projectile.GetSource_FromThis(), (int)Projectile.Center.X, (int)Projectile.Center.Y,
+                                    ModContent.NPCType<MrFrosty>(), Target: Projectile.owner);
+                        }
+                        else if (player.ZoneJungle || player.ZoneUnderworldHeight) //Batafire
+                        {
+                            index = NPC.NewNPC(Projectile.GetSource_FromThis(), (int)Projectile.Center.X, (int)Projectile.Center.Y,
+                                ModContent.NPCType<Batafire>(), Target: Projectile.owner);
+                        }
+                        else //Bonkers is default
+                        {
+                            index = NPC.NewNPC(Projectile.GetSource_FromThis(), (int)Projectile.Center.X, (int)Projectile.Center.Y,
+                                ModContent.NPCType<Bonkers>(), Target: Projectile.owner);
+                        }
+                    }
+                    else //Marc
                     {
                         index = NPC.NewNPC(Projectile.GetSource_FromThis(), (int)Projectile.Center.X, (int)Projectile.Center.Y,
-                                ModContent.NPCType<MrFrosty>(), Target: Projectile.owner);
+                                ModContent.NPCType<Marx.Townie.MarxTownieDown>());
                     }
-                    else if (player.ZoneJungle || player.ZoneUnderworldHeight) //Batafire
-                    {
-                        index = NPC.NewNPC(Projectile.GetSource_FromThis(), (int)Projectile.Center.X, (int)Projectile.Center.Y,
-                            ModContent.NPCType<Batafire>(), Target: Projectile.owner);
-                    }
-                    else //Bonkers is default
-                    {
-                        index = NPC.NewNPC(Projectile.GetSource_FromThis(), (int)Projectile.Center.X, (int)Projectile.Center.Y,
-                            ModContent.NPCType<Bonkers>(), Target: Projectile.owner);
-                    }
+                }
+
+                if (index != -1)
+                {
+                    NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, index);
                 }
 
                 for (int i = 0; i < 30; i++)

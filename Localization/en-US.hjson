@@ -27,6 +27,43 @@ Mods: {
 			Zero: The darkness clears...
 		}
 
+		Achievements: {
+			WhispyAchievement: {
+				Description: Defeat the self-elected guardian of the forest who grew from the wishes of another world.
+				FriendlyName: Like a Whisper
+			}
+
+			KrackoAchievement: {
+				Description: Defeat the thundering menace who controls the skies with swiftness and lightning.
+				FriendlyName: Not All it's Kracked Up to be
+			}
+
+			KingDededeAchievement: {
+				Description: Defeat the larger-than-life ruler aimlessly wandering the land after being carried from his throne into another dimension.
+				FriendlyName: Star of the Show!
+			}
+
+			NightmareAchievement: {
+				Description: Defeat the shadowy terror who haunts the night when a deposit of dreams makes itself known.
+				FriendlyName: Dream Once More
+			}
+
+			# MarxAchievement: {
+			# Description: Defeat the maniacal magician who attempted to gain power through cunning trickery and paitent planning.
+			# FriendlyName: Super Ultra Schemer
+			# }
+			
+			DarkMatterAchievement: {
+				Description: Defeat the ruthless invader of unknown origin who carries with it an ominous darkness.
+				FriendlyName: Let There be Light
+			}
+
+			ZeroAchievement: {
+				Description: Defeat the re-reborn form of darkness incarnate and prove yourself as a worthy champion of all that is good.
+				FriendlyName: Back to Zero
+			}
+		}
+
 		Buffs: {
 			DarkFeeling: {
 				DisplayName: Dark Feeling
@@ -1250,6 +1287,15 @@ Mods: {
 				DisplayName: Changaroonie
 			}
 
+			Unmarxify: {
+				Tooltip:
+					'''
+					Dev item
+					Resets Marx's spawning and townie conditions
+					'''
+				DisplayName: Un-Marxify
+			}
+
 			DimensionalDestabilizer: {
 				DisplayName: Dimensional Destabilizer
 				Tooltip:
@@ -1395,11 +1441,16 @@ Mods: {
 
 			NightStarAmmo: {
 				DisplayName: Nightmare Star
-				Tooltip: 
+				Tooltip:
 					'''
 					Shoots a fast-flying homing star
 					Used with star cannons
 					'''
+			}
+
+			SparklingSoul: {
+				DisplayName: Sparkling Soul
+				Tooltip: ""
 			}
 		}
 
@@ -1656,6 +1707,14 @@ Mods: {
 			BandanaDeeSpearThrown.DisplayName: Bandana Dee Spear Thrown
 			UFOMountLaser.DisplayName: UFO Laser
 			CannonNightStar.DisplayName: Nightmare Star
+			MarxCutter.DisplayName: Marx Cutter
+			MarxIceBomb.DisplayName: Marx Ice Bomb
+			MarxIceBombFrag.DisplayName: Marx Ice Bomb Frag
+			MarxBall.DisplayName: Marx Ball
+			MarxMassiveLaser.DisplayName: Marx Massive Laser
+			MarxVine.DisplayName: Marx Vine
+			MarxVineSeed.DisplayName: Marx Vine Seed
+			FlyingSparklingSoul.DisplayName: Flying Sparkling Soul
 		}
 
 		NPCs: {
@@ -1729,7 +1788,7 @@ Mods: {
 
 				BossChecklistIntegration: {
 					SpawnInfo: Use a [i:5681].
-					DespawnMessage: Whispy Woods blends back in with it's bretheren...
+					DespawnMessage: Whispy Woods blends back in with its bretheren...
 				}
 			}
 
@@ -1752,7 +1811,7 @@ Mods: {
 
 				BossChecklistIntegration: {
 					SpawnInfo: Place down [i:5681] on flat terrain, and right-click it.
-					DespawnMessage: Whispy Woods blends back in with it's bretheren...
+					DespawnMessage: Whispy Woods blends back in with its bretheren...
 				}
 			}
 
@@ -1760,6 +1819,91 @@ Mods: {
 			Bomber.DisplayName: Bomber
 			Wheelie.DisplayName: Wheelie
 			Batafire.DisplayName: Batafire
+
+			MarxTownie: {
+				DisplayName: Marx
+				Census.SpawnCondition: Defeat a Pre-Hardmode Kirby boss OR enter Hardmode, and then wait for a rift to appear
+
+				Dialogue: {
+					DInitial: Hello! I've seem to have gotten lost in this strange new world! Will you keep me company? I can help you learn about my people, too! From one friend to another!
+					D1: Why does your world's food taste so nasty? The only thing good here is the residue of whatever comes out at night!
+					D2: Everyone has been billowing out of some weird star-shaped rifts into this place. It's a little annoying how many people I recognize.
+					D3: Got a question? Glad to answer!
+					D4: This world gives me a mixed feeling of fear and paranoia... it's great!
+					D5: I can tell you anything that will help you along your way! After all, what are friends for... if not to be used?
+					DDownedWOF: Gosh! Seeing that guide disintegrate into ashes was... bad. Very bad. Yes.
+					DPrePlant: Ever since those souls were released I've been thinking up a way to use them for our own benefit! My plan will be done soon...
+					DPreMarx: Y'know, I think I've been a great friend helping you through all this. Maybe it's time you help me for once? Just gotta hear me out...
+					DPostMarx: Sorry about that fight... I was feeling a little hangry, is all!
+					DPreMoonLord: I can feel cosmic horrors are loomimg above us... just the usual.
+					DPreMoonLord2: I feel a powerful presence at the dungeon beckoning incomprehensible evil... not again.
+					DLunarPillars: Unknowable entities invading from outside? Took them long enough.
+					DPostMoonLord: Well, we're still here. With no way to get home... Got an interdimensional portal gun, or something?
+					DMoon: What a cool moon!
+					DShutTheHellUp: Everything is so strange in this... new world... Frankly, it's quite hard to adapt to this... forgotten land.
+					DKirby1: All the monsters of this world would stand no chance against... him...
+					DKirby2: Friend? Every world has its two-faced frauds, so don't let betrayal get to you, okay?
+					DKirby3: ...Where is he?... He could be anywhere...
+					DKirby4: Have you ever heard of a Galactic Nova? No? Okay, nevermind.
+					DKirby5: That starboard is pissing me off.
+					DReference: Friend! You gotta do SOOOOMMMMTHAAAAAYYYYYNNG!
+					DMarxolor: What!? Do I look like a traitor to you!?
+				}
+
+				Help: {
+					HStarbits: First of all, don't underestimate these marshmallow candy-looking guys! They carry with them their burning wishes to make a name for themselves! Though, you should know that using other people's desires for your own gain is quite a good plan!
+					HWeapons: When my guys were brought here, they scurried all over the place! Try searching around! You might 'finesse' something useful from them!
+					HBosses: If there's something our worlds have in common, is that really powerful foes lurk in every corner! Surely some were carried here, too! Defeat them and earn some REAL valuable goodies!
+					HWhispyWoods: There is quite an iconic tree that often gets in our way within the woods. You might be able to grow one with an acorn able to wish... and then chop it down!
+					HKracko: In the skies, a powerful cloud lurks to keep them clear. Its baby form has probably worked its way here! Try hunting it!
+					HKingDedede: I wonder if that fat slob of a king was brought into this world with everyone else... we just need something precious to him that he'll hunt down from a mile away!
+					HMidbosses: Star rifts are what brought us all here. But they appear so sporadically! I wonder if there's a way to force them to appear... you could probably round up some of the more stubborn characters who defy the rift's pull!
+					HDreamMatter: With the true form of this world unveiled, some of my guys might've began to venture once more! Go look again! The skies! The caves! The ends of the world! Go look now that their dreams of fitting in have been stirred!
+					HRareStones: With all these rifts in space, some of these guys had outta pick up some rare stones! Though they'd have to have the power to be able to retrieve them. The same power that resists the rifts, probably.
+					HEvoWeapons: With rare stones, you could upgrade some weapons to a fuller potential! Though these recipes aren't cheap, you seem like a skilled blacksmith!
+					HNightmare: The fountain of dreams was an... interesting landmark of our world. I wonder if you could recreate it with this world's materials. It would even be fun if we could attract another... what? I wasn't saying anything!
+					HHeartMatter: Love is something I find quite icky, but those burning wishes, dreams, and that energy of life can be channeled into a powerful resource!
+					HMarx: I've appreciated your help thus far, but now I have something to ask of you: an awful evil slowly descends upon this world, but I figured out that if we use the power of the spirits of light and dark of this world with the care and compassion of our world, then we could influence the released souls to fight back against the enemy! Whaddya say?
+					HDarkMatter: There existed a terrible force in our world, but it has mostly since been wiped out. I wonder if this world contains its own dark forces. Try attracting them using some dark stuff! It should be interesting...
+					HZero: Ever since the darkness has been wiped away, our world hasn't had as many omnipresent adversaries... but with these alien materials, a ritual to resurect the heart of the darkness might be possible... Yes... I'd say that'd make an interesting last challenge.
+					HPostZero: ...What? I don't have anything else to tell you. Friends are only useful for so long.
+				}
+
+				TownNPCMood: {
+					Content: Everything is going accordingly... which means I'm happy!
+					NoHome: You don't have a home for me? Oh, it's fine! I only promised to help you, is all...
+					FarFromHome: How did I get here? Hey, friend? Do you mind taking me back home? I'd really appreciate it!
+					LoveSpace: So much room to think! So much room to plan! I love it!
+					DislikeCrowded: Now, friend, I enjoy a little compansionship, but it's a little hard to think in this environment.
+					HateCrowded: Hey! I don't mean to be rude, but having too many patrons around makes it hard to plan... shoo them away already!
+					LoveBiome: Such a beautiful, magnificent landscape bustling with activity! It really speaks to me, y'know?
+					LikeBiome: A little chaos goes a long way... and this place has it!
+					HateBiome: It's calm here... a little too calm here... It bores my senses!
+					LoveNPC: Wow! Everyone hates {NPCName} so much! Their air of negativity is just admirable!
+					LikeNPC: "{NPCName}'s penchant for destruction is awesome! I love a little chaos!"
+					DislikeNPC: Why does {NPCName} prefer to help rather than hurt? No one will need your help if you can hurt anyone around you!
+					HateNPC: I hate {NPCName}! Every year, he gives me stupid, black rocks! That puffball does a way better job with gifts than him!
+					LikeNPC_Princess: "{NPCName}'s personality makes me gag... but she also gives me food, which is always appreciated!"
+					Princess_LovesNPC: "{NPCName} may seem shifty, but as long as you keep him fed he'll always be a wonderful ally!"
+				}
+			}
+
+			MarxTownieDown.DisplayName: Suspicious Looking Jester
+
+			MarxPrelude: {
+				DisplayName: Marx
+
+				Dialogue: {
+					1: It worked! I can't believe it worked!
+					2: I got you to take me in, trust me as an ally, and you went and forged the Sparkling Soul...
+					3: The ancient spirits are mine to control! Now I can establish this wacky world as my own!
+					1Stranger: You thought I wouldn't notice you trying to obtain this?
+					2Stranger: Pretending is my forte, and so is jumping in at the right moment!
+					ReFight: You know how much I want that, so how about I just fight you already!
+				}
+			}
+
+			MarxBoss.DisplayName: Marx
 		}
 
 		Tiles: {
@@ -1788,5 +1932,7 @@ Mods: {
 				}
 			}
 		}
+
+		Emotes.MarxTownieEmote.Command: marxtownieemote
 	}
 }

@@ -33,7 +33,7 @@ namespace KirboMod.Items.Weapons
 			Item.knockBack = 2f;
 			Item.value = 516;
 			Item.rare = ItemRarityID.Blue;
-			Item.UseSound = NewWhispyBoss.AirShotSFX; //blowpipe
+			Item.UseSound = NewWhispyBoss.AirShotSFX; //not blowpipe
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.GoodWhisp>();
 			Item.shootSpeed = 15f;

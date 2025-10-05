@@ -14,7 +14,7 @@ namespace KirboMod.Items
 			 // DisplayName.SetDefault("Dark Mirror");
 			/* Tooltip.SetDefault("Left click to throw it out, walk up to it to collect it" +
 				"\n'A bright light reflecting off of this could attract a dark presence...'"); */ 
-			ItemID.Sets.SortingPriorityBossSpawns[Item.type] = 100; //go to *this* spot in boss spawn group
+			ItemID.Sets.SortingPriorityBossSpawns[Item.type] = 4; //go to *this* spot in boss spawn group
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research
         }
 

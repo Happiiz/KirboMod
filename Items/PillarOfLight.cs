@@ -16,7 +16,7 @@ namespace KirboMod.Items
 		{
 			 // DisplayName.SetDefault("Totem Of Light");
 			// Tooltip.SetDefault("Summons a great darkness upon your world");
-			ItemID.Sets.SortingPriorityBossSpawns[Item.type] = 100; //go to *this* spot in boss spawn group
+			ItemID.Sets.SortingPriorityBossSpawns[Item.type] = 5; //go to *this* spot in boss spawn group
 			ItemID.Sets.ItemNoGravity[Item.type] = true;
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research
         }

@@ -191,7 +191,11 @@ namespace KirboMod.Projectiles
         }
         public override bool? CanHitNPC(NPC target)
         {
-            return !PVPStar;
+            if (!PVPStar) //arranged like this to prevent friendly NPC damage
+            {
+                return null;
+            }
+            return false;
         }
         public override bool? CanCutTiles()
         {

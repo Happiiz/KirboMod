@@ -58,17 +58,26 @@ namespace KirboMod.Projectiles.BandanaDee
             }
             if (owner.active && owner.whoAmI != -1 && bandanaDee.attacking && bandanaDee.attacktype == 0)
             {
-                Vector2 targetVel = Main.MouseWorld - center;
+                Vector2 targetVel = center + bandanaDee.Projectile.velocity;
+
+                if (bandanaDee.aggroTarget.active)
+                {
+                    targetVel = bandanaDee.aggroTarget.Center - center;
+                }
                 targetVel.Normalize();
                 targetVel *= Range;
                 if (targetVel.HasNaNs())
                 {
                     targetVel = Vector2.UnitX * owner.direction;
                 }
-                if (targetVel.X != Projectile.velocity.X || targetVel.Y != Projectile.velocity.Y)
-                {
-                    Projectile.netUpdate = true;
-                }
+
+                //probably not needed since this isn't mouse controlled anymore
+
+                //if (targetVel.X != Projectile.velocity.X || targetVel.Y != Projectile.velocity.Y)
+                //{
+                //    Projectile.netUpdate = true;
+                //}
+
                 Projectile.velocity = targetVel;
             }
             else
