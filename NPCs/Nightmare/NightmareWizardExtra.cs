@@ -63,7 +63,7 @@ namespace KirboMod.NPCs
             NPC.defense = 20;
             NPC.HitSound = SoundID.NPCHit2; //bone
             NPC.DeathSound = SoundID.NPCDeath2; //undead
-            NPC.value = Item.buyPrice(0, 5, 0, 0); // money it drops
+            NPC.value = Item.buyPrice(0, 12, 0, 0); // money it drops
             NPC.knockBackResist = 0f;
             NPC.aiStyle = -1;
             NPC.boss = true;
@@ -153,11 +153,11 @@ namespace KirboMod.NPCs
             npcLoot.Add(masterMode);
         }
 
-        public override void BossLoot(ref string name, ref int potionType)
+        public override void BossLoot(ref int potionType)
         {
-            name = "Nightmare"; //_ has been defeated!
             potionType = ItemID.GreaterHealingPotion; //potion it drops
         }
+
         public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
         {
             scale = 1.5f;

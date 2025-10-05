@@ -11,7 +11,7 @@ using KirboMod.Projectiles.Marx.Cutter;
 using KirboMod.NPCs.Marx;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace KirboMod.Items
+namespace KirboMod.Items.DebugItems
 {
 	public class Changaroonie : ModItem
 	{

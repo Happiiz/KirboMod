@@ -29,7 +29,7 @@ namespace KirboMod.NPCs
         bool InitializedTextures { get => NPC.soundDelay != 0; set { NPC.soundDelay = value ? int.MaxValue : 0; } }
         int tpEffectCounter = 12;
         Vector2 tpEffectPos;
-        static void ClampLength(ref Vector2 vector, float length = 100)//TODO: CHANGE DEFAULT VALUE TO 300
+        static void ClampLength(ref Vector2 vector, float length = 300)
         {
             length = 300;
             float vecLength = vector.Length();
@@ -1000,6 +1000,7 @@ namespace KirboMod.NPCs
             }
             else
             {
+                NPC.HideStrikeDamage = true;
                 NPC.SimpleStrikeNPC(999999, 1, false, 0, null, false, 0, false);
             }
         }

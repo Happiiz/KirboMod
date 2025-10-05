@@ -21,7 +21,7 @@ namespace KirboMod.Projectiles.BandanaDee
         float spaceJumpRotation = 0; //here for sprite rotation of space jump
 
         private List<float> Targetdistances = new(); //targeting
-        private NPC aggroTarget = null; //target the minion is currently focused on
+        public NPC aggroTarget = null; //target the minion is currently focused on
 
         bool reverseRun = false; //for running animation loop
 

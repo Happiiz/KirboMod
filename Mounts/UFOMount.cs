@@ -1,6 +1,7 @@
 using KirboMod.Buffs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoMod.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -151,7 +152,7 @@ namespace KirboMod.Mounts
         void ShootLaser(Player player) //referenced from UFO and Personal Cloud code
         {
             //targeting
-            int targetIndex = 0; //setting it to -1 bugs the mount
+            int targetIndex = -1;
             const float attackRangeSQ = 1000 * 1000;
             Vector2 center = player.MountedCenter + Vector2.UnitY * 40;
             for (int i = 0; i < Main.maxNPCs; i++)
@@ -165,21 +166,24 @@ namespace KirboMod.Mounts
                 }
             }
 
-            if (Main.npc[targetIndex].DistanceSQ(center) <= attackRangeSQ && Main.npc[targetIndex].active)
+            if (targetIndex != -1)
             {
-                NPC target = Main.npc[targetIndex];
-
-                float vel = 20;
-
-                //predicts player movement
-                Utils.ChaseResults result = Utils.GetChaseResults(center, vel, target.Center, target.velocity);
-                result.ChaserVelocity = result.InterceptionHappens ? result.ChaserVelocity : (Vector2.Normalize(target.velocity) * vel);
-
-                float projMaxUpdates = ContentSamples.ProjectilesByType[ModContent.ProjectileType<Projectiles.UFOLaser>()].MaxUpdates;
-                Particles.Ring.ShotRing(center, Color.Red, result.ChaserVelocity);
-                if (Main.netMode != NetmodeID.MultiplayerClient)
+                if (Main.npc[targetIndex].DistanceSQ(center) <= attackRangeSQ && Main.npc[targetIndex].active)
                 {
-                    Projectile.NewProjectile(player.GetSource_FromThis(), center, result.ChaserVelocity / projMaxUpdates, ModContent.ProjectileType<Projectiles.UFOMountLaser>(), 100, 7, player.whoAmI);
+                    NPC target = Main.npc[targetIndex];
+
+                    float vel = 20;
+
+                    //predicts player movement
+                    Utils.ChaseResults result = Utils.GetChaseResults(center, vel, target.Center, target.velocity);
+                    result.ChaserVelocity = result.InterceptionHappens ? result.ChaserVelocity : (Vector2.Normalize(target.velocity) * vel);
+
+                    float projMaxUpdates = ContentSamples.ProjectilesByType[ModContent.ProjectileType<Projectiles.UFOLaser>()].MaxUpdates;
+                    Particles.Ring.ShotRing(center, Color.Red, result.ChaserVelocity);
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        Projectile.NewProjectile(player.GetSource_FromThis(), center, result.ChaserVelocity / projMaxUpdates, ModContent.ProjectileType<Projectiles.UFOMountLaser>(), 100, 7, player.whoAmI);
+                    }
                 }
             }
         }

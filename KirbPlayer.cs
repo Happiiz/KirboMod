@@ -13,6 +13,7 @@ using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 
 namespace KirboMod
 {
@@ -110,6 +111,7 @@ namespace KirboMod
 
         public int ufoMountShootTimer = 0;
 
+        public bool talkedToMarx = false;
 
         public override void ResetEffects() //restart accesory stats so if not wearing one then it stops doing the effects
         {
@@ -923,6 +925,23 @@ namespace KirboMod
                 }
             }
         }
+
+        public override void SaveData(TagCompound tag)
+        {
+            if (talkedToMarx)
+            {
+                tag.Add("TalkedToMarx", talkedToMarx);
+            }
+        }
+
+        public override void LoadData(TagCompound tag)
+        {
+            if (tag.ContainsKey("TalkedToMarx"))
+            {
+                talkedToMarx = tag.Get<bool>("TalkedToMarx");
+            }
+        }
+
         private void NightCloakEffect_Pvp(Player.HurtInfo info)
         {
             if (info.CooldownCounter == ImmunityCooldownID.Lava || info.CooldownCounter == ImmunityCooldownID.TileContactDamage || info.CooldownCounter == ImmunityCooldownID.WrongBugNet)

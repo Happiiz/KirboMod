@@ -322,5 +322,15 @@ namespace KirboMod.NPCs.MidBosses
             Lighting.AddLight(NPC.Center, TorchID.Torch);
             return Color.White;
         }
+
+        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
+        {
+            position = NPC.Bottom + Vector2.UnitY * 10;
+            return true;
+        }
+        public override void ModifyHoverBoundingBox(ref Rectangle boundingBox)
+        {
+            boundingBox = NPC.Hitbox;
+        }
     }
 }
