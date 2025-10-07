@@ -62,6 +62,41 @@ Mods: {
 				Description: Defeat the re-reborn form of darkness incarnate and prove yourself as a worthy champion of all that is good.
 				FriendlyName: Back to Zero
 			}
+
+			MidBossAchievement: {
+				Description: Defeat an almost-mighty foe forced into your world through a star-shaped rift.
+				FriendlyName: Boss in Training
+			}
+
+			EnemiesAchievement: {
+				Description: Defeat every basic enemy and mid-boss in Kirby's Terraria Mod.
+				FriendlyName: Popstar Popper
+			}
+
+			RareStoneAchievement: {
+				Description: Obtain a rare stone, a valuable artifact recovered from a powerful foe crossing between dimensions.
+				FriendlyName: I Like My Stones Rare
+			}
+
+			EvoWeaponAchievement: {
+				Description: Use a rare stone to upgrade a weapon beyond its base potential.
+				FriendlyName: Level Up!
+			}
+
+			ThirdTierAchievement: {
+				Description: Bring a weapon up to its third evolution with rare stones.
+				FriendlyName: To go Even Further Beyond!
+			}
+
+			RainbowSwordAchievement: {
+				Description: Use all the colors of the world to craft a blade that unifies them against the dark.
+				FriendlyName: Spectrum
+			}
+
+			ZeroWeaponAchievement: {
+				Description: Craft a supreme, darkness-defying weapon with the matter of the darkest being.
+				FriendlyName: Seal the Darkness
+			}
 		}
 
 		Buffs: {

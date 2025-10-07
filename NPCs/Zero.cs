@@ -810,13 +810,15 @@ namespace KirboMod.NPCs
                             NPC.NewNPC(NPC.GetSource_FromThis(), (int)NPC.Center.X, (int)NPC.Center.Y - 15, ModContent.NPCType<ZeroEye>(), ai2: ai2s[i]);
                         }
 
+                        string notif = ("Zero's eye has ejected from its body!");
+
                         if (Main.netMode == NetmodeID.SinglePlayer)
                         {
-                            Main.NewText("Zero's eye has ejected from it's body!", 175, 75);
+                            Main.NewText(notif, 175, 75);
                         }
                         else if (Main.netMode == NetmodeID.Server)
                         {
-                            ChatHelper.BroadcastChatMessage(NetworkText.FromKey("Zero's eye has ejected from it's body!"), new Color(175, 75, 255));
+                            ChatHelper.BroadcastChatMessage(NetworkText.FromKey(notif), new Color(175, 75, 255));
                         }
                     }
                 }

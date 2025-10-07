@@ -155,13 +155,15 @@ namespace KirboMod.NPCs.DarkMatter
                 }
             }
         }
-        public override void OnKill()
-        {
-            NPC.SetEventFlagCleared(ref DownedBossSystem.downedDarkMatterBoss, -1);
-        }
+
         public override Color? GetAlpha(Color lightColor)
         {
             return Color.White * NPC.Opacity; //make it unaffected by light
+        }
+
+        public override void ModifyHoverBoundingBox(ref Rectangle boundingBox)
+        {
+            boundingBox = NPC.Hitbox;
         }
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
