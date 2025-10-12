@@ -20,12 +20,13 @@ namespace KirboMod.NPCs
 			NPC.width = 24;
 			NPC.height = 24;
 			NPC.defense = 0; 
-			NPC.lifeMax = 5;
+            //underscore just for clarity (86 million HP)
+			NPC.lifeMax = 86_000_000;
 			NPC.damage = 0;
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
 			NPC.value = 0f; // money it drops
-			NPC.knockBackResist = 1f; //how much knockback applies
+			NPC.knockBackResist = 0f; //how much knockback applies
 			Banner = NPC.type;
 			NPC.aiStyle = NPCAIStyleID.Butterfly;
 			AIType = NPCID.Butterfly;
@@ -91,16 +92,30 @@ namespace KirboMod.NPCs
                     d.noGravity = false;
                 }
             }
+            for (int i = 0; i < 2; i++)
+            {
+                Vector2 speed = Main.rand.NextVector2Circular(5f, 5f); //circle
+                Dust d = Dust.NewDustPerfect(NPC.Center, DustID.Lava, speed); //Makes dust in a messy circle
+                d.noGravity = false;
+            }
         }
         public override void OnCaughtBy(Player player, Item item, bool failed)
+        {
+
+            if(Main.netMode == NetmodeID.MultiplayerClient)
+            {
+                NetMethods.SendMorphoButterflyVanish((byte)NPC.whoAmI);
+            }
+            FailedCatchDust(NPC.Center);
+            NPC.active = false;
+        }
+        public static void FailedCatchDust(Vector2 position)
         {
             for (int i = 0; i < 20; i++)
             {
                 Vector2 speed = Main.rand.NextVector2Circular(8f, 8f); //circle
-                Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.RainbowSparkle>(), speed, Scale: 0.5f); //Makes dust in a messy circle
+                Dust d = Dust.NewDustPerfect(position, ModContent.DustType<Dusts.RainbowSparkle>(), speed, Scale: 0.5f); //Makes dust in a messy circle
             }
-            failed = true;
-            NPC.active = false;
         }
 	}
 }

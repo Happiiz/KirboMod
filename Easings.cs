@@ -1,14 +1,5 @@
-﻿using KirboMod.Projectiles;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using Terraria;
-using Terraria.Audio;
-using Terraria.GameContent;
-using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace KirboMod
 {
@@ -48,9 +39,13 @@ namespace KirboMod
         {
             return -(MathF.Cos(MathF.PI * progress) - 1) / 2;
         }
+        public static float EaseOutSine(float progress)
+        {
+            return MathF.Sin((progress * MathF.PI) / 2);
+        }
         public static float EaseInOut(float progress, float exponent)
         {
-            if( progress < .5f)
+            if (progress < .5f)
             {
                 return MathF.Pow(2 * progress - 2, exponent) * .5f;
             }

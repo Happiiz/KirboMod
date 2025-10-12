@@ -1,6 +1,8 @@
 ﻿using KirboMod.Items.NewWhispy;
+using KirboMod.NPCs;
 using KirboMod.Tiles;
 using Microsoft.Xna.Framework;
+using System;
 using System.IO;
 using System.Linq;
 using Terraria;
@@ -58,6 +60,10 @@ namespace KirboMod
             /// byte: player index, int: tileX, int: tileY
             /// </summary>
             SpawnNightmareOrb = 12,
+            /// <summary>
+            /// byte: butterfly NPC whoAmI
+            /// </summary>
+            MorphoButterflyVanish = 13,
         }
         //initially called on the client that owns the projectile
         public static void SyncProjPosition(Projectile proj, byte playerWhoAmI)
@@ -243,8 +249,27 @@ namespace KirboMod
                 case ModPacketType.SpawnNightmareOrb:
                     ReadSpawnNightmareOrb(reader);
                     break;
+                case ModPacketType.MorphoButterflyVanish:
+                    ReadMorphoButterflyVanishDust(reader);
+                    break;
             }
-        } 
+        }
+
+        private static void ReadMorphoButterflyVanishDust(BinaryReader reader)
+        {
+            byte npcIndex = reader.ReadByte();
+            NPC butterfly = Main.npc[npcIndex];
+            if(butterfly.active && butterfly.type == ModContent.NPCType<OrangeButterfly>())
+            {
+                butterfly.active = false;
+                OrangeButterfly.FailedCatchDust(butterfly.Center);
+            }
+            if (Main.dedServ)
+            {
+                SendMorphoButterflyVanish(npcIndex);
+            }
+        }
+
         private static void ReadSpawnNightmareOrb(BinaryReader reader)
         {
             // don't need to re-send packet because the server will be responsible for spawning the NPC
@@ -260,6 +285,18 @@ namespace KirboMod
             int i = reader.ReadInt32();
             int j = reader.ReadInt32();
             NewWhispySummonTile.SpawnWhispyAt(playerIndex, i, j);
+        }
+
+        public static void SendMorphoButterflyVanish(NPC butterfly)
+        {
+            SendMorphoButterflyVanish((byte)butterfly.whoAmI);
+        }
+        public static void SendMorphoButterflyVanish(byte butterflyWhoAmI)
+        {
+            ModPacket p = KirboMod.instance.GetPacket();
+            p.Write((byte)ModPacketType.MorphoButterflyVanish);
+            p.Write(butterflyWhoAmI);
+            p.Send();
         }
     }
 }

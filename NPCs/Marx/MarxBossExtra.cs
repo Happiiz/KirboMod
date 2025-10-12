@@ -18,12 +18,16 @@ namespace KirboMod.NPCs.Marx
         public override string Texture => "KirboMod/NPCs/Marx/Marx";
         enum AttackType : byte
         {
-            None,
+            DecideNext,
             Teleport,
             Cutter,
             Vine,
             IceBomb,
             MassiveLaser,
+            BlackHole,
+            Intro,
+            DashFromBelow,
+            TeleportFrenzy,
         }
 
         enum Animation : byte
@@ -36,11 +40,13 @@ namespace KirboMod.NPCs.Marx
             Cutter,
             TeleportOut,
             TeleportIn,
+            Split,
+            Intro
         }
 
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[NPC.type] = 24;
+            Main.npcFrameCount[NPC.type] = 25;
 
             NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new()
             {
@@ -55,8 +61,8 @@ namespace KirboMod.NPCs.Marx
 
         public override void SetDefaults()
         {
-            NPC.width = 88;
-            NPC.height = 88;
+            NPC.width = 400;
+            NPC.height = 120;
             DrawOffsetY = 54;
             NPC.damage = 70;
             NPC.noTileCollide = true;
@@ -72,17 +78,16 @@ namespace KirboMod.NPCs.Marx
             NPC.noGravity = true;
             NPC.lavaImmune = true;
             NPC.npcSlots = 8;
-            /*if (!Main.dedServ)//if not dedicated server
+            if (!Main.dedServ)//if not dedicated server
             {
-                int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/NightmareWizardWithLoopMetadata");
+                int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/DeathZ_Marx");
                 Music = musicSlot;
                 Main.musicFade[musicSlot] = 1;
                 Main.musicNoCrossFade[musicSlot] = true;
 
-                musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Photonic0_NightmareOrb");
-                Main.musicFade[musicSlot] = 0;
-
-            }*/
+            }
+            MarxWingRenderer.Initialize();
+            wingRenderer = new();
         }
 
         public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)

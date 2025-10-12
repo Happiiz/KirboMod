@@ -76,7 +76,6 @@ namespace KirboMod.Projectiles.Marx.Cutter
         }
         public override void SetDefaults()
         {
-            SetStaticDefaults();
             Projectile.tileCollide = false;
             Projectile.hostile = true;
             Projectile.width = Projectile.height = 60;
@@ -89,7 +88,7 @@ namespace KirboMod.Projectiles.Marx.Cutter
            
             if(RotationSpeed == 0)
             {
-                RotationSpeed = 0.01f * Projectile.velocity.X + 0.012f * Projectile.velocity.Y;
+                RotationSpeed = Main.rand.NextFloat(.2f,.4f) * (Main.rand.Next(2) * 2 - 1);
             }
             TimeLeft--;
             if(TimeLeft < 0)
@@ -106,7 +105,7 @@ namespace KirboMod.Projectiles.Marx.Cutter
             {
                 InitialVel = Projectile.velocity;
             }
-            Projectile.rotation += RotationSpeed;
+            Projectile.rotation += RotationSpeed * MathF.Max(.5f, Projectile.velocity.Length() * 0.05f);
             ReturnCountdown--;
             if(ReturnCountdown < 0)
             {
