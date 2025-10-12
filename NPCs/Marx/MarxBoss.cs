@@ -7,7 +7,7 @@ using Terraria.ModLoader;
 
 namespace KirboMod.NPCs.Marx
 {
-    //[AutoloadBossHead]
+    [AutoloadBossHead]
     public partial class MarxBoss : ModNPC //Nightmare Wizard used as a base
     {
         private Animation animation = Animation.Intro;
