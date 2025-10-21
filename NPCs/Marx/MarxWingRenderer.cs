@@ -177,6 +177,10 @@ namespace KirboMod.NPCs.Marx
         {
             RenderCellList(wingCellsBack, frameIndex, sb, marxCenter, screenPos, rotation, scale, marxSheetWidth, globalOffset, offsetL, offsetR);
             //RenderCellList(wingCellsFront, frameIndex, sb, marxCenter, screenPos, rotation, scale);
+            if(frameIndex >= drawOffsets.Length)
+            {
+                return;
+            }
             Vector2[] offsets = drawOffsets[frameIndex];
             List<Vector2> randomlyChosenOffsets = [];
             List<Vector2> remainingAVailable = [.. offsets];
@@ -222,6 +226,10 @@ namespace KirboMod.NPCs.Marx
             {
                 MarxWingCell cell = cells[i];
                 if (cell.Inactive)
+                {
+                    continue;
+                }
+                if(frameIndex >= drawOffsets.Length)
                 {
                     continue;
                 }

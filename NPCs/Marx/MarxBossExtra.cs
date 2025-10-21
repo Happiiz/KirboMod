@@ -41,7 +41,9 @@ namespace KirboMod.NPCs.Marx
             TeleportOut,
             TeleportIn,
             Split,
-            Intro
+            Intro,
+            PuffUp,
+            ShadowHole
         }
 
         public override void SetStaticDefaults()

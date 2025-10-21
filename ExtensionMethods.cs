@@ -40,6 +40,16 @@ namespace KirboMod
             origin = tex.Size() / 2;
             return tex;
         }
+        public static Vector2 Ring(this UnifiedRandom rnd, float minDist, float maxDist)
+        {
+            float minDistNormalized = minDist / maxDist;
+            minDistNormalized *= minDistNormalized;//compensate for the square rooting.
+            float dist = rnd.NextFloat() * (1 - minDistNormalized) + minDistNormalized;
+            dist = MathF.Sqrt(dist);//even out distribution of points
+            dist *= maxDist;
+            float angle = rnd.NextFloat() * MathF.Tau;
+            return new Vector2(MathF.Cos(angle) * dist, MathF.Sin(angle) * dist);
+        }
         public static Vector2 BetterNextVector2Circular(this UnifiedRandom rnd, float maxRadius)
         {
             float angle = rnd.NextFloat(MathF.Tau);

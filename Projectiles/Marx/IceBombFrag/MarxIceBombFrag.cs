@@ -1,6 +1,8 @@
 ﻿using KirboMod.Dusts;
 using Microsoft.Xna.Framework;
+using System;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -8,6 +10,9 @@ namespace KirboMod.Projectiles.Marx.IceBombFrag
 {
     internal class MarxIceBombFrag : ModProjectile
     {
+        public static SoundStyle IceBombRightRollSFX => new("KirboMod/Sounds/NPC/Marx/IceBombRightRoll");
+        public static SoundStyle IceBombLeftRollSFX => new("KirboMod/Sounds/NPC/Marx/IceBombRightRoll");
+
         public override void SetDefaults()
         {
             Projectile.coldDamage = true;
@@ -26,6 +31,7 @@ namespace KirboMod.Projectiles.Marx.IceBombFrag
         ref float DistTravelled => ref Projectile.localAI[1];
         int TargetPlayerIndex => (int)Projectile.ai[0];
         bool IsProjForClient => TargetPlayerIndex == Main.myPlayer;
+        bool PlaySFX => MathF.Abs(Projectile.ai[1]) == 1;
         public override void AI()
         {
             DistTravelled += Projectile.velocity.Length();
@@ -48,6 +54,19 @@ namespace KirboMod.Projectiles.Marx.IceBombFrag
                     d.alpha = 200;
                 }
             }
+            if (Timer == 1)
+            {
+                if (PlaySFX)
+                {
+                    SoundEngine.PlaySound(Projectile.ai[1] >= 0 ? IceBombRightRollSFX : IceBombLeftRollSFX, Projectile.Center, SoundUpdateCallback);
+                }
+            }
+        }
+
+        bool SoundUpdateCallback(ActiveSound soundInstance)
+        {
+            soundInstance.Position = Projectile.position;
+            return true;
         }
         public override bool PreDraw(ref Color lightColor)
         {

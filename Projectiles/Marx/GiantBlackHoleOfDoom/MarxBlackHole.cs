@@ -1,8 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
+using Terraria.GameContent;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles.Marx.GiantBlackHoleOfDoom
@@ -10,10 +13,10 @@ namespace KirboMod.Projectiles.Marx.GiantBlackHoleOfDoom
     public class MarxBlackHole : ModProjectile
     {
         public static float ScaleUpDuration => 10f;
-        static float MaxScale => 1f;
+        static float MaxScale => 2f;
         static float SuckStrengthMin => 8f * SuckStrengthMult;
         static float SuckStrengthMax => 60f * SuckStrengthMult;
-        static float SuckStrengthMult => Main.expertMode ? 1.3f : 1.05f;
+        static float SuckStrengthMult => Main.expertMode ? 1.7f : 1.05f;
         static float SuckStrengthMinDist => 120f;
         static float SuckStrengthMaxDist => 2000f;
         static float NoMoreSuckDist => 2500f;
@@ -32,32 +35,45 @@ namespace KirboMod.Projectiles.Marx.GiantBlackHoleOfDoom
         public ref float Timer => ref Projectile.localAI[0];
         public override void AI()
         {
+            Projectile.frameCounter++;
             Timer++;
-            if(Timer == 1)
+            ScalingAndSFX();
+            if (Timer > SuckDuration)
             {
-                SoundEngine.PlaySound(SuckSFX.WithVolumeScale(0.8f), Projectile.position, null);
-            }
-            Projectile.scale = Helper.RemapEased(Timer + 1, 0, ScaleUpDuration, 0, MaxScale, Easings.EaseOutSquare);
-            Projectile.scale *= Helper.RemapEased(Timer + 1, SuckDuration + ScaleUpDuration, SuckDuration, 0, MaxScale, Easings.EaseOutSquare);
-            if(Timer > SuckDuration)
-            {
-                if(Projectile.scale <= 0)
+                if (Projectile.scale <= 0)
                 {
                     Projectile.Kill();
                 }
                 return;
             }
+            KillHooks();
+            SuckPlayers();
 
+            //DebugDisplays();
+        }
+
+        private void ScalingAndSFX()
+        {
+            if (Timer == 1)
+            {
+                SoundEngine.PlaySound(SuckSFX.WithVolumeScale(0.8f), Projectile.position, null);
+            }
+            Projectile.scale = Helper.RemapEased(Timer + 1, 0, ScaleUpDuration, 0, 1f, Easings.EaseOutSquare);
+            Projectile.scale *= Helper.RemapEased(Timer + 1, SuckDuration + ScaleUpDuration, SuckDuration, 0, 1f, Easings.EaseOutSquare);
+            Projectile.scale *= MaxScale;
+        }
+
+        private void SuckPlayers()
+        {
             //proj is 1 hitbox width height so can use position instead of center
             Vector2 center = Projectile.position;
-
             for (int i = 0; i < Main.maxPlayers; i++)
             {
                 Player plr = Main.player[i];
                 if (plr.active && !plr.dead)
                 {
                     float dist = plr.Distance(center);
-                    if(dist > NoMoreSuckDist)
+                    if (dist > NoMoreSuckDist)
                     {
                         continue;
                     }
@@ -65,7 +81,21 @@ namespace KirboMod.Projectiles.Marx.GiantBlackHoleOfDoom
                     plr.velocity = Vector2.Lerp(plr.velocity, plr.DirectionTo(center) * MathF.Max(plr.velocity.Length(), suckStrength), 0.05f);
                 }
             }
-            //DebugDisplays();
+        }
+
+        void KillHooks()
+        {
+            if (Main.expertMode)
+            {
+                for (int i = 0; i < Main.maxProjectiles; i++)
+                {
+                    Projectile p = Main.projectile[i];
+                    if (p.aiStyle == ProjAIStyleID.Hook)
+                    {
+                        p.Kill();
+                    }
+                }
+            }
         }
         void DebugDisplays()
         {
@@ -76,11 +106,24 @@ namespace KirboMod.Projectiles.Marx.GiantBlackHoleOfDoom
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
             //proj is 1 hitbox width height so can use position instead of center
-            return Helper.CheckCircleCollision(targetHitbox, Projectile.position, HitboxRadius);
+            return Helper.CheckCircleCollision(targetHitbox, Projectile.position, HitboxRadius * Projectile.scale * .5f);
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            return Projectile.DrawSelf();
+            int type = ModContent.ProjectileType<MarxBlackHole>();
+            Main.instance.LoadProjectile(type);
+            Texture2D texture = TextureAssets.Projectile[type].Value;
+            int spinFPS = 1;
+            int framesX = 5;
+            int framesY = 30;
+            int frameX = Projectile.frameCounter / spinFPS;
+            int frameY = Projectile.frameCounter;
+            frameX %= framesX;
+            frameY %= framesY;
+            Rectangle frame = texture.Frame(framesX, framesY, frameX, frameY);
+
+            Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, frame, Color.White, 0, frame.Size() / 2, Projectile.scale, SpriteEffects.None);
+            return false;
         }
         public override void OnHitPlayer(Player target, Player.HurtInfo info)
         {

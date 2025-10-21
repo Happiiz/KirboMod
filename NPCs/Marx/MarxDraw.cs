@@ -37,6 +37,7 @@ namespace KirboMod.NPCs.Marx
         public static int CutterChargeFrame => 19;
         public static int CutterThrowFrameStart => 19;
         public static int CutterThrowFrameEnd => 21;
+        public static int CutterThrowFrameDuration => 5;
         public static int TeleportFrameStart => 22;
         public static int TeleportFrameEnd => 24;
 
@@ -44,6 +45,18 @@ namespace KirboMod.NPCs.Marx
         MarxWingRenderer wingRenderer = new();
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            if (animation == Animation.ShadowHole)
+            {
+                float shadowHoleScaleMult = 1f;
+                //-2 because framecounter is effectively 2(?) frames delayed from attack timer
+                if(NPC.frameCounter > DashFromBelowChaseDuration - 2)
+                {
+                    shadowHoleScaleMult = 1.5f;
+                }
+                RenderShadowHole(spriteBatch, screenPos, 1f);
+                return false;
+            }
+
             MarxWingRenderer.Initialize();
             wingRenderer ??= new MarxWingRenderer();
             wingRenderer.Update();
@@ -120,8 +133,14 @@ namespace KirboMod.NPCs.Marx
 
             frame = NPC.frame;
             Vector2 drawPos = NPC.Center - screenPos;
+            if(frameIndex >= TeleportFrameStart && frameIndex <= TeleportFrameEnd)
+            {
+                drawColor = Color.White;
+            }
             wingRenderer.RenderFrame(frameIndex, spriteBatch, NPC.Center, screenPos, NPC.rotation, NPC.scale, frame.Width, -frame.Size() / 2);
-            spriteBatch.Draw(texture, drawPos, frame, drawColor, NPC.rotation, frame.Size() / 2, NPC.scale, NPC.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0); 
+            spriteBatch.Draw(texture, drawPos, frame, drawColor, NPC.rotation, frame.Size() / 2, NPC.scale, NPC.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+
+           
             return false;
         }
 

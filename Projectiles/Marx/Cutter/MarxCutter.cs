@@ -78,8 +78,10 @@ namespace KirboMod.Projectiles.Marx.Cutter
         {
             Projectile.tileCollide = false;
             Projectile.hostile = true;
-            Projectile.width = Projectile.height = 60;
+            Projectile.width = Projectile.height = 70;
             Projectile.ignoreWater = true;
+            Projectile.penetrate = -1;
+          
 
         }
         public override void AI()

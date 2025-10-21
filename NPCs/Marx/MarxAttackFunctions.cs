@@ -12,7 +12,11 @@ namespace KirboMod.NPCs.Marx
     public partial class MarxBoss : ModNPC
     {
         public static SoundStyle CutterShootLeftSFX => new("KirboMod/Sounds/NPC/Marx/CutterShotLeft");
+        public static SoundStyle CutterChargeSFX => new("KirboMod/Sounds/NPC/Marx/CutterCharge");
         public static SoundStyle CutterShootRightSFX => new("KirboMod/Sounds/NPC/Marx/CutterShotRight");
+        public static SoundStyle IceBombPuffUpSFX => new("KirboMod/Sounds/NPC/Marx/IceBombPuffUpCheeks");
+        public static SoundStyle IceBombChaseSFX => new("KirboMod/Sounds/NPC/Marx/IceBombChase");
+        public static SoundStyle IceBombSpitSFX => new("KirboMod/Sounds/NPC/Marx/IceBombSpit");
         public static int CutterDamage => 80;//ADJUST LATER
         public void ShootCutters()
         {

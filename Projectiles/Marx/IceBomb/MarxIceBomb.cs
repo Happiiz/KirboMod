@@ -1,6 +1,7 @@
 ﻿using KirboMod.Projectiles.Marx.IceBombFrag;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -8,6 +9,8 @@ namespace KirboMod.Projectiles.Marx.IceBomb
 {
     public class MarxIceBomb : ModProjectile
     {
+        public static SoundStyle SpitSFX => new("KirboMod/Sounds/NPC/Marx/IceBombSpit");
+        public static SoundStyle IceBombBreakSFX => new("KirboMod/Sounds/NPC/Marx/IceBombBreak");
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.CanHitPastShimmer[Type] = true;
@@ -28,6 +31,7 @@ namespace KirboMod.Projectiles.Marx.IceBomb
             Player target = Main.player[TargetPlayerIndex];
             if (Projectile.Center.Y >= target.Center.Y)//if below player or leveled with played center
             {
+                SoundEngine.PlaySound(IceBombBreakSFX, Projectile.Center);
                 Projectile.Kill();
             }
             Projectile.localAI[0]++;
@@ -43,15 +47,15 @@ namespace KirboMod.Projectiles.Marx.IceBomb
         /// </summary>
         public static void SpawnBombsForEveryPlayerAndPlaySFX(NPC marx, int damage)
         {
-            //todo: add sfx here
-            if(Main.netMode != NetmodeID.MultiplayerClient)
+            SoundEngine.PlaySound(SpitSFX, marx.Center);
+            if (Main.netMode == NetmodeID.MultiplayerClient)
             {
                 return;
             }
             foreach (Player plr in Main.ActivePlayers)
             {
                 //if within 200 tiles of marx
-                if(plr.Distance(marx.position) < 16 * 200)
+                if (plr.Distance(marx.position) < 16 * 200)
                 {
                     SpawnBombForPlayer(marx, damage, plr.whoAmI);
                 }
@@ -59,6 +63,7 @@ namespace KirboMod.Projectiles.Marx.IceBomb
         }
         /// <summary>
         /// use this if you want the bomb attack to only attack 1 player in multiplayer
+        /// DOESN'T PLAY SFX
         /// </summary>
         public static void SpawnBombForPlayer(NPC marx, int damage, int target)
         {
@@ -66,11 +71,11 @@ namespace KirboMod.Projectiles.Marx.IceBomb
             {
                 return;
             }
-            Projectile.NewProjectile(marx.GetSource_FromAI(), marx.Center, Vector2.Zero, ModContent.ProjectileType<MarxIceBomb>(), damage, 0f, -1, target);
+            Projectile.NewProjectile(marx.GetSource_FromAI(), marx.Center + marx.velocity * 2f, Vector2.Zero, ModContent.ProjectileType<MarxIceBomb>(), damage, 0f, -1, target);
         }
         private void SpawnFrag()
         {
-            //todo: add break sfx here
+
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
                 return;
@@ -95,7 +100,7 @@ namespace KirboMod.Projectiles.Marx.IceBomb
                     //avoid div by 0 inside remap function
                     float angle = fragCountPerSide == 1 ? 0 : Utils.Remap(j, 0, fragCountPerSide - 1, -spread / 2f, spread / 2f);
                     Vector2 vel = new Vector2(i * shootSpeed, 0).RotatedBy(angle);
-                    Projectile.NewProjectile(Projectile.GetSource_Death(), Projectile.Center, vel, id, Projectile.damage, 0f, -1, TargetPlayerIndex);
+                    Projectile.NewProjectile(Projectile.GetSource_Death(), Projectile.Center, vel, id, Projectile.damage, 0f, -1, TargetPlayerIndex, j * i);
                 }
             }
         }
