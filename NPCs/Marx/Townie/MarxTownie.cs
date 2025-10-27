@@ -84,7 +84,7 @@ namespace KirboMod.NPCs.Marx.Townie
 			NPC.lifeMax = 25000;
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath6; //ghastly sound (For playing up the "-has left!" effect)
-			NPC.knockBackResist = 0.5f;
+			NPC.knockBackResist = 0.8f;
 
 			AnimationType = NPCID.Guide;
         }

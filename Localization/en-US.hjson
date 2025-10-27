@@ -7,6 +7,7 @@ Mods: {
 			MusicBoxTitle: Music Box
 			ShroomiteHelmetBenefitDowngrades: This weapon and its downgrades benefit from the [i:1548] Shroomite Helmet
 			ShroomiteHelmetBenefit: This weapon benefits from the [i:1548] Shroomite Helmet
+			UnimplementedAbilityHat: "'What could've been'"
 		}
 
 		ProgressionDescription: {
@@ -1487,6 +1488,66 @@ Mods: {
 				DisplayName: Sparkling Soul
 				Tooltip: ""
 			}
+
+			BeamAbilityHat: {
+				DisplayName: Beam Ability Hat
+				Tooltip: ""
+			}
+
+			BombAbilityHat: {
+				DisplayName: Bomb Ability Hat
+				Tooltip: ""
+			}
+
+			CutterAbilityHat: {
+				DisplayName: Cutter Ability Hat
+				Tooltip: ""
+			}
+
+			FighterAbilityHat: {
+				DisplayName: Fighter Ability Hat
+				Tooltip: ""
+			}
+
+			FireAbilityHat: {
+				DisplayName: Fire Ability Hat
+				Tooltip: ""
+			}
+
+			IceAbilityHat: {
+				DisplayName: Ice Ability Hat
+				Tooltip: ""
+			}
+
+			PlasmaAbilityHat: {
+				DisplayName: Plasma Ability Hat
+				Tooltip: ""
+			}
+
+			TornadoAbilityHat: {
+				DisplayName: Tornado Ability Hat
+				Tooltip: ""
+			}
+
+			WaterAbilityHat: {
+				DisplayName: Water Ability Hat
+				Tooltip: "{$CommonItemTooltip.UnimplementedAbilityHat}"
+			}
+
+			LeafAbilityHat: {
+				DisplayName: Leaf Ability Hat
+				Tooltip: "{$CommonItemTooltip.UnimplementedAbilityHat}"
+			}
+
+			MirrorAbilityHat: {
+				DisplayName: Mirror Ability Hat
+				Tooltip: "{$CommonItemTooltip.UnimplementedAbilityHat}"
+			}
+
+			YoyoAbilityHat: {
+				DisplayName: Yo-Yo Ability Hat
+				Tooltip: "{$CommonItemTooltip.UnimplementedAbilityHat}"
+			}
 		}
 
 		Projectiles: {
@@ -1901,7 +1962,7 @@ Mods: {
 					HHeartMatter: Love is something I find quite icky, but those burning wishes, dreams, and that energy of life can be channeled into a powerful resource!
 					HMarx: I've appreciated your help thus far, but now I have something to ask of you: an awful evil slowly descends upon this world, but I figured out that if we use the power of the spirits of light and dark of this world with the care and compassion of our world, then we could influence the released souls to fight back against the enemy! Whaddya say?
 					HDarkMatter: There existed a terrible force in our world, but it has mostly since been wiped out. I wonder if this world contains its own dark forces. Try attracting them using some dark stuff! It should be interesting...
-					HZero: Ever since the darkness has been wiped away, our world hasn't had as many omnipresent adversaries... but with these alien materials, a ritual to resurect the heart of the darkness might be possible... Yes... I'd say that'd make an interesting last challenge.
+					HZero: Ever since the darkness has been wiped away, our world hasn't had as many omnipresent adversaries... but with these alien materials, a ritual to resurect the heart of the darkness might be possible... That's a final battle I'd want to see!
 					HPostZero: ...What? I don't have anything else to tell you. Friends are only useful for so long.
 				}
 
@@ -1917,8 +1978,8 @@ Mods: {
 					HateBiome: It's calm here... a little too calm here... It bores my senses!
 					LoveNPC: Wow! Everyone hates {NPCName} so much! Their air of negativity is just admirable!
 					LikeNPC: "{NPCName}'s penchant for destruction is awesome! I love a little chaos!"
-					DislikeNPC: Why does {NPCName} prefer to help rather than hurt? No one will need your help if you can hurt anyone around you!
-					HateNPC: I hate {NPCName}! Every year, he gives me stupid, black rocks! That puffball does a way better job with gifts than him!
+					DislikeNPC: Why does {NPCName} prefer to help rather than hurt? You won't need help if you can hurt everyone around you!
+					HateNPC: I hate {NPCName}! Every year, he gives me stupid, black, tasteless rocks! Even that puffball does a way better job with gifts than him!
 					LikeNPC_Princess: "{NPCName}'s personality makes me gag... but she also gives me food, which is always appreciated!"
 					Princess_LovesNPC: "{NPCName} may seem shifty, but as long as you keep him fed he'll always be a wonderful ally!"
 				}
