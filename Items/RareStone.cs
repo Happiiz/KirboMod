@@ -38,6 +38,15 @@ namespace KirboMod.Items
 		public override Color? GetAlpha(Color lightColor)
 		{
 			return Color.White; // Makes it uneffected by light
-		}
-	}
+        }
+		
+        public override void AddRecipes()
+        {
+            Recipe recipe = CreateRecipe();
+            recipe.AddIngredient(ModContent.ItemType<TreasureStone>());
+            recipe.AddIngredient(ModContent.ItemType<MysticalStone>());
+            recipe.AddTile(TileID.MythrilAnvil);
+            recipe.Register(); //adds this recipe to the game
+        }
+    }
 }

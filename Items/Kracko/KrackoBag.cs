@@ -43,7 +43,10 @@ namespace KirboMod.Items.Kracko
             itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<KrackoMask>(), 7));
             itemLoot.Add(ItemDropRule.Common(ItemID.Cloud, 1, 20, 20));
 
-			itemLoot.Add(ItemDropRule.OneFromOptions(1, ModContent.ItemType<AirWalkerHelmet>(), ModContent.ItemType<AirWalkerBreastplate>(), ModContent.ItemType<AirWalkerLeggings>()));
+            //itemLoot.Add(ItemDropRule.OneFromOptions(1, ModContent.ItemType<AirWalkerHelmet>(), ModContent.ItemType<AirWalkerBreastplate>(), ModContent.ItemType<AirWalkerLeggings>()));
+
+            itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<KrackoSpikeItem>(), 1, 10, 14));
+
             itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<PeeWeePole>(), 4));
             itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<PersonalCloud>()));
 

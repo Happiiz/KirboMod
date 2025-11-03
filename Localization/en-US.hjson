@@ -7,7 +7,7 @@ Mods: {
 			MusicBoxTitle: Music Box
 			ShroomiteHelmetBenefitDowngrades: This weapon and its downgrades benefit from the [i:1548] Shroomite Helmet
 			ShroomiteHelmetBenefit: This weapon benefits from the [i:1548] Shroomite Helmet
-			UnimplementedAbilityHat: "'What could've been'"
+			UnimplementedAbilityHat: "'What could've been...'"
 		}
 
 		ProgressionDescription: {
@@ -1548,6 +1548,85 @@ Mods: {
 				DisplayName: Yo-Yo Ability Hat
 				Tooltip: "{$CommonItemTooltip.UnimplementedAbilityHat}"
 			}
+
+			StarBlockItem: {
+				DisplayName: Star Block
+				Tooltip:
+					'''
+					May be destroyed by weapons and projectiles
+					Does not drop upon breaking
+					'''
+			}
+
+			MetaKnightMask: {
+				DisplayName: Swordsman's Mask
+				Tooltip: "'Wear the might of the greatest swordsman across dimensions'"
+			}
+
+			BandanaDeeBandana: {
+				DisplayName: Spearman's Bandana
+				Tooltip: "'Shine like a diamond with the insignia of the greatest spear user'"
+			}
+
+			DarkMetaKnightMask: {
+				DisplayName: Fractured Mask
+				Tooltip: "'Wear the fury of the darkest swordsman in another dimension'"
+			}
+
+			MasterCrown: {
+				DisplayName: Suspicious Looking Crown
+				Tooltip: "'It seems to be dormant...'"
+			}
+
+			TaranzaWig: {
+				DisplayName: Webber's Wig
+				Tooltip: "'Its distinguished appearance almost makes you forget what could be crawling in there'"
+			}
+
+			DaroachHat: {
+				DisplayName: Expert Thief's Hat
+				Tooltip: "'This stylish hat represents the prideful, gluttonous mojo of the greatest thief anywhere!'"
+			}
+
+			SusieHat: {
+				DisplayName: Secretary's Headgear
+				Tooltip: "'Put on not just your working clothes, but also your curious, scientific, cold, unfeeling, and greedy clothes as well!'"
+			}
+
+			KrackoSpikeItem: {
+				DisplayName: Krackling Spike
+				Tooltip: "'Watch out for the tip... and everywhere else!'"
+			}
+
+			DededeRobes: {
+				Tooltip: "'A large, gaudy coat fit for a king!'"
+				DisplayName: Royal Robe
+			}
+
+			HynessRobes: {
+				Tooltip: "'Embody the mantle of a diabolical leader hellbent on causing the end of everything'"
+				DisplayName: Doomsday Cultist Robe
+			}
+
+			HynessHood: {
+				Tooltip: "'Embody the face of a diabolical leader who has traded compassion for zealous obsession'"
+				DisplayName: Doomsday Cultist Hood
+			}
+
+			RibbonWig: {
+				Tooltip: "'A pretty pink wig that'll make your looks shine like a crystal!'"
+				DisplayName: Fairy Wig
+			}
+
+			AdeleineBeret: {
+				Tooltip: "'With this beret, your paintings will seem to come to life!'"
+				DisplayName: Artist's Beret
+			}
+
+			DaroachCloak: {
+				Tooltip: "'This devilish cape will make you feel like you can slip, speed and sneak like a rodent!'"
+				DisplayName: Roach Cloak
+			}
 		}
 
 		Projectiles: {
@@ -2017,6 +2096,7 @@ Mods: {
 			NightmareMusicBoxTile.MapEntry: Nightmare Music Box Tile
 			PowerOrbMusicBoxTile.MapEntry: Power Orb Music Box Tile
 			PureDarkMatterMusicBoxTile.MapEntry: Pure Dark Matter Music Box Tile
+			StarBlock.MapEntry: Star Block
 		}
 
 		Configs: {
@@ -2030,6 +2110,6 @@ Mods: {
 			}
 		}
 
-		Emotes.MarxTownieEmote.Command: marxtownieemote
+		Emotes.MarxTownieEmote.Command: Marx
 	}
 }

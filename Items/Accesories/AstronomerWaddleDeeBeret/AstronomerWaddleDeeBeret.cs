@@ -14,16 +14,17 @@ namespace KirboMod.Items.Accesories.AstronomerWaddleDeeBeret
         public override void SetDefaults()
         {
             Item.vanity = true;
-            Item.accessory = true;
             Item.width = 30;
             Item.height = 14;
-            Item.value = Item.buyPrice(0, 1, 0, 0);
+            Item.value = Item.buyPrice(0, 0, 0, 20);
+            Item.rare = ItemRarityID.Green;
         }
         public override void AddRecipes()
         {
             CreateRecipe()
-                .AddIngredient(ItemID.Silk, 5)
-                .AddIngredient<Starbit>()
+                .AddIngredient(ItemID.Silk, 20)
+                .AddIngredient(ItemID.FallenStar, 3)
+                .AddIngredient(ItemID.MeteoriteBar, 10)
                 .AddTile(TileID.Loom)
                 .Register();
         }

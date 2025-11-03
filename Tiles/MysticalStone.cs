@@ -19,7 +19,7 @@ namespace KirboMod.Tiles
 			Main.tileTable[Type] = false; //can't place things on it
 			Main.tileMergeDirt[Type] = false; //doesn't merge with dirt
 			Main.tileLavaDeath[Type] = true; //dosen't die by lava
-			Main.tileWaterDeath[Type] = true; //dosen't die by water
+			Main.tileWaterDeath[Type] = false; //dosen't die by water
 			Main.tileCut[Type] = false; //can't be destroyed by weapons
 			Main.tileSpelunker[Type] = true; // The tile will be affected by spelunker highlighting
 			Main.tileOreFinderPriority[Type] = 500; //same detection as chests
@@ -62,10 +62,10 @@ namespace KirboMod.Tiles
 
 		public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b)
 		{
-			//orange-ish light
-			r = 1f;
-			g = 0.6f;
-			b = 0.6f;
-		}
-	}
+            //green-ish light
+            r = 0.6f;
+            g = 1f;
+            b = 0.7f;
+        }
+    }
 }

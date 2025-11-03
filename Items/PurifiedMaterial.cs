@@ -31,8 +31,8 @@ namespace KirboMod.Items
 		public override void AddRecipes()
 		{
 			Recipe recipe = CreateRecipe();
-			recipe.AddIngredient(ModContent.ItemType<DarkMaterial>());
-			recipe.AddIngredient(ModContent.ItemType<HeartMatter>(), 3);
+			recipe.AddIngredient(ModContent.ItemType<DarkMaterial>(), 3);
+			recipe.AddIngredient(ModContent.ItemType<HeartMatter>(), 2);
 			recipe.AddTile(TileID.MythrilAnvil);
 			recipe.Register();
 		}

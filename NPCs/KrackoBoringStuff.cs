@@ -1,4 +1,5 @@
-﻿using KirboMod.Items.Accesories;
+﻿using KirboMod.Items;
+using KirboMod.Items.Accesories;
 using KirboMod.Items.Armor.AirWalker;
 using KirboMod.Items.Kracko;
 using KirboMod.Systems;
@@ -125,12 +126,14 @@ namespace KirboMod.NPCs
             LeadingConditionRule notExpertRule = new(new Conditions.NotExpert()); //checks if not expert
             LeadingConditionRule masterMode = new(new Conditions.IsMasterMode()); //checks if master mode
 
-            notExpertRule.OnSuccess(ItemDropRule.Common(ItemID.Cloud, 1, 50, 50)); //50 clouds
+            notExpertRule.OnSuccess(ItemDropRule.Common(ItemID.Cloud, 1, 20, 20)); //20 clouds
 
             notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<KrackoMask>(), 7));
 
             // Drop one of these 3 items with 100% chance
-            notExpertRule.OnSuccess(ItemDropRule.OneFromOptions(1, ModContent.ItemType<AirWalkerHelmet>(), ModContent.ItemType<AirWalkerBreastplate>(), ModContent.ItemType<AirWalkerLeggings>()));
+            //notExpertRule.OnSuccess(ItemDropRule.OneFromOptions(1, ModContent.ItemType<AirWalkerHelmet>(), ModContent.ItemType<AirWalkerBreastplate>(), ModContent.ItemType<AirWalkerLeggings>()));
+
+            notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<KrackoSpikeItem>(), 1, 10, 14));
 
             notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<PeeWeePole>(), 4));
 

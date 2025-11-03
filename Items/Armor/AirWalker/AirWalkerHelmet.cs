@@ -37,5 +37,14 @@ namespace KirboMod.Items.Armor.AirWalker
 			player.setBonus = "You have an extra double jump";
 			player.GetModPlayer<KirbPlayer>().airWalkerSet = true;
 		}
-	}
+
+        public override void AddRecipes()
+        {
+            Recipe recipe = CreateRecipe();
+            recipe.AddIngredient(ModContent.ItemType<KrackoSpikeItem>(), 2);
+            recipe.AddIngredient(ItemID.Cloud, 5);
+            recipe.AddTile(TileID.Anvils);
+            recipe.Register(); //adds this recipe to the game
+        }
+    }
 }

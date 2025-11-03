@@ -38,61 +38,11 @@ namespace KirboMod
             }
         }
 
-        /*public override void ModifyHardmodeTasks(List<GenPass> list)
+        public override void AddRecipeGroups()
         {
-            //Find out which step [insert step pass] is.
-            int hardmodeAnnouncmentTask = list.FindIndex(genpass => genpass.Name.Equals("Hardmode Announcement"));
-
-			if (hardmodeAnnouncmentTask != -1)
-			{
-				//Put new pass after [insert step pass].
-				list.Insert(hardmodeAnnouncmentTask + 1, new RareStonePass("Placing Rare Shinies", 237.4298f));
-			} 
+            //"Any Gold" - makes a recipe groupd containing gold and platinum bars
+            RecipeGroup group = new RecipeGroup(() => $"{Language.GetTextValue("LegacyMisc.37")} {Lang.GetItemNameValue(ItemID.GoldBar)}", ItemID.GoldBar, ItemID.PlatinumBar);
+            RecipeGroup.RegisterGroup("Gold", group);
         }
-
-        public class RareStonePass : GenPass
-        {
-            public RareStonePass(string name, float loadWeight) : base(name, loadWeight)
-            {
-            }
-
-            protected override void ApplyPass(GenerationProgress progress, GameConfiguration configuration)
-            {
-                // don't make progress text for when making a Hardmode pass
-
-                for (int k = 0; k < (int)((double)(Main.maxTilesX * Main.maxTilesY) * 10e-6); k++) //3e-6 is 10 one millionths
-                {
-                    bool placeSuccessful = false;
-                    Tile tile;
-                    int tileToPlace = ModContent.TileType<Tiles.RareStone>();
-                    while (!placeSuccessful)
-                    {
-                        int x = WorldGen.genRand.Next(0, Main.maxTilesX);
-                        int y = WorldGen.genRand.Next((int)GenVars.rockLayerLow, Main.maxTilesY - 300); //generate within cave layer
-
-                        List<ushort> dungeonbrick = new List<ushort> //for marking all dungeon bricks
-                        {
-                            TileID.BlueDungeonBrick,
-                            TileID.PinkDungeonBrick,
-                            TileID.GreenDungeonBrick,
-                            TileID.CrackedBlueDungeonBrick,
-                            TileID.CrackedPinkDungeonBrick,
-                            TileID.CrackedGreenDungeonBrick
-                        };
-
-                        for (int i = 0; i < 3; i++)
-                        {
-                            if (!Main.tile[x, y].HasTile && Main.tile[i, y + 3].TileType != TileID.LihzahrdBrick
-                                && !dungeonbrick.Contains(Main.tile[i, y + 3].TileType)) //just double check for pots, dungeon bricks, and temple bricks
-                            {
-                                WorldGen.PlaceTile(x, y, tileToPlace);
-                                tile = Main.tile[x, y];
-                                placeSuccessful = tile.HasTile && tile.TileType == tileToPlace;
-                            }
-                        }
-                    }
-                }
-            }
-        }*/
     }
 }

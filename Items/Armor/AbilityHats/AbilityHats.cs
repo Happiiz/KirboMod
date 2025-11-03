@@ -10,7 +10,7 @@ namespace KirboMod.Items.Armor.AbilityHats
 	[AutoloadEquip(EquipType.Head)]
 	public class FireAbilityHat : ModItem
 	{
-        public static int AbilityHatPrice => 500;
+        public static int AbilityHatPrice => 500; //5 silver
 
 		public override void SetStaticDefaults() 
         {
@@ -21,8 +21,8 @@ namespace KirboMod.Items.Armor.AbilityHats
 		public override void SetDefaults() {
 			Item.width = 10;
 			Item.height = 10;
-			Item.value = Item.buyPrice(AbilityHatPrice);
-			Item.rare = ItemRarityID.Orange;
+			Item.value = AbilityHatPrice;
+            Item.rare = ItemRarityID.Orange;
 			Item.vanity = true;
 		}
 
@@ -30,17 +30,10 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
-            recipe.AddIngredient(ItemID.GoldBar, 10);
+            recipe.AddRecipeGroup("Gold", 10);
             recipe.AddIngredient(ModContent.ItemType<Fire>());
             recipe.AddTile(TileID.Anvils);
             recipe.Register();
-
-            Recipe recipe2 = CreateRecipe();
-            recipe2.AddIngredient(ModContent.ItemType<Starbit>(), 20);
-            recipe2.AddIngredient(ItemID.PlatinumBar, 10);
-            recipe2.AddIngredient(ModContent.ItemType<Fire>());
-            recipe2.AddTile(TileID.Anvils);
-            recipe2.Register();
         }
     }
 
@@ -57,7 +50,7 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Item.width = 10;
             Item.height = 10;
-            Item.value = Item.buyPrice(FireAbilityHat.AbilityHatPrice);
+            Item.value = FireAbilityHat.AbilityHatPrice;
             Item.rare = ItemRarityID.Orange;
             Item.vanity = true;
         }
@@ -66,17 +59,10 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
-            recipe.AddIngredient(ItemID.GoldBar, 10);
+            recipe.AddRecipeGroup("Gold", 10);
             recipe.AddIngredient(ModContent.ItemType<Ice>());
             recipe.AddTile(TileID.Anvils);
             recipe.Register();
-
-            Recipe recipe2 = CreateRecipe();
-            recipe2.AddIngredient(ModContent.ItemType<Starbit>(), 20);
-            recipe2.AddIngredient(ItemID.PlatinumBar, 10);
-            recipe2.AddIngredient(ModContent.ItemType<Ice>());
-            recipe2.AddTile(TileID.Anvils);
-            recipe2.Register();
         }
     }
 
@@ -94,7 +80,7 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Item.width = 10;
             Item.height = 10;
-            Item.value = Item.buyPrice(FireAbilityHat.AbilityHatPrice);
+            Item.value = FireAbilityHat.AbilityHatPrice;
             Item.rare = ItemRarityID.Orange;
             Item.vanity = true;
         }
@@ -103,17 +89,10 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
-            recipe.AddIngredient(ItemID.GoldBar, 10);
+            recipe.AddRecipeGroup("Gold", 10);
             recipe.AddIngredient(ModContent.ItemType<Tornado>());
             recipe.AddTile(TileID.Anvils);
             recipe.Register();
-
-            Recipe recipe2 = CreateRecipe();
-            recipe2.AddIngredient(ModContent.ItemType<Starbit>(), 20);
-            recipe2.AddIngredient(ItemID.PlatinumBar, 10);
-            recipe2.AddIngredient(ModContent.ItemType<Tornado>());
-            recipe2.AddTile(TileID.Anvils);
-            recipe2.Register();
         }
     }
 
@@ -130,7 +109,7 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Item.width = 10;
             Item.height = 10;
-            Item.value = Item.buyPrice(FireAbilityHat.AbilityHatPrice);
+            Item.value = FireAbilityHat.AbilityHatPrice;
             Item.rare = ItemRarityID.Orange;
             Item.vanity = true;
         }
@@ -139,17 +118,10 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
-            recipe.AddIngredient(ItemID.GoldBar, 10);
+            recipe.AddRecipeGroup("Gold", 10);
             recipe.AddIngredient(ModContent.ItemType<Plasma>());
             recipe.AddTile(TileID.Anvils);
             recipe.Register();
-
-            Recipe recipe2 = CreateRecipe();
-            recipe2.AddIngredient(ModContent.ItemType<Starbit>(), 20);
-            recipe2.AddIngredient(ItemID.PlatinumBar, 10);
-            recipe2.AddIngredient(ModContent.ItemType<Plasma>());
-            recipe2.AddTile(TileID.Anvils);
-            recipe2.Register();
         }
     }
 
@@ -166,7 +138,7 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Item.width = 10;
             Item.height = 10;
-            Item.value = Item.buyPrice(FireAbilityHat.AbilityHatPrice);
+            Item.value = FireAbilityHat.AbilityHatPrice;
             Item.rare = ItemRarityID.Orange;
             Item.vanity = true;
         }
@@ -195,7 +167,7 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Item.width = 10;
             Item.height = 10;
-            Item.value = Item.buyPrice(FireAbilityHat.AbilityHatPrice);
+            Item.value = FireAbilityHat.AbilityHatPrice;
             Item.rare = ItemRarityID.Orange;
             Item.vanity = true;
         }
@@ -224,7 +196,7 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Item.width = 10;
             Item.height = 10;
-            Item.value = Item.buyPrice(FireAbilityHat.AbilityHatPrice);
+            Item.value = FireAbilityHat.AbilityHatPrice;
             Item.rare = ItemRarityID.Orange;
             Item.vanity = true;
         }
@@ -253,7 +225,7 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Item.width = 10;
             Item.height = 10;
-            Item.value = Item.buyPrice(FireAbilityHat.AbilityHatPrice);
+            Item.value = FireAbilityHat.AbilityHatPrice;
             Item.rare = ItemRarityID.Orange;
             Item.vanity = true;
         }
@@ -282,7 +254,7 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Item.width = 10;
             Item.height = 10;
-            Item.value = Item.buyPrice(FireAbilityHat.AbilityHatPrice);
+            Item.value = FireAbilityHat.AbilityHatPrice;
             Item.rare = ItemRarityID.Orange;
             Item.vanity = true;
         }
@@ -291,17 +263,10 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ModContent.ItemType<Starbit>(), 10);
-            recipe.AddIngredient(ItemID.GoldBar, 10);
+            recipe.AddRecipeGroup("Gold", 10);
             recipe.AddIngredient(ItemID.WaterBolt);
             recipe.AddTile(TileID.Anvils);
             recipe.Register();
-
-            Recipe recipe2 = CreateRecipe();
-            recipe2.AddIngredient(ModContent.ItemType<Starbit>(), 10);
-            recipe2.AddIngredient(ItemID.PlatinumBar, 10);
-            recipe2.AddIngredient(ItemID.WaterBolt);
-            recipe2.AddTile(TileID.Anvils);
-            recipe2.Register();
         }
     }
 
@@ -318,7 +283,7 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Item.width = 10;
             Item.height = 10;
-            Item.value = Item.buyPrice(FireAbilityHat.AbilityHatPrice);
+            Item.value = FireAbilityHat.AbilityHatPrice;
             Item.rare = ItemRarityID.Orange;
             Item.vanity = true;
         }
@@ -327,17 +292,10 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ModContent.ItemType<Starbit>(), 10);
-            recipe.AddIngredient(ItemID.GoldBar, 10);
+            recipe.AddRecipeGroup("Gold", 10);
             recipe.AddIngredient(ItemID.BladeofGrass);
             recipe.AddTile(TileID.Anvils);
             recipe.Register();
-
-            Recipe recipe2 = CreateRecipe();
-            recipe2.AddIngredient(ModContent.ItemType<Starbit>(), 10);
-            recipe2.AddIngredient(ItemID.PlatinumBar, 10);
-            recipe2.AddIngredient(ItemID.BladeofGrass);
-            recipe2.AddTile(TileID.Anvils);
-            recipe2.Register();
         }
     }
 
@@ -354,7 +312,7 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Item.width = 10;
             Item.height = 10;
-            Item.value = Item.buyPrice(FireAbilityHat.AbilityHatPrice);
+            Item.value = FireAbilityHat.AbilityHatPrice;
             Item.rare = ItemRarityID.Orange;
             Item.vanity = true;
         }
@@ -390,7 +348,7 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Item.width = 10;
             Item.height = 10;
-            Item.value = Item.buyPrice(FireAbilityHat.AbilityHatPrice);
+            Item.value = FireAbilityHat.AbilityHatPrice;
             Item.rare = ItemRarityID.Orange;
             Item.vanity = true;
         }
