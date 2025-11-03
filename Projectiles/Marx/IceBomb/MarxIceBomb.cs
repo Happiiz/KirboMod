@@ -14,7 +14,6 @@ namespace KirboMod.Projectiles.Marx.IceBomb
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.CanHitPastShimmer[Type] = true;
-
         }
         public override void SetDefaults()
         {

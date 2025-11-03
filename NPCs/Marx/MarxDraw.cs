@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
@@ -17,7 +18,6 @@ namespace KirboMod.NPCs.Marx
         public static float HorizontalSplitDist => 270;
         public static int SplitTeleportAwayTime => 160;
 
-
         public static int IdleFrameStart => 0;
         public static int IdleFrameEnd => 7;
         public static int IdleFrameDuration => 5;
@@ -31,32 +31,30 @@ namespace KirboMod.NPCs.Marx
         public static int SpitFrameEnd => 14;
         public static int SpitFrameDuration => 5;
         public static int BigLaserShootLeftFrameStart => 15;
-        public static int BigLaserShootLeftFrameEnd => 16;   
+        public static int BigLaserShootLeftFrameEnd => 16;
         public static int BigLaserShootRightFrameStart => 18;
         public static int BigLaserShootRightFrameEnd => 18;
+        public static int BigLaserShootFrameDuration => 3;
         public static int CutterChargeFrame => 19;
         public static int CutterThrowFrameStart => 19;
         public static int CutterThrowFrameEnd => 21;
         public static int CutterThrowFrameDuration => 5;
         public static int TeleportFrameStart => 22;
         public static int TeleportFrameEnd => 24;
-
+        //2 from playing the animation twice (1 for out, 1 in reverse for in)
+        public static int TotalTeleportInOutDuration => TeleportFrameDuration * (TeleportFrameEnd - TeleportFrameStart + 1) * 2;
 
         MarxWingRenderer wingRenderer = new();
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             if (animation == Animation.ShadowHole)
             {
-                float shadowHoleScaleMult = 1f;
                 //-2 because framecounter is effectively 2(?) frames delayed from attack timer
-                if(NPC.frameCounter > DashFromBelowChaseDuration - 2)
-                {
-                    shadowHoleScaleMult = 1.5f;
-                }
-                RenderShadowHole(spriteBatch, screenPos, 1f);
+                bool big = NPC.frameCounter > DashFromBelowChaseDuration - 2;
+                RenderShadowHole(spriteBatch, screenPos, 1f, big);
                 return false;
             }
-
+            RenderCutterChargeRings();
             MarxWingRenderer.Initialize();
             wingRenderer ??= new MarxWingRenderer();
             wingRenderer.Update();
@@ -133,19 +131,58 @@ namespace KirboMod.NPCs.Marx
 
             frame = NPC.frame;
             Vector2 drawPos = NPC.Center - screenPos;
-            if(frameIndex >= TeleportFrameStart && frameIndex <= TeleportFrameEnd)
+            if (frameIndex >= TeleportFrameStart && frameIndex <= TeleportFrameEnd)
             {
                 drawColor = Color.White;
             }
             wingRenderer.RenderFrame(frameIndex, spriteBatch, NPC.Center, screenPos, NPC.rotation, NPC.scale, frame.Width, -frame.Size() / 2);
             spriteBatch.Draw(texture, drawPos, frame, drawColor, NPC.rotation, frame.Size() / 2, NPC.scale, NPC.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
 
-           
+            if (attacktype == AttackType.MassiveLaser && AttackTimer < TotalTeleportInOutDuration + MassiveLaserChargeupTime)
+            {
+                float progress = Utils.GetLerpValue(TotalTeleportInOutDuration, TotalTeleportInOutDuration + MassiveLaserChargeupTime, AttackTimer, true);
+                float scale = Helper.RemapEased(progress, 0f, 1f, 0.2f, 3f, Easings.EaseOutSquare);
+                Vector2 scaleVec = new(scale);
+                Vector2 fatness = new(1);
+                Color color = new(255, 0, 255, 128);
+                VFX.DrawPrettyStarSparkle(1f, NPC.Center - screenPos + new Vector2(0, 26), Color.White with { A = 0 }, color, 2f, 0, 1, 3, 4, 0f, scaleVec, fatness);
+            }
             return false;
         }
+        private void RenderCutterChargeRings()
+        {
 
-
-
+            if (attacktype != AttackType.Cutter)
+            {
+                return;
+            }
+            if(AttackTimer > CutterRoundDuration * CutterRounds)
+            {
+                return;
+            }
+            int relativeTimer = (int)(AttackTimer % CutterRoundDuration);
+            relativeTimer -= TotalTeleportInOutDuration;
+            if(relativeTimer <= 0)
+            {
+                return;
+            }
+            
+            Vector2 drawPos = NPC.Center - Main.screenPosition;
+        //  int shootTime = CutterMoveDuration + CutterChargeDuration + 1;
+            int timeOffsetPerLoop = 10;
+            int ringDuration = 25;
+            int ringCount = 4;
+            for (int i = 0; i < ringCount; i++)
+            {
+                int timeOffset = i * timeOffsetPerLoop;
+                float scale = Utils.Remap(relativeTimer - timeOffset, 0, ringDuration, 10, 0);
+                float opacityMult = Utils.Remap(relativeTimer - timeOffset, 0, 10, 0f, .9f);
+                if (scale > 0 && opacityMult > 0)
+                {
+                    Main.EntitySpriteDraw(VFX.RingShine, drawPos, null, new Color(255, 255, 255) * opacityMult, Main.rand.NextFloat(MathF.Tau), VFX.ring.Size() / 2, scale, SpriteEffects.None);
+                }
+            }
+        }
         public static void DrawTpFx(Vector2 drawPos, int timer, SpriteBatch spriteBatch, float rotation = 0, float scale = 1f)
         {
             int type = ModContent.NPCType<MarxBoss>();
@@ -155,7 +192,7 @@ namespace KirboMod.NPCs.Marx
             int tpFrameStart = TeleportFrameStart;
             int frameIndex = tpFrameStart + timer / tpFrameDuration;
             int frameCount = Main.npcFrameCount[type];
-            if(frameIndex >= frameCount)
+            if (frameIndex >= frameCount)
             {
                 return;//don't draw because out of bounds of sheet so don't waste processing power
             }

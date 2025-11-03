@@ -1,8 +1,11 @@
+using KirboMod.NPCs.Marx.SpecialFX;
 using KirboMod.Projectiles.Marx.GiantBlackHoleOfDoom;
 using KirboMod.Projectiles.Marx.IceBomb;
+using KirboMod.Projectiles.Marx.VineSeed;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -13,30 +16,82 @@ namespace KirboMod.NPCs.Marx
     [AutoloadBossHead]
     public partial class MarxBoss : ModNPC //Nightmare Wizard used as a base
     {
+        public static int TeleportFrameDuration => 3;
+        static int MassiveLaserChargeupTime => Main.getGoodWorld ? 65 : Main.expertMode ? 80 : 120;
+        static int MassiveLaserDuration => 50;
+        static int MassiveLaserExtraWaitBeforeTeleport => 1;//NEEDS TO BE MORE THAN 0 OR ELSE NO TELEPORT WILL HAPPEN
+        static int MassiveLaserExtraWaitAfterTeleport => 19;
+        static int MassiveLaserRecoilSpeed => 70;
+        static int CutterMoveDuration => TotalTeleportInOutDuration + 1;
+        static int CutterChargeDuration => 53;
+        static int CutterRounds => 2;
+        static int CutterExtraWaitAfterRound => 20;
+        static int CutterExtraWaitAfterAllRounds => 100;
+        static int CutterRoundDuration => CutterMoveDuration + CutterChargeDuration + CutterExtraWaitAfterRound;
+        static int IceBombMoveDuration => Main.expertMode ? 40 : 80;
+        static int IceBombMaxHold => 120;
+        static int IceBombSpitDuration => 15;
+        static int IceBombExtraWait => 30;
+        static float IceBombAimAheadAmount => 7f;
+        static int DashFromBelowChaseDuration => 80;
+        static int DashFromBelowTelegraphDuration => Main.expertMode ? 30 : 100;
+        static int DashFromBelowDashUpDuration => 20;
+        static int DashFromBelowDashUpSpeed => 50;
+        //I don't remember why there is a +4, but keep it
+        static int TeleportFrenzyTpRate => TeleportFrameDuration * (TeleportFrameEnd - TeleportFrameStart + 4);
+        static int TeleportFrenzyTpCount => Main.getGoodWorld ? 2 : 6;
+        static int VineSeedCount => 10;
+        static int VineSeedSpreadX => 2000;
+        static int VineSeedRate => 2;
+        static int VineSeedStartup => 30;
+        static int VineSeedTeleportRate => 100;
+        static int VineSeedExtraWait => 200;
+        static float VineSeedDropVel => 12;
+        static float VineSeedSpawnYOffset => -600;
+        static float VineSeedMinFallDist => 100;
+        static float VineSeedMaxFallDist => 1200;
+
+        /// <summary>
+        /// DO NOT SET DIRECTLY!!! use function ChangeAnimation()
+        /// </summary>
         private Animation animation = Animation.Intro;
         private AttackType attacktype = AttackType.Intro;
         private AttackType lastattacktype = AttackType.DecideNext;
 
-        private int phase = 1; //decides what kind of attack cycle
 
         static int DeathAnimDuration => 360;
-
         public static int IntroDuration => 60;
         ref float AttackTimer { get => ref NPC.ai[0]; }
-
         ref float DeathCounter { get => ref NPC.ai[1]; }
-        public static int TeleportFrameDuration => 3;
+        Vector2 TargetTPPos
+        {
+            get
+            {
+                return new Vector2(NPC.ai[2], NPC.ai[3]);
+            }
+            set
+            {
+                if (Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    NPC.ai[2] = value.X;
+                    NPC.ai[3] = value.Y;
+                }
+                else
+                {
+                    //failsafe value so he doesn't teleport out of existence if something goes wrong
+                    NPC.ai[2] = NPC.position.X + NPC.width / 2;
+                    NPC.ai[3] = NPC.position.Y + NPC.height / 2;
+                }
 
-        public static int BlackHoleDamage => 80 / 2;
-
+            }
+        }
         public static SoundStyle SplitSFX => new("KirboMod/Sounds/NPC/Marx/BlackholeSnap");
         public static SoundStyle TpSFX => new("KirboMod/Sounds/NPC/Marx/Teleport");
         public override void AI() //constantly cycles each time
         {
             NPC.TargetClosest(false);
             Player player = Main.player[NPC.target];
-
-            NPC.spriteDirection = NPC.direction; //face whatever direction
+            NPC.spriteDirection = 1;
 
             AttackTimer++;
             NPC.TargetClosest(false);
@@ -65,8 +120,8 @@ namespace KirboMod.NPCs.Marx
             //{
             //    ShootCutters();
             //}
+            NPC.spriteDirection = 1;
         }
-
         void State_BlackHole()
         {
             if (AttackTimer == 1)
@@ -92,26 +147,12 @@ namespace KirboMod.NPCs.Marx
             }
             if (AttackTimer > HorizontalSplitStart + 3 + MarxBlackHole.SuckDuration + MarxBlackHole.ScaleUpDuration)
             {
-                EndState(AttackType.DashFromBelow, Animation.Rise);
+                EndState(AttackType.DashFromBelow, Animation.ShadowHole);
             }
 
         }
-        /*void AttackDecideNext()
-        {
-            List<AttackType> possibleAttacks = new() { };
-
-            possibleAttacks.Remove(lastattacktype);
-
-            attacktype = possibleAttacks[Main.rand.Next(possibleAttacks.Count)];
-            lastattacktype = attacktype;
-            NPC.netUpdate = true;
-        }*/
-
-
         private void AttackCycle()
         {
-            Player player = Main.player[NPC.target];
-
             switch (attacktype)
             {
                 case AttackType.Teleport:
@@ -121,13 +162,13 @@ namespace KirboMod.NPCs.Marx
                     State_Cutter();
                     break;
                 case AttackType.Vine:
-                    DecideNextState();
+                    State_Vine();
                     break;
                 case AttackType.IceBomb:
                     State_IceBomb();
                     break;
                 case AttackType.MassiveLaser:
-                    DecideNextState();
+                    State_MassiveLaser();
                     break;
                 case AttackType.BlackHole:
                     State_BlackHole();
@@ -147,13 +188,150 @@ namespace KirboMod.NPCs.Marx
             {
                 DecideNextState();
             }
+            if (animation == Animation.TeleportIn || animation == Animation.TeleportOut)
+            {
+                NPC.velocity = Vector2.Zero;
+            }
+            // Main.NewText(attacktype);
         }
-        static int CutterMoveDuration => 60;
-        static int CutterChargeDuration => 40;
-        static int CutterRounds => 2;
-        static int CutterExtraWaitAfterRound => 20;
-        static int CutterExtraWaitAfterAllRounds => 100;
-        static int CutterRoundDuration => CutterMoveDuration + CutterChargeDuration + CutterExtraWaitAfterRound;
+        private void State_Vine()
+        {
+
+            if (AttackTimer % VineSeedTeleportRate == 0)
+            {
+                TeleportAboveAheadPlayer(30);
+            }
+
+            if (AttackTimer < VineSeedStartup)
+            {
+
+            }
+            else if (AttackTimer < VineSeedStartup + VineSeedRate * VineSeedCount)
+            {
+                if ((AttackTimer - VineSeedStartup) % VineSeedRate == 0)
+                {
+
+                    Vector2 spawnPos;
+                    if (NPC.HasPlayerTarget)
+                    {
+                        Player plr = Main.player[NPC.target];
+                        spawnPos = plr.Center;
+                        spawnPos += (plr.position - plr.oldPosition) * 20;
+                    }
+                    else
+                    {
+                        spawnPos = NPC.Center;
+                    }
+                    //PLACEHOLDER 
+                    // SoundEngine.PlaySound(IceBombSpitSFX, spawnPos);
+                    int seedIndex = (int)(AttackTimer - VineSeedStartup) / VineSeedRate;
+                    seedIndex = (int)((seedIndex * Helper.Phi) % VineSeedCount);
+                    float range = VineSeedSpreadX / VineSeedCount;
+                    range /= 4;
+                    spawnPos.X += Utils.Remap(seedIndex, 0, VineSeedCount, -VineSeedSpreadX / 2f, VineSeedSpreadX / 2f);
+                    spawnPos.X += Main.rand.NextFloat(-range, range);
+                    int vineSeedID = ModContent.ProjectileType<MarxVineSeed>();
+                    //Main.rand.NextFloat(-VineSeedSpreadX / 2f, VineSeedSpreadX / 2f);
+                    spawnPos.Y += VineSeedSpawnYOffset;
+                    bool closeInX = false;
+                    bool closeInY = false;
+                    for (int i = 0; i < Main.maxProjectiles; i++)
+                    {
+                        Projectile pToCheck = Main.projectile[i];
+                        if (!pToCheck.active || pToCheck.type != vineSeedID)
+                        {
+                            continue;
+                        }
+                        if (MathF.Abs(spawnPos.X - pToCheck.position.X) < range * 2f)
+                        {
+                            closeInX = true;
+                        }
+
+                    }
+                    if (!closeInX && (!Main.expertMode || !closeInY))
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), spawnPos, new Vector2(0, VineSeedDropVel), vineSeedID, VineSeedDamage, 0f, -1, 0, spawnPos.Y + Main.rand.NextFloat(VineSeedMinFallDist, VineSeedMaxFallDist));
+                    }
+                }
+            }
+            else if (AttackTimer < VineSeedStartup + VineSeedRate * VineSeedCount + VineSeedExtraWait)
+            {
+
+            }
+            else
+            {
+                EndState();
+            }
+
+        }
+        private void State_MassiveLaser()
+        {
+            if (AttackTimer == 1)
+            {
+                NPC.velocity = Vector2.Zero;
+                Player plr = Main.player[NPC.target];
+                int side = Main.rand.Next(2) * 2 - 1;
+                NPC.direction = side;
+                side *= 400;
+                TeleportToPosAhead(plr.Center + new Vector2(side, 0), 40);
+            }
+            if (AttackTimer < TotalTeleportInOutDuration)
+            {
+                return;
+            }
+
+            float relativeTimer = AttackTimer - TotalTeleportInOutDuration;
+            if (relativeTimer < 20)
+            {
+                if (relativeTimer == 1)
+                {
+                    ChangeAnimation(Animation.PuffUp);
+                }
+                int side = NPC.direction;
+                side *= 400;
+                Player plr = Main.player[NPC.target];
+                MoveTo_LerpDecayVel(plr.Center + new Vector2(side, 0) + plr.velocity * 20, 40f, .1f);
+            }
+            else
+            {
+                NPC.velocity *= 0.9f;
+            }
+            if (relativeTimer < MassiveLaserChargeupTime)
+            {
+                if (relativeTimer == MathF.Max(MassiveLaserChargeupTime - 65, 0))
+                {
+                    IncreasingStrengthShake.Add(MassiveLaserChargeupTime, 4, 2f);
+                    SoundEngine.PlaySound(MassiveLaserCharge.WithPitchOffset(0f), NPC.Center);
+                }
+            }
+            else if (relativeTimer < MassiveLaserChargeupTime + MassiveLaserDuration)
+            {
+                NPC.velocity = new Vector2(NPC.direction * MassiveLaserRecoilSpeed, 0);
+                if (relativeTimer == MassiveLaserChargeupTime)
+                {
+                    ChangeAnimation(Animation.Blast);
+                    DecreasingStrengthShake.Add(MassiveLaserDuration, 10);
+                    LaserColorCorrection.ActivateScreenSaturation(MassiveLaserDuration, false);
+                    ShootMassiveLaser();
+                }
+            }
+            else if (relativeTimer < MassiveLaserChargeupTime + MassiveLaserDuration + MassiveLaserExtraWaitBeforeTeleport)
+            {
+                if (relativeTimer == MassiveLaserChargeupTime + MassiveLaserDuration)
+                {
+                    TeleportAboveAheadPlayer();
+                }
+            }
+            else if (relativeTimer < MassiveLaserChargeupTime + MassiveLaserDuration + MassiveLaserExtraWaitBeforeTeleport + MassiveLaserExtraWaitAfterTeleport)
+            {
+
+            }
+            else
+            {
+                NPC.velocity = Vector2.Zero;
+                EndState();
+            }
+        }
         private void State_Cutter()
         {
             //constants defined outside
@@ -178,9 +356,10 @@ namespace KirboMod.NPCs.Marx
             }
 
             //first part of a round
-            if (relativeTimer <= moveDuration)
+            if (relativeTimer == MathF.Min(1, moveDuration - TotalTeleportInOutDuration))
             {
-                MoveAbovePlayer_LerpDecayVel();
+                // MoveAbovePlayer_LerpDecayVel();
+                TeleportAboveAheadPlayer(CutterChargeDuration - 10);
             }
             //second part of a round
             else if (relativeTimer <= moveDuration + chargeDuration)
@@ -203,11 +382,6 @@ namespace KirboMod.NPCs.Marx
             }
 
         }
-        static int IceBombMoveDuration => Main.expertMode ? 40 : 80;
-        static int IceBombMaxHold => 120;
-        static int IceBombSpitDuration => 15;
-        static int IceBombExtraWait => 30;
-        static float IceBombAimAheadAmount => 7f;
         private void State_IceBomb()
         {
             float velDecayAmount = 0.9f;
@@ -239,7 +413,7 @@ namespace KirboMod.NPCs.Marx
                 {
                     SoundEngine.PlaySound(IceBombSpitSFX, NPC.Center);
                     ChangeAnimation(Animation.Spit);
-                    MarxIceBomb.SpawnBombsForEveryPlayerAndPlaySFX(NPC, 100);
+                    MarxIceBomb.SpawnBombsForEveryPlayerAndPlaySFX(NPC, IceBombDamage);
                     NPC.velocity.Y = -30;//recoil from spit
                 }
 
@@ -275,15 +449,12 @@ namespace KirboMod.NPCs.Marx
         }
         private void State_TeleportFrenzy()
         {
+            NPC.velocity = Vector2.Zero;
             NPC.damage = 0;
-            int tpRate = TeleportFrameDuration * (TeleportFrameEnd - TeleportFrameStart + 4);
-            int tpCount = 10;
+            int tpRate = TeleportFrenzyTpRate;
+            int tpCount = TeleportFrenzyTpCount;
             int tpIndex = (int)(AttackTimer / tpRate);
             if (AttackTimer % tpRate == 1)
-            {
-                ChangeAnimation(Animation.TeleportOut);
-            }
-            if (AttackTimer % tpRate == 4)
             {
                 Player target = Main.player[NPC.target];
                 Vector2 tpPos = target.Center;
@@ -295,72 +466,143 @@ namespace KirboMod.NPCs.Marx
                 {
                     tpPos += target.velocity * 20;
                     tpPos -= Vector2.UnitY * 200;
-                    NPC.netUpdate = true;
                 }
-                NPC.Center = tpPos;
+                TeleportTo(tpPos);
             }
             if (AttackTimer > tpCount * tpRate)
             {
                 EndState(AttackType.BlackHole, Animation.Idle);
             }
         }
-
+        //thank you chatgpt for this code
         private void DecideNextState()
         {
+            // Define canonical comparison
+            //Name comes from math:
+            //"relating to a general rule or standard formula."
+            AttackType GetCanonicalType(AttackType type) =>
+                type == AttackType.DashFromBelow ? AttackType.TeleportFrenzy : type;
+
+            // Fetch durations for each attack
+            GetAttackDurations(out float cutterDuration, out float iceBombDuration, out float blackHoleDuration, out float laserDuration, out float vineDuration, out _);
+
+            Dictionary<AttackType, float> durations = new()
+            {
+                { AttackType.Cutter, cutterDuration },
+                { AttackType.TeleportFrenzy, blackHoleDuration },
+                { AttackType.MassiveLaser, laserDuration },
+                { AttackType.IceBomb, iceBombDuration },
+                { AttackType.Vine, vineDuration },
+            };
+
+            // Exclude the last attack, using canonical type to treat some as equivalent
+            AttackType lastCanonical = GetCanonicalType(lastattacktype);
+
+            List<KeyValuePair<AttackType, float>> candidates = durations
+                .Where(kvp => GetCanonicalType(kvp.Key) != lastCanonical)
+                .ToList();
+
+            // Build a list of (AttackType, Weight) pairs where weight is 1/duration
+            List<(AttackType atkType, float weight)> weightedAttackChances = candidates
+                .Select(kvp => (atkType: kvp.Key, weight: 1f / kvp.Value))
+                .ToList();
+
+            // Compute total weight
+            float totalWeight = weightedAttackChances.Sum(w => w.weight);
+
+            // Build cumulative distribution
+            float cumulative = 0f;
+            for (int i = 0; i < weightedAttackChances.Count; i++)
+            {
+                (AttackType atk, float weight) = weightedAttackChances[i];
+                cumulative += weight / totalWeight;
+                weightedAttackChances[i] = (atk, cumulative);
+            }
+
+            // Roll random chance
+            float roll = Main.rand.NextFloat();
+            foreach ((AttackType atk, float threshold) in weightedAttackChances)
+            {
+                if (roll <= threshold)
+                {
+                    // Optionally apply special transitions here
+                    attacktype = atk;
+                    break;
+                }
+            }
+
+            // Update lastattacktype based on canonical type
+            lastattacktype = attacktype;
+            AttackTimer = 0;
+            return;
+
+            //old attack distribution code
+
             //DONT SET LASTATTACKTYPE HERE BECAUSE IF YOU DO IT WILL ALWAYS END UP AS DECIDENEXT
             List<AttackType> attacks = new()
             //tp frenzy leads to black hole then dash from below, so don't include any of those in the list
             //massive laser also leads to dash from below
-            { AttackType.Cutter, AttackType.IceBomb, AttackType.TeleportFrenzy  };
-            //effectively removing the black hole attack from the options 1/3 of the time
-            if (Main.rand.NextBool(3))
+            { AttackType.Cutter, AttackType.IceBomb,  AttackType.TeleportFrenzy, AttackType.MassiveLaser, AttackType.Vine};
+            //effectively removing the black hole attack from the options 1/2 of the time
+            if (Main.rand.NextBool(2))
             {
                 attacks.Remove(AttackType.TeleportFrenzy);
             }
             //don't do big laser too often
             //big laser also leads to dash from below
-            if (Main.rand.NextBool(3))
+            if (Main.rand.NextBool(2))
             {
                 attacks.Remove(AttackType.MassiveLaser);
             }
             attacks.Remove(lastattacktype);
             lastattacktype = attacktype;
             attacktype = Main.rand.NextFromCollection(attacks);
-            attacktype = AttackType.TeleportFrenzy;
+            //attacktype = AttackType.Cutter;//debug
+            // attacktype = AttackType.MassiveLaser;//debug
             // attacktype = AttackType.IceBomb;//debug
+            //attacktype = AttackType.Vine; //debug
             AttackTimer = 0;
         }
+        private void GetAttackDurations(out float cutterDuration, out float iceBombDuration, out float blackHoleDuration, out float laserDuration, out float vineDuration, out float sum)
+        {
+            blackHoleDuration = DashFromBelowChaseDuration + DashFromBelowTelegraphDuration + DashFromBelowDashUpDuration;
+            blackHoleDuration += TeleportFrenzyTpCount * TeleportFrenzyTpRate;
+            blackHoleDuration += HorizontalSplitStart + 3 + MarxBlackHole.SuckDuration + MarxBlackHole.ScaleUpDuration;
 
+            cutterDuration = CutterRoundDuration * CutterRounds - CutterExtraWaitAfterRound + CutterExtraWaitAfterAllRounds;
+            iceBombDuration = IceBombMoveDuration + IceBombSpitDuration + IceBombExtraWait + IceBombMaxHold / 2;// /2 to kinda average it idk
+            laserDuration = MassiveLaserChargeupTime + MassiveLaserDuration + MassiveLaserExtraWaitBeforeTeleport + MassiveLaserExtraWaitAfterTeleport + TotalTeleportInOutDuration;
+            vineDuration = VineSeedStartup + VineSeedRate * VineSeedCount + VineSeedExtraWait;
+            sum = blackHoleDuration + cutterDuration + iceBombDuration + laserDuration + vineDuration;
+        }
         private void State_Teleport()
         {
+            NPC.velocity = Vector2.Zero;
             if (AttackTimer == 1)
             {
-                ChangeAnimation(Animation.TeleportOut);
+                TeleportAboveAheadPlayer();
             }
-            if (AttackTimer > 6 * TeleportFrameDuration)
+            if (AttackTimer > TotalTeleportInOutDuration)
             {
-                EndState();
+                EndState_DontSetLastAttackType();
             }
         }
-        static int DashFromBelowChaseDuration => 120;
-        static int DashFromBelowTelegraphDuration => Main.expertMode ? 70 : 120;
-        static int DashFromBelowDashUpDuration => 20;
-        static int DashFromBelowDashUpSpeed => 50;
         private void State_DashFromBelow()
         {
+            Player plr = Main.player[NPC.target];
             if (AttackTimer == 1)
             {
                 ChangeAnimation(Animation.ShadowHole);
+                NPC.Center = plr.Center;
             }
-            Player plr = Main.player[NPC.target];
             float chaseDuration = DashFromBelowChaseDuration;
             float riseTelegraphDuration = DashFromBelowTelegraphDuration;
             float dashUpDuration = DashFromBelowDashUpDuration;
             float dashUpSpeed = DashFromBelowDashUpSpeed;
             if (AttackTimer < chaseDuration)
             {
-                
-                NPC.Center = Vector2.Lerp(NPC.Center, plr.Center, .2f);
+
+                NPC.Center = Vector2.Lerp(NPC.Center, plr.Center, .05f);
             }
             else if (AttackTimer < chaseDuration + riseTelegraphDuration)
             {
@@ -371,7 +613,7 @@ namespace KirboMod.NPCs.Marx
                     pos.Y *= .5f;
                     pos += SearchForShadowHolePosition();
 
-                    Dust d= Dust.NewDustPerfect(pos, DustID.Shadowflame);
+                    Dust d = Dust.NewDustPerfect(pos, DustID.Shadowflame);
                     d.noGravity = true;
                     d.noLight = true;
                     d.noLightEmittence = true;
@@ -379,6 +621,10 @@ namespace KirboMod.NPCs.Marx
             }
             else if (AttackTimer < chaseDuration + riseTelegraphDuration + dashUpDuration)
             {
+                if (AttackTimer == chaseDuration + riseTelegraphDuration)
+                {
+                    NPC.Center = SearchForShadowHolePosition();
+                }
                 NPC.velocity.Y = -dashUpSpeed;
                 NPC.velocity.X = 0;
                 ChangeAnimation(Animation.Rise);
@@ -389,7 +635,12 @@ namespace KirboMod.NPCs.Marx
                 EndState(AttackType.Teleport, Animation.TeleportOut);
             }
         }
-
+        void EndState_DontSetLastAttackType()
+        {
+            AttackTimer = 0;
+            ChangeAnimation(Animation.Idle);
+            attacktype = AttackType.DecideNext;
+        }
         void EndState()
         {
             AttackTimer = 0;
@@ -424,63 +675,49 @@ namespace KirboMod.NPCs.Marx
             targetVel *= maxSpeed * speedMult;
             NPC.velocity = Vector2.Lerp(NPC.velocity, targetVel, lerpAmount);
         }
-        /*static void ClampLength(ref Vector2 vector, float length = 300)
+        static void ClampLength(ref Vector2 vector, float length = 300)
         {
-            length = 300;
             float vecLength = vector.Length();
             if (vecLength < length)
             {
                 vector *= length / vecLength;
             }
-        }*/
-
-        /*Vector2 GetTeleportLocation(int framesAhead)
+        }
+        Vector2 GetTeleportLocation(int framesAhead)
         {
+            if (!NPC.HasValidTarget)
+            {
+                return Vector2.Zero;
+            }
             Player plr = Main.player[NPC.target];
-            Vector2 result = new Vector2(0, -100) + plr.velocity * framesAhead;
+            Vector2 result = new Vector2(0, -250) + plr.velocity * framesAhead;
             ClampLength(ref result);
+            result += plr.Center;
             return result;
-        }*/
-
-        /*public override bool CheckDead()
+        }
+        void TeleportAboveAheadPlayer(int framesAhead = 20)
         {
-            if (DeathCounter < 360)
-            {
-                NPC.active = true;
-                NPC.life = 1;
-                DeathCounter += 1; //go up
-                return false;
-            }
-            return true;
-        }*/
-
-        /*private void DoDeathAnimation()
+            Vector2 tpLocation = GetTeleportLocation(framesAhead);
+            TeleportTo(tpLocation);
+        }
+        void TeleportTo(Vector2 tpLocation)
         {
-            attackTimer = 0; //don't attack
-            NPC.dontTakeDamage = true;
-            NPC.damage = 0;
-            NPC.rotation = 0;
-
-            DeathCounter++; //go up
-
-            if (DeathCounter < 120)
+            TargetTPPos = tpLocation;
+            NPC.netUpdate = true;
+            ChangeAnimation(Animation.TeleportOut);
+        }
+        void TeleportToPosAhead(Vector2 tpLocation, int framesAhead = 20)
+        {
+            TargetTPPos = tpLocation;
+            NPC.netUpdate = true;
+            if (!NPC.HasValidTarget)
             {
-                animation = 9;
+                return;
             }
-            else if (DeathCounter < 240)
-            {
-                animation = 10;
-            }
-            else if (DeathCounter < 360)
-            {
-                animation = 11;
-            }
-            else
-            {
-                NPC.HideStrikeDamage = true;
-                NPC.SimpleStrikeNPC(999999, 1, false, 0, null, false, 0, false);
-            }
-        }*/
+            Player plr = Main.player[NPC.target];
+            TargetTPPos += plr.velocity * framesAhead;
+            ChangeAnimation(Animation.TeleportOut);
+        }
         void ChangeAnimation(Animation newAnimation)
         {
             //set to -1 instead of 0 because timer increments before it is read
@@ -503,7 +740,7 @@ namespace KirboMod.NPCs.Marx
 
             if (animation == Animation.TeleportOut)
             {
-                if(NPC.frameCounter == -1)
+                if (NPC.frameCounter == -1)
                 {
                     SoundEngine.PlaySound(TpSFX, NPC.Center);
                 }
@@ -519,6 +756,7 @@ namespace KirboMod.NPCs.Marx
                 if (frameIndex >= Main.npcFrameCount[Type])//automatically set to teleport in
                 {
                     ChangeAnimation(Animation.TeleportIn);
+                    NPC.Center = TargetTPPos;
                     //no need to change frame.Y because next part of code does that
                 }
             }
@@ -544,6 +782,8 @@ namespace KirboMod.NPCs.Marx
                 if (frameIndex < TeleportFrameStart)//automatically set to idle
                 {
                     NPC.frame.Y = 0;
+                    //sync position after teleporting
+                    NPC.netUpdate = true;
                     ChangeAnimation(Animation.Idle);
                 }
             }
@@ -629,7 +869,24 @@ namespace KirboMod.NPCs.Marx
                 frameIndex += RiseFrameStart;
                 NPC.frame.Y = frameHeight * frameIndex;
             }
+            if (animation == Animation.Blast)
+            {
+                NPC.dontTakeDamage = false;
+                NPC.frameCounter++;
+                int frameCount = BigLaserShootLeftFrameEnd - BigLaserShootLeftFrameStart + 1;
 
+                int frameIndex = (int)NPC.frameCounter / BigLaserShootFrameDuration;
+                frameIndex %= frameCount;
+                if (NPC.direction == 1)
+                {
+                    frameIndex += BigLaserShootLeftFrameStart;
+                }
+                else
+                {
+                    frameIndex += BigLaserShootRightFrameStart - 1;
+                }
+                NPC.frame.Y = frameIndex * frameHeight;
+            }
             if (attacktype == AttackType.TeleportFrenzy)
             {
                 NPC.dontTakeDamage = true;

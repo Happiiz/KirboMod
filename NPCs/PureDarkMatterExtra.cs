@@ -40,7 +40,11 @@ namespace KirboMod.NPCs
                 Position = new Vector2(20, 0),
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(NPC.type, drawModifiers);
-
+            string musicPath = "KirboMod/Music/Photonic0_PureDarkMatterWithLoopMetadata";
+            int musicSlot = MusicLoader.GetMusicSlot(musicPath);
+            Music = musicSlot;
+            Main.musicFade[musicSlot] = 1;
+            Main.musicNoCrossFade[musicSlot] = true;
             NPCID.Sets.ImmuneToRegularBuffs[Type] = true; //immune to all buffs that aren't whips
         }
 
@@ -71,7 +75,13 @@ namespace KirboMod.NPCs
 
             if (!Main.dedServ)//if not dedicated server
             {
-                int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Photonic0_PureDarkMatterWithLoopMetadata");
+                string musicPath = "KirboMod/Music/Photonic0_PureDarkMatterWithLoopMetadata";
+                bool debug_useRematchMusicToTestLoopPoint = false;
+                if (debug_useRematchMusicToTestLoopPoint)
+                {
+                    musicPath = "KirboMod/Music/Photonic0_DarkMatterRematch_WithLoopMetadata";
+                }
+                int musicSlot = MusicLoader.GetMusicSlot(musicPath);
                 Music = musicSlot;
                 Main.musicFade[musicSlot] = 1;
                 Main.musicNoCrossFade[musicSlot] = true;
@@ -106,8 +116,8 @@ namespace KirboMod.NPCs
             attacktype = (DarkMatterAttackType)reader.ReadByte();
             lastattacktype = (DarkMatterAttackType)reader.ReadByte();
 
-            attackTurn = reader.ReadInt32();
-            phase = reader.ReadInt32();
+            attackTurn = reader.ReadByte();
+            phase = reader.ReadByte();
 
             spot = reader.ReadVector2();
         }

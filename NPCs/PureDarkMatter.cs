@@ -16,11 +16,11 @@ namespace KirboMod.NPCs
     [AutoloadBossHead]
     public partial class PureDarkMatter : ModNPC
     {
-        private int phase = 1;
+        private byte phase = 1;
 
         private Vector2 spot = new(0, 0);
 
-        private int attackTurn = 2; //start at two so last expert phase starts on spin move
+        private byte attackTurn = 2; //start at two so last expert phase starts on spin move
 
         private DarkMatterAttackType attacktype = DarkMatterAttackType.Petals;
 
@@ -504,7 +504,10 @@ namespace KirboMod.NPCs
             {
                 if (NPC.ai[0] % 10 == 0) //little dust to warn player
                 {
-                    Dust.NewDust(NPC.position, NPC.width, NPC.height, ModContent.DustType<DarkResidue>());
+                    Dust d = Dust.NewDustDirect(NPC.position, NPC.width, NPC.height, DustID.GemDiamond);
+                    d.noGravity = true;
+                    d.noLight = true;
+                    d.noLightEmittence = true;
                 }
 
                 NPC.rotation = playerDistance.ToRotation() + MathHelper.ToRadians(MathF.Sin(Main.GlobalTimeWrappedHourly * 5) * 45);

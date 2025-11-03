@@ -14,6 +14,7 @@ namespace KirboMod.Projectiles.Marx.MassiveLaser
         {
             ProjectileID.Sets.CanHitPastShimmer[Type] = true;
             Main.projFrames[Type] = 6;
+            //increased distance before the laser is culled
             ProjectileID.Sets.DrawScreenCheckFluff[Type] = LaserLength;
         }
         public override void SetDefaults()
@@ -23,19 +24,20 @@ namespace KirboMod.Projectiles.Marx.MassiveLaser
             Projectile.width = 182 * 2;
             Projectile.tileCollide = false;
             Projectile.scale = 1f / 5f;
+            Projectile.penetrate = -1;
         }
         //debug value, change be later
-        static int LaserLength => 16 * 200;
+        static int LaserLength => 16 * 400;
         ref float Timer => ref Projectile.localAI[0];
+        ref float LaserDuration => ref Projectile.ai[0];
         public override void AI()
         {
             FrameCounting();
-            Projectile.damage = 5;//TEST VALUE, DELETE LATER
             Timer++;
-            Projectile.scale = Helper.RemapEased(Timer, 0f, 5f, 0f, 2f, Easings.EaseOutSquare);
+            Projectile.scale = Utils.GetLerpValue(0f, 5f, Timer, true) * Utils.GetLerpValue(LaserDuration, LaserDuration - 5, Timer, true);
+            Projectile.scale = Easings.EaseOutSquare(Projectile.scale) * 3f;
             Projectile.rotation = Projectile.velocity.ToRotation();
         }
-
         private void FrameCounting()
         {
             if (++Projectile.frameCounter >= 1)
@@ -47,7 +49,7 @@ namespace KirboMod.Projectiles.Marx.MassiveLaser
         }
         static void AABBLineVisualizer(Vector2 lineStart, Vector2 lineEnd, float lineWidth)
         {
-            Texture2D blankTexture = Terraria.GameContent.TextureAssets.Extra[195].Value;
+            Texture2D blankTexture = Terraria.GameContent.TextureAssets.Extra[ExtrasID.RainbowRodTrailColorGradient].Value;
             Vector2 texScale = new Vector2((lineStart - lineEnd).Length(), lineWidth) * 0.00390625f;//1/256, texture is 256x256
             Main.EntitySpriteDraw(blankTexture, (lineStart) - Main.screenPosition, null, Color.Red, (lineEnd - lineStart).ToRotation(), new Vector2(0, 128), texScale, SpriteEffects.None);
         }
@@ -67,10 +69,16 @@ namespace KirboMod.Projectiles.Marx.MassiveLaser
             Vector2 start = Projectile.Center - Main.screenPosition;
             Color drawCol = Color.White;
             drawCol.A = 200;
+            float cullScale = 2f * 1.5f;
             Main.EntitySpriteDraw(tex, start, capFrame, drawCol, Projectile.rotation, capOrigin, Projectile.scale, SpriteEffects.FlipHorizontally);
             for (int i = 0; i < segments; i++)
             {
                 Vector2 pos = start + dir * (capFrame.Width / 2f * Projectile.scale + i * bodyFrame.Width * Projectile.scale);
+                //cull individual segments for performance
+                if (pos.X > Main.screenWidth + bodyFrame.Width * cullScale || pos.X < -bodyFrame.Width * cullScale || pos.Y > Main.screenHeight + bodyFrame.Height * cullScale || pos.Y < -bodyFrame.Height * cullScale)
+                {
+                    continue;
+                }
                 Main.EntitySpriteDraw(tex, pos, bodyFrame, drawCol, Projectile.rotation, bodyOrigin, Projectile.scale, SpriteEffects.None);
             }
             Vector2 capPos = start + dir * (segments * bodyFrame.Width * Projectile.scale + capFrame.Width * Projectile.scale);
@@ -93,6 +101,10 @@ namespace KirboMod.Projectiles.Marx.MassiveLaser
 
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
+            if(Timer < 5 || Timer > LaserDuration - 5)
+            {
+                return false;
+            }
             float colPoint = 0;
             GetLaserCollisionParams(out Vector2 start, out Vector2 end, out float width);
             return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), start, end, width, ref colPoint);

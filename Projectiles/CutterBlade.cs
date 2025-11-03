@@ -22,7 +22,7 @@ namespace KirboMod.Projectiles
 			Projectile.DamageType = DamageClass.Ranged;
 			Projectile.timeLeft = 300;
 			Projectile.tileCollide = true;
-			Projectile.penetrate = -1;
+			Projectile.penetrate = 3;
             Projectile.extraUpdates = 1;
 			Projectile.usesLocalNPCImmunity = true; //allows to have npc immunity frames on its own accord
 			Projectile.localNPCHitCooldown = 40; //time until it can damage again regardless if a projectile just struck the target
@@ -84,6 +84,10 @@ namespace KirboMod.Projectiles
             if (Projectile.alpha != 0 || Timer % 10 != 0 || EffectCooldown < 20)
                 return;
             Particles.Ring.CutterRing(this);
+        }
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            Projectile.damage = (int)(Projectile.damage * 0.8f);
         }
         public override bool OnTileCollide(Vector2 oldVelocity) 
         {

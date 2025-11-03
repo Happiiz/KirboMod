@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
 using Terraria.ID;
@@ -237,7 +238,12 @@ namespace KirboMod
             return angleToTarget - MathF.Asin(aimedTargetVelLength * MathF.Sin(z) / shotVelLength);
         }
 
-
+        public static void AABBvLineVisualizer(Vector2 lineStart, Vector2 lineEnd, float lineWidth)
+        {
+            Texture2D blankTexture = Terraria.GameContent.TextureAssets.Extra[195].Value;
+            Vector2 texScale = new Vector2((lineStart - lineEnd).Length(), lineWidth) * 0.00390625f;//1/256, texture is 256x256
+            Main.EntitySpriteDraw(blankTexture, (lineStart) - Main.screenPosition, null, Color.Red, (lineEnd - lineStart).ToRotation(), new Vector2(0, 128), texScale, SpriteEffects.None);
+        }
         public static float InverseRemapEased(float result, float fromMin, float fromMax, float toMin, float toMax, Func<float, float> inverseEasingFunction)
         {
             // Normalize to easing space

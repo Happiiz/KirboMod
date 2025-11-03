@@ -110,16 +110,12 @@ namespace KirboMod.NPCs.Marx
         {
             writer.Write((byte)attacktype);
             writer.Write((byte)lastattacktype);
-
-            writer.Write((byte)phase);
         }
 
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             attacktype = (AttackType)reader.ReadByte();
             lastattacktype = (AttackType)reader.ReadByte();
-
-            phase = reader.ReadByte();
         }
 
         public override void OnKill()
