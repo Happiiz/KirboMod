@@ -60,10 +60,7 @@ namespace KirboMod.NPCs
         }
         private void AttackPattern()
         {
-            Player player = Main.player[NPC.target];
-            Vector2 moveTo = player.Center;
-            Vector2 playerDistance = player.Center - NPC.Center;
-            Vector2 move = player.Center - NPC.Center;
+
 
             NPC.ai[0]++;
 
@@ -151,7 +148,6 @@ namespace KirboMod.NPCs
                 }
             }
         }
-
         void AttackDecideNext()
         {
             List<DarkMatterAttackType> possibleAttacks = new() { DarkMatterAttackType.Petals, DarkMatterAttackType.Dash, DarkMatterAttackType.Lasers };
@@ -175,7 +171,6 @@ namespace KirboMod.NPCs
                 lastattacktype = attacktype;
             }
         }
-
         void AttackPetals()
         {
             Player target = Main.player[NPC.target];
@@ -234,7 +229,6 @@ namespace KirboMod.NPCs
                 NPC.ai[0] = 29;
             }
         }
-
         void AttackDash()
         {
             Player player = Main.player[NPC.target];
@@ -310,11 +304,11 @@ namespace KirboMod.NPCs
         }
         static float VoidInitialAttackAngle(float progress)
         {
-            float result = MathF.Sin(progress * progress * MathF.Tau) * MathF.PI;
-            result += (3 * progress * progress - 2 * progress * progress * progress) * (MathF.Tau * 4f / 3f);
+            float progressSqr = progress * progress;
+            float result = MathF.Sin(progressSqr * MathF.Tau) * MathF.PI;
+            result += (3 * progressSqr - 2 * progressSqr * progress) * (MathF.Tau * 4f / 3f);
             return result;
         }
-
         void AttackLasers()
         {
             Player player = Main.player[NPC.target];

@@ -1,4 +1,5 @@
 using KirboMod.NPCs;
+using KirboMod.NPCs.PureDarkMatterRematch;
 using Terraria;
 using Terraria.Graphics.Effects;
 using Terraria.ModLoader;
@@ -9,7 +10,7 @@ namespace KirboMod.Biomes
     {
         public override bool IsSceneEffectActive(Player player)
         {
-            if (NPC.AnyNPCs(ModContent.NPCType<Zero>()) || NPC.AnyNPCs(ModContent.NPCType<ZeroEye>()))
+            if (NPC.AnyNPCs(ModContent.NPCType<Zero>()) || NPC.AnyNPCs(ModContent.NPCType<ZeroEye>()) || NPC.AnyNPCs(ModContent.NPCType<PureDarkMatterRematch>()))
             {
                 //Disable these specific sky effects
                 SkyManager.Instance["Party"].Deactivate();

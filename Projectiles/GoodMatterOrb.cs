@@ -11,8 +11,8 @@ using Terraria.ModLoader;
 namespace KirboMod.Projectiles
 {
 	public class GoodMatterOrb : ModProjectile
-	{
-		public override void SetStaticDefaults()
+    {
+        public override void SetStaticDefaults()
 		{
 			Main.projFrames[Projectile.type] = 4;
             ProjectileID.Sets.TrailCacheLength[Projectile.type] = 4; // The length of old position to be recorded

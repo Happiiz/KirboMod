@@ -49,7 +49,7 @@ namespace KirboMod.NPCs
         public override Color OnTileColor(Color inColor)
         {
             float intensity = GetIntensity();
-            return new Color(Vector4.Lerp(new Vector4(0.0f, 0.0f, 1f, 1f), inColor.ToVector4(), 1f - intensity));
+            return new Color(Vector4.Lerp(new Vector4(0.75f, 0.75f, 1f, 1f), inColor.ToVector4(), 1f - intensity));
         }
 
         public static Asset<Texture2D> Cloud;
@@ -61,7 +61,7 @@ namespace KirboMod.NPCs
             if (maxDepth >= 0f && minDepth < 0f)
             {
                 float intensity = GetIntensity();
-                spriteBatch.Draw(TextureAssets.BlackTile.Value, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.Blue);
+                spriteBatch.Draw(TextureAssets.BlackTile.Value, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.Blue * .5f);
             }
             //Main cloud
             if (ModContent.GetInstance<KirbConfig>().HyperzoneClouds) //enabled in the config
@@ -96,7 +96,7 @@ namespace KirboMod.NPCs
         public static void DrawFrontLayer(SpriteBatch sb)
         {
             hyperZoneFront ??= ModContent.Request<Texture2D>("KirboMod/ExtraTextures/HyperZoneFront");
-            Texture2D back = hyperZoneFront.Value;
+            Texture2D front = hyperZoneFront.Value;
             Vector2 texSize = hyperZoneFront.Size();
             Vector2 referencePos = Main.screenPosition;
             for (int i = 0; i < 4; i++)
@@ -109,8 +109,7 @@ namespace KirboMod.NPCs
                     offsetY -= referencePos.Y % texSize.Y;
                     offsetX -= fgOffset;
                     offsetY += fgOffset;
-
-                    sb.Draw(back, new Rectangle((int)(offsetX + .5f), (int)(offsetY + .5f), (int)(texSize.X), (int)(texSize.Y)), Color.White * .5f);
+                    sb.Draw(front, new Rectangle((int)(offsetX + .5f), (int)(offsetY + .5f), (int)(texSize.X), (int)(texSize.Y)), Color.White * .35f);
                 }
             }
 

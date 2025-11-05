@@ -226,6 +226,11 @@ namespace KirboMod.Projectiles.Lightnings
             ai0 = velocity.ToRotation();
             ai1 = Main.rand.Next(100);
         }
+        public static void GetSpawningStats(float velocityAngle, out float ai0, out float ai1)
+        {
+            ai0 = velocityAngle;
+            ai1 = Main.rand.Next(100);
+        }
         void SetColorVariable(int i, ref Vector2 halfSize, float opacityMultiplier)
         {
             switch (i)

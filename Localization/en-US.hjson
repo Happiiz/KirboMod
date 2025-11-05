@@ -1751,6 +1751,7 @@ Mods: {
 			MarxVineSeed.DisplayName: Marx Vine Seed
 			FlyingSparklingSoul.DisplayName: Flying Sparkling Soul
 			MarxBlackHole.DisplayName: Marx Black Hole
+			MatterOrbHoming.DisplayName: Matter Orb
 		}
 
 		NPCs: {
@@ -1940,6 +1941,7 @@ Mods: {
 			}
 
 			MarxBoss.DisplayName: Marx
+			PureDarkMatterRematch.DisplayName: Dark Matter
 		}
 
 		Tiles: {

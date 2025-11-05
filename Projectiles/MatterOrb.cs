@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
-using System.Reflection.Metadata;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
@@ -14,10 +13,11 @@ namespace KirboMod.Projectiles
 {
     public class MatterOrb : ModProjectile
     {
+        public override string Texture => "KirboMod/Projectiles/MatterOrb";
         public override void SetStaticDefaults()
         {
             Main.projFrames[Projectile.type] = 4;
-
+            ProjectileID.Sets.CanHitPastShimmer[Type] = true;
             //for afterimages
             ProjectileID.Sets.TrailCacheLength[Projectile.type] = 17; // The length of old position to be recorded
             ProjectileID.Sets.TrailingMode[Projectile.type] = 0; // The recording mode
@@ -35,12 +35,12 @@ namespace KirboMod.Projectiles
             Projectile.scale = 1f;
         }
         static int BlastSize => 60;
-        ref float Timer => ref Projectile.localAI[0];
+        public ref float Timer => ref Projectile.localAI[0];
         ref float BallIndex => ref Projectile.ai[0];
         int BallDelayIndex => SpawnIndexToDelayIndex(Projectile.ai[0]);
         int DarkMatterNPCIndex => (int)Projectile.ai[1];
         ref float DirectionSign => ref Projectile.ai[2];
-        static int ThrowDelay => 20;
+        public static int ThrowDelay => 20;
         static int PerIndexExtraThrowDelay => 8;
         float ThrowTime => ThrowDelay + BallIndex * PerIndexExtraThrowDelay;
         static int FlyDuration => 30;
@@ -138,11 +138,11 @@ namespace KirboMod.Projectiles
                 relativeTimer = Timer - ExplodeTime - 1;
                 if (relativeTimer % 10 == 0)
                 {
-                    SoundEngine.PlaySound(SoundID.Item14 with {  MaxInstances = 0 }, Projectile.Center);
+                    SoundEngine.PlaySound(SoundID.Item14 with { MaxInstances = 0 }, Projectile.Center);
                 }
                 if (relativeTimer % 3 == 0)
                 {
-                   
+
                     int dustCount = 16;
                     float deviation = 5;
                     int lineDustCount = 4;
@@ -153,14 +153,14 @@ namespace KirboMod.Projectiles
                         Dust d = Dust.NewDustPerfect(dustPos + dustVel, DustID.GemDiamond, dustVel, 0, Color.White, 1f);
                         d.noGravity = true;
                         d.scale = 2f;
-                        
+
                     }
                     for (int i = 0; i < dustCount; i++)
                     {
                         float angle = MathF.Tau * ((float)i / dustCount);
                         Vector2 dustVel = new(MathF.Cos(angle), MathF.Sin(angle));
                         Vector2 dustPos = Projectile.Center + dustVel * 30;
-                        dustVel *= 6; 
+                        dustVel *= 6;
                         dustPos.X += Main.rand.NextFloat(-deviation, deviation);
                         dustVel.X += Main.rand.NextFloat(-deviation, deviation);
                         dustVel.Y += Main.rand.NextFloat(-deviation, deviation);
@@ -177,7 +177,7 @@ namespace KirboMod.Projectiles
                 //    gorePos.X += Main.rand.NextFloat(-BlastSize, BlastSize);
                 //    gorePos.Y += Main.rand.NextFloat(-BlastSize, BlastSize);
                 //    Gore.NewGoreDirect(Projectile.GetSource_FromThis(), gorePos, Projectile.velocity, Utils.SelectRandom(Main.rand, GoreID.Smoke1, GoreID.Smoke2, GoreID.Smoke3), 1.2f);
-                   
+
                 //}
 
             }
