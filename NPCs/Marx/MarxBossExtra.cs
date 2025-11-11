@@ -1,4 +1,5 @@
 using KirboMod.Bestiary;
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using System;
 using System.IO;
@@ -97,11 +98,11 @@ namespace KirboMod.NPCs.Marx
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
-            bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
-            {
-				new SurfaceBackgroundProvider(),
-				new FlavorTextBestiaryInfoElement("Big fat traitorous meanie") //WIP
-            });
+            bestiaryEntry.Info.AddRange(
+            [
+                new SurfaceBackgroundProvider(),
+				new FlavorTextBestiaryInfoElement("A two-faced fiend with incredible magical abilities that used your trust (or curiosity) to secure an artifact that could've enabled him to rule all of Terraria... that was, until he got thwarted!")
+            ]);
         }
 
         public override void SendExtraAI(BinaryWriter writer)
@@ -122,7 +123,7 @@ namespace KirboMod.NPCs.Marx
 
         public override void OnKill()
         {
-            //NPC.SetEventFlagCleared(ref DownedBossSystem.downedMarxBoss, -1);
+            NPC.SetEventFlagCleared(ref DownedBossSystem.downedMarxBoss, -1);
         }
 
         public override void ModifyNPCLoot(NPCLoot npcLoot)

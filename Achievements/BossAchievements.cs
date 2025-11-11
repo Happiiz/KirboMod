@@ -55,9 +55,7 @@ public class NightmareAchievement : ModAchievement
     public override Position GetDefaultPosition() => new After("DRAX_ATTAX");
 }
 
-//WAIT 'TIL AFTER MARX HAS BEEN ADDED
-
-/*public class MarxAchievement : ModAchievement
+public class MarxAchievement : ModAchievement
 {
     public override void SetStaticDefaults()
     {
@@ -67,7 +65,7 @@ public class NightmareAchievement : ModAchievement
     }
 
     public override Position GetDefaultPosition() => new After("THE_GREAT_SOUTHERN_PLANTKILL");
-}*/
+}
 
 public class DarkMatterAchievement : ModAchievement
 {

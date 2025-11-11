@@ -3,6 +3,7 @@ using Terraria.ModLoader;
 using Terraria.ID;
 using Terraria.GameContent.Creative;
 using KirboMod.Items.Armor.AbilityHats;
+using KirboMod.Tiles;
 
 namespace KirboMod.Items.Armor.CharacterVanity
 {
@@ -111,17 +112,13 @@ namespace KirboMod.Items.Armor.CharacterVanity
             Item.vanity = true;
         }
 
-        //TODO: Add recipe using Dimensional Mirror as station
-
-        /*public override void AddRecipes()
+        public override void AddRecipes()
         {
             Recipe recipe = CreateRecipe();
-            recipe.AddIngredient(ModContent.ItemType<DreamEssence>(), 20);
-            recipe.AddIngredient(ItemID.SoulofMight, 5);
-            recipe.AddIngredient(ItemID.Silk, 20);
-            recipe.AddTile(TileID.Anvils);
+            recipe.AddIngredient(ModContent.ItemType<MetaKnightMask>());
+            recipe.AddTile<DimensionMirror>();
             recipe.Register();
-        }*/
+        }
     }
 
     [AutoloadEquip(EquipType.Head)]

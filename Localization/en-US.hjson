@@ -49,11 +49,11 @@ Mods: {
 				FriendlyName: Dream Once More
 			}
 
-			# MarxAchievement: {
-			# Description: Defeat the maniacal magician who attempted to gain power through cunning trickery and paitent planning.
-			# FriendlyName: Super Ultra Schemer
-			# }
-			
+			MarxAchievement: {
+				Description: Defeat the maniacal magician who attempted to gain power through cunning trickery and paitent planning.
+				FriendlyName: Super Ultra Schemer
+			}
+
 			DarkMatterAchievement: {
 				Description: Defeat the ruthless invader of unknown origin who carries with it an ominous darkness.
 				FriendlyName: Let There be Light
@@ -102,8 +102,8 @@ Mods: {
 
 		Buffs: {
 			DarkFeeling: {
-				DisplayName: Dark Feeling
-				Description: This mirror is giving bad vibes...
+				DisplayName: Restless
+				Description: The fountain pulses with an ominous glow...
 			}
 
 			Dreamy: {
@@ -1124,7 +1124,7 @@ Mods: {
 				Tooltip:
 					'''
 					Mighty staff of the Jamba followers
-					Right click to swing it
+					Currently unobtainable
 					'''
 			}
 
@@ -1414,7 +1414,7 @@ Mods: {
 				DisplayName: Bomber Bomb
 				Tooltip:
 					'''
-					Shoots a high-velocity bomb that explodes in a large blast radius
+					Chuck a high velocity bomb that explodes in a large blast radius
 					Will not destroy tiles
 					'''
 			}
@@ -1486,7 +1486,8 @@ Mods: {
 
 			SparklingSoul: {
 				DisplayName: Sparkling Soul
-				Tooltip: ""
+				Tooltip: A star-shaped heart fused by the spirits to control the spirits
+				Summon: Summons Marx
 			}
 
 			BeamAbilityHat: {
@@ -1626,6 +1627,24 @@ Mods: {
 			DaroachCloak: {
 				Tooltip: "'This devilish cape will make you feel like you can slip, speed and sneak like a rodent!'"
 				DisplayName: Roach Cloak
+			}
+
+			JambaHeartItem: {
+				DisplayName: Jamba Heart
+				Tooltip:
+					'''
+					A cursed artifact from an unknown realm, nesting limitless destructive potential...
+					...But it doesn't seem to accept the offers of this world
+					'''
+			}
+
+			DimensionMirrorItem: {
+				DisplayName: Dimension Mirror
+				Tooltip:
+					'''
+					A portal to a parallel dimension disguised as a guilded mirror, darkness awaiting for those who gaze into it
+					It seems to be dormant, overwhelmed by the eldritch reflections of this already chaotic world...
+					'''
 			}
 		}
 
@@ -1891,6 +1910,8 @@ Mods: {
 			MarxVineSeed.DisplayName: Marx Vine Seed
 			FlyingSparklingSoul.DisplayName: Flying Sparkling Soul
 			MarxBlackHole.DisplayName: Marx Black Hole
+			ZeroEyeless.DisplayName: Zero Eyeless
+			KingDededead.DisplayName: King Dededead
 		}
 
 		NPCs: {
@@ -2037,7 +2058,7 @@ Mods: {
 					HDreamMatter: With the true form of this world unveiled, some of my guys might've began to venture once more! Go look again! The skies! The caves! The ends of the world! Go look now that their dreams of fitting in have been stirred!
 					HRareStones: With all these rifts in space, some of these guys had outta pick up some rare stones! Though they'd have to have the power to be able to retrieve them. The same power that resists the rifts, probably.
 					HEvoWeapons: With rare stones, you could upgrade some weapons to a fuller potential! Though these recipes aren't cheap, you seem like a skilled blacksmith!
-					HNightmare: The fountain of dreams was an... interesting landmark of our world. I wonder if you could recreate it with this world's materials. It would even be fun if we could attract another... what? I wasn't saying anything!
+					HNightmare: The Fountain of Dreams was an... interesting landmark of our world. I wonder if you could recreate it with this world's materials. It would even be fun if we could attract another... what? I wasn't saying anything!
 					HHeartMatter: Love is something I find quite icky, but those burning wishes, dreams, and that energy of life can be channeled into a powerful resource!
 					HMarx: I've appreciated your help thus far, but now I have something to ask of you: an awful evil slowly descends upon this world, but I figured out that if we use the power of the spirits of light and dark of this world with the care and compassion of our world, then we could influence the released souls to fight back against the enemy! Whaddya say?
 					HDarkMatter: There existed a terrible force in our world, but it has mostly since been wiped out. I wonder if this world contains its own dark forces. Try attracting them using some dark stuff! It should be interesting...
@@ -2097,6 +2118,8 @@ Mods: {
 			PowerOrbMusicBoxTile.MapEntry: Power Orb Music Box Tile
 			PureDarkMatterMusicBoxTile.MapEntry: Pure Dark Matter Music Box Tile
 			StarBlock.MapEntry: Star Block
+			JambaHeart.MapEntry: Jamba Heart
+			DimensionMirror.MapEntry: Dimension Mirror
 		}
 
 		Configs: {

@@ -10,9 +10,6 @@ namespace KirboMod.Items.Weapons
 	{
 		public override void SetStaticDefaults() 
 		{
-			 // DisplayName.SetDefault("Jamba Staff"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
-			/* Tooltip.SetDefault("Mighty staff of the Jamba followers" +
-				"\nRight click to swing it"); */
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research
         }
 
@@ -22,7 +19,7 @@ namespace KirboMod.Items.Weapons
 			Item.knockBack = 2;
 			Item.useStyle = ItemUseStyleID.Shoot;
 			Item.useAnimation = Item.useTime = 10;
-			Item.DamageType = DamageClass.Melee/* tModPorter Suggestion: Consider MeleeNoSpeed for no attack speed scaling */;
+			Item.DamageType = DamageClass.MeleeNoSpeed;
 			Item.width = 62;
 			Item.height = 62;
 			Item.value = Item.buyPrice(0, 0, 25, 0);
@@ -36,5 +33,15 @@ namespace KirboMod.Items.Weapons
 			Item.noUseGraphic = true;
 			Item.ArmorPenetration = 20;
 		}
+
+        /*public override void AddRecipes()
+        {
+			Recipe recipe = CreateRecipe()
+				.AddIngredient(ModContent.ItemType<DreamEssence>(), 20)
+				.AddIngredient(ItemID.SoulofNight, 15)
+				.AddIngredient(ItemID.HallowedBar, 5)
+                .AddTile(TileID.MythrilAnvil)
+                .Register();
+        }*/
     }
 }

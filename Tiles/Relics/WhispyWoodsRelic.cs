@@ -17,11 +17,15 @@ namespace KirboMod.Tiles.Relics
 	// And in case of wanting to add more relics but not wanting to go the optional way, scroll down to the bottom of the file
 	public class WhispyWoodsRelic : ModTile
 	{
-		public const int FrameWidth = 18 * 3;
-		public const int FrameHeight = 18 * 4;
-		public const int HorizontalFrames = 1;
+		public virtual int FrameWidth => 18 * 3;
+		public virtual int FrameHeight => 18 * 4;
+		public virtual int HorizontalFrames => 1;
 
-		public Asset<Texture2D> RelicTexture;
+		public virtual float YOffset => 0;
+
+        public virtual float XOffset => 0;
+
+        public Asset<Texture2D> RelicTexture;
 
 		// Every relic has its own extra floating part, should be 50x50. Optional: Expand this sheet if you want to add more, stacked vertically
 		// If you do not go the optional way, and you extend from this class, you can override this to point to a different texture
@@ -81,8 +85,8 @@ namespace KirboMod.Tiles.Relics
 			// Only required If you decide to make your tile utilize different styles through Item.placeStyle
 
 			// This preserves its original frameX/Y which is required for determining the correct texture floating on the pedestal, but makes it draw properly
-			tileFrameX %= FrameWidth; // Clamps the frameX
-			tileFrameY %= FrameHeight * 2; // Clamps the frameY (two horizontally aligned place styles, hence * 2)
+			tileFrameX %= (short)FrameWidth; // Clamps the frameX
+			tileFrameY %= (short)(FrameHeight * 2); // Clamps the frameY (two horizontally aligned place styles, hence * 2)
 		}
 
 		public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData) {
@@ -125,7 +129,7 @@ namespace KirboMod.Tiles.Relics
 			// Some math magic to make it smoothly move up and down over time
 			const float TwoPi = (float)Math.PI * 2f;
 			float offset = (float)Math.Sin(Main.GlobalTimeWrappedHourly * TwoPi / 5f);
-			Vector2 drawPos = worldPos + offScreen - Main.screenPosition + new Vector2(0f, -40f) + new Vector2(0f, offset * 4f);
+			Vector2 drawPos = worldPos + offScreen - Main.screenPosition + new Vector2(0f + XOffset, -40f + YOffset) + new Vector2(0f, offset * 4f);
 
 			// Draw the main texture
 			spriteBatch.Draw(texture, drawPos, frame, color, 0f, origin, 1f, effects, 0f);

@@ -38,7 +38,7 @@ namespace KirboMod.NPCs.Marx.Townie
             NPC.noTileCollide = false;
             NPC.noGravity = true;
             NPC.aiStyle = -1;
-            NPC.alpha = 0;
+            NPC.alpha = 255;
         }
 
         public override void OnSpawn(IEntitySource source)

@@ -21,8 +21,8 @@ namespace KirboMod.Buffs
 		{
 			player.lifeRegen += 1;
             player.statDefense += 5; //add 5 defense
-            player.moveSpeed += 0.05f; //5%
-			player.maxRunSpeed += 0.05f; //5%
+            player.accRunSpeed += 0.1f; //10%
+            player.maxRunSpeed += 0.1f; //10%
 		}
 	}
 }

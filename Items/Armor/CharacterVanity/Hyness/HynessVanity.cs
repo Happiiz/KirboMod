@@ -3,6 +3,7 @@ using Terraria.ModLoader;
 using Terraria.ID;
 using Terraria.GameContent.Creative;
 using KirboMod.Items.Armor.AbilityHats;
+using KirboMod.Tiles;
 
 namespace KirboMod.Items.Armor.CharacterVanity.Hyness
 {
@@ -28,8 +29,8 @@ namespace KirboMod.Items.Armor.CharacterVanity.Hyness
             Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ModContent.ItemType<HeartMatter>(), 5);
             recipe.AddIngredient(ItemID.LunarBar, 3);
-            recipe.AddIngredient(ItemID.BlueLunaticHood, 3);
-            recipe.AddTile(TileID.LunarCraftingStation);
+            recipe.AddIngredient(ItemID.BlueLunaticHood);
+            recipe.AddTile<JambaHeart>();
             recipe.Register();
         }
     }
@@ -71,8 +72,8 @@ namespace KirboMod.Items.Armor.CharacterVanity.Hyness
             Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ModContent.ItemType<HeartMatter>(), 5);
             recipe.AddIngredient(ItemID.LunarBar, 3);
-            recipe.AddIngredient(ItemID.BlueLunaticRobe, 3);
-            recipe.AddTile(TileID.LunarCraftingStation);
+            recipe.AddIngredient(ItemID.BlueLunaticRobe);
+            recipe.AddTile<JambaHeart>();
             recipe.Register();
         }
     }

@@ -289,12 +289,10 @@ namespace KirboMod.NPCs.Marx.Townie
                         }
                         else if (hint == 12)
                         {
-                            //extra code is WIP
-
-                            //if (!DownedBossSystem.downedMarxBoss)
-                            chosenText = Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Help.HMarx");
-                            //else
-                            //hint++;
+                            if (!DownedBossSystem.downedMarxBoss)
+                                chosenText = Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Help.HMarx");
+                            else
+                                hint++;
                         }
                         else if (NPC.downedGolemBoss)
                         {
@@ -415,16 +413,13 @@ namespace KirboMod.NPCs.Marx.Townie
             {
                 reaction = Main.rand.NextFromList<int>(EmoteID.EmoteWink, EmoteID.EmotionLove, EmoteID.EmoteNote, EmoteID.EmoteSilly);
 
-                //vvv to be implemented vvv
-
-                /* if (DownedBossSystem.DownedMarxBoss)
-                 * {
-                 *     for (int i = 0; i < 5; i++)
-                       {
-                           emoteList.Add(EmoteID.EmotionCry);
-                       }
-                 * }
-                */
+                if (DownedBossSystem.downedMarxBoss)
+                {
+                    for (int i = 0; i < 5; i++)
+                    {
+                        emoteList.Add(EmoteID.EmotionCry);
+                    }
+                }
             }
 
             for (int i = 0; i < 5; i++) //more likely

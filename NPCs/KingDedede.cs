@@ -1,6 +1,7 @@
 using KirboMod.Bestiary;
 using KirboMod.Items.KingDedede;
 using KirboMod.Projectiles;
+using KirboMod.Projectiles.BossDeaths;
 using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -1715,14 +1716,7 @@ namespace KirboMod.NPCs
                     Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center, speed, Main.rand.Next(11, 13), Scale: 2f); //double jump smoke
                 }
 
-                if (NPC.direction == -1) //die left
-                {
-                    Dust.NewDustPerfect(NPC.position, ModContent.DustType<Dusts.KingDededead>(), new Vector2(NPC.direction * -8, -8), 1);
-                }
-                else if (NPC.direction == 1)//die right
-                {
-                    Dust.NewDustPerfect(NPC.position, ModContent.DustType<Dusts.KingDededeadRight>(), new Vector2(NPC.direction * -8, -8), 1);
-                }
+                Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center, new Vector2(NPC.direction * -8, -8), ModContent.ProjectileType<KingDededead>(), 0, 0);
             }
             else
             {

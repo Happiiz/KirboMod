@@ -59,6 +59,14 @@ namespace KirboMod.Tiles
             }
         }
 
+        public override void RandomUpdate(int i, int j)
+        {
+            if (!Main.dayTime)
+            {
+                Dust.NewDust(new Point(i, j).ToWorldCoordinates(), 4 * 16, 5 * 16, DustID.Shadowflame);
+            }
+        }
+
         public override bool RightClick(int i, int j)
         {
             Player player = Main.LocalPlayer;
@@ -93,25 +101,35 @@ namespace KirboMod.Tiles
 
         public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b)
         {
-            //Blueish Light
-            r = 0.6f;
-            g = 0.6f;
-            b = 1f;
+            if (!Main.dayTime)
+            {
+                //Purple Light
+                r = 1.2f;
+                g = 0.6f;
+                b = 1.5f;
+            }
+            else
+            {
+                //Blueish Light
+                r = 0.6f;
+                g = 0.6f;
+                b = 1f;
+            }
         }
 
         public override void NearbyEffects(int i, int j, bool closer)
         {
             Player player = Main.LocalPlayer;
-            //within range ,not dead & no nightmare
+            //within range && not dead
             if (closer == true & !player.dead)
             {
                 if (Main.dayTime)
                 {
                     player.AddBuff(ModContent.BuffType<Buffs.Dreamy>(), 15); //add dreamy buff
                 }
-                else if (!NPC.AnyDanger()) //no boss alive
+                else
                 {
-                    player.AddBuff(ModContent.BuffType<Buffs.Nightmare>(), 15); //add nightmare
+                    player.AddBuff(ModContent.BuffType<Buffs.DarkFeeling>(), 15); //add restless debuff(?)
                 }
             }
         }
