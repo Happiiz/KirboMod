@@ -22,7 +22,7 @@ namespace KirboMod.Items.Weapons
 		static float ShootSpeed => 35f;
 		public override void SetDefaults() 
 		{
-			Item.damage = 22;
+			Item.damage = 36;
 			Item.DamageType = DamageClass.Melee/* tModPorter Suggestion: Consider MeleeNoSpeed for no attack speed scaling */;
 			Item.width = 30; //world dimensions
 			Item.height = 30; //world dimensions
