@@ -591,9 +591,10 @@ namespace KirboMod.NPCs.PureDarkMatterRematch
             Vector2 directionToTarget = (targetPos - NPC.Center).SafeNormalize(Vector2.Zero);
             NPC.velocity = Vector2.Lerp(NPC.velocity, directionToTarget * maxVel, lerpSmoothingT);
         }
+        //shorten the zero intro by one measure(or maybe half)
         public override void OnKill()
         {
-            NPC.NewNPC(NPC.GetSource_Death(), (int)((NPC.width / 2 + NPC.position.X) / 16), (int)((NPC.height / 2 + NPC.position.Y) / 16), ModContent.NPCType<Zero>());
+           int index =  NPC.NewNPC(NPC.GetSource_Death(), (int)((NPC.width / 2 + NPC.position.X)), (int)((NPC.height / 2 + NPC.position.Y)), ModContent.NPCType<Zero>());
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {

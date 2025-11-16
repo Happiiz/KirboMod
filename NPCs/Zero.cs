@@ -11,7 +11,6 @@ using System.IO;
 using Terraria;
 using Terraria.Audio;
 using Terraria.Chat;
-using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
@@ -43,6 +42,8 @@ namespace KirboMod.NPCs
                                                                       //public to check zero's dash
         private float backupoffset = 0; //offset goto position when backing up
 
+        //so that the music box can update automatically whenever the song is changed
+        public static string MusicPath => "Music/02NewerWithMetadata";
         static int BloodDamage => (calamityEnabled ? 180 : 100) / 2;
         static int DarkMatterDamage => (calamityEnabled ? 180 : 100) / 2;
         public static int SparkDamage => (calamityEnabled ? 180 : 100) / 2;
@@ -55,17 +56,16 @@ namespace KirboMod.NPCs
         private int backgroundAttackCountDown = 0; //cycles through background attack at x% health every x attacks
 
         private int animationXframeOffset = 0; //changes the sprite column depending on what animation is playing
-
+        float zPos;
         public override void Load()
         {
-            calamityEnabled = ModLoader.TryGetMod("CalamityMod", out _);
         }
         public override void SetStaticDefaults()
         {
             // DisplayName.SetDefault("Zero");
             Main.npcFrameCount[NPC.type] = 8; //kinda pointless as the drawing is done manually
 
-            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new(0)
+            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new()
             {
                 CustomTexturePath = "KirboMod/NPCs/BestiaryTextures/ZeroPortrait",
                 PortraitScale = 1f, // Portrait refers to the full picture when clicking on the icon in the bestiary
@@ -76,11 +76,6 @@ namespace KirboMod.NPCs
 
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
-
-            NPCDebuffImmunityData debuffData = new()
-            {
-                ImmuneToAllBuffsThatAreNotWhips = true,
-            };
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true; //immune to not mess up movement
 
         }
@@ -92,17 +87,9 @@ namespace KirboMod.NPCs
             DrawOffsetY = 193;
             NPC.damage = 1; //dash damage in dash projectile. Needs to be >0 damage or else ApplyDifficultyAndPlayerScaling won't be called
             NPC.noTileCollide = true;
-            if (!calamityEnabled)
-            {
-                //regular stats
-                NPC.defense = 86;
-                NPC.lifeMax = 280000;
-            }
-            else
-            {
-                NPC.defense = 200;
-                NPC.lifeMax = 4_000_000;
-            }
+
+            NPC.defense = 86;
+            NPC.lifeMax = 280000;
             NPC.HitSound = SoundID.NPCHit1; //slime
             NPC.DeathSound = SoundID.NPCDeath1;
             NPC.value = Item.buyPrice(0, 38, 18, 10); // money it drops
@@ -116,12 +103,21 @@ namespace KirboMod.NPCs
             /*Music = MusicID.Boss2;*/
             if (!Main.dedServ)
             {
-                Music = MusicLoader.GetMusicSlot(Mod, "Music/Photonic0_ZeroTwo");
+                //Music = MusicLoader.GetMusicSlot(Mod, "Music/Photonic0_ZeroTwo");
+                //int slot = MusicLoader.GetMusicSlot(Mod, "Music/Photonic0_New02_WithLoopMetadata");
+                int slot = MusicLoader.GetMusicSlot(Mod, MusicPath);
+                Music = slot;
+                for (int i = 0; i < Main.musicFade.Length; i++)
+                {
+                    Main.musicFade[i] = .5f;
+                }
+                Main.musicFade[slot] = .5f;
                 //Music = MusicID.Boss2;
             }
 
             SceneEffectPriority = SceneEffectPriority.BossHigh; // By default, musicPriority is BossLow
             NPC.alpha = 255; //initally
+            zPos = 0;
         }
 
         public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */ //damage is automatically doubled in expert, use this to reduce it
@@ -137,8 +133,13 @@ namespace KirboMod.NPCs
             {
                 new HyperzoneBackgroundProvider(), //I totally didn't reference the vanilla code what no way
 
+<<<<<<< Updated upstream
 				//bestiary description
 				new FlavorTextBestiaryInfoElement("The ultimate leader of all dark matter. Uses its leigon to blanket entire worlds in darkness.")
+=======
+				// Sets the description of this NPC that is listed in the bestiary.
+				new FlavorTextBestiaryInfoElement("The ultimate leader of all dark matter. Uses its legion to blanket entire worlds in darkness.")
+>>>>>>> Stashed changes
             });
         }
 
@@ -231,7 +232,7 @@ namespace KirboMod.NPCs
             bool bloodShots = attacktype == ZeroAttackType.BloodShots;
             Vector2 playerRightDistance = player.Center + new Vector2((bloodShots ? 1000 : 500) + backupoffset, 0) - NPC.Center;
             Vector2 playerLeftDistance = player.Center + new Vector2((bloodShots ? -1000 : -500) - backupoffset, 0) - NPC.Center;
-            Vector2 playerAboveDistance = player.Center + new Vector2(0, -700) - NPC.Center;
+            Vector2 playerAboveDistance = player.Center + new Vector2(0, -1000) - NPC.Center;
 
             if (NPC.ai[0] == 0) //restart stats
             {
@@ -318,26 +319,22 @@ namespace KirboMod.NPCs
 
         private void Attack_BGShots(Player player)
         {
-            NPC.velocity.Y *= 0.98f;
+            float minScale = 0.4f;
+            Vector2 targetPos = player.Center;
+            float acc = 1f;
+            float topSpeed = 30f;
+            float maxXDist = 500;
+            targetPos.X += NPC.direction * Utils.Remap(NPC.ai[0], AttackCooldown, AttackCooldown + 360, -maxXDist, maxXDist);
+            AccelerateTowards(targetPos, acc, topSpeed);
 
             if (NPC.ai[0] <= AttackCooldown + 60) //backup
             {
                 NPC.TargetClosest(false); //don't face player during attack
 
-                NPC.scale = 1 - (Utils.GetLerpValue(AttackCooldown, AttackCooldown + 60, NPC.ai[0]) * 0.6f); //get smaller
-
+                zPos = Utils.Remap(NPC.ai[0], AttackCooldown, AttackCooldown + 60, 1f, minScale); //get smaller
                 NPC.behindTiles = true;
                 NPC.damage = 0;
                 NPC.dontTakeDamage = true;
-
-                if (NPC.ai[0] == AttackCooldown + 1)
-                {
-                    NPC.velocity.X *= 0; //reset momentum
-                }
-                else
-                {
-                    NPC.velocity.X -= NPC.direction * 0.2f; //back up
-                }
 
                 animation = 5;
             }
@@ -356,35 +353,33 @@ namespace KirboMod.NPCs
                     SoundEngine.PlaySound(SoundID.NPCHit9.WithVolumeScale(0.8f), NPC.Center); //leech hit
 
                 }
-
-                NPC.velocity.X += NPC.direction * 0.2f;
-
-                if (NPC.velocity.X > 10)
-                {
-                    NPC.velocity.X = 10;
-                }
-                if (NPC.velocity.X < -10)
-                {
-                    NPC.velocity.X = -10;
-                }
-
-                if (NPC.ai[0] >= 420)
-                {
-                    NPC.scale += 0.01f; //get bigger
-                }
+                float scaleupDuration = 15;
+                int endTime = AttackCooldown + 360;
+                zPos = Utils.Remap(NPC.ai[0], endTime, endTime - scaleupDuration, 1f, minScale); //get smaller                
             }
             else //reset
             {
                 NPC.TargetClosest(true);
                 NPC.ai[0] = 0;
                 backupoffset = 0;
+                zPos = 0;//just in case
                 NPC.scale = 1; //just in case
                 NPC.behindTiles = false;
             }
         }
-
+        void AccelerateTowards(Vector2 targetPos, float acc, float topSpeed)
+        {
+            Vector2 toTargetPos = (targetPos - NPC.Center);
+            float distToTarget = toTargetPos.Length();
+            topSpeed *= Utils.GetLerpValue(64, 0, distToTarget, true);
+            Vector2 targetVel = NPC.DirectionTo(targetPos);
+            targetVel *= topSpeed;
+            NPC.velocity = NPC.velocity.MoveTowards(targetVel, acc);
+        }
         private void Attack_ThornTail(ref Vector2 playerAboveDistance, ref float speed, float inertia)
         {
+            speed += 10;
+            inertia -= 10;
             if (NPC.ai[0] < AttackCooldown + 20)
             {
                 animation = 2;
@@ -405,9 +400,18 @@ namespace KirboMod.NPCs
                 playerAboveDistance *= speed;
                 NPC.velocity = (NPC.velocity * (inertia - 1) + playerAboveDistance) / inertia; //fly towards player
                 int projRate = 25;
-                if ((NPC.ai[0] - AttackCooldown) % projRate == 0 && Main.netMode != NetmodeID.MultiplayerClient)
+                bool blockShooting = false;
+                if (NPC.HasPlayerTarget)
                 {
-                    int count = 15;
+                    Player plr = Main.player[NPC.target];
+                    if (plr.Center.Y - 500 > NPC.Center.Y && (MathF.Abs(NPC.Center.X - plr.Center.Y) < 16 * 5))
+                    {
+                        blockShooting = true;
+                    }
+                }
+                if (!blockShooting && (NPC.ai[0] - AttackCooldown) % projRate == 0 && Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    int count = 11;
                     int index = (int)(NPC.ai[0] - AttackCooldown) / projRate;
                     if (index % 3 == 1)
                         count++;
@@ -927,20 +931,46 @@ namespace KirboMod.NPCs
                 direction = SpriteEffects.None; //face left
             }
 
-            //draw!
-            spriteBatch.Draw(zero, NPC.Center - Main.screenPosition, Animation(), new Color(r, g, b), NPC.rotation,
+            float scaleMult = 1f;
+            float zPosScaleMult = GetScaleFor3D();
+            scaleMult *= zPosScaleMult;
+            Vector2 screenCenter = Main.screenPosition + new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f);
+            Vector2 center = Vector2.Lerp(screenCenter, NPC.Center, scaleMult);
+            center -= screenPos;
+
+
+            spriteBatch.Draw(zero, center, Animation(), new Color(r, g, b), NPC.rotation,
                 new Vector2(400, 400), NPC.scale, direction, 0f);
             if (attacktype == ZeroAttackType.Dash)
             {
+                //intentionally unclamped
                 float progress = Utils.GetLerpValue(0, 240, NPC.ai[0]);
                 float size = Easings.EaseOut(progress, 3) * 5 + 1;
+                size *= scaleMult;
                 float opacity = Easings.RemapProgress(0, 10, 300, 310, NPC.ai[0]);
-                Vector2 drawpos = NPC.Center + new Vector2(NPC.direction * 135, 2) - Main.screenPosition;
+                Vector2 drawpos = center + new Vector2(NPC.direction * 135, 2) * scaleMult;
                 float rotation = Easings.InOutCirc(progress) * MathF.Tau * 6;
-                VFX.DrawPrettyStarSparkle(opacity, drawpos, Color.Black, Color.Black, 1, 0, .9f, 1.1f, 2, rotation, new Vector2(size) * 2, new Vector2(4));
-                VFX.DrawPrettyStarSparkle(opacity, drawpos, new Color(255, 255, 255, 0), Color.Red, 1, 0, .9f, 1.1f, 2, rotation, new Vector2(size), new Vector2(2));
+                VFX.DrawPrettyStarSparkle(opacity, drawpos, Color.Black, Color.Black, 1, 0, .9f, 1.1f, 2, rotation, new Vector2(size) * 2, new Vector2(4 * scaleMult));
+                VFX.DrawPrettyStarSparkle(opacity, drawpos, new Color(255, 255, 255, 0), Color.Red, 1, 0, .9f, 1.1f, 2, rotation, new Vector2(size), new Vector2(2 * scaleMult));
             }
             return false;
+        }
+        float GetScaleFor3D()
+        {
+            return GetScaleFor3D(zPos);
+        }
+        public static float GetScaleFor3D(float zPos)
+        {
+            //lower camera pos = smaller
+            //higher z pos = smaller
+            float safeDivisor = zPos / 16f + 1f;
+
+            if (safeDivisor <= 0f || float.IsNaN(safeDivisor))
+            {
+                return 0f;
+            }
+            float scale = 1f / safeDivisor;
+            return scale;
         }
         private Rectangle Animation() //make the dimensions for the frames
         {
