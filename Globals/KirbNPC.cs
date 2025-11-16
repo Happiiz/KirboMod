@@ -1,9 +1,13 @@
 ﻿using KirboMod.Buffs;
+using KirboMod.Items.Placeables;
 using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.GameContent.Personalities;
+using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace KirboMod.Globals
@@ -38,6 +42,19 @@ namespace KirboMod.Globals
         {
             dragonFire = false;
         }
+
+        public override void ModifyShop(NPCShop shop)
+        {
+            if (shop.NpcType == NPCID.Painter && shop.FullName == NPCShopDatabase.GetShopName(227, "Decor")) //if in "decor" of Painter shop
+            {
+                //setting up
+                Item item = new Item();
+                item.SetDefaults(ModContent.ItemType<AdoDrawingItem>());
+
+                shop.Add(new NPCShop.Entry(item.type));
+            }
+        }
+
         // public int finalCutteredCounter = 0;//
         //public override void OnHitByProjectile(NPC npc, Projectile projectile, NPC.HitInfo hit, int damageDone)
         //{

@@ -12,20 +12,26 @@ using Terraria.Localization;
 
 namespace KirboMod.Tiles
 {
-	public class BossTrophy : ModTile
+	public class BeamAttackPicture : ModTile
 	{
 		public override void SetStaticDefaults() {
 			Main.tileFrameImportant[Type] = true;
 			Main.tileLavaDeath[Type] = true;
-			TileID.Sets.FramesOnKillWall[Type] = true; // Necessary since Style3x3Wall uses AnchorWall
+			TileID.Sets.FramesOnKillWall[Type] = true;
             TileID.Sets.DisableSmartCursor[Type] = true;
             TileObjectData.newTile.CopyFrom(TileObjectData.Style3x3Wall);
-			TileObjectData.newTile.StyleHorizontal = true;
-			TileObjectData.newTile.StyleWrapLimit = 36;
-			TileObjectData.addTile(Type);
-			DustType = 7;
+
+            TileObjectData.newTile.Width = 5;
+            TileObjectData.newTile.Height = 5;
+
+            TileObjectData.newTile.Origin = new Point16(3, 3);
+
+            TileObjectData.newTile.CoordinateHeights = new int[] { 16, 16, 16, 16, 16 };
+
+            TileObjectData.addTile(Type);
+			DustType = DustID.Cloud;
 			LocalizedText name = CreateMapEntryName();
-			AddMapEntry(new Color(120, 85, 60), name);
+			AddMapEntry(new Color(114, 158, 246), name);
 		}
 	}
 }

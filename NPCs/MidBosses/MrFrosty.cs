@@ -1,17 +1,18 @@
+using KirboMod.ItemDropRules.DropConditions;
 using KirboMod.Items;
+using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using System;
 using Terraria;
 using Terraria.Audio;
-using Terraria.ID;
-using Terraria.ModLoader;
-using SoundEngine = Terraria.Audio.SoundEngine;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using KirboMod.Projectiles;
-using KirboMod.ItemDropRules.DropConditions;
+using Terraria.ID;
+using Terraria.Localization;
+using Terraria.ModLoader;
+using SoundEngine = Terraria.Audio.SoundEngine;
 
 namespace KirboMod.NPCs.MidBosses
 {
@@ -54,6 +55,7 @@ namespace KirboMod.NPCs.MidBosses
             NPC.knockBackResist = 0f; //how much knockback applies
             Banner = NPC.type;
             BannerItem = ModContent.ItemType<Items.Banners.MrFrostyBanner>();
+            ItemID.Sets.KillsToBanner[BannerItem] = 10;
             NPC.aiStyle = -1; 
 			NPC.friendly = false;
 			NPC.noGravity = false;
@@ -76,15 +78,15 @@ namespace KirboMod.NPCs.MidBosses
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
-            // We can use AddRange instead of calling Add multiple times in order to add multiple items at once
-            bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
-            {
-				// Sets the spawning conditions of this NPC that is listed in the bestiary.
+            //uses AddRange to add multiple things instead of Add for simplicity
+            bestiaryEntry.Info.AddRange(
+            [
+				//set spawning conditions of NPC in bestiary
 				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Snow,
 
-				// Sets the description of this NPC that is listed in the bestiary.
-				new FlavorTextBestiaryInfoElement("An icy beast that appeared in the tundra from a strange star shaped rift. Does its best to stamp out any threats with style and grace, or lack thereof.")
-            });
+				//bestiary description
+				new FlavorTextBestiaryInfoElement(Language.GetTextValue("Mods.KirboMod.NPCs.Bestiary.MrFrosty"))
+            ]);
         }
         public override void AI() //constantly cycles each time
 		{

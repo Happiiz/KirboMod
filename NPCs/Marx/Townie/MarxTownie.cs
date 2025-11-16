@@ -29,7 +29,27 @@ namespace KirboMod.NPCs.Marx.Townie
 	{
 		public int hint = -1; //start at -1 so when it increases for the first time it starts at 0
 
-		private static Profiles.StackedNPCProfile NPCProfile;
+        bool wrathfulGodsEnabled = ModLoader.HasMod("NoxusBoss");
+
+        #region WOTG checks
+
+        //Holding off on adding project references to this mod for now so just skips inspection for these properties
+
+        [JITWhenModsEnabled("NoxusBoss")]
+        public bool AvatarDown => NoxusBoss.Core.World.WorldSaving.BossDownedSaveSystem.HasDefeated<NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm.AvatarOfEmptiness>();
+
+        [JITWhenModsEnabled("NoxusBoss")]
+        public bool RiftEclipseOn => NoxusBoss.Core.World.GameScenes.RiftEclipse.RiftEclipseManagementSystem.RiftEclipseOngoing;
+
+        [JITWhenModsEnabled("NoxusBoss")]
+        public bool SolynAround => NPC.AnyNPCs(ModContent.NPCType<NoxusBoss.Content.NPCs.Friendly.Solyn>());
+
+        [JITWhenModsEnabled("NoxusBoss")]
+        public bool NamelessDown => NoxusBoss.Core.World.WorldSaving.BossDownedSaveSystem.HasDefeated<NoxusBoss.Content.NPCs.Bosses.NamelessDeity.NamelessDeityBoss>();
+
+        #endregion WOTG checks
+
+        private static Profiles.StackedNPCProfile NPCProfile;
 
 		public override void SetStaticDefaults() {
 			Main.npcFrameCount[Type] = 26;
@@ -90,16 +110,15 @@ namespace KirboMod.NPCs.Marx.Townie
         }
 
 		public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry) {
-			// We can use AddRange instead of calling Add multiple times in order to add multiple items at once
-			bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[] {
+			//uses AddRange to add multiple things instead of Add for simplicity
+			bestiaryEntry.Info.AddRange([
                 BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.TheCrimson,
                 BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.TheCorruption,
 
-				//Bestiary flavor text
-				new FlavorTextBestiaryInfoElement("A friendly face has appeared from a land of dreams to help you figure out his " +
-                "world's weird visitors! He's a little weird, himself, but there's nothing wrong with that... right?"),
+				//bestiary description
+				new FlavorTextBestiaryInfoElement(Language.GetTextValue("Mods.KirboMod.NPCs.Bestiary.MarxTownie")),
 
-			});
+			]);
 		}
 
 		public override void HitEffect(NPC.HitInfo hit) 
@@ -130,6 +149,11 @@ namespace KirboMod.NPCs.Marx.Townie
 			return NPCProfile;
 		}
 
+        public override void AI()
+        {
+            NPCID.Sets.IsTownPet[Type] = false; //set to not pet when spawning back in after death
+        }
+
 		public override List<string> SetNPCNameList() 
 		{
 			return default; //use type name
@@ -138,7 +162,7 @@ namespace KirboMod.NPCs.Marx.Townie
 		public override string GetChat() {
 			WeightedRandom<string> chat = new WeightedRandom<string>();
 
-            for (int i = 0; i < 5; i++) //more common than others
+            for (int i = 0; i < 10; i++) //more common than others
             {
                 chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.D1"));
                 chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.D2"));
@@ -149,7 +173,7 @@ namespace KirboMod.NPCs.Marx.Townie
 
             if (Main.bloodMoon || Main.eclipse || Main.pumpkinMoon || Main.snowMoon)
             {
-                for (int i = 0; i < 10; i++) //much more common
+                for (int i = 0; i < 20; i++) //much more common
                 {
                     chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DMoon"));
                 }
@@ -157,14 +181,24 @@ namespace KirboMod.NPCs.Marx.Townie
 
             if (NPC.IsShimmerVariant)
             {
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DMarxolor"));
                 }
             }
 
+            if (DownedBossSystem.downedMarxBoss)
+            {
+                chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DPostMarx"));
+            }
+            else if (NPC.downedPlantBoss)
+            {
+                chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DPreMarx"));
+            }
+
             chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DShutTheHellUp"));
             chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DReference"));
+            chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DKirbyTransformation"));
 
             if (Main.hardMode)
             {
@@ -186,6 +220,42 @@ namespace KirboMod.NPCs.Marx.Townie
 				chosenChat = Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DInitial"); //guaranteed
             }
 
+            if (wrathfulGodsEnabled) //only display these lines when wotg is installed
+            {
+                if (AvatarDown)
+                {
+                    chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.D1Hater2"));
+                    chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DAOEDowned"));
+                }
+                else
+                {
+                    if (RiftEclipseOn)
+                    {
+                        for (int i = 0; i < 20; i++) //much more common
+                        {
+                            chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DRift"));
+                        }
+                    }
+
+                    if (SolynAround)
+                    {
+                        for (int i = 0; i < 10; i++) //common
+                        {
+                            chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.D1Hater"));
+                        }
+                    }
+                }
+
+                if (NamelessDown)
+                {
+                    for (int i = 0; i < 10; i++) //common
+                    {
+                        chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DNamelessDowned"));
+                    }
+                }
+            }
+
+            //set to true when, well, talking to Marx
             Main.LocalPlayer.GetModPlayer<KirbPlayer>().talkedToMarx = true;
 
             return chosenChat;
@@ -351,7 +421,7 @@ namespace KirboMod.NPCs.Marx.Townie
         {
             if (NPC.life <= 0)
             {
-                NPCID.Sets.IsTownPet[Type] = true; //set to pet last second to make the "-has left!" text appear
+                NPCID.Sets.IsTownPet[Type] = true; //set to pet last second to make the "-has left!" text appear (is constantly reveresed in AI())
             }
             return base.CheckDead();
         }

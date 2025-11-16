@@ -100,6 +100,12 @@ Mods: {
 			}
 		}
 
+		DropConditions: {
+			PostGolem: In Hardmode, post-Golem
+			PreGolem: In Hardmode, pre-Golem
+			WaddleDoo: Not from a minion
+		}
+
 		Buffs: {
 			DarkFeeling: {
 				DisplayName: Restless
@@ -1646,6 +1652,29 @@ Mods: {
 					It seems to be dormant, overwhelmed by the eldritch reflections of this already chaotic world...
 					'''
 			}
+
+			KingDededePortraitItem: {
+				Tooltip:
+					'''
+					'Really captures the hearty likeness of your highness!'
+					'P. Roller'
+					'''
+				DisplayName: Kingly Portrait
+			}
+
+			BeamAttackPictureItem: {
+				DisplayName: Afterlife
+				Tooltip:
+					'''
+					'Maybe this one will hit 'em!'
+					'F. Boat'
+					'''
+			}
+
+			AdoDrawingItem: {
+				DisplayName: Unknown Cryptid
+				Tooltip: "'Ad. [i:58]'"
+			}
 		}
 
 		Projectiles: {
@@ -2045,6 +2074,14 @@ Mods: {
 					DKirby5: That starboard is pissing me off.
 					DReference: Friend! You gotta do SOOOOMMMMTHAAAAAYYYYYNNG!
 					DMarxolor: What!? Do I look like a traitor to you!?
+					#vvv The most that can be done to reference Transformation Mod atm because files aren't available thru extraction
+					DKirbyTransformation: Trust me, friend. You'll never be him. No matter how much you transform yourself.
+					#vvv Only appears with wotg enabled
+					D1Hater: Look, I get you 'appreciate' her, but that Soylent character seems a little suspicious to me... especially her warp star...
+					D1Hater2: What!? Soylent is gone!? Aw... don't worry about it, friend. I'm still here!
+					DRift: Ah, things are finally looking up around here.
+					DAOEDowned: Aaaaand everything sucks, again.
+					DNamelessDowned: You beat God? Big whoop. I know a guy who does that every Tuesday.
 				}
 
 				Help: {
@@ -2101,25 +2138,62 @@ Mods: {
 			}
 
 			MarxBoss.DisplayName: Marx
+
+			Bestiary: {
+				BioSpark: An elite ninja that hides deep within the caverns, training to become stronger. Ambushes targets with a flurry of attacks.
+				Birdon: This high-flying bird just loves to see how far can they fly! Got along very well with the harpies, and now they protect their blue feathery friends!
+				BladeKnight: A fearless warrior constantly searching for a challenge to appease his desire for battle. Despite being an ametaur, anyways.
+				Bomber: Don't let its cutesy, dinky appearance fool you. If it looks like a bomb, falls like a bomb, and explodes like a bomb... it's a bomb!
+				BrontoBurt: Flutters through the air in a wave pattern. Will push others out of the way to keep on it's path.
+				BroomHatter: Sweep, sweep, sweep! Must sweep the world clean! That's the monumental task this little guy puts on himself!
+				BurningLeo: Burning Leos found comfort in the warm jungle, and now they scorch anyone who touches their land!
+				Cappy: This shy creature keeps itself concealed with a mushroom like hat. Uncovering it reveals a face that doesn't look as cheery as they move.
+				Chilly: Chillies found comfort in the cold tundra, and now they freeze anyone who touches their land!
+				Kabu: A little wooden mound that slides around erratically in caves. Is rumored to carry a lot of wisdom.
+				KnuckleJoe: Watch out! Knuckle Joe wants a challenge and you seem perfectly fit! They'll bombard you with a flurry of vulcan jabs and smash punches 'til you're down!
+				OrangeButterfly: Life after death after life after death. The wheel of mortality never stops. It cannot stop, for the wheel, stopping means detaching from the cart, forever falling from existence. How can one cast judgement on that which cannot be judged? That is the dilemma this emissary of fate faces.
+				ParasolDee: A waddle dee that likes to take it's umbrella out for walks, even when it isn't raining.
+				PlasmaWisp: A ghastly entity sparking high amounts of electricity and light. Tries to snuff out intruders of its domain.
+				PoppyBrosJr: This happy little demolitionist loves to throw, toss, and hurl bombs! All while keep a wide grin on its face that never seems to wash off!
+				Scarfy: A cute little face that stands out amongst the demons and flames, but only if you keep it that way!
+				SirKibble: A fearless warrior that refuses to back out of a battle, even when the odds are stacked against them.
+				UFO: Rarely some may see mysterious constructs floating around the atmosphere. They tend to open fire on suspicious life forms that get too close.
+				WaddleDee: Simple minded wanderers that have no desire to fight. Although they can be quite the nuisance when you're in a hurry.
+				WaddleDoo: The more dangerous cousin of the Waddle Dee. Shoots out electric beams whenever it feels threatened.
+				Bonkers: A giant armored monkey that came from a strange star shaped rift, prepared to smash down on any threat that approaches with its hammer!
+				MrFrosty: An icy beast that appeared in the tundra from a strange star shaped rift. Does its best to stamp out any threats with style and grace, or lack thereof.
+				Batafire: When this fiery fiend appeared from the star-shaped rift it immediately found solace where it made sense the most: the only other places with bats and heat!
+				Whispy: A tree that gained the unatural ability of sentience, and now has devoted its life to guarding it's brethren.
+				Kracko: Kracko is a living cloud that has lingered in the sky since ancient times, and thus has mastered the art of thunder!
+				KingDedede: The mighty-yet-greedy ruler of a distant castle! He loves to snack and show those who mistreat him the boot! Especially people who take his precious life-saving brooches!
+				Nightmare: An evil wizard bent on spreading nightmares to all that can dream. Its magic can twist the mind and body of those who are cursed with it.
+				DarkMatter: A mysterious monocular invader with a body as black as darkness itself. What hidden motives does it have descending upon this world?
+				MarxTownie: A friendly face has appeared from a land of dreams to help you figure out his world's weird visitors! He's a little weird, himself, but there's nothing wrong with that... right?
+				MarxBoss: A two-faced fiend with incredible magical abilities that used your trust (or curiosity) to secure an artifact that could've enabled him to rule all of Terraria... that was, until he got thwarted!
+				Zero: The supreme ruler of all matter that is dark, reborn once more into another world through a ritual involving Cthulhu's fallen essence.
+			}
 		}
 
 		Tiles: {
 			BossTrophy.MapEntry: Trophy
 			EnemyBanner.MapEntry: Banner
-			FountainOfDreams.MapEntry: Fountain of Dreams
-			RareStone.MapEntry: Rare Stone
-			TreasureStone.MapEntry: Treasure Stone
-			MysticalStone.MapEntry: Mystical Stone
+			FountainOfDreams.MapEntry: "{$Items.FountainOfDreams.DisplayName}"
+			RareStone.MapEntry: "{$Items.RareStone.DisplayName}"
+			TreasureStone.MapEntry: "{$Items.TreasureStone.DisplayName}"
+			MysticalStone.MapEntry: "{$Items.MysticalStone.DisplayName}"
 			DededeMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
 			DarkMatterMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
 			DreamLandBossMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
-			ZeroMusicBoxTile.MapEntry: Zero Music Box Tile
-			NightmareMusicBoxTile.MapEntry: Nightmare Music Box Tile
-			PowerOrbMusicBoxTile.MapEntry: Power Orb Music Box Tile
-			PureDarkMatterMusicBoxTile.MapEntry: Pure Dark Matter Music Box Tile
-			StarBlock.MapEntry: Star Block
-			JambaHeart.MapEntry: Jamba Heart
-			DimensionMirror.MapEntry: Dimension Mirror
+			ZeroMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
+			NightmareMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
+			PowerOrbMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
+			PureDarkMatterMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
+			StarBlock.MapEntry: "{$Items.StarBlockItem.DisplayName}"
+			JambaHeart.MapEntry: "{$Items.JambaHeartItem.DisplayName}"
+			DimensionMirror.MapEntry: "{$Items.DimensionMirrorItem.DisplayName}"
+			KingDededePortrait.MapEntry: "{$Items.KingDededePortraitItem.DisplayName}"
+			BeamAttackPicture.MapEntry: "{$Items.BeamAttackPictureItem.DisplayName}"
+			AdoDrawing.MapEntry: "{$Items.AdoDrawing.DisplayName}"
 		}
 
 		Configs: {

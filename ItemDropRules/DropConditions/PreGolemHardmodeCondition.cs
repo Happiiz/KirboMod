@@ -1,5 +1,6 @@
 ﻿using Terraria;
 using Terraria.GameContent.ItemDropRules;
+using Terraria.Localization;
 
 namespace KirboMod.ItemDropRules.DropConditions
 {
@@ -18,7 +19,7 @@ namespace KirboMod.ItemDropRules.DropConditions
 		}
 
 		public string GetConditionDescription() {
-			return "In Hardmode, pre-Golem";
+			return Language.GetTextValue("Mods.KirboMod.DropConditions.PreGolem");
         }
 	}
 }

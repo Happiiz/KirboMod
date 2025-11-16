@@ -8,6 +8,7 @@ using Terraria.Audio;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace KirboMod.NPCs.Marx
@@ -101,7 +102,7 @@ namespace KirboMod.NPCs.Marx
             bestiaryEntry.Info.AddRange(
             [
                 new SurfaceBackgroundProvider(),
-				new FlavorTextBestiaryInfoElement("A two-faced fiend with incredible magical abilities that used your trust (or curiosity) to secure an artifact that could've enabled him to rule all of Terraria... that was, until he got thwarted!")
+				new FlavorTextBestiaryInfoElement(Language.GetTextValue("Mods.KirboMod.NPCs.Bestiary.MarxBoss"))
             ]);
         }
 

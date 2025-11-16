@@ -7,6 +7,7 @@ using Terraria.Audio;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace KirboMod.NPCs.MidBosses
@@ -47,6 +48,7 @@ namespace KirboMod.NPCs.MidBosses
             NPC.lavaImmune = true;
             Banner = NPC.type;
             BannerItem = ModContent.ItemType<Items.Banners.BatafireBanner>();
+            ItemID.Sets.KillsToBanner[BannerItem] = 10;
             NPC.rarity = 1; //1 is dungeon slime, 4 is mimic
 
             attackTimer = -30; //start with intro
@@ -57,7 +59,7 @@ namespace KirboMod.NPCs.MidBosses
             bestiaryEntry.Info.AddRange([
             BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.TheUnderworld,
             BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Jungle,
-            new FlavorTextBestiaryInfoElement("When this fiery fiend appeared from the star-shaped rift it immediately found solace where it made sense the most: the only other places with bats and heat!"),
+            new FlavorTextBestiaryInfoElement(Language.GetTextValue("Mods.KirboMod.NPCs.Bestiary.Batafire")),
             ]);
         }
 
