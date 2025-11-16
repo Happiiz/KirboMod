@@ -15,6 +15,7 @@ namespace KirboMod.Systems
         public static bool downedNightmareBoss = false;
         public static bool downedDarkMatterBoss = false;
         public static bool downedZeroBoss = false;
+        public static bool downedMarxBoss = false;
         // public static bool downedOtherBoss = false;
 
         public override void OnWorldLoad() {
@@ -24,6 +25,7 @@ namespace KirboMod.Systems
             downedNightmareBoss = false;
             downedDarkMatterBoss = false;
             downedZeroBoss = false;
+            downedMarxBoss = false;
             // downedOtherBoss = false;
         }
 
@@ -34,6 +36,7 @@ namespace KirboMod.Systems
             downedNightmareBoss = false;
             downedDarkMatterBoss = false;
             downedZeroBoss = false;
+            downedMarxBoss = false;
             // downedOtherBoss = false;
         }
 
@@ -63,6 +66,10 @@ namespace KirboMod.Systems
             {
                 tag["downedZeroBoss"] = true;
             }
+            if (downedMarxBoss)
+            {
+                tag["downedMarxBoss"] = true;
+            }
             // if (downedOtherBoss) {
             //	tag["downedOtherBoss"] = true;
             // }
@@ -75,6 +82,7 @@ namespace KirboMod.Systems
             downedNightmareBoss = tag.ContainsKey("downedNightmareBoss");
             downedDarkMatterBoss = tag.ContainsKey("downedDarkMatterBoss");
             downedZeroBoss = tag.ContainsKey("downedZeroBoss");
+            downedMarxBoss = tag.ContainsKey("downedMarxBoss");
             // downedOtherBoss = tag.ContainsKey("downedOtherBoss");
         }
 
@@ -87,7 +95,8 @@ namespace KirboMod.Systems
             flags[3] = downedNightmareBoss;
             flags[4] = downedDarkMatterBoss;
             flags[5] = downedZeroBoss;
-            // flags[6] = downedOtherBoss;
+            flags[6] = downedMarxBoss;
+            // flags[x] = downedOtherBoss;
             //when up to [7], create a new BitsByte
             writer.Write(flags);
 		}
@@ -101,6 +110,7 @@ namespace KirboMod.Systems
             downedNightmareBoss = flags[3];
             downedDarkMatterBoss = flags[4];
             downedZeroBoss = flags[5];
+            downedMarxBoss = flags[6];
             // downedOtherBoss = flags[6];
             //when up to [7], create a new BitsByte
         }

@@ -22,6 +22,12 @@ namespace KirboMod.NPCs.Marx.Townie
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[NPC.type] = 4;
+
+            NPCID.Sets.NPCBestiaryDrawModifiers value = new()
+            {
+                Hide = true //don't show in bestiary
+            };
+            NPCID.Sets.NPCBestiaryDrawOffset.Add(NPC.type, value);
         }
 
         const int transPoint = 300;
@@ -38,7 +44,7 @@ namespace KirboMod.NPCs.Marx.Townie
             NPC.noTileCollide = false;
             NPC.noGravity = true;
             NPC.aiStyle = -1;
-            NPC.alpha = 0;
+            NPC.alpha = 255;
         }
 
         public override void OnSpawn(IEntitySource source)

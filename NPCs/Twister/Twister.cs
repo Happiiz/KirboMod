@@ -64,13 +64,13 @@ namespace KirboMod.NPCs.Twister
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
-            // We can use AddRange instead of calling Add multiple times in order to add multiple items at once
+            //uses AddRange to add multiple things instead of Add for simplicity
             bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
             {
-				// Sets the spawning conditions of this NPC that is listed in the bestiary.
+				//set spawning conditions of NPC in bestiary
 				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Marble,
 
-				// Sets the description of this NPC that is listed in the bestiary.
+				//bestiary description
 				new FlavorTextBestiaryInfoElement("Look out! This little yellow top has the knack to spin violently towards intruders! One could wonder how it goes about doing so without eyes.")
             });
         }

@@ -1,4 +1,5 @@
-﻿using KirboMod.Items.Accesories;
+﻿using KirboMod.Items;
+using KirboMod.Items.Accesories;
 using KirboMod.Items.Armor.AirWalker;
 using KirboMod.Items.Kracko;
 using KirboMod.Systems;
@@ -10,6 +11,7 @@ using Terraria.Audio;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 namespace KirboMod.NPCs
 {
@@ -125,12 +127,14 @@ namespace KirboMod.NPCs
             LeadingConditionRule notExpertRule = new(new Conditions.NotExpert()); //checks if not expert
             LeadingConditionRule masterMode = new(new Conditions.IsMasterMode()); //checks if master mode
 
-            notExpertRule.OnSuccess(ItemDropRule.Common(ItemID.Cloud, 1, 50, 50)); //50 clouds
+            notExpertRule.OnSuccess(ItemDropRule.Common(ItemID.Cloud, 1, 20, 20)); //20 clouds
 
             notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<KrackoMask>(), 7));
 
             // Drop one of these 3 items with 100% chance
-            notExpertRule.OnSuccess(ItemDropRule.OneFromOptions(1, ModContent.ItemType<AirWalkerHelmet>(), ModContent.ItemType<AirWalkerBreastplate>(), ModContent.ItemType<AirWalkerLeggings>()));
+            //notExpertRule.OnSuccess(ItemDropRule.OneFromOptions(1, ModContent.ItemType<AirWalkerHelmet>(), ModContent.ItemType<AirWalkerBreastplate>(), ModContent.ItemType<AirWalkerLeggings>()));
+
+            notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<KrackoSpikeItem>(), 1, 10, 14));
 
             notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<PeeWeePole>(), 4));
 
@@ -243,15 +247,15 @@ namespace KirboMod.NPCs
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
-            // We can use AddRange instead of calling Add multiple times in order to add multiple items at once
-            bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
-            {
-				// Sets the spawning conditions of this NPC that is listed in the bestiary.
+            //uses AddRange to add multiple things instead of Add for simplicity
+            bestiaryEntry.Info.AddRange(
+            [
+				//set spawning conditions of NPC in bestiary
 				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Sky,
 
-				// Sets the description of this NPC that is listed in the bestiary.
-				new FlavorTextBestiaryInfoElement("Kracko is a living cloud that has lingered in the sky since ancient times, and thus has mastered the art of thunder!")
-            });
+				//bestiary description
+				new FlavorTextBestiaryInfoElement(Language.GetTextValue("Mods.KirboMod.NPCs.Bestiary.Kracko"))
+            ]);
         }
 
         public override void SendExtraAI(BinaryWriter writer)

@@ -61,13 +61,13 @@ namespace KirboMod.NPCs
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
-			// We can use AddRange instead of calling Add multiple times in order to add multiple items at once
+			//uses AddRange to add multiple things instead of Add for simplicity
 			bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
 			{
-				// Sets the spawning conditions of this NPC that is listed in the bestiary.
+				//set spawning conditions of NPC in bestiary
 				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Surface,
 
-				// Sets the description of this NPC that is listed in the bestiary.
+				//bestiary description
 				new FlavorTextBestiaryInfoElement("Stay out! This is Wheelie territory, and you're not fast enough for these rambunctious racers! But perhaps if you can show them up, one of them will help you ride around town...")
 			}); 
         }

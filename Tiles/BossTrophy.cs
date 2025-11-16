@@ -25,7 +25,6 @@ namespace KirboMod.Tiles
 			TileObjectData.addTile(Type);
 			DustType = 7;
 			LocalizedText name = CreateMapEntryName();
-			// name.SetDefault("Trophy");
 			AddMapEntry(new Color(120, 85, 60), name);
 		}
 	}

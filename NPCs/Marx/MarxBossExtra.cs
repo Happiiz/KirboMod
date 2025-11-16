@@ -1,4 +1,5 @@
 using KirboMod.Bestiary;
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using System;
 using System.IO;
@@ -7,6 +8,7 @@ using Terraria.Audio;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace KirboMod.NPCs.Marx
@@ -99,11 +101,11 @@ namespace KirboMod.NPCs.Marx
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
-            bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
-            {
-				new SurfaceBackgroundProvider(),
-				new FlavorTextBestiaryInfoElement("Big fat traitorous meanie") //WIP
-            });
+            bestiaryEntry.Info.AddRange(
+            [
+                new SurfaceBackgroundProvider(),
+				new FlavorTextBestiaryInfoElement(Language.GetTextValue("Mods.KirboMod.NPCs.Bestiary.MarxBoss"))
+            ]);
         }
 
         public override void SendExtraAI(BinaryWriter writer)
@@ -120,7 +122,7 @@ namespace KirboMod.NPCs.Marx
 
         public override void OnKill()
         {
-            //NPC.SetEventFlagCleared(ref DownedBossSystem.downedMarxBoss, -1);
+            NPC.SetEventFlagCleared(ref DownedBossSystem.downedMarxBoss, -1);
         }
 
         public override void ModifyNPCLoot(NPCLoot npcLoot)

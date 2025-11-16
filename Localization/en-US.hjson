@@ -7,6 +7,7 @@ Mods: {
 			MusicBoxTitle: Music Box
 			ShroomiteHelmetBenefitDowngrades: This weapon and its downgrades benefit from the [i:1548] Shroomite Helmet
 			ShroomiteHelmetBenefit: This weapon benefits from the [i:1548] Shroomite Helmet
+			UnimplementedAbilityHat: "'What could've been...'"
 		}
 
 		ProgressionDescription: {
@@ -48,11 +49,11 @@ Mods: {
 				FriendlyName: Dream Once More
 			}
 
-			# MarxAchievement: {
-			# Description: Defeat the maniacal magician who attempted to gain power through cunning trickery and paitent planning.
-			# FriendlyName: Super Ultra Schemer
-			# }
-			
+			MarxAchievement: {
+				Description: Defeat the maniacal magician who attempted to gain power through cunning trickery and paitent planning.
+				FriendlyName: Super Ultra Schemer
+			}
+
 			DarkMatterAchievement: {
 				Description: Defeat the ruthless invader of unknown origin who carries with it an ominous darkness.
 				FriendlyName: Let There be Light
@@ -99,10 +100,16 @@ Mods: {
 			}
 		}
 
+		DropConditions: {
+			PostGolem: In Hardmode, post-Golem
+			PreGolem: In Hardmode, pre-Golem
+			WaddleDoo: Not from a minion
+		}
+
 		Buffs: {
 			DarkFeeling: {
-				DisplayName: Dark Feeling
-				Description: This mirror is giving bad vibes...
+				DisplayName: Restless
+				Description: The fountain pulses with an ominous glow...
 			}
 
 			Dreamy: {
@@ -1123,7 +1130,7 @@ Mods: {
 				Tooltip:
 					'''
 					Mighty staff of the Jamba followers
-					Right click to swing it
+					Currently unobtainable
 					'''
 			}
 
@@ -1413,7 +1420,7 @@ Mods: {
 				DisplayName: Bomber Bomb
 				Tooltip:
 					'''
-					Shoots a high-velocity bomb that explodes in a large blast radius
+					Chuck a high velocity bomb that explodes in a large blast radius
 					Will not destroy tiles
 					'''
 			}
@@ -1485,7 +1492,188 @@ Mods: {
 
 			SparklingSoul: {
 				DisplayName: Sparkling Soul
+				Tooltip: A star-shaped heart fused by the spirits to control the spirits
+				Summon: Summons Marx
+			}
+
+			BeamAbilityHat: {
+				DisplayName: Beam Ability Hat
 				Tooltip: ""
+			}
+
+			BombAbilityHat: {
+				DisplayName: Bomb Ability Hat
+				Tooltip: ""
+			}
+
+			CutterAbilityHat: {
+				DisplayName: Cutter Ability Hat
+				Tooltip: ""
+			}
+
+			FighterAbilityHat: {
+				DisplayName: Fighter Ability Hat
+				Tooltip: ""
+			}
+
+			FireAbilityHat: {
+				DisplayName: Fire Ability Hat
+				Tooltip: ""
+			}
+
+			IceAbilityHat: {
+				DisplayName: Ice Ability Hat
+				Tooltip: ""
+			}
+
+			PlasmaAbilityHat: {
+				DisplayName: Plasma Ability Hat
+				Tooltip: ""
+			}
+
+			TornadoAbilityHat: {
+				DisplayName: Tornado Ability Hat
+				Tooltip: ""
+			}
+
+			WaterAbilityHat: {
+				DisplayName: Water Ability Hat
+				Tooltip: "{$CommonItemTooltip.UnimplementedAbilityHat}"
+			}
+
+			LeafAbilityHat: {
+				DisplayName: Leaf Ability Hat
+				Tooltip: "{$CommonItemTooltip.UnimplementedAbilityHat}"
+			}
+
+			MirrorAbilityHat: {
+				DisplayName: Mirror Ability Hat
+				Tooltip: "{$CommonItemTooltip.UnimplementedAbilityHat}"
+			}
+
+			YoyoAbilityHat: {
+				DisplayName: Yo-Yo Ability Hat
+				Tooltip: "{$CommonItemTooltip.UnimplementedAbilityHat}"
+			}
+
+			StarBlockItem: {
+				DisplayName: Star Block
+				Tooltip:
+					'''
+					May be destroyed by weapons and projectiles
+					Does not drop upon breaking
+					'''
+			}
+
+			MetaKnightMask: {
+				DisplayName: Swordsman's Mask
+				Tooltip: "'Wear the might of the greatest swordsman across dimensions'"
+			}
+
+			BandanaDeeBandana: {
+				DisplayName: Spearman's Bandana
+				Tooltip: "'Shine like a diamond with the insignia of the greatest spear user'"
+			}
+
+			DarkMetaKnightMask: {
+				DisplayName: Fractured Mask
+				Tooltip: "'Wear the fury of the darkest swordsman in another dimension'"
+			}
+
+			MasterCrown: {
+				DisplayName: Suspicious Looking Crown
+				Tooltip: "'It seems to be dormant...'"
+			}
+
+			TaranzaWig: {
+				DisplayName: Webber's Wig
+				Tooltip: "'Its distinguished appearance almost makes you forget what could be crawling in there'"
+			}
+
+			DaroachHat: {
+				DisplayName: Expert Thief's Hat
+				Tooltip: "'This stylish hat represents the prideful, gluttonous mojo of the greatest thief anywhere!'"
+			}
+
+			SusieHat: {
+				DisplayName: Secretary's Headgear
+				Tooltip: "'Put on not just your working clothes, but also your curious, scientific, cold, unfeeling, and greedy clothes as well!'"
+			}
+
+			KrackoSpikeItem: {
+				DisplayName: Krackling Spike
+				Tooltip: "'Watch out for the tip... and everywhere else!'"
+			}
+
+			DededeRobes: {
+				Tooltip: "'A large, gaudy coat fit for a king!'"
+				DisplayName: Royal Robe
+			}
+
+			HynessRobes: {
+				Tooltip: "'Embody the mantle of a diabolical leader hellbent on causing the end of everything'"
+				DisplayName: Doomsday Cultist Robe
+			}
+
+			HynessHood: {
+				Tooltip: "'Embody the face of a diabolical leader who has traded compassion for zealous obsession'"
+				DisplayName: Doomsday Cultist Hood
+			}
+
+			RibbonWig: {
+				Tooltip: "'A pretty pink wig that'll make your looks shine like a crystal!'"
+				DisplayName: Fairy Wig
+			}
+
+			AdeleineBeret: {
+				Tooltip: "'With this beret, your paintings will seem to come to life!'"
+				DisplayName: Artist's Beret
+			}
+
+			DaroachCloak: {
+				Tooltip: "'This devilish cape will make you feel like you can slip, speed and sneak like a rodent!'"
+				DisplayName: Roach Cloak
+			}
+
+			JambaHeartItem: {
+				DisplayName: Jamba Heart
+				Tooltip:
+					'''
+					A cursed artifact from an unknown realm, nesting limitless destructive potential...
+					...But it doesn't seem to accept the offers of this world
+					'''
+			}
+
+			DimensionMirrorItem: {
+				DisplayName: Dimension Mirror
+				Tooltip:
+					'''
+					A portal to a parallel dimension disguised as a guilded mirror, darkness awaiting for those who gaze into it
+					It seems to be dormant, overwhelmed by the eldritch reflections of this already chaotic world...
+					'''
+			}
+
+			KingDededePortraitItem: {
+				Tooltip:
+					'''
+					'Really captures the hearty likeness of your highness!'
+					'P. Roller'
+					'''
+				DisplayName: Kingly Portrait
+			}
+
+			BeamAttackPictureItem: {
+				DisplayName: Afterlife
+				Tooltip:
+					'''
+					'Maybe this one will hit 'em!'
+					'F. Boat'
+					'''
+			}
+
+			AdoDrawingItem: {
+				DisplayName: Unknown Cryptid
+				Tooltip: "'Ad. [i:58]'"
 			}
 		}
 
@@ -1752,6 +1940,8 @@ Mods: {
 			FlyingSparklingSoul.DisplayName: Flying Sparkling Soul
 			MarxBlackHole.DisplayName: Marx Black Hole
 			MatterOrbHoming.DisplayName: Matter Orb
+			ZeroEyeless.DisplayName: Zero Eyeless
+			KingDededead.DisplayName: King Dededead
 		}
 
 		NPCs: {
@@ -1885,6 +2075,14 @@ Mods: {
 					DKirby5: That starboard is pissing me off.
 					DReference: Friend! You gotta do SOOOOMMMMTHAAAAAYYYYYNNG!
 					DMarxolor: What!? Do I look like a traitor to you!?
+					#vvv The most that can be done to reference Transformation Mod atm because files aren't available thru extraction
+					DKirbyTransformation: Trust me, friend. You'll never be him. No matter how much you transform yourself.
+					#vvv Only appears with wotg enabled
+					D1Hater: Look, I get you 'appreciate' her, but that Soylent character seems a little suspicious to me... especially her warp star...
+					D1Hater2: What!? Soylent is gone!? Aw... don't worry about it, friend. I'm still here!
+					DRift: Ah, things are finally looking up around here.
+					DAOEDowned: Aaaaand everything sucks, again.
+					DNamelessDowned: You beat God? Big whoop. I know a guy who does that every Tuesday.
 				}
 
 				Help: {
@@ -1898,11 +2096,11 @@ Mods: {
 					HDreamMatter: With the true form of this world unveiled, some of my guys might've began to venture once more! Go look again! The skies! The caves! The ends of the world! Go look now that their dreams of fitting in have been stirred!
 					HRareStones: With all these rifts in space, some of these guys had outta pick up some rare stones! Though they'd have to have the power to be able to retrieve them. The same power that resists the rifts, probably.
 					HEvoWeapons: With rare stones, you could upgrade some weapons to a fuller potential! Though these recipes aren't cheap, you seem like a skilled blacksmith!
-					HNightmare: The fountain of dreams was an... interesting landmark of our world. I wonder if you could recreate it with this world's materials. It would even be fun if we could attract another... what? I wasn't saying anything!
+					HNightmare: The Fountain of Dreams was an... interesting landmark of our world. I wonder if you could recreate it with this world's materials. It would even be fun if we could attract another... what? I wasn't saying anything!
 					HHeartMatter: Love is something I find quite icky, but those burning wishes, dreams, and that energy of life can be channeled into a powerful resource!
 					HMarx: I've appreciated your help thus far, but now I have something to ask of you: an awful evil slowly descends upon this world, but I figured out that if we use the power of the spirits of light and dark of this world with the care and compassion of our world, then we could influence the released souls to fight back against the enemy! Whaddya say?
 					HDarkMatter: There existed a terrible force in our world, but it has mostly since been wiped out. I wonder if this world contains its own dark forces. Try attracting them using some dark stuff! It should be interesting...
-					HZero: Ever since the darkness has been wiped away, our world hasn't had as many omnipresent adversaries... but with these alien materials, a ritual to resurect the heart of the darkness might be possible... Yes... I'd say that'd make an interesting last challenge.
+					HZero: Ever since the darkness has been wiped away, our world hasn't had as many omnipresent adversaries... but with these alien materials, a ritual to resurect the heart of the darkness might be possible... That's a final battle I'd want to see!
 					HPostZero: ...What? I don't have anything else to tell you. Friends are only useful for so long.
 				}
 
@@ -1918,8 +2116,8 @@ Mods: {
 					HateBiome: It's calm here... a little too calm here... It bores my senses!
 					LoveNPC: Wow! Everyone hates {NPCName} so much! Their air of negativity is just admirable!
 					LikeNPC: "{NPCName}'s penchant for destruction is awesome! I love a little chaos!"
-					DislikeNPC: Why does {NPCName} prefer to help rather than hurt? No one will need your help if you can hurt anyone around you!
-					HateNPC: I hate {NPCName}! Every year, he gives me stupid, black rocks! That puffball does a way better job with gifts than him!
+					DislikeNPC: Why does {NPCName} prefer to help rather than hurt? You won't need help if you can hurt everyone around you!
+					HateNPC: I hate {NPCName}! Every year, he gives me stupid, black, tasteless rocks! Even that puffball does a way better job with gifts than him!
 					LikeNPC_Princess: "{NPCName}'s personality makes me gag... but she also gives me food, which is always appreciated!"
 					Princess_LovesNPC: "{NPCName} may seem shifty, but as long as you keep him fed he'll always be a wonderful ally!"
 				}
@@ -1942,22 +2140,62 @@ Mods: {
 
 			MarxBoss.DisplayName: Marx
 			PureDarkMatterRematch.DisplayName: Dark Matter
+
+			Bestiary: {
+				BioSpark: An elite ninja that hides deep within the caverns, training to become stronger. Ambushes targets with a flurry of attacks.
+				Birdon: This high-flying bird just loves to see how far can they fly! Got along very well with the harpies, and now they protect their blue feathery friends!
+				BladeKnight: A fearless warrior constantly searching for a challenge to appease his desire for battle. Despite being an ametaur, anyways.
+				Bomber: Don't let its cutesy, dinky appearance fool you. If it looks like a bomb, falls like a bomb, and explodes like a bomb... it's a bomb!
+				BrontoBurt: Flutters through the air in a wave pattern. Will push others out of the way to keep on it's path.
+				BroomHatter: Sweep, sweep, sweep! Must sweep the world clean! That's the monumental task this little guy puts on himself!
+				BurningLeo: Burning Leos found comfort in the warm jungle, and now they scorch anyone who touches their land!
+				Cappy: This shy creature keeps itself concealed with a mushroom like hat. Uncovering it reveals a face that doesn't look as cheery as they move.
+				Chilly: Chillies found comfort in the cold tundra, and now they freeze anyone who touches their land!
+				Kabu: A little wooden mound that slides around erratically in caves. Is rumored to carry a lot of wisdom.
+				KnuckleJoe: Watch out! Knuckle Joe wants a challenge and you seem perfectly fit! They'll bombard you with a flurry of vulcan jabs and smash punches 'til you're down!
+				OrangeButterfly: Life after death after life after death. The wheel of mortality never stops. It cannot stop, for the wheel, stopping means detaching from the cart, forever falling from existence. How can one cast judgement on that which cannot be judged? That is the dilemma this emissary of fate faces.
+				ParasolDee: A waddle dee that likes to take it's umbrella out for walks, even when it isn't raining.
+				PlasmaWisp: A ghastly entity sparking high amounts of electricity and light. Tries to snuff out intruders of its domain.
+				PoppyBrosJr: This happy little demolitionist loves to throw, toss, and hurl bombs! All while keep a wide grin on its face that never seems to wash off!
+				Scarfy: A cute little face that stands out amongst the demons and flames, but only if you keep it that way!
+				SirKibble: A fearless warrior that refuses to back out of a battle, even when the odds are stacked against them.
+				UFO: Rarely some may see mysterious constructs floating around the atmosphere. They tend to open fire on suspicious life forms that get too close.
+				WaddleDee: Simple minded wanderers that have no desire to fight. Although they can be quite the nuisance when you're in a hurry.
+				WaddleDoo: The more dangerous cousin of the Waddle Dee. Shoots out electric beams whenever it feels threatened.
+				Bonkers: A giant armored monkey that came from a strange star shaped rift, prepared to smash down on any threat that approaches with its hammer!
+				MrFrosty: An icy beast that appeared in the tundra from a strange star shaped rift. Does its best to stamp out any threats with style and grace, or lack thereof.
+				Batafire: When this fiery fiend appeared from the star-shaped rift it immediately found solace where it made sense the most: the only other places with bats and heat!
+				Whispy: A tree that gained the unatural ability of sentience, and now has devoted its life to guarding it's brethren.
+				Kracko: Kracko is a living cloud that has lingered in the sky since ancient times, and thus has mastered the art of thunder!
+				KingDedede: The mighty-yet-greedy ruler of a distant castle! He loves to snack and show those who mistreat him the boot! Especially people who take his precious life-saving brooches!
+				Nightmare: An evil wizard bent on spreading nightmares to all that can dream. Its magic can twist the mind and body of those who are cursed with it.
+				DarkMatter: A mysterious monocular invader with a body as black as darkness itself. What hidden motives does it have descending upon this world?
+				MarxTownie: A friendly face has appeared from a land of dreams to help you figure out his world's weird visitors! He's a little weird, himself, but there's nothing wrong with that... right?
+				MarxBoss: A two-faced fiend with incredible magical abilities that used your trust (or curiosity) to secure an artifact that could've enabled him to rule all of Terraria... that was, until he got thwarted!
+				Zero: The supreme ruler of all matter that is dark, reborn once more into another world through a ritual involving Cthulhu's fallen essence.
+			}
 		}
 
 		Tiles: {
 			BossTrophy.MapEntry: Trophy
 			EnemyBanner.MapEntry: Banner
-			FountainOfDreams.MapEntry: Fountain of Dreams
-			RareStone.MapEntry: Rare Stone
-			TreasureStone.MapEntry: Treasure Stone
-			MysticalStone.MapEntry: Mystical Stone
+			FountainOfDreams.MapEntry: "{$Items.FountainOfDreams.DisplayName}"
+			RareStone.MapEntry: "{$Items.RareStone.DisplayName}"
+			TreasureStone.MapEntry: "{$Items.TreasureStone.DisplayName}"
+			MysticalStone.MapEntry: "{$Items.MysticalStone.DisplayName}"
 			DededeMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
 			DarkMatterMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
 			DreamLandBossMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
-			ZeroMusicBoxTile.MapEntry: Zero Music Box Tile
-			NightmareMusicBoxTile.MapEntry: Nightmare Music Box Tile
-			PowerOrbMusicBoxTile.MapEntry: Power Orb Music Box Tile
-			PureDarkMatterMusicBoxTile.MapEntry: Pure Dark Matter Music Box Tile
+			ZeroMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
+			NightmareMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
+			PowerOrbMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
+			PureDarkMatterMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
+			StarBlock.MapEntry: "{$Items.StarBlockItem.DisplayName}"
+			JambaHeart.MapEntry: "{$Items.JambaHeartItem.DisplayName}"
+			DimensionMirror.MapEntry: "{$Items.DimensionMirrorItem.DisplayName}"
+			KingDededePortrait.MapEntry: "{$Items.KingDededePortraitItem.DisplayName}"
+			BeamAttackPicture.MapEntry: "{$Items.BeamAttackPictureItem.DisplayName}"
+			AdoDrawing.MapEntry: "{$Items.AdoDrawing.DisplayName}"
 		}
 
 		Configs: {
@@ -1971,6 +2209,6 @@ Mods: {
 			}
 		}
 
-		Emotes.MarxTownieEmote.Command: marxtownieemote
+		Emotes.MarxTownieEmote.Command: Marx
 	}
 }

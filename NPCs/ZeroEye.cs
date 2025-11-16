@@ -76,12 +76,12 @@ namespace KirboMod.NPCs
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
-            // We can use AddRange instead of calling Add multiple times in order to add multiple items at once
+            //uses AddRange to add multiple things instead of Add for simplicity
             bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
             {
                 new HyperzoneBackgroundProvider(), //I totally didn't reference the vanilla code what no way
 
-				// Sets the description of this NPC that is listed in the bestiary.
+				//bestiary description
 				new FlavorTextBestiaryInfoElement("I see you (unused)")
             });
         }

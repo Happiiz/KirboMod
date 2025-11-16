@@ -26,5 +26,14 @@ namespace KirboMod.Items.Armor.AirWalker
 			player.maxRunSpeed += 0.10f; //10%
             player.accRunSpeed += 0.10f;
         }
-	}
+
+        public override void AddRecipes()
+        {
+            Recipe recipe = CreateRecipe();
+            recipe.AddIngredient(ModContent.ItemType<KrackoSpikeItem>(), 4);
+            recipe.AddIngredient(ItemID.Cloud, 10);
+            recipe.AddTile(TileID.Anvils);
+            recipe.Register(); //adds this recipe to the game
+        }
+    }
 }

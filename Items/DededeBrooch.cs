@@ -69,19 +69,12 @@ namespace KirboMod.Items
 
         public override void AddRecipes()
         {
-			Recipe recipe = CreateRecipe();//the result is whispy seed
+			Recipe recipe = CreateRecipe();//the result is brooch
 			recipe.AddIngredient(ModContent.ItemType<Items.Starbit>(), 40); //40 starbits
-			recipe.AddIngredient(ItemID.GoldBar, 5); //gold bar 
-			recipe.AddIngredient(ItemID.Bone, 20); //bone
+            recipe.AddRecipeGroup("Gold", 10); //gold or platinum bar
+            recipe.AddIngredient(ItemID.Bone, 20); //bone
 			recipe.AddTile(TileID.DemonAltar); //crafted at demon or crimson altar
 			recipe.Register(); //adds this recipe to the game
-
-			Recipe recipe2 = CreateRecipe();//the result is whispy seed
-			recipe2.AddIngredient(ModContent.ItemType<Items.Starbit>(), 40); //40 starbits
-			recipe2.AddIngredient(ItemID.PlatinumBar, 5); //platinum bar
-			recipe2.AddIngredient(ItemID.Bone, 20); //bone
-			recipe2.AddTile(TileID.DemonAltar); //crafted at demon or crimson altar
-			recipe2.Register(); //adds this recipe to the game
 		}
     }
 }

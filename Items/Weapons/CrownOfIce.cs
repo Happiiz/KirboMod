@@ -62,22 +62,5 @@ namespace KirboMod.Items.Weapons
             player.SpawnMinionOnCursor(source, player.whoAmI, Item.shoot, Item.damage, knockback);
             return false;
 		}
-
-  //      public override void AddRecipes()
-		//{
-		//	Recipe recipe = CreateRecipe();
-		//	recipe.AddIngredient(ModContent.ItemType<Starbit>(), 10);
-		//	recipe.AddIngredient(ItemID.GoldBar, 10);
-		//	recipe.AddIngredient(ModContent.ItemType<Ice>());
-		//	recipe.AddTile(TileID.Anvils);
-		//	recipe.Register();
-
-		//	Recipe recipe2 = CreateRecipe();
-		//	recipe2.AddIngredient(ModContent.ItemType<Starbit>(), 10);
-		//	recipe2.AddIngredient(ItemID.PlatinumBar, 10);
-		//	recipe2.AddIngredient(ModContent.ItemType<Ice>());
-		//	recipe2.AddTile(TileID.Anvils);
-		//	recipe2.Register();
-		//}
 	}
 }

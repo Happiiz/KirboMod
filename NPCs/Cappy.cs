@@ -5,6 +5,7 @@ using System;
 using Terraria;
 using Terraria.GameContent.Bestiary;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace KirboMod.NPCs
@@ -53,14 +54,14 @@ namespace KirboMod.NPCs
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
-            // We can use AddRange instead of calling Add multiple times in order to add multiple items at once
+            //uses AddRange to add multiple things instead of Add for simplicity
             bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
             {
-				// Sets the spawning conditions of this NPC that is listed in the bestiary.
+				//set spawning conditions of NPC in bestiary
 				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Surface,
 
-				// Sets the description of this NPC that is listed in the bestiary.
-				new FlavorTextBestiaryInfoElement("This shy creature keeps itself concealed with a mushroom like hat. Uncovering it reveals a face that doesn't look as cheery as they move.")
+				//bestiary description
+				new FlavorTextBestiaryInfoElement(Language.GetTextValue("Mods.KirboMod.NPCs.Bestiary.Cappy"))
             });
         }
 		//todo: test confusion functionality

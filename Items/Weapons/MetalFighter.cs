@@ -23,8 +23,8 @@ namespace KirboMod.Items.Weapons
 		public static int UseTime => 6;
 		public override void SetDefaults()
 		{
-			Item.damage = 22;
-			Item.DamageType = DamageClass.Melee/* tModPorter Suggestion: Consider MeleeNoSpeed for no attack speed scaling */;
+			Item.damage = 36;
+            Item.DamageType = DamageClass.Melee/* tModPorter Suggestion: Consider MeleeNoSpeed for no attack speed scaling */;
 			Item.width = 40; //world dimensions
 			Item.height = 40; //world dimensions
 			Item.useTime = UseTime;

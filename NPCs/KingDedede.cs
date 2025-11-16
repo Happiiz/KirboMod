@@ -1,6 +1,8 @@
 using KirboMod.Bestiary;
 using KirboMod.Items.KingDedede;
+using KirboMod.Items.Placeables;
 using KirboMod.Projectiles;
+using KirboMod.Projectiles.BossDeaths;
 using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -13,6 +15,7 @@ using Terraria.GameContent;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace KirboMod.NPCs
@@ -121,15 +124,15 @@ namespace KirboMod.NPCs
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
-            // We can use AddRange instead of calling Add multiple times in order to add multiple items at once
-            bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
-            {
+            //uses AddRange to add multiple things instead of Add for simplicity
+            bestiaryEntry.Info.AddRange(
+            [
                 new SurfaceBackgroundProvider(), //I totally didn't steal this code
-				// Sets the spawning conditions of this NPC that is listed in the bestiary.
+				//set spawning conditions of NPC in bestiary
 
-				// Sets the description of this NPC that is listed in the bestiary.
-				new FlavorTextBestiaryInfoElement("The mighty-yet-greedy ruler of a distant castle! He loves to snack and show those who mistreat him the boot! Especially people who take his precious life-saving brooches!"),
-            });
+				//bestiary description
+				new FlavorTextBestiaryInfoElement(Language.GetTextValue("Mods.KirboMod.NPCs.Bestiary.KingDedede")),
+            ]);
         }
 
         public override void SendExtraAI(BinaryWriter writer) //for syncing non NPC.ai[] stuff
@@ -1674,6 +1677,9 @@ namespace KirboMod.NPCs
 
             notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<Items.KingDedede.KingDededeMask>(), 7));
 
+            //rare chance to drop painting
+            notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<KingDededePortraitItem>(), 30));
+
             npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Items.KingDedede.KingDededeTrophy>(), 10));
 
             //master mode stuff
@@ -1715,14 +1721,7 @@ namespace KirboMod.NPCs
                     Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center, speed, Main.rand.Next(11, 13), Scale: 2f); //double jump smoke
                 }
 
-                if (NPC.direction == -1) //die left
-                {
-                    Dust.NewDustPerfect(NPC.position, ModContent.DustType<Dusts.KingDededead>(), new Vector2(NPC.direction * -8, -8), 1);
-                }
-                else if (NPC.direction == 1)//die right
-                {
-                    Dust.NewDustPerfect(NPC.position, ModContent.DustType<Dusts.KingDededeadRight>(), new Vector2(NPC.direction * -8, -8), 1);
-                }
+                Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center, new Vector2(NPC.direction * -8, -8), ModContent.ProjectileType<KingDededead>(), 0, 0);
             }
             else
             {

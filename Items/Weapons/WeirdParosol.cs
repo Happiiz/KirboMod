@@ -58,7 +58,7 @@ namespace KirboMod.Items.Weapons
 		public override void AddRecipes()
 		{
 			Recipe recipe = CreateRecipe();
-			recipe.AddIngredient(ModContent.ItemType<DreamEssence>(), 50);
+			recipe.AddIngredient(ModContent.ItemType<HeartMatter>(), 10);
 			recipe.AddIngredient(ModContent.ItemType<DarkMaterial>(), 15);
 			recipe.AddTile(TileID.MythrilAnvil);
 			recipe.Register();

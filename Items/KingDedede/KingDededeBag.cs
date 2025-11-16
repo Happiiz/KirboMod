@@ -1,14 +1,15 @@
-using Terraria;
-using Terraria.ModLoader;
-using Terraria.ID;
-using Terraria.GameContent;
-using Terraria.GameContent.ItemDropRules;
 using KirboMod.Items.Kracko;
-using KirboMod.Items.Zero;
+using KirboMod.Items.Placeables;
 using KirboMod.Items.Weapons;
-using Microsoft.Xna.Framework.Graphics;
+using KirboMod.Items.Zero;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Terraria;
+using Terraria.GameContent;
 using Terraria.GameContent.Creative;
+using Terraria.GameContent.ItemDropRules;
+using Terraria.ID;
+using Terraria.ModLoader;
 
 namespace KirboMod.Items.KingDedede
 {
@@ -48,6 +49,8 @@ namespace KirboMod.Items.KingDedede
                 , ItemDropRule.Common(ModContent.ItemType<Items.Weapons.DooStaff>(), 1)));
 
             itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<RoyalSlippers>()));
+
+            itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<KingDededePortraitItem>(), 30));
 
             itemLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<NPCs.KingDedede>())); // drop money
 

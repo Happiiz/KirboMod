@@ -1,15 +1,16 @@
+using KirboMod.Bestiary;
 using KirboMod.Items.DarkMatter;
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
+using System.IO;
 using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
+using Terraria.Audio;
+using Terraria.DataStructures;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
-using KirboMod.Bestiary;
-using KirboMod.Systems;
-using System.IO;
-using Terraria.DataStructures;
-using Terraria.Audio;
+using Terraria.ID;
+using Terraria.Localization;
+using Terraria.ModLoader;
 
 namespace KirboMod.NPCs.DarkMatter
 {
@@ -88,15 +89,15 @@ namespace KirboMod.NPCs.DarkMatter
         }
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
-            // We can use AddRange instead of calling Add multiple times in order to add multiple items at once
-            bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
-            {
+            //uses AddRange to add multiple things instead of Add for simplicity
+            bestiaryEntry.Info.AddRange(
+            [
                 new SurfaceBackgroundProvider(), //I totally didn't steal this code
-				// Sets the spawning conditions of this NPC that is listed in the bestiary.
+				//set spawning conditions of NPC in bestiary
 
-				// Sets the description of this NPC that is listed in the bestiary.
-				new FlavorTextBestiaryInfoElement("A mysterious monocular invader with a body as black as darkness itself. What hidden motives does it have descending upon this world?")
-            });
+				//bestiary description
+				new FlavorTextBestiaryInfoElement(Language.GetTextValue("Mods.KirboMod.NPCs.Bestiary.DarkMatter"))
+            ]);
         }
         public override void SendExtraAI(BinaryWriter writer)
         {

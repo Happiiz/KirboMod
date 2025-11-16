@@ -1,12 +1,15 @@
 using KirboMod.Projectiles;
 using KirboMod.Projectiles.Marx;
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace KirboMod.Items
@@ -39,8 +42,6 @@ namespace KirboMod.Items
 
         public override bool CanUseItem(Player player)
         {
-            //WIP
-
             bool anySoul = false;
 
             for (int i = 0; i < Main.maxProjectiles; i++)
@@ -60,24 +61,6 @@ namespace KirboMod.Items
             return true;
         }
 
-        /*public override bool? UseItem(Player player)
-        {
-            if (player.whoAmI == Main.myPlayer) //if the player using the item is the client
-            {
-                if (Main.netMode != NetmodeID.MultiplayerClient) // If the player is not in multiplayer, spawn directly
-                {
-                    //NPC.SpawnOnPlayer(player.whoAmI, NPC.AnyNPCs(ModContent.NPCType<NPCs.Marx.MarxTownie.MarxPrelude>()));
-                }
-                else // If the player is in multiplayer, request a spawn
-                {
-                    //this will only work if NPCID.Sets.MPAllowedEnemies[type] is set in boss
-                    //NetMessage.SendData(MessageID.SpawnBossUseLicenseStartEvent, number: player.whoAmI, number2: ModContent.NPCType<NPCs.DarkMatter.DarkMatter>());
-                }
-                SoundEngine.PlaySound(SoundID.Roar, player.position);
-            }
-            return true;
-        }*/
-
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {
             position.Y = player.Center.Y - 50;
@@ -87,18 +70,15 @@ namespace KirboMod.Items
             velocity.Y = -20;
         }
 
-        /*public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+        public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
-            position.Y = player.Center.Y - 50;
-            position.X = player.Center.X + player.direction * 50;
+            Player player = Main.LocalPlayer;
 
-            velocity.X = 0;
-            velocity.Y = -10;
-
-            Projectile.NewProjectile(source, position, velocity, type, 0, 0, player.whoAmI, ai1: )
-
-            return false;
-        }*/
+            if (DownedBossSystem.downedMarxBoss)
+            {
+                tooltips.Add(new TooltipLine(Mod, "TooltipLine1", Language.GetTextValue("Mods.KirboMod.Items.SparklingSoul.Summon")));
+            }
+        }
 
         public override Color? GetAlpha(Color lightColor)
         {

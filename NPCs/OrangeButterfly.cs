@@ -5,6 +5,7 @@ using System;
 using Terraria;
 using Terraria.GameContent.Bestiary;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Utilities;
 
@@ -40,15 +41,15 @@ namespace KirboMod.NPCs
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
-            // We can use AddRange instead of calling Add multiple times in order to add multiple items at once
-            bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
-            {
-				// Sets the spawning conditions of this NPC that is listed in the bestiary.
+            //uses AddRange to add multiple things instead of Add for simplicity
+            bestiaryEntry.Info.AddRange(
+            [
+				//set spawning conditions of NPC in bestiary
 				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Surface,
 
-				// Sets the description of this NPC that is listed in the bestiary.
-				new FlavorTextBestiaryInfoElement("Life after death after life after death. The wheel of mortality never stops. It cannot stop, for the wheel, stopping means detaching from the cart, forever falling from existence. How can one cast judgement on that which cannot be judged? That is the dilemma this emissary of fate faces.")
-            });
+				//bestiary description
+				new FlavorTextBestiaryInfoElement(Language.GetTextValue("Mods.KirboMod.NPCs.Bestiary.OrangeButterfly"))
+            ]);
         }
 
         public override void AI()
