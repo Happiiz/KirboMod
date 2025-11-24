@@ -30,7 +30,7 @@ namespace KirboMod.Items
 		public override void AddRecipes()
 		{
 			Recipe heartmatterrecipe = CreateRecipe(2);
-            heartmatterrecipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
+            heartmatterrecipe.AddIngredient(ItemID.SoulofLight, 3);
             heartmatterrecipe.AddIngredient(ItemID.ChlorophyteBar, 2);
             heartmatterrecipe.AddIngredient(ModContent.ItemType<DreamEssence>(), 5);
             heartmatterrecipe.AddTile(TileID.MythrilAnvil);

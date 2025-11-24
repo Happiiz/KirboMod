@@ -30,7 +30,7 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
-            recipe.AddRecipeGroup("Gold", 10);
+            recipe.AddRecipeGroup("Gold", 5);
             recipe.AddIngredient(ModContent.ItemType<Fire>());
             recipe.AddTile(TileID.Anvils);
             recipe.Register();
@@ -59,7 +59,7 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
-            recipe.AddRecipeGroup("Gold", 10);
+            recipe.AddRecipeGroup("Gold", 5);
             recipe.AddIngredient(ModContent.ItemType<Ice>());
             recipe.AddTile(TileID.Anvils);
             recipe.Register();
@@ -89,7 +89,7 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
-            recipe.AddRecipeGroup("Gold", 10);
+            recipe.AddRecipeGroup("Gold", 5);
             recipe.AddIngredient(ModContent.ItemType<Tornado>());
             recipe.AddTile(TileID.Anvils);
             recipe.Register();
@@ -118,7 +118,7 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
-            recipe.AddRecipeGroup("Gold", 10);
+            recipe.AddRecipeGroup("Gold", 5);
             recipe.AddIngredient(ModContent.ItemType<Plasma>());
             recipe.AddTile(TileID.Anvils);
             recipe.Register();
@@ -205,7 +205,7 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
-            recipe.AddIngredient(RecipeGroupID.IronBar, 20);
+            recipe.AddIngredient(RecipeGroupID.IronBar, 10);
             recipe.AddIngredient(ModContent.ItemType<Cutter>());
             recipe.AddTile(TileID.Anvils);
             recipe.Register();
@@ -263,7 +263,7 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ModContent.ItemType<Starbit>(), 10);
-            recipe.AddRecipeGroup("Gold", 10);
+            recipe.AddRecipeGroup("Gold", 5);
             recipe.AddIngredient(ItemID.WaterBolt);
             recipe.AddTile(TileID.Anvils);
             recipe.Register();
@@ -292,7 +292,7 @@ namespace KirboMod.Items.Armor.AbilityHats
         {
             Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ModContent.ItemType<Starbit>(), 10);
-            recipe.AddRecipeGroup("Gold", 10);
+            recipe.AddRecipeGroup("Gold", 5);
             recipe.AddIngredient(ItemID.BladeofGrass);
             recipe.AddTile(TileID.Anvils);
             recipe.Register();

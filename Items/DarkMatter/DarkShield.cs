@@ -28,7 +28,7 @@ namespace KirboMod.Items.DarkMatter
             Item.crit = (int)player.GetCritChance(DamageClass.Melee);
             Item.DamageType = DamageClass.Melee/* tModPorter Suggestion: Consider MeleeNoSpeed for no attack speed scaling */;
 			Item.accessory = true;
-			Item.value = Item.sellPrice(0, 0, 30, 15);
+			Item.value = Item.sellPrice(0, 5, 0, 0);
 			Item.rare = ItemRarityID.Blue;
 			Item.expert = true;
 			Item.defense = 3;

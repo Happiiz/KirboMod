@@ -23,8 +23,8 @@ namespace KirboMod.Items.Zero
 			Item.height = 15;
 			Item.useStyle = ItemUseStyleID.HoldUp;
 			Item.expert = true;
-			Item.value = 5997; //half of 1, 9, 97
-			Item.shoot = ModContent.ProjectileType<Projectiles.Pets.ZeroEyePetProj>();
+            Item.value = Item.buyPrice(0, 10, 99, 7); //1997
+            Item.shoot = ModContent.ProjectileType<Projectiles.Pets.ZeroEyePetProj>();
 			Item.buffType = ModContent.BuffType<Buffs.Pets.ZeroEyePetBuff>();
 		}
 
