@@ -1,3 +1,4 @@
+using KirboMod.Bestiary;
 using KirboMod.ItemDropRules.DropConditions;
 using KirboMod.Items;
 using KirboMod.Projectiles;
@@ -86,7 +87,8 @@ namespace KirboMod.NPCs.MidBosses
             bestiaryEntry.Info.AddRange(
             [
 				//set spawning conditions of NPC in bestiary
-				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Surface,
+                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Desert,
+                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Surface,
 
 				//bestiary description
 				new FlavorTextBestiaryInfoElement(Language.GetTextValue("Mods.KirboMod.NPCs.Bestiary.Bonkers"))
@@ -311,7 +313,9 @@ namespace KirboMod.NPCs.MidBosses
                             8f, Main.myPlayer, 0, NPC.whoAmI); 
                     }
 
-                    SoundEngine.PlaySound(SoundID.Item1, NPC.Center); //we dont define the stuff after coordinates because legacy sound style
+                    SoundEngine.PlaySound(SoundID.Item1, NPC.Center);
+
+                    SoundEngine.PlaySound(SoundID.Item14, NPC.Center); //bomb
                 }
                 if (NPC.ai[1] >= 120) //restart
                 {

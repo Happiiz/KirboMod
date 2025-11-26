@@ -1687,8 +1687,18 @@ Mods: {
 				Tooltip: "'Ad. [i:58]'"
 			}
 
+			BatafireMusicBox: {
+				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Mid-Boss Type F)"
+				Tooltip: ""
+			}
+
 			MarxMusicBox: {
 				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Marx)"
+				Tooltip: ""
+			}
+
+			RefightMusicBox: {
+				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Dark Matter Rematch)"
 				Tooltip: ""
 			}
 
@@ -1746,8 +1756,18 @@ Mods: {
 					'''
 					{$CommonItemTooltip.FlightAndSlowfall}
 					{$CommonItemTooltip.PressDownToHover}
-					Hovering last 2x as long
+					Hovering lasts 2x as long
 					'''
+			}
+
+			BonkersMusicBox: {
+				Tooltip: ""
+				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Mid-Boss Type H)"
+			}
+
+			MrFrostyMusicBox: {
+				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Mid-Boss Type I)"
+				Tooltip: ""
 			}
 		}
 
@@ -2104,6 +2124,8 @@ Mods: {
 					SpawnInfo: Use a [i:5597] and prepare for what comes next.
 					DespawnMessage: The darkness clears...
 				}
+
+				Eye: Zero's eye has ejected from its body!
 			}
 
 			ZeroEye.DisplayName: Eye of Zero
@@ -2272,7 +2294,11 @@ Mods: {
 			KingDededePortrait.MapEntry: "{$Items.KingDededePortraitItem.DisplayName}"
 			BeamAttackPicture.MapEntry: "{$Items.BeamAttackPictureItem.DisplayName}"
 			AdoDrawing.MapEntry: "{$Items.AdoDrawing.DisplayName}"
-			MarxMusicBoxTile.MapEntry: Marx Music Box Tile
+			BatafireMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
+			MarxMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
+			RefightMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
+			MrFrostyMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
+			BonkersMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
 		}
 
 		Configs: {

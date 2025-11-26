@@ -82,7 +82,8 @@ namespace KirboMod.NPCs.MidBosses
             bestiaryEntry.Info.AddRange(
             [
 				//set spawning conditions of NPC in bestiary
-				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Snow,
+                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Ocean,
+                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Snow,
 
 				//bestiary description
 				new FlavorTextBestiaryInfoElement(Language.GetTextValue("Mods.KirboMod.NPCs.Bestiary.MrFrosty"))

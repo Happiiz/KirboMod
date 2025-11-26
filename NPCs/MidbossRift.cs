@@ -63,7 +63,12 @@ namespace KirboMod.NPCs
                 {
                     if (Projectile.ai[1] == 1 || MarxSpawningSystem.MarxHasAppeared)
                     {
-                        if (player.ZoneSnow) //Mr. Frosty
+                        if (player.ZoneSkyHeight) //Kracko Jr. (easter egg)
+                        {
+                            index = NPC.NewNPC(Projectile.GetSource_FromThis(), (int)Projectile.Center.X, (int)Projectile.Center.Y,
+                                ModContent.NPCType<KrackoJr>(), Target: Projectile.owner);
+                        }
+                        else if (player.ZoneSnow || player.ZoneBeach) //Mr. Frosty
                         {
                             index = NPC.NewNPC(Projectile.GetSource_FromThis(), (int)Projectile.Center.X, (int)Projectile.Center.Y,
                                     ModContent.NPCType<MrFrosty>(), Target: Projectile.owner);

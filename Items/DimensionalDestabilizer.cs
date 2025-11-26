@@ -46,6 +46,8 @@ namespace KirboMod.Items
             ,ModContent.NPCType<NPCs.MidBosses.Batafire>()];
 
 
+            bool usableLocation = !player.ZoneRockLayerHeight && !player.ZoneDirtLayerHeight;
+
             for (int i = 0; i < midbossIDs.Count; i++)
             {
                 if (NPC.AnyNPCs(midbossIDs[i]))
@@ -56,7 +58,8 @@ namespace KirboMod.Items
 
             if (AnyProjs(ModContent.ProjectileType<MidbossRift>())
                      || player.CountItem(ModContent.ItemType<Starbit>()) < 25
-                     || WorldGen.SolidOrSlopedTile(Main.tile[mouselocation.X, mouselocation.Y]))
+                     || WorldGen.SolidOrSlopedTile(Main.tile[mouselocation.X, mouselocation.Y])
+                     || !usableLocation)
             {
                 return false;
             }

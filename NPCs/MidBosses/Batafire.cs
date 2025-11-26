@@ -10,6 +10,7 @@ using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace KirboMod.NPCs.MidBosses
 {
@@ -38,7 +39,7 @@ namespace KirboMod.NPCs.MidBosses
             NPC.width = 100;
             NPC.height = 100;
             DrawOffsetY = 70;
-            NPC.damage = Main.hardMode ? (NPC.downedGolemBoss ? 80 : 50) : 24; //all stats scale with progression
+            NPC.damage = Main.hardMode ? (NPC.downedGolemBoss ? 150 : 100) : 50; //all stats scale with progression
             NPC.defense = Main.hardMode ? 30 : 15;
             NPC.lifeMax = Main.hardMode ? (NPC.downedGolemBoss ? 32000 : 5000) : 1500;
             NPC.HitSound = SoundID.NPCHit1;
@@ -100,6 +101,8 @@ namespace KirboMod.NPCs.MidBosses
         public static float PrehardmodeDiveEndTime => 120;
         static float DashThreshold => 300;
 
+        readonly int projDamage = Main.hardMode ? (NPC.downedGolemBoss ? 60 : 30) : 15;
+
         public override void AI()
         {
             NPC.TargetClosest(false);
@@ -150,7 +153,7 @@ namespace KirboMod.NPCs.MidBosses
                     distanceFromPlayer *= speed;
 
                     int fireballRate = 100;
-                    if (AttackTimer % fireballRate == 0)
+                    if (AttackTimer % fireballRate == 0 && AttackTimer != 0)
                     {
                         IdleFireballBurst();
                     }
@@ -257,7 +260,6 @@ namespace KirboMod.NPCs.MidBosses
                 return;
             }
             Vector2 position = NPC.Center;
-            int damage = NPC.damage / 2;//halve because projectiles deal double damage for some reason
             float knockback = 5f;
             int type = ModContent.ProjectileType<Projectiles.Flames.BatafireFire>();
             //rotate starting down diagonally and then turning up
@@ -265,10 +267,10 @@ namespace KirboMod.NPCs.MidBosses
             if (NPC.downedGolemBoss)
                 trajectory = (MathF.PI / 2.5f) - (MathF.PI / 2.5f + MathF.PI / 2.5f) * ((timer - shootStart) / shootTime);
             float shootSpeed = Main.hardMode ? (NPC.downedGolemBoss ? PostGolemShootSpeed : HardmodeShootSpeed) : PrehardmodeShootSpeed;
-            Vector2 projVel = new Vector2(-MathF.Cos(trajectory), MathF.Sin(trajectory)) * shootSpeed;
-            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projVel, type, damage / 2, knockback, Main.myPlayer);
+            Vector2 projVel = new Vector2(MathF.Cos(trajectory), MathF.Sin(trajectory)) * shootSpeed;
+            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, projVel, type, projDamage / 2, knockback, Main.myPlayer);
             projVel.X *= -1;
-            Projectile.NewProjectile(NPC.GetSource_FromAI(), position, projVel, type, damage / 2, knockback, Main.myPlayer);
+            Projectile.NewProjectile(NPC.GetSource_FromAI(), position, projVel, type, projDamage / 2, knockback, Main.myPlayer);
         }
 
         void DiveFireballs()
@@ -286,7 +288,7 @@ namespace KirboMod.NPCs.MidBosses
             float fireballYVel = -16;
             for (int i = 0; i < fireballCount; i++)
             {
-                BatafireFire.SpawnWithGravity(NPC.GetSource_FromAI(), NPC.Center - dashDeltaPos.SafeNormalize(Vector2.Zero) * (offsetAmt + i), new Vector2(0, fireballYVel), NPC.damage / 2, fireballGrav);
+                BatafireFire.SpawnWithGravity(NPC.GetSource_FromAI(), NPC.Center - dashDeltaPos.SafeNormalize(Vector2.Zero) * (offsetAmt + i), new Vector2(0, fireballYVel), projDamage / 2, fireballGrav);
 
             }
             DiveFireballDistTracker %= distPerFireball;
@@ -294,11 +296,12 @@ namespace KirboMod.NPCs.MidBosses
         }
         void IdleFireballBurst()
         {
-            SoundEngine.PlaySound(SoundID.Item100, NPC.Center);
             if (Main.netMode == NetmodeID.MultiplayerClient || !Main.hardMode)
             {
                 return;
             }
+            SoundEngine.PlaySound(SoundID.Item100, NPC.Center);
+
             int fireballCount = 8;
             if (NPC.downedGolemBoss)
             {
@@ -314,7 +317,7 @@ namespace KirboMod.NPCs.MidBosses
             {
                 float angle = Utils.Remap(i, 0, fireballCount, 0, MathF.Tau);
                 Vector2 vel = angle.ToRotationVector2() * shootSpeed;
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, vel, ModContent.ProjectileType<BatafireFire>(), NPC.damage / 2, 0f, -1, fireballGrav);
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, vel, ModContent.ProjectileType<BatafireFire>(), projDamage / 2, 0f, -1, fireballGrav);
 
             }
         }
