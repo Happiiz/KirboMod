@@ -31,7 +31,7 @@ namespace KirboMod.NPCs
             // DisplayName.SetDefault("Dark Matter");
             Main.npcFrameCount[NPC.type] = 4;
 
-            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new(0)
+            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new()
             {
                 //CustomTexturePath = ,
                 PortraitScale = 1, // Portrait refers to the full picture when clicking on the icon in the bestiary

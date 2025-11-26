@@ -105,7 +105,7 @@ namespace KirboMod.NPCs
 
             if(Main.netMode == NetmodeID.MultiplayerClient)
             {
-                NetMethods.SendMorphoButterflyVanish((byte)NPC.whoAmI);
+                NetMethods.SyncMorphoButterflyVanish((byte)NPC.whoAmI);
             }
             FailedCatchDust(NPC.Center);
             NPC.active = false;

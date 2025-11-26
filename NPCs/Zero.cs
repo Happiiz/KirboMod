@@ -133,13 +133,8 @@ namespace KirboMod.NPCs
             {
                 new HyperzoneBackgroundProvider(), //I totally didn't reference the vanilla code what no way
 
-<<<<<<< Updated upstream
 				//bestiary description
-				new FlavorTextBestiaryInfoElement("The ultimate leader of all dark matter. Uses its leigon to blanket entire worlds in darkness.")
-=======
-				// Sets the description of this NPC that is listed in the bestiary.
 				new FlavorTextBestiaryInfoElement("The ultimate leader of all dark matter. Uses its legion to blanket entire worlds in darkness.")
->>>>>>> Stashed changes
             });
         }
 
@@ -891,7 +886,7 @@ namespace KirboMod.NPCs
 
         public override void DrawBehind(int index)
         {
-            if (attacktype == ZeroAttackType.BackgroundShots & NPC.ai[0] > 120)
+            if (attacktype == ZeroAttackType.BackgroundShots &&  NPC.ai[0] > 120)
             {
                 NPC.hide = true;
                 Main.instance.DrawCacheNPCsMoonMoon.Add(index);//be drawn behind things like moonlord(?)

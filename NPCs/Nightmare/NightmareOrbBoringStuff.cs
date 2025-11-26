@@ -55,7 +55,7 @@ namespace KirboMod.NPCs
             NPC.damage = 70; //initally
             NPC.noTileCollide = true;
             NPC.defense = 30;
-            NPC.lifeMax = 12000;
+            NPC.lifeMax = 15000;
             NPC.HitSound = SoundID.NPCHit4;
             NPC.DeathSound = SoundID.NPCDeath14; //explosive metal
             NPC.value = 0f; // money it drops
@@ -66,12 +66,17 @@ namespace KirboMod.NPCs
             NPC.boss = true;
             NPC.noGravity = true;
             NPC.lavaImmune = true;
-            Music = MusicID.Boss3;
             NPC.npcSlots = 6;
             NPC.dontTakeDamage = true;
             if (!Main.dedServ)//if not dedicated server
             {
-                Music = MusicLoader.GetMusicSlot("KirboMod/Music/Photonic0_NightmareOrb");
+                int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Photonic0_NightmareOrb");
+                for (int i = 0; i < Main.maxMusic; i++)
+                {
+                    Main.musicFade[i] = 0;
+                }
+                Main.musicFade[musicSlot] = 1;
+                Music = musicSlot;
             }
         }
 

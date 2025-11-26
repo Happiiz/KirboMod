@@ -3,9 +3,11 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.UI;
 
 namespace KirboMod
 {
@@ -210,7 +212,39 @@ namespace KirboMod
             drawColorStar.A = starAlpha;
             Main.EntitySpriteDraw(starTrailTexture, drawPos, null, drawColorStar, proj.rotation, starTrailTexture.Size() / 2, 1, SpriteEffects.None, 0);
         }
+        public static bool NightmareItemsPreDrawPreDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Color drawColor, float scale)
+        {
+            scale *= 8;
+            Texture2D texture = TextureAssets.Item[item.type].Value;
+            Rectangle frame = NightmareItemsFraming(texture, 1f);
+            spriteBatch.Draw(texture, position, frame, drawColor, 0, frame.Size() / 2, new Vector2(scale), SpriteEffects.None, 0);
+            return false;
+        }
+        
+        public static bool NightmareItemsPreDrawInWorld(Item item, SpriteBatch spriteBatch, ref float rotation, ref float scale)
+        {
+            Texture2D texture = TextureAssets.Item[item.type].Value;
+            Rectangle frame = NightmareItemsFraming(texture, 1f);
+            Vector2 position = item.Center - Main.screenPosition;
+            spriteBatch.Draw(texture, position, frame, Color.White, rotation, frame.Size() / 2, new Vector2(scale), SpriteEffects.None, 0);
+            return false;
+        }
 
+        public static Rectangle NightmareItemsFraming(Texture2D texture, float animSpeed, int framesX = 8, int framesY = 8)
+        {
+            int frameIndex = (int)((Main.timeForVisualEffects * animSpeed) % (framesX * framesY));
+            int frameIndexX = frameIndex % framesX;
+            int frameIndexY = frameIndex / framesX;
+            Rectangle frame = texture.Frame(framesX, framesY, frameIndexX, frameIndexY);
+            return frame;
+        }
+        public class NightmareItemAnimation : DrawAnimation
+        {
+            public override Rectangle GetFrame(Texture2D texture, int frameCounterOverride = -1)
+            {
+                return NightmareItemsFraming(texture, 1f);
+            }
+        }
     }
 
 }

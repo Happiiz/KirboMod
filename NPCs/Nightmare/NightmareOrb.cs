@@ -40,7 +40,7 @@ namespace KirboMod.NPCs
         };
         private NightmareOrbAtkType AttackType { get => (NightmareOrbAtkType)NPC.ai[2]; set => NPC.ai[2] = (int)value; }
         int AttacksPerformedSinceSpawn { get => (int)NPC.ai[1]; set => NPC.ai[1] = value; }
-        public bool frenzy { get => NPC.ai[3] == 1f; set => NPC.ai[3] = value ? 1f : 0f; }
+        public bool Frenzy { get => NPC.ai[3] == 1f; set => NPC.ai[3] = value ? 1f : 0f; }
         static int DashSFXTimeOffset => 80;
         public override void AI() //constantly cycles each time
         {
@@ -64,7 +64,7 @@ namespace KirboMod.NPCs
                     //checks if should go frenzy (expert mode special phase)
                     if (Main.expertMode && NPC.GetLifePercent() <= 0.4f && AttackType == NightmareOrbAtkType.DecideNext)
                     {
-                        frenzy = true;
+                        Frenzy = true;
                     }
 
                     DecideNextAttack();
@@ -199,8 +199,8 @@ namespace KirboMod.NPCs
         }
         private void AttackTripleStar()
         {
-            int startTime = frenzy ? 40 : 60;
-            int fireRate = frenzy ? 20 : 35;
+            int startTime = Frenzy ? 40 : 60;
+            int fireRate = Frenzy ? 20 : 35;
             fireRate = GetValueDividedDependingOnPhaseAndDifficulty(fireRate);
             int numberOfShots = 4;
             if ((NPC.ai[0] - startTime) % fireRate == 0)
@@ -225,8 +225,8 @@ namespace KirboMod.NPCs
         }
         private void AttackHomingStar()
         {
-            int startTime = frenzy ? 40 : 60;
-            int fireRate = frenzy ? 40 : 60;
+            int startTime = Frenzy ? 40 : 60;
+            int fireRate = Frenzy ? 40 : 60;
             int numberOfShots = 3;
             if ((NPC.ai[0] - startTime) % fireRate == 0 && (NPC.ai[0] - startTime) <= numberOfShots * fireRate) //homing stars go behind it
             {
@@ -260,10 +260,10 @@ namespace KirboMod.NPCs
             shootVel.Normalize(); //reduces it to a value of 1
             shootVel *= 15f; //projectile speed
             shootVel *= Main.expertMode ? 1.25f : 1;
-            shootVel *= frenzy ? 1.25f : 1;
-            int fireRate = frenzy ? 12 : 15;
+            shootVel *= Frenzy ? 1.25f : 1;
+            int fireRate = Frenzy ? 12 : 15;
             int startTime = 49;
-            int numberOfShots = frenzy ? 13 : 8;
+            int numberOfShots = Frenzy ? 13 : 8;
             if ((NPC.ai[0] - startTime) % fireRate == 0)
             {
                 if (Main.netMode != NetmodeID.MultiplayerClient)
@@ -363,13 +363,13 @@ namespace KirboMod.NPCs
         int GetValueMultipliedDependingOnPhaseAndDifficulty(float value, float expertMultiplier = 1.2f, float frenzyMultiplier = 1.2f)
         {
             value *= Main.expertMode ? expertMultiplier : 1;
-            value *= frenzy ? frenzyMultiplier : 1;
+            value *= Frenzy ? frenzyMultiplier : 1;
             return (int)value;
         }
         int GetValueDividedDependingOnPhaseAndDifficulty(float value, float expertDivisor = 1.2f, float frenzyDivisor = 1.2f)
         {
             value /= Main.expertMode ? expertDivisor : 1;
-            value /= frenzy ? frenzyDivisor : 1;
+            value /= Frenzy ? frenzyDivisor : 1;
             return (int)value;
         }
         private void EndAttack(int delayBeforeNextAttack = 0)

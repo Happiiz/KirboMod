@@ -303,8 +303,6 @@ namespace KirboMod.NPCs
             int delayBeforeSlide = phase2 ? /*20 : 30*/ 40 : 60;
             int slideDuration = 30;
             int extraWaitTime = phase2 ? 70 : 100;
-            if (Main.getGoodWorld)
-                extraWaitTime = 0;
 
             Teleport(timer - NPC.ai[1], player, GetTeleportLocation(60));
             if (timer == delayBeforeSlide) //move to side
@@ -336,13 +334,13 @@ namespace KirboMod.NPCs
 
                 //spawn on top of hand
                 Vector2 startpos = NPC.Center + new Vector2(NPC.direction * -45, -55);
-                int firerate = Main.expertMode ? 9 : 12;
+                int firerate = Main.getGoodWorld ? 7 : Main.expertMode ? 9 : 12;
                 if (phase2)
                 {
                     firerate = (int)(firerate * 0.8f);
                 }
                 Vector2 direction = player.Center - startpos;
-                direction.Normalize();
+                direction = direction.SafeNormalize(new Vector2(NPC.direction, 0));
                 direction *= phase2 ? 30 : 25;
                 NPC.direction = MathF.Sign(direction.X);
                 NPC.spriteDirection = NPC.direction;
@@ -354,6 +352,15 @@ namespace KirboMod.NPCs
                     {
                         Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction,
                             ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
+                        if (Main.getGoodWorld)
+                        {
+                            float rotOffsetAmount = MathF.PI / 4;
+                            rotOffsetAmount *= 0.7f;
+                            Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction.RotatedBy(-rotOffsetAmount),
+                           ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
+                            Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction.RotatedBy(rotOffsetAmount),
+                                    ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
+                        }
                     }
                 }
                 else if (timer % (firerate * 2) == 0)
@@ -361,9 +368,14 @@ namespace KirboMod.NPCs
                     PlayStarShotSoundEffect();
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction.RotatedBy(-(MathF.PI / 8)),
+                        float rotOffsetAmount = MathF.PI / 8;
+                        if (Main.getGoodWorld)
+                        {
+                            rotOffsetAmount *= 0.7f;
+                        }
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction.RotatedBy(-rotOffsetAmount),
                             ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction.RotatedBy(MathF.PI / 8),
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), startpos, direction.RotatedBy(rotOffsetAmount),
                                 ModContent.ProjectileType<Projectiles.BadStar>(), 50 / 2, 6);
                     }
                 }
@@ -393,6 +405,7 @@ namespace KirboMod.NPCs
                 if (timer > 80 && timer % 20 == 0)
                 {
                     int starsInRing = Main.expertMode ? 15 : 9;
+                    starsInRing = Main.getGoodWorld ? 21 : starsInRing;
                     PlayBodyStarSoundEffect();
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
