@@ -5,6 +5,7 @@ Mods: {
 			DefensePenetration: Ignores {0} points of enemy defense
 			IgnoresDefense: Ignores enemy defense completely
 			MusicBoxTitle: Music Box
+			NightStarDamageMult: "[i:4060] Super Star Shooter's slashes will deal {0}x damage as opposed 0.75x"
 			ShroomiteHelmetBenefitDowngrades: This weapon and its downgrades benefit from the [i:1548] Shroomite Helmet
 			ShroomiteHelmetBenefit: This weapon benefits from the [i:1548] Shroomite Helmet
 			UnimplementedAbilityHat: "'What could've been...'"
@@ -246,7 +247,7 @@ Mods: {
 					Summons homing stars when hit, their numbers based on damage taken
 					The stars have a combined damage value of 3x the damage taken
 					Each star ignores 40 defense each
-					In PVP, all stars spawn only with 3x damage taken
+					In PVP, all stars spawn with 3x damage taken each
 					Stars spawned from PVP cannot hit enemies and vice-versa
 					Does not activate from damage taken from spikes, lava, and using a regular bug net on hell critters
 					'''
@@ -1498,6 +1499,7 @@ Mods: {
 					'''
 					Shoots a fast-flying homing star
 					Used with star cannons
+					{$CommonItemTooltip.NightStarDamageMult}
 					'''
 			}
 

@@ -14,6 +14,7 @@
     <None Remove="ExtraTextures\WaddleDooBeam1.png" />
     <None Remove="Items\Accesories\AstronomerWaddleDeeBeret\AstronomerWaddleDeeBeret.png" />
     <None Remove="Items\Accesories\AstronomerWaddleDeeBeret\AstronomerWaddleDeeBeret_Head.png" />
+    <None Remove="Items\Ammo\NightStarAmmo.png" />
     <None Remove="Items\Armor\Photonic0Boots\Photonic0Boots.png" />
     <None Remove="Items\Armor\Photonic0Boots\Photonic0BootsGlow.png" />
     <None Remove="Items\Armor\Photonic0Boots\Photonic0Boots_Legs.png" />
@@ -24,6 +25,13 @@
     <None Remove="Items\RainbowSword\RainbowSwordHeldGlow.png" />
     <None Remove="Items\RainbowSword\RainbowSwordMask.png" />
     <None Remove="Items\Weapons\MaskedHammerHeld.png" />
+    <None Remove="NPCs\Marx\ShadowHole\GradientBig.png" />
+    <None Remove="NPCs\Marx\ShadowHole\GradientSmall.png" />
+    <None Remove="NPCs\Marx\ShadowHole\MarxShadowHole.png" />
+    <None Remove="NPCs\Marx\ShadowHole\SparksBig.png" />
+    <None Remove="NPCs\Marx\ShadowHole\SparksSmall.png" />
+    <None Remove="NPCs\Marx\ShadowHole\Sparks_CoverEverything.png" />
+    <None Remove="NPCs\Marx\ShadowHole\sparks_coverInner.png" />
     <None Remove="NPCs\NewWhispy\NewWhispyBase_Placeholder.png" />
     <None Remove="NPCs\Nightmare\StarryStrip.png" />
     <None Remove="NPCs\PlasmaWisp\fire_01.png" />
@@ -57,6 +65,7 @@
     <None Remove="Projectiles\NightmareLightningOrb\spark_06.png" />
     <None Remove="Projectiles\NightmareLightningOrb\twirl_01.png" />
     <None Remove="Projectiles\NightmareLightningOrb\twirl_02.png" />
+    <None Remove="Projectiles\NightStarWhite.png" />
     <None Remove="Projectiles\Tornadoes\tornado_0.png" />
     <None Remove="Projectiles\Tornadoes\tornado_1.png" />
     <None Remove="Projectiles\Tornadoes\tornado_2.png" />
@@ -65,7 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="NPCs\DarkMatter\NovaPasta\" />
-    <Folder Include="Projectiles\Marx\GiantBlackHoleOfDoom\" />
+    <Folder Include="NPCs\Marx\Masks\" />
     <Folder Include="Projectiles\NewWhispy\NewWhispyAppleBig\" />
   </ItemGroup>
 </Project>

@@ -19,6 +19,7 @@ namespace KirboMod.Items.Nightmare
 			// Tooltip.SetDefault("{$CommonItemTooltip.RightClickToOpen}");
             ItemID.Sets.BossBag[Type] = true;
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 3; //amount needed to research
+            Main.RegisterItemAnimation(Type, new VFX.NightmareItemAnimation());
         }
 
 		public override void SetDefaults()

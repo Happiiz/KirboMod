@@ -1,5 +1,3 @@
-using KirboMod.Buffs;
-using KirboMod.Items.Accesories;
 using KirboMod.Items.Armor.Photonic0Boots;
 using KirboMod.Items.Weapons;
 using KirboMod.Mounts;
@@ -479,7 +477,7 @@ namespace KirboMod
                 else
                 {
                     //do air walker jump
-                    if (Player.controlJump && Player.releaseJump && airWalkerJump == true && blockAirWalkerJump == false 
+                    if (Player.controlJump && Player.releaseJump && airWalkerJump == true && blockAirWalkerJump == false
                         && !Player.blockExtraJumps && !(Player.mount.CanHover() && Player.mount.Active))
                     {
                         Player.velocity.Y = -7.5f;
@@ -1049,7 +1047,7 @@ namespace KirboMod
                         break;
                     case KickAndUppercutIDHardenedFighterUppercut:
                         break;
-                       
+
                     case KickAndUppercutIDMetalFighterUppercut:
                         UpdateMetalUppercut();
                         break;
@@ -1079,6 +1077,16 @@ namespace KirboMod
         public static void IncreaseComboCounter(int owner)
         {
             Main.player[owner].GetModPlayer<KirbPlayer>().fighterComboCounter++;
+        }
+
+        public override bool Shoot(Item item, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+        {
+            if (CannonNightStar.TryShootWithSpecialData(item, source, position, velocity, type, damage, knockback))
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 

@@ -1,3 +1,4 @@
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -30,11 +31,15 @@ namespace KirboMod.Projectiles
             Projectile.ArmorPenetration = 40;
             Projectile.alpha = 255;
         }
-        int TargetIndex { get => (int)Projectile.ai[0]; set => Projectile.ai[0] = value; }
+        public int TargetIndex { get => (int)Projectile.ai[0]; set => Projectile.ai[0] = value; }
         bool PVPStar { get => Projectile.ai[2] == 0; set => Projectile.ai[2] = value ? 0 : 1; }
-        ref float InitialVelLength { get => ref Projectile.ai[1]; }
+        public ref float InitialVelLength { get => ref Projectile.localAI[1]; }
         public override void AI()
         {
+            if(InitialVelLength == 0)
+            {
+                InitialVelLength = Projectile.velocity.Length();
+            }
             if (PVPStar && Projectile.timeLeft % 4 == 0)
             {
                 Projectile.timeLeft--;
@@ -196,6 +201,10 @@ namespace KirboMod.Projectiles
                 return null;
             }
             return false;
+        }
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            NetMethods.SyncProjHitCd(Projectile, target);
         }
         public override bool? CanCutTiles()
         {

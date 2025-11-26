@@ -35,17 +35,17 @@ namespace KirboMod.NPCs.Marx.Townie
 
         //Holding off on adding project references to this mod for now so just skips inspection for these properties
 
-        [JITWhenModsEnabled("NoxusBoss")]
-        public bool AvatarDown => NoxusBoss.Core.World.WorldSaving.BossDownedSaveSystem.HasDefeated<NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm.AvatarOfEmptiness>();
+        //[JITWhenModsEnabled("NoxusBoss")]
+        //public bool AvatarDown => NoxusBoss.Core.World.WorldSaving.BossDownedSaveSystem.HasDefeated<NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm.AvatarOfEmptiness>();
 
-        [JITWhenModsEnabled("NoxusBoss")]
-        public bool RiftEclipseOn => NoxusBoss.Core.World.GameScenes.RiftEclipse.RiftEclipseManagementSystem.RiftEclipseOngoing;
+        //[JITWhenModsEnabled("NoxusBoss")]
+        //public bool RiftEclipseOn => NoxusBoss.Core.World.GameScenes.RiftEclipse.RiftEclipseManagementSystem.RiftEclipseOngoing;
 
-        [JITWhenModsEnabled("NoxusBoss")]
-        public bool SolynAround => NPC.AnyNPCs(ModContent.NPCType<NoxusBoss.Content.NPCs.Friendly.Solyn>());
+        //[JITWhenModsEnabled("NoxusBoss")]
+        //public bool SolynAround => NPC.AnyNPCs(ModContent.NPCType<NoxusBoss.Content.NPCs.Friendly.Solyn>());
 
-        [JITWhenModsEnabled("NoxusBoss")]
-        public bool NamelessDown => NoxusBoss.Core.World.WorldSaving.BossDownedSaveSystem.HasDefeated<NoxusBoss.Content.NPCs.Bosses.NamelessDeity.NamelessDeityBoss>();
+        //[JITWhenModsEnabled("NoxusBoss")]
+        //public bool NamelessDown => NoxusBoss.Core.World.WorldSaving.BossDownedSaveSystem.HasDefeated<NoxusBoss.Content.NPCs.Bosses.NamelessDeity.NamelessDeityBoss>();
 
         #endregion WOTG checks
 
@@ -222,37 +222,37 @@ namespace KirboMod.NPCs.Marx.Townie
 
             if (wrathfulGodsEnabled) //only display these lines when wotg is installed
             {
-                if (AvatarDown)
-                {
-                    chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.D1Hater2"));
-                    chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DAOEDowned"));
-                }
-                else
-                {
-                    if (RiftEclipseOn)
-                    {
-                        for (int i = 0; i < 20; i++) //much more common
-                        {
-                            chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DRift"));
-                        }
-                    }
+                //if (AvatarDown)
+                //{
+                //    chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.D1Hater2"));
+                //    chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DAOEDowned"));
+                //}
+                //else
+                //{
+                //    if (RiftEclipseOn)
+                //    {
+                //        for (int i = 0; i < 20; i++) //much more common
+                //        {
+                //            chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DRift"));
+                //        }
+                //    }
 
-                    if (SolynAround)
-                    {
-                        for (int i = 0; i < 10; i++) //common
-                        {
-                            chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.D1Hater"));
-                        }
-                    }
-                }
+                //    if (SolynAround)
+                //    {
+                //        for (int i = 0; i < 10; i++) //common
+                //        {
+                //            chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.D1Hater"));
+                //        }
+                //    }
+                //}
 
-                if (NamelessDown)
-                {
-                    for (int i = 0; i < 10; i++) //common
-                    {
-                        chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DNamelessDowned"));
-                    }
-                }
+                //if (NamelessDown)
+                //{
+                //    for (int i = 0; i < 10; i++) //common
+                //    {
+                //        chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DNamelessDowned"));
+                //    }
+                //}
             }
 
             //set to true when, well, talking to Marx

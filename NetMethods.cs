@@ -1,5 +1,6 @@
 ﻿using KirboMod.Items.NewWhispy;
 using KirboMod.NPCs;
+using KirboMod.Systems;
 using KirboMod.Tiles;
 using Microsoft.Xna.Framework;
 using System;
@@ -20,50 +21,65 @@ namespace KirboMod
             //byte: playerWhoAmI, byte: number of npcs, bytes: indexes of npcs caught in effect
             StartFinalCutterMultiNPC = 1,
             /// <summary>
-            /// changes the player's plasma charge.
-            /// byte: player whoAmI
+            /// changes the player's plasma charge.<br/>
+            /// byte: player whoAmI<br/>
             /// sbyte: amount to change
             /// </summary>
             PlasmaChargeChange = 2,
             /// <summary>
-            /// sets the player's right click bool in the array to false.
+            /// sets the player's right click bool in the array to false.<br/>
             /// byte: player whoAmI
             /// </summary>
             PlayerRightClickFalse = 6,
             /// <summary>
-            /// sets the player's right click bool in the array to true.
+            /// sets the player's right click bool in the array to true.<br/>
             /// byte: player whoAmI
             /// /// </summary>
             PlayerRightClickTrue = 7,
             /// <summary>
-            /// updates the player's position.
-            /// byte: player whoAmI. Vector2: player position (not center!).
+            /// updates the player's position.<br/>
+            /// byte: player whoAmI.<br/>
+            /// Vector2: player position (not center!).
             /// </summary>
             PlayerPosition = 8,
             /// <summary>
-            /// updates the player's position and velocity.
+            /// updates the player's position and velocity.<br/>
             /// byte: player whoAmI. Vector2: player position(not center!). Vector2 player velocity.
             /// </summary>
             PlayerPositionAndVelocity = 9,
             /// <summary>
-            /// spawns whispy woods boss
-            /// byte: player index, int: tileX, int: tileY
+            /// spawns whispy woods boss<br/>
+            /// byte: player index<br/>
+            /// int: tileX<br/>
+            /// int: tileY
             /// </summary>
             SpawnWhispy = 10,
             /// <summary>
-            /// syncs a projectile's position
-            /// byte: projectile.identity of the projectile to sync, Vector2: projectile.position(not center!), byte: player whoAmI of client that called the method
+            /// syncs a projectile's position<br/>
+            /// byte: projectile.identity of the projectile to sync<br/>
+            /// Vector2: projectile.position(not center!)<br/>
+            /// byte: player whoAmI of client that called the method
             /// </summary>
             ProjectilePosition = 11,
             /// <summary>
-            /// spawnsn nightmare power orb
-            /// byte: player index, int: tileX, int: tileY
+            /// spawnsn nightmare power orb<br/>
+            /// byte: player index<br/>
+            /// int: tileX<br/>
+            /// int: tileY
             /// </summary>
             SpawnNightmareOrb = 12,
             /// <summary>
             /// byte: butterfly NPC whoAmI
             /// </summary>
             MorphoButterflyVanish = 13,
+            //short: proj identity
+            //byte: npc hit index
+            /// <summary>
+            /// for projectiles that implement IHitCdSync<br/>
+            /// short: proj identity of the projectile being synced<br/>
+            /// byte: whoAmI of the npc hit<br/>
+            /// </summary>
+            ProjHitCdSync = 14
         }
         //initially called on the client that owns the projectile
         public static void SyncProjPosition(Projectile proj, byte playerWhoAmI)
@@ -252,8 +268,13 @@ namespace KirboMod
                 case ModPacketType.MorphoButterflyVanish:
                     ReadMorphoButterflyVanishDust(reader);
                     break;
+                case ModPacketType.ProjHitCdSync:
+                    ReadProjHitCdSync(reader);
+                    break;
             }
         }
+
+
 
         private static void ReadMorphoButterflyVanishDust(BinaryReader reader)
         {
@@ -266,7 +287,7 @@ namespace KirboMod
             }
             if (Main.dedServ)
             {
-                SendMorphoButterflyVanish(npcIndex);
+                SyncMorphoButterflyVanish(npcIndex);
             }
         }
 
@@ -289,14 +310,52 @@ namespace KirboMod
 
         public static void SendMorphoButterflyVanish(NPC butterfly)
         {
-            SendMorphoButterflyVanish((byte)butterfly.whoAmI);
+            SyncMorphoButterflyVanish((byte)butterfly.whoAmI);
         }
-        public static void SendMorphoButterflyVanish(byte butterflyWhoAmI)
+        public static void SyncMorphoButterflyVanish(byte butterflyWhoAmI)
         {
             ModPacket p = KirboMod.instance.GetPacket();
             p.Write((byte)ModPacketType.MorphoButterflyVanish);
             p.Write(butterflyWhoAmI);
             p.Send();
+        }
+        public static void SyncProjHitCd(Projectile proj, NPC npcHit)
+        {
+            SyncProjHitCd(proj, npcHit.whoAmI);
+        }
+        public static void SyncProjHitCd(Projectile proj, int npcHitIndex)
+        {
+            if(Main.netMode == NetmodeID.SinglePlayer)
+            {
+                return;
+            }
+            if(npcHitIndex < 0 || npcHitIndex >= Main.maxNPCs)
+            {
+                return;
+            }
+           
+            ModPacket p = KirboMod.instance.GetPacket();
+            p.Write((byte)ModPacketType.ProjHitCdSync);
+            p.Write((short)proj.identity);
+            p.Write((byte)npcHitIndex);
+            //don't need to write iframe amount because that can be gathered from the projectile from the other client
+            p.Send();
+        }
+        private static void ReadProjHitCdSync(BinaryReader reader)
+        {
+            int projIdentity = reader.ReadInt16();
+            int npcHitIndex = reader.ReadByte();
+            Projectile proj = Main.projectile.FirstOrDefault(x => (x.active && x.identity == projIdentity));          
+            if(proj == null)
+            {
+                return;
+            }
+            proj.localNPCImmunity[npcHitIndex] = proj.localNPCHitCooldown;
+            //re-send to other clients
+            if (Main.dedServ)
+            {
+                SyncProjHitCd(proj, npcHitIndex);
+            }
         }
     }
 }

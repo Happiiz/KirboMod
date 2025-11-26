@@ -69,6 +69,8 @@ namespace KirboMod.Projectiles
         // This projectile uses additional textures for drawing
         public static Asset<Texture2D> StarTexture;
 
+		//bad star's color=
+		//(173, 247, 255)
         public override bool PreDraw(ref Color lightColor) //blue "afterimage" thing
 		{
             StarTexture = ModContent.Request<Texture2D>("KirboMod/Projectiles/BadStar");
