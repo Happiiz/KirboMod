@@ -20,8 +20,8 @@ namespace KirboMod.Items.Zero
 			Item.width = 31; //half of world width
 			Item.height = 31; //half of world height
 			Item.accessory = true;
-			Item.value = Item.sellPrice( 0, 1, 9, 97);
-			Item.rare = ItemRarityID.Blue;
+            Item.value = Item.buyPrice(0, 10, 99, 7); //1997
+            Item.rare = ItemRarityID.Blue;
 			Item.expert = true;
 			Item.defense = 6;
 		}

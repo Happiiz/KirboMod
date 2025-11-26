@@ -3,6 +3,7 @@ using KirboMod.Items.Weapons;
 using KirboMod.Mounts;
 using KirboMod.NPCs;
 using KirboMod.Projectiles;
+using KirboMod.Projectiles.Pets;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -82,6 +83,7 @@ namespace KirboMod
         public bool nightmarePet;
         public bool darkMatterPet;
         public bool zeroPet;
+        public bool marxPet;
 
         public bool badgeofgloom; //for badge of gloom accesory true or false
         public int gloombadgeattackcount = 0;
@@ -108,6 +110,7 @@ namespace KirboMod
         public List<int> currentFinalCutterTargets = new();
 
         public int ufoMountShootTimer = 0;
+        public int starshipShootTimer = 0;
 
         public bool talkedToMarx = false;
 
@@ -131,6 +134,7 @@ namespace KirboMod
             kingDededePet = false;
             darkMatterPet = false;
             zeroPet = false;
+            marxPet = false;
 
             airWalkerSet = false;
             blockAirWalkerJump = false;
@@ -176,6 +180,11 @@ namespace KirboMod
                 ufoMountShootTimer = 0;
             }
 
+
+            if (Player.mount.Type != ModContent.MountType<Starship>() || !Player.mount.Active)
+            {
+                starshipShootTimer = 0;
+            }
         }
         public TripleStarStar GetAvailableTripleStarStar()
         {

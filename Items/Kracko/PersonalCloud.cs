@@ -21,7 +21,7 @@ namespace KirboMod.Items.Kracko
             Item.width = 10;
 			Item.height = 10;
             Item.accessory = true;
-			Item.value = Item.buyPrice(0, 0, 5, 50);
+			Item.value = Item.buyPrice(0, 2, 0, 0);
 			Item.rare = ItemRarityID.Blue;
 			Item.expert = true; //gives the accesory its permenant rainbow color
 		}

@@ -30,7 +30,7 @@ namespace KirboMod.NPCs.Marx.Townie
             NPCID.Sets.NPCBestiaryDrawOffset.Add(NPC.type, value);
         }
 
-        const int transPoint = 300;
+        int transPoint = DownedBossSystem.downedMarxBoss ? 120 : 300; //shorten timer if Marx has been downed
 
         public override void SetDefaults()
         {
@@ -51,6 +51,7 @@ namespace KirboMod.NPCs.Marx.Townie
         {
             NPC.velocity.Y = 15;
 
+            SoundEngine.PlaySound(new SoundStyle("KirboMod/Sounds/NPC/Marx/MarxSummonLaugh"), NPC.Center);
         }
 
         public override void AI()
@@ -64,7 +65,14 @@ namespace KirboMod.NPCs.Marx.Townie
             NPC.velocity *= 0.9f;
 
 
-            if (MarxSpawningSystem.UnlockedMarx)
+            if (DownedBossSystem.downedMarxBoss)
+            {
+                if (NPC.ai[0] == 1)
+                {
+                    ChatHelper.BroadcastChatMessage(NetworkText.FromKey("Mods.KirboMod.NPCs.MarxPrelude.Dialogue.Rematch"), Color.Violet);
+                }
+            }
+            else if (MarxSpawningSystem.UnlockedMarx)
             {
                 if (NPC.ai[0] == 1)
                 {

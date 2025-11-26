@@ -19,7 +19,7 @@ namespace KirboMod.Items.KingDedede
 		public override void SetDefaults() {
 			Item.width = 23;
 			Item.height = 23;
-			Item.value = Item.buyPrice(0, 0, 8, 25);
+			Item.value = Item.buyPrice(0, 3, 3, 3);
 			Item.rare = ItemRarityID.Blue;
 			Item.expert = true;
 			Item.accessory = true;

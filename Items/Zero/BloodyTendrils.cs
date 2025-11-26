@@ -39,7 +39,7 @@ namespace KirboMod.Items.Zero
 			// Instead of copying these values, we can clone and modify the ones we want to copy
 			Item.CloneDefaults(ItemID.AmethystHook);
 			Item.expert = true;
-			Item.value = 5997; //half of 1, 9, 97
+			Item.value = Item.buyPrice(0, 10, 99, 7); //1997
 			Item.shootSpeed = 18f; // how quickly the hook is shot.
 			Item.shoot = ModContent.ProjectileType<BloodyTendrilsProj>();
 		}

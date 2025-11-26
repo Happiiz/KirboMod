@@ -222,6 +222,16 @@ Mods: {
 				DisplayName: UFO
 				Description: You are very lucky to have gotten this mount!
 			}
+
+			StarshipMount: {
+				Description: Set sail toward the sparkling star of hope!
+				DisplayName: Starship
+			}
+
+			MarxPetBuff: {
+				Description: The only wish this nova can grant is mild comfort
+				DisplayName: Mini Nova
+			}
 		}
 
 		Items: {
@@ -398,7 +408,7 @@ Mods: {
 			}
 
 			DarkMatterBag: {
-				DisplayName: Treasure Bag
+				DisplayName: Treasure Bag ({$Mods.KirboMod.NPCs.DarkMatter.DisplayName})
 				Tooltip: "{$CommonItemTooltip.RightClickToOpen}"
 			}
 
@@ -465,7 +475,7 @@ Mods: {
 			}
 
 			KingDededeBag: {
-				DisplayName: Treasure Bag
+				DisplayName: Treasure Bag ({$Mods.KirboMod.NPCs.KingDedede.DisplayName})
 				Tooltip: "{$CommonItemTooltip.RightClickToOpen}"
 			}
 
@@ -499,7 +509,7 @@ Mods: {
 			}
 
 			KrackoBag: {
-				DisplayName: Treasure Bag
+				DisplayName: Treasure Bag ({$Mods.KirboMod.NPCs.Kracko.DisplayName})
 				Tooltip: "{$CommonItemTooltip.RightClickToOpen}"
 			}
 
@@ -538,7 +548,7 @@ Mods: {
 			}
 
 			NightmareBag: {
-				DisplayName: Treasure Bag
+				DisplayName: Treasure Bag ({$Mods.KirboMod.NPCs.NightmareWizard.DisplayName})
 				Tooltip: "{$CommonItemTooltip.RightClickToOpen}"
 			}
 
@@ -1245,7 +1255,7 @@ Mods: {
 			}
 
 			WhispyBag: {
-				DisplayName: Treasure Bag
+				DisplayName: Treasure Bag ({$Mods.KirboMod.NPCs.NewWhispyBoss.DisplayName})
 				Tooltip: "{$CommonItemTooltip.RightClickToOpen}"
 			}
 
@@ -1293,7 +1303,7 @@ Mods: {
 			}
 
 			ZeroBag: {
-				DisplayName: Treasure Bag
+				DisplayName: Treasure Bag ({$Mods.KirboMod.NPCs.Zero.DisplayName})
 				Tooltip: "{$CommonItemTooltip.RightClickToOpen}"
 			}
 
@@ -1346,6 +1356,7 @@ Mods: {
 					Summons a dimensional rift containing a powerful enemy at the cursor's position
 					Enemy summoned depends on the biome you're in
 					Consumes 25 starbits per use
+					Can't activate within caverns
 					'''
 			}
 
@@ -1396,7 +1407,7 @@ Mods: {
 
 			BirdonWings: {
 				DisplayName: Birdon Wings
-				Tooltip: Allows flight and slow fall
+				Tooltip: "{$CommonItemTooltip.FlightAndSlowfall}"
 			}
 
 			WingedBow: {
@@ -1677,6 +1688,89 @@ Mods: {
 				DisplayName: Unknown Cryptid
 				Tooltip: "'Ad. [i:58]'"
 			}
+
+			BatafireMusicBox: {
+				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Mid-Boss Type F)"
+				Tooltip: ""
+			}
+
+			MarxMusicBox: {
+				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Marx)"
+				Tooltip: ""
+			}
+
+			RefightMusicBox: {
+				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Dark Matter Rematch)"
+				Tooltip: ""
+			}
+
+			SoulMatter: {
+				DisplayName: Soul Matter
+				Tooltip: Matter of determined souls still hanging on past their finale, regurgitated by the trickster
+			}
+
+			MarxBag: {
+				Tooltip: "{$CommonItemTooltip.RightClickToOpen}"
+				DisplayName: Treasure Bag ({$Mods.KirboMod.NPCs.MarxBoss.DisplayName})
+			}
+
+			MarxMask: {
+				DisplayName: Marx Mask
+				Tooltip: ""
+			}
+
+			MarxTrophy: {
+				DisplayName: Marx Trophy
+				Tooltip: ""
+			}
+
+			MarxRelicItem: {
+				DisplayName: Marx Relic
+				Tooltip: ""
+			}
+
+			StarshipSummon: {
+				Tooltip:
+					'''
+					'The remains of a soulful heart used for evil, still beating with a wish to help save the world'
+					Summons a Starship to sail towards danger and fire with starpower while using an item
+					'''
+				DisplayName: Starry Essence
+			}
+
+			HappizMask: {
+				Tooltip: "'Put on a happy face!... But maybe not that one'"
+				DisplayName: Happiz's Mask
+			}
+
+			MarxPetItem: {
+				Tooltip:
+					'''
+					Summons a mini nova
+					'The jester must've held onto this piece for a very long time.'
+					'''
+				DisplayName: Ancient Scrap
+			}
+
+			MarxWings: {
+				DisplayName: Jester Wings
+				Tooltip:
+					'''
+					{$CommonItemTooltip.FlightAndSlowfall}
+					{$CommonItemTooltip.PressDownToHover}
+					Hovering lasts 2x as long
+					'''
+			}
+
+			BonkersMusicBox: {
+				Tooltip: ""
+				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Mid-Boss Type H)"
+			}
+
+			MrFrostyMusicBox: {
+				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Mid-Boss Type I)"
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {
@@ -1944,6 +2038,8 @@ Mods: {
 			MatterOrbHoming.DisplayName: Matter Orb
 			ZeroEyeless.DisplayName: Zero Eyeless
 			KingDededead.DisplayName: King Dededead
+			StarshipStar.DisplayName: Starship Star
+			MarxPet.DisplayName: Mini Nova
 		}
 
 		NPCs: {
@@ -2030,6 +2126,8 @@ Mods: {
 					SpawnInfo: Use a [i:5597] and prepare for what comes next.
 					DespawnMessage: The darkness clears...
 				}
+
+				Eye: Zero's eye has ejected from its body!
 			}
 
 			ZeroEye.DisplayName: Eye of Zero
@@ -2060,7 +2158,7 @@ Mods: {
 					D3: Got a question? Glad to answer!
 					D4: This world gives me a mixed feeling of fear and paranoia... it's great!
 					D5: I can tell you anything that will help you along your way! After all, what are friends for... if not to be used?
-					DDownedWOF: Gosh! Seeing that guide disintegrate into ashes was... bad. Very bad. Yes.
+					DDownedWOF: Wow! Seeing that guide disintegrate into ashes was... bad. Very bad. Yes.
 					DPrePlant: Ever since those souls were released I've been thinking up a way to use them for our own benefit! My plan will be done soon...
 					DPreMarx: Y'know, I think I've been a great friend helping you through all this. Maybe it's time you help me for once? Just gotta hear me out...
 					DPostMarx: Sorry about that fight... I was feeling a little hangry, is all!
@@ -2088,20 +2186,20 @@ Mods: {
 				}
 
 				Help: {
-					HStarbits: First of all, don't underestimate these marshmallow candy-looking guys! They carry with them their burning wishes to make a name for themselves! Though, you should know that using other people's desires for your own gain is quite a good plan!
+					HStarbits: First of all, don't underestimate these guys! They carry with them their burning wishes to make a name for themselves! Though, you should know that using other people's desires for your own gain is quite a good plan!
 					HWeapons: When my guys were brought here, they scurried all over the place! Try searching around! You might 'finesse' something useful from them!
 					HBosses: If there's something our worlds have in common, is that really powerful foes lurk in every corner! Surely some were carried here, too! Defeat them and earn some REAL valuable goodies!
-					HWhispyWoods: There is quite an iconic tree that often gets in our way within the woods. You might be able to grow one with an acorn able to wish... and then chop it down!
+					HWhispyWoods: There is quite an infamous tree that often gets in our way within the woods. You might be able to grow one with an acorn imbued with burning wishes... and then chop it down!
 					HKracko: In the skies, a powerful cloud lurks to keep them clear. Its baby form has probably worked its way here! Try hunting it!
 					HKingDedede: I wonder if that fat slob of a king was brought into this world with everyone else... we just need something precious to him that he'll hunt down from a mile away!
 					HMidbosses: Star rifts are what brought us all here. But they appear so sporadically! I wonder if there's a way to force them to appear... you could probably round up some of the more stubborn characters who defy the rift's pull!
 					HDreamMatter: With the true form of this world unveiled, some of my guys might've began to venture once more! Go look again! The skies! The caves! The ends of the world! Go look now that their dreams of fitting in have been stirred!
 					HRareStones: With all these rifts in space, some of these guys had outta pick up some rare stones! Though they'd have to have the power to be able to retrieve them. The same power that resists the rifts, probably.
 					HEvoWeapons: With rare stones, you could upgrade some weapons to a fuller potential! Though these recipes aren't cheap, you seem like a skilled blacksmith!
-					HNightmare: The Fountain of Dreams was an... interesting landmark of our world. I wonder if you could recreate it with this world's materials. It would even be fun if we could attract another... what? I wasn't saying anything!
-					HHeartMatter: Love is something I find quite icky, but those burning wishes, dreams, and that energy of life can be channeled into a powerful resource!
+					HNightmare: The Fountain of Dreams was an interesting landmark of our world. I wonder if you could recreate it with this world's materials. It would even be fun if we could attract another... what? I wasn't saying anything!
+					HHeartMatter: Love is something I find quite icky, but those burning wishes, dreams, and that energy of life can be channeled into a powerful resource to be used!
 					HMarx: I've appreciated your help thus far, but now I have something to ask of you: an awful evil slowly descends upon this world, but I figured out that if we use the power of the spirits of light and dark of this world with the care and compassion of our world, then we could influence the released souls to fight back against the enemy! Whaddya say?
-					HDarkMatter: There existed a terrible force in our world, but it has mostly since been wiped out. I wonder if this world contains its own dark forces. Try attracting them using some dark stuff! It should be interesting...
+					HDarkMatter: There existed a terrible force in our world, but it has mostly since been wiped out. I wonder if this world contains its own dark forces. Try attracting them using some dark, nightmarish stuff! It should be interesting...
 					HZero: Ever since the darkness has been wiped away, our world hasn't had as many omnipresent adversaries... but with these alien materials, a ritual to resurect the heart of the darkness might be possible... That's a final battle I'd want to see!
 					HPostZero: ...What? I don't have anything else to tell you. Friends are only useful for so long.
 				}
@@ -2136,7 +2234,7 @@ Mods: {
 					3: The ancient spirits are mine to control! Now I can establish this wacky world as my own!
 					1Stranger: You thought I wouldn't notice you trying to obtain this?
 					2Stranger: Pretending is my forte, and so is jumping in at the right moment!
-					ReFight: You know how much I want that, so how about I just fight you already!
+					Rematch: You know how much I want that, so how about I just fight you already!
 				}
 			}
 
@@ -2156,7 +2254,7 @@ Mods: {
 				Kabu: A little wooden mound that slides around erratically in caves. Is rumored to carry a lot of wisdom.
 				KnuckleJoe: Watch out! Knuckle Joe wants a challenge and you seem perfectly fit! They'll bombard you with a flurry of vulcan jabs and smash punches 'til you're down!
 				OrangeButterfly: Life after death after life after death. The wheel of mortality never stops. It cannot stop, for the wheel, stopping means detaching from the cart, forever falling from existence. How can one cast judgement on that which cannot be judged? That is the dilemma this emissary of fate faces.
-				ParasolDee: A waddle dee that likes to take it's umbrella out for walks, even when it isn't raining.
+				ParasolDee: A waddle dee that likes to take its umbrella out for walks, even when it isn't raining.
 				PlasmaWisp: A ghastly entity sparking high amounts of electricity and light. Tries to snuff out intruders of its domain.
 				PoppyBrosJr: This happy little demolitionist loves to throw, toss, and hurl bombs! All while keep a wide grin on its face that never seems to wash off!
 				Scarfy: A cute little face that stands out amongst the demons and flames, but only if you keep it that way!
@@ -2198,6 +2296,11 @@ Mods: {
 			KingDededePortrait.MapEntry: "{$Items.KingDededePortraitItem.DisplayName}"
 			BeamAttackPicture.MapEntry: "{$Items.BeamAttackPictureItem.DisplayName}"
 			AdoDrawing.MapEntry: "{$Items.AdoDrawing.DisplayName}"
+			BatafireMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
+			MarxMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
+			RefightMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
+			MrFrostyMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
+			BonkersMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
 		}
 
 		Configs: {

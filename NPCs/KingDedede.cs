@@ -789,7 +789,7 @@ namespace KirboMod.NPCs
          //   NPC.noTileCollide = (NPC.Bottom.Y + NPC.velocity.Y * 2) < player.position.Y;
             if (attack == (phase == 3 ? 90 : 120) - phaseThreeSpeedUp)
             {
-
+                NPC.noTileCollide = true; //set initially
                 NPC.velocity.Y = MathHelper.Clamp(predictDistance.Y, -35, -30);
                 NPC.velocity.X = MathHelper.Clamp(predictDistance.X, -30, 30);
                 ChooseAnimation(10); //jump
@@ -804,17 +804,14 @@ namespace KirboMod.NPCs
 
                 ChooseAnimation(10); //jump
 
-                if ((NPC.Bottom.Y + NPC.velocity.Y) < player.position.Y)/* (NPC.Bottom.Y < player.Top.Y - 100 || NPC.velocity.Y < 0) *///higher than player (adjusts to velocity) or going up
+                if (NPC.Bottom.Y + NPC.velocity.Y < player.position.Y || NPC.velocity.Y < 0)/* (NPC.Bottom.Y < player.Top.Y - 100 || NPC.velocity.Y < 0) *///higher than player (adjusts to velocity) or going up
                 {
                     NPC.noTileCollide = true; //don't collide with tiles
                 }
                 else
                 {
                     NPC.noTileCollide = false;
-                    if (NPC.velocity.Y > 16f)
-                    {
-                        NPC.velocity.Y = 16f;
-                    }
+
                     if (NPC.velocity.Y == 0 || NPC.oldVelocity.Y == 0) //on ground or stopped rising/falling midjump
                     {
                         NPC.velocity.X = 0;

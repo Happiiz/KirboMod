@@ -18,8 +18,8 @@ namespace KirboMod.Items.Nightmare
 		{
 			Item.width = 22;
 			Item.height = 22;
-			Item.value = Item.sellPrice(0, 0, 15, 0);
-			Item.rare = ItemRarityID.Blue;
+            Item.value = Item.buyPrice(0, 3, 50, 0);
+            Item.rare = ItemRarityID.Blue;
 			Item.expert = true; //gives the accesory its permenant rainbow color
 			Item.defense = 3;
 			Item.accessory = true;

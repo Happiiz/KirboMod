@@ -1,6 +1,7 @@
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria;
 
 namespace KirboMod.Items.Accesories
 {
@@ -20,7 +21,7 @@ namespace KirboMod.Items.Accesories
 			Item.useTime = 20;
 			Item.useAnimation = 20;
 			Item.useStyle = ItemUseStyleID.HoldUp;
-			Item.value = 10;
+			Item.value = Item.buyPrice(0, 10, 0, 0);
 			Item.rare = ItemRarityID.LightPurple;
 			Item.UseSound = SoundID.Item4;
 			Item.noMelee = true;

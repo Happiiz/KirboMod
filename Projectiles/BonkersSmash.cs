@@ -70,7 +70,7 @@ namespace KirboMod.Projectiles
             }
         }
 
-        private void DoDustEffect()
+        private void DoDustEffect() //referenced from ogre smash code
         {
             Point topleft = Projectile.TopLeft.ToTileCoordinates();
             Point topright = Projectile.BottomRight.ToTileCoordinates();
@@ -79,7 +79,6 @@ namespace KirboMod.Projectiles
             {
                 return;
             }
-            int num3 = (int)Projectile.ai[0] / 3;
 
             for (int i = topleft.X; i <= topright.X; i++)
             {
@@ -92,7 +91,7 @@ namespace KirboMod.Projectiles
                         continue;
                     }
                     Tile tileAbove = Framing.GetTileSafely(i, j - 1);
-                    if (WorldGen.SolidOrSlopedTile(tileAbove) && TileID.Sets.Platforms[tileAbove.TileType] == true)
+                    if (WorldGen.SolidTile3(tileAbove) || TileID.Sets.Platforms[tileAbove.TileType] == true)
                     {
                         continue;
                     }

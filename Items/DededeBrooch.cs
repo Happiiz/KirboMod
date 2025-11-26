@@ -70,9 +70,9 @@ namespace KirboMod.Items
         public override void AddRecipes()
         {
 			Recipe recipe = CreateRecipe();//the result is brooch
-			recipe.AddIngredient(ModContent.ItemType<Items.Starbit>(), 40); //40 starbits
-            recipe.AddRecipeGroup("Gold", 10); //gold or platinum bar
-            recipe.AddIngredient(ItemID.Bone, 20); //bone
+			recipe.AddIngredient(ModContent.ItemType<Starbit>(), 40); //40 starbits
+            recipe.AddRecipeGroup("Gold", 5); //gold or platinum bar
+            recipe.AddIngredient(ItemID.Bone, 20); //bone???
 			recipe.AddTile(TileID.DemonAltar); //crafted at demon or crimson altar
 			recipe.Register(); //adds this recipe to the game
 		}

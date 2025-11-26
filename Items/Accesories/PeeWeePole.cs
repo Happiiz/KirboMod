@@ -1,6 +1,7 @@
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria;
 
 namespace KirboMod.Items.Accesories
 {
@@ -20,8 +21,8 @@ namespace KirboMod.Items.Accesories
 			Item.useTime = 20;
 			Item.useAnimation = 20;
 			Item.useStyle = ItemUseStyleID.Swing;
-			Item.value = 10;
-			Item.rare = ItemRarityID.Green;
+            Item.value = Item.buyPrice(0, 0, 60, 0);
+            Item.rare = ItemRarityID.Green;
 			Item.UseSound = SoundID.Item79;
 			Item.noMelee = true;
 			Item.mountType = ModContent.MountType<Mounts.FlyingNimbus>();

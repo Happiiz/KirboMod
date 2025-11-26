@@ -19,7 +19,7 @@ namespace KirboMod.Items.WhispyWoods
 			Item.width = 15; //half of world width
 			Item.height = 26; //half of world height
 			Item.accessory = true;
-			Item.value = Item.sellPrice(0, 0, 4, 27);
+			Item.value = Item.sellPrice(0, 1, 0, 0);
 			Item.rare = ItemRarityID.Blue;
 			Item.expert = true;
 			Item.defense = 3;

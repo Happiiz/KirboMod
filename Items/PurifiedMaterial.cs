@@ -23,7 +23,7 @@ namespace KirboMod.Items
 		{
 			Item.width = 28;
 			Item.height = 16;
-			Item.value = Item.buyPrice(0, 0, 1, 0);
+			Item.value = Item.buyPrice(0, 1, 0, 0);
 			Item.rare = ItemRarityID.Yellow; //post golem
 			Item.maxStack = 9999;
 		}

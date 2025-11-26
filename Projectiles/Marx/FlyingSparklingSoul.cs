@@ -83,8 +83,6 @@ namespace KirboMod.Projectiles.Marx
                 {
                     NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, index);
                 }
-
-                SoundEngine.PlaySound(new SoundStyle("KirboMod/Sounds/NPC/Marx/MarxSummonLaugh"), Projectile.Center);
 			}
             else if (Projectile.ai[0] >= 360 && Projectile.ai[0] < 390)
             {

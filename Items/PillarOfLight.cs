@@ -1,3 +1,5 @@
+using KirboMod.NPCs;
+using KirboMod.NPCs.PureDarkMatterRematch;
 using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
 using System;
@@ -40,9 +42,9 @@ namespace KirboMod.Items
         public override bool CanUseItem(Player player)
         {
 			//can use item if no Pure Dark Matter, Zero, Eye of Zero or Totem proj
-			if (!NPC.AnyNPCs(Mod.Find<ModNPC>("Zero").Type) && !NPC.AnyNPCs(Mod.Find<ModNPC>("ZeroEye").Type))
+			if (!NPC.AnyNPCs(ModContent.NPCType<NPCs.Zero>()) && !NPC.AnyNPCs(ModContent.NPCType<ZeroEye>()) && !NPC.AnyNPCs(ModContent.NPCType<PureDarkMatterRematch>()))
 			{
-				return player.ownedProjectileCounts[ModContent.ProjectileType<Projectiles.FlyingPillarOfLight>()] < 1; //can use if no pillars
+				return player.ownedProjectileCounts[ModContent.ProjectileType<FlyingPillarOfLight>()] < 1; //can use if no pillars
 			}
 			else
 			{

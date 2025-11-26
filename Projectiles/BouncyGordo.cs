@@ -6,7 +6,7 @@ using Terraria.ModLoader;
 
 namespace KirboMod.Projectiles
 {
-	public class BouncyGordo : ModProjectile //gordo projectile used by Whispy Woods
+	public class BouncyGordo : ModProjectile //gordo projectile used by King Dedede
     {
 		public override void SetStaticDefaults()
 		{
@@ -28,6 +28,17 @@ namespace KirboMod.Projectiles
 		{
 			Projectile.velocity.Y += GordoGravity;
 			Projectile.rotation += 0.1f; // rotates projectile
+
+			Projectile.ai[0]++;
+
+			if (Projectile.velocity.Y < 0 && Projectile.ai[0] < 20) //here to ensure it doesn't get blocked when being launched
+			{
+                Projectile.tileCollide = false;
+            }
+			else
+			{
+                Projectile.tileCollide = true;
+            }
 		}
 
         public override bool OnTileCollide(Vector2 oldVelocity) 

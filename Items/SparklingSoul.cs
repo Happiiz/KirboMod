@@ -1,3 +1,4 @@
+using KirboMod.NPCs.Marx.Townie;
 using KirboMod.Projectiles;
 using KirboMod.Projectiles.Marx;
 using KirboMod.Systems;
@@ -55,8 +56,42 @@ namespace KirboMod.Items
                 }
             }
 
-            if (NPC.AnyNPCs(ModContent.NPCType<NPCs.Marx.MarxBoss>()) || NPC.AnyNPCs(ModContent.NPCType<NPCs.Marx.Townie.MarxPrelude>()) || anySoul)
+            if (NPC.AnyNPCs(ModContent.NPCType<NPCs.Marx.MarxBoss>()) || NPC.AnyNPCs(ModContent.NPCType<MarxPrelude>()) || anySoul)
 				return false;
+
+            return true;
+        }
+
+        public override bool? UseItem(Player player)
+        {
+            if (!DownedBossSystem.downedMarxBoss)
+            {
+                return null;
+            }
+
+            //just spawns marx regularly
+
+            int index = -1;
+
+            if (Main.netMode != NetmodeID.MultiplayerClient) // If not a client
+            {
+                index = NPC.NewNPC(Item.GetSource_FromThis(), (int)player.Center.X, (int)player.Center.Y - 300, ModContent.NPCType<MarxPrelude>());
+            }
+
+            if (index != -1)
+            {
+                NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, index);
+            }
+
+            return true;
+        }
+
+        public override bool CanShoot(Player player)
+        {
+            if (DownedBossSystem.downedMarxBoss)
+            {
+                return false;
+            }
 
             return true;
         }
