@@ -18,9 +18,7 @@ namespace KirboMod.Menu
 
 		public override Asset<Texture2D> MoonTexture => ModContent.Request<Texture2D>($"{menuAssetPath}/Moon");
 
-		//public override int Music => MusicLoader.GetMusicSlot(Mod, "Assets/Music/MysteriousMystery");
-
-		//public override ModSurfaceBackgroundStyle MenuBackgroundStyle => ModContent.GetInstance<ExampleSurfaceBackgroundStyle>();
+		public override int Music => MusicLoader.GetMusicSlot(Mod, "Music/Happiz_MilkyWayWishesRemix");
 
 		public override string DisplayName => "Kirby's Terraria Mod";
 

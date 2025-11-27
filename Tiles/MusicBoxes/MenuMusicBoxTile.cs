@@ -11,8 +11,8 @@ using Terraria.ObjectData;
 
 namespace KirboMod.Tiles.MusicBoxes
 {
-	public class DarkMatterMusicBoxTile : DreamLandBossMusicBoxTile
+	public class MenuMusicBoxTile : DreamLandBossMusicBoxTile
     {
-        public override int CursorItemID => ModContent.ItemType<DarkMatterMusicBox>();
+        public override int CursorItemID => ModContent.ItemType<MenuMusicBox>();
     }
 }

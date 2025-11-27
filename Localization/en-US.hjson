@@ -1771,6 +1771,11 @@ Mods: {
 				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (Mid-Boss Type I)"
 				Tooltip: ""
 			}
+
+			MenuMusicBox: {
+				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (KTM Menu)"
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {
@@ -2301,6 +2306,7 @@ Mods: {
 			RefightMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
 			MrFrostyMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
 			BonkersMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
+			MenuMusicBoxTile.MapEntry: "{$CommonItemTooltip.MusicBoxTitle}"
 		}
 
 		Configs: {
