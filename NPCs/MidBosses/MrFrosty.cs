@@ -404,16 +404,16 @@ namespace KirboMod.NPCs.MidBosses
                 if (NPC.direction == 1)
                 {
                     //checks for tiles on right side of NPC
-                    Tile tile = Main.tile[new Vector2(NPC.Right.X + 2, NPC.position.Y + i).ToTileCoordinates()];
-                    climableTiles |= WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType] || tile.IsHalfBlock;
+                    Point tileLocation = new Vector2(NPC.Right.X + 1, NPC.position.Y + i).ToTileCoordinates();
+                    climableTiles = WorldGen.SolidTile2(tileLocation.X, tileLocation.Y) || Main.tile[tileLocation.X, tileLocation.Y].Slope > 0;
                 }
                 else
                 {
                     //checks for tiles on left side of NPC
-                    Tile tile = Main.tile[new Vector2(NPC.Left.X - 2, NPC.position.Y + i).ToTileCoordinates()];
-                    climableTiles |= WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType] || tile.IsHalfBlock;
+                    Point tileLocation = new Vector2(NPC.Left.X - 1, NPC.position.Y + i).ToTileCoordinates();
+                    climableTiles = WorldGen.SolidTile2(tileLocation.X, tileLocation.Y) || Main.tile[tileLocation.X, tileLocation.Y].Slope > 0;
                 }
-                if (climableTiles && MathF.Abs(NPC.Bottom.Y - player.Bottom.Y) >= 0f)
+                if (climableTiles)
                 {
                     NPC.noTileCollide = true;
                     NPC.noGravity = true;

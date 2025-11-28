@@ -290,4 +290,34 @@ namespace KirboMod.Items.Armor.CharacterVanity
             recipe.Register();
         }
     }
+
+    [AutoloadEquip(EquipType.Head)]
+    public class GryllHat : ModItem
+    {
+        public override void SetStaticDefaults()
+        {
+            ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] = false;
+            ArmorIDs.Head.Sets.IsTallHat[Item.headSlot] = true;
+            CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research
+        }
+
+        public override void SetDefaults()
+        {
+            Item.width = 10;
+            Item.height = 10;
+            Item.value = FireAbilityHat.AbilityHatPrice * 4;
+            Item.rare = ItemRarityID.LightPurple;
+            Item.vanity = true;
+        }
+
+        public override void AddRecipes()
+        {
+            Recipe recipe = CreateRecipe();
+            recipe.AddIngredient(ModContent.ItemType<DreamEssence>(), 20);
+            recipe.AddIngredient(ItemID.ManaCrystal, 5);
+            recipe.AddIngredient(ItemID.Silk, 30);
+            recipe.AddTile(TileID.Loom);
+            recipe.Register();
+        }
+    }
 }

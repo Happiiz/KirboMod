@@ -1776,6 +1776,11 @@ Mods: {
 				DisplayName: "{$CommonItemTooltip.MusicBoxTitle} (KTM Menu)"
 				Tooltip: ""
 			}
+
+			GryllHat: {
+				Tooltip: "'This gaudy hat gives you the confidence you need to grill your opponents in any challenge!'"
+				DisplayName: Stacker Witch's Hat
+			}
 		}
 
 		Projectiles: {

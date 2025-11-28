@@ -33,18 +33,13 @@ namespace KirboMod.Projectiles
 		{
             NPC bonkers = Main.npc[(int)Projectile.ai[1]];
 
-            if (bonkers.velocity.Y != 0) //suspend time
-            {
-                Projectile.timeLeft = 5;
-            }
-
             bool isDedede = bonkers.type == ModContent.NPCType<KingDedede>();  //not bonkers
 
             Projectile.Center = bonkers.Center + new Vector2(bonkers.direction * 130, -10);
 
             if (isDedede)
             {
-                Projectile.Center = bonkers.Center + new Vector2(bonkers.direction * 130, 20);
+                Projectile.Center = bonkers.Center + new Vector2(bonkers.direction * 130, 0);
             }
             if (Projectile.ai[2] == 0) //Only do once
             {
@@ -52,9 +47,8 @@ namespace KirboMod.Projectiles
                 {
                     Point tileLocation = (Projectile.BottomLeft + new Vector2(i, 0)).ToTileCoordinates();
 
-                    Tile tile = Main.tile[tileLocation];
-
-                    if ((WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType]) && bonkers.velocity.Y == 0)
+                    if ((WorldGen.SolidTile2(tileLocation.X, tileLocation.Y) || Main.tile[tileLocation.X, tileLocation.Y].Slope > 0)
+                        && bonkers.velocity.Y == 0)
                     {
                         Projectile.ai[2] = 1;
                     }
@@ -64,6 +58,7 @@ namespace KirboMod.Projectiles
             {
                 while (Projectile.ai[0] < 20)
                 {
+                    SoundEngine.PlaySound(SoundID.Item14, Projectile.Center); //bomb
                     DoDustEffect();
                     Projectile.ai[0]++;
                 }

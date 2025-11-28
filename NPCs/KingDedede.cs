@@ -58,6 +58,8 @@ namespace KirboMod.NPCs
 
         public static SoundStyle SuperJumpRise => new SoundStyle("KirboMod/Sounds/NPC/KingDedede/superJumpRise") with { Volume = 0.8f };
 
+        public static SoundStyle SuperJumpStomp => new SoundStyle("KirboMod/Sounds/NPC/KingDedede/superJumpStomp") with { Volume = 0.8f };
+
         public static SoundStyle HeartyLaugh => new("KirboMod/Sounds/NPC/KingDedede/summon");
 
         public static SoundStyle HammerWindUp => new SoundStyle("KirboMod/Sounds/NPC/KingDedede/hammerWindUp") with { Volume = 0.8f };
@@ -993,7 +995,6 @@ namespace KirboMod.NPCs
         {
             SoundEngine.PlaySound(SoundID.Item9, NPC.Center); //star swoosh
 
-            SoundEngine.PlaySound(SoundID.Item14, NPC.Center); //bomb
             if (attacktype == DededeAttackType.Hammer)
             {
                 if (repeathammer > -1)
@@ -1025,6 +1026,8 @@ namespace KirboMod.NPCs
             }
             else if (attacktype == DededeAttackType.Slam)
             {
+                SoundEngine.PlaySound(SuperJumpStomp, NPC.Center); //land
+
                 //prev: 16 + phase * 8
                 float maxNumber = 8 + phase * 4;
                 if (Main.getGoodWorld)
@@ -1086,17 +1089,17 @@ namespace KirboMod.NPCs
                 if (NPC.direction == 1)
                 {
                     //checks for tiles on right side of NPC
-                    Tile tile = Main.tile[new Vector2(NPC.Right.X + 1, NPC.position.Y + i).ToTileCoordinates()];
-                    climableTiles = WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType] || tile.IsHalfBlock;
+                    Point tileLocation = new Vector2(NPC.Right.X + 1, NPC.position.Y + i).ToTileCoordinates();
+                    climableTiles = WorldGen.SolidTile2(tileLocation.X, tileLocation.Y) || Main.tile[tileLocation.X, tileLocation.Y].Slope > 0;
                 }
                 else
                 {
                     //checks for tiles on left side of NPC
-                    Tile tile = Main.tile[new Vector2(NPC.Left.X - 1, NPC.position.Y + i).ToTileCoordinates()];
-                    climableTiles = WorldGen.SolidOrSlopedTile(tile) || TileID.Sets.Platforms[tile.TileType] || tile.IsHalfBlock;
+                    Point tileLocation = new Vector2(NPC.Left.X - 1, NPC.position.Y + i).ToTileCoordinates();
+                    climableTiles = WorldGen.SolidTile2(tileLocation.X, tileLocation.Y) || Main.tile[tileLocation.X, tileLocation.Y].Slope > 0;
                 }
 
-                if (climableTiles && MathF.Abs(NPC.Bottom.Y - player.Bottom.Y) > 20f || NPC.velocity.X == 0)
+                if (climableTiles || NPC.velocity.X == 0)
                 {
                     NPC.noTileCollide = true;
 
