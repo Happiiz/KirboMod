@@ -56,12 +56,14 @@ namespace KirboMod.Projectiles
 				d.noGravity = true;
 			}
 
-			if (Projectile.ai[0] == 360)
+			float bossSpawnTime = 360;
+			float bossIntroDuration = 10;
+			if (Projectile.ai[0] == bossSpawnTime)
 			{
 				if (Main.netMode != NetmodeID.MultiplayerClient) // If not a client
 				{
 					//-300 to compensate for zero spawning above for some reason
-					NPC.SpawnBoss((int)Projectile.Center.X, (int)Projectile.Center.Y + 300, ModContent.NPCType<NPCs.Zero>(), player.whoAmI);
+					NPC.SpawnBoss((int)Projectile.Center.X, (int)Projectile.Center.Y + 300, ModContent.NPCType<NPCs.PureDarkMatterRematch.PureDarkMatterRematch>(), player.whoAmI);
 				}
 
 				SoundEngine.PlaySound(SoundID.Item74, Projectile.Center); //inferno explosion
@@ -73,7 +75,8 @@ namespace KirboMod.Projectiles
 					d.noGravity = true;
 				}
 			}
-			float progress = Easings.RemapProgress(0, 30, 360 + 389 - 20, 360 + 389, Projectile.ai[0]);
+            //float progress = Easings.RemapProgress(0, 30, bossSpawnTime + 389 - 20, bossSpawnTime + 389, Projectile.ai[0]);
+            float progress = Easings.RemapProgress(0, 30, bossSpawnTime + bossIntroDuration - 20, bossSpawnTime + bossIntroDuration, Projectile.ai[0]);
 			progress = Easings.EaseInOutSine(progress);
 			CameraScrollToZero.cameraCenter = Vector2.Lerp(Main.LocalPlayer.Center, Projectile.Center, progress);
 		}

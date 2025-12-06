@@ -30,12 +30,13 @@ namespace KirboMod.NPCs.PureDarkMatterRematch
         static int BeamDamage => 100 / 2;
         enum AtkType : byte
         {
-            DecideNext = 0,
-            Petals,//1
-            Dash,//2
-            Lasers,//3
-            Spin,//4
-            Beams,//5
+            Intro = 0,
+            DecideNext,// 1
+            Petals,//2
+            Dash,//3
+            Lasers,//4
+            Spin,//5
+            Beams,//6
         }
         public override void SetStaticDefaults()
         {
@@ -86,15 +87,28 @@ namespace KirboMod.NPCs.PureDarkMatterRematch
             Helper.BossHpScalingForHigherDifficulty(ref NPC.lifeMax, balance);
             //NPC.damage = (int)(NPC.damage * 0.6);
         }
+        void FacePlayerOrRight()
+        {
+            if (NPC.HasPlayerTarget)
+            {
+                NPC.direction = NPC.spriteDirection = MathF.Sign(Main.player[NPC.target].Center.X - NPC.Center.X);
+                NPC.rotation = NPC.spriteDirection == -1 ? 0 : MathF.PI;
+                return;
+            }
+            NPC.rotation = 0;
+            NPC.direction = NPC.spriteDirection = 1;
+        }
         public override void AI() //constantly cycles each time
         {
             if (!NPC.HasPlayerTarget)
             {
                 NPC.TargetClosest();
+                FacePlayerOrRight();
             }
             if (!NPC.HasPlayerTarget)
             {
                 FleeAndDespawn();
+
                 return;
             }
             Player plr = Main.player[NPC.target];
@@ -128,6 +142,9 @@ namespace KirboMod.NPCs.PureDarkMatterRematch
                 case AtkType.Beams:
                     AttackBeams();
                     break;
+                case AtkType.Intro:
+                    Intro();
+                    break;
             }
             Timer++;
             if (CurrentAttackType == AtkType.DecideNext)
@@ -135,6 +152,29 @@ namespace KirboMod.NPCs.PureDarkMatterRematch
                 AttackDecideNext();
             }
         }
+        public static int IntroDuration => 100;
+        public static int IntroMaxSpeedY => -10;
+        private void Intro()
+        {
+            FacePlayerOrRight();
+            if(Timer == 0)
+            {
+                for (int i = 0; i < 30; i++)
+                {
+                    Vector2 speed = Main.rand.NextVector2CircularEdge(20, 20); //circle edge
+                    Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.DarkResidue>(), speed); //Makes dust in a messy circle
+                    d.noGravity = true;
+
+                    SoundEngine.PlaySound(SoundID.Roar, NPC.Center); //OOooAAAHHRrrr
+                }
+            }
+            NPC.velocity.Y = Helper.RemapEased(Timer, 0, IntroDuration, IntroMaxSpeedY, 0, Easings.EaseInOutSquare);
+            if (Timer >= IntroDuration)
+            {
+                EndState();
+            }
+        }
+
         //circle around loosely while firing predictive beams
         float BeamCircleDist => 500;
         float BeamCircleRate => 0.03f;
@@ -197,6 +237,7 @@ namespace KirboMod.NPCs.PureDarkMatterRematch
         }
         private void FleeAndDespawn()
         {
+            NPC.direction = NPC.spriteDirection = 1;
             NPC.velocity.Y -= 2;
             NPC.timeLeft = 29;
             NPC.EncourageDespawn(30);
@@ -598,6 +639,10 @@ namespace KirboMod.NPCs.PureDarkMatterRematch
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            if(CurrentAttackType == AtkType.Intro)
+            {
+                FacePlayerOrRight();
+            }
             Texture2D tex = TextureAssets.Npc[Type].Value;
             //if (!Main.gamePaused)
             //{
@@ -660,6 +705,5 @@ namespace KirboMod.NPCs.PureDarkMatterRematch
                 NPC.frameCounter = 0.0; //reset
             }
         }
-
     }
 }

@@ -16,7 +16,7 @@ namespace KirboMod.NPCs.MidBosses
                 short musicSlot = (short)MusicLoader.GetMusicSlot(path + "Photonic0_BatafireBattle_WithLoopMetadata");
                 if(curMusic == -1)//only if just changed the song
                 {
-                    ChangeMusicTo(musicSlot);
+                   // ChangeMusicTo(musicSlot);
                 }
                 curMusic = musicSlot;
                 return true;
@@ -24,12 +24,12 @@ namespace KirboMod.NPCs.MidBosses
             if(NPC.AnyNPCs(ModContent.NPCType<Bonkers>()))
             {
                 //curMusic = (short)MusicLoader.GetMusicSlot(path + "Happiz_BonkersBattle");
-                //curMusic = (short)MusicLoader.GetMusicSlot(path + "Happiz_BonkersBattle_WithLoopMetadata");
-                //return true;
+                curMusic = (short)MusicLoader.GetMusicSlot(path + "Photonic0_BonkersBattle_WithLoopMetadata");
+                return true;
             }
             if (NPC.AnyNPCs(ModContent.NPCType<MrFrosty>()))
             {
-                //curMusic = (short)MusicLoader.GetMusicSlot(path + "Photonic0_FrostyBattle_WithLoopMetadata");
+                curMusic = (short)MusicLoader.GetMusicSlot(path + "Photonic0_FrostyBattle_WithLoopMetadata");
                 //return true;
             }
             curMusic = -1;

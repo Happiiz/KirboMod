@@ -237,7 +237,15 @@ namespace KirboMod
             float z = MathF.PI + targetTraj - angleToTarget;
             return angleToTarget - MathF.Asin(aimedTargetVelLength * MathF.Sin(z) / shotVelLength);
         }
+        public static void RectVisualizer(Rectangle rect)
+        {
+            Texture2D blankTexture = Terraria.GameContent.TextureAssets.Extra[195].Value;
+            Vector2 texScale = new Vector2(rect.Width, rect.Height) * 0.00390625f;//1/256, texture is 256x256
+            Vector2 leftEdge = new Vector2(rect.X, rect.Y + rect.Height / 2);
+            Vector2 rightEdge = new Vector2(rect.X + rect.Width, rect.Y + rect.Height / 2);
+            Main.EntitySpriteDraw(blankTexture, (leftEdge) - Main.screenPosition, null, Color.Red, (rightEdge - leftEdge).ToRotation(), new Vector2(0, 128), texScale, SpriteEffects.None);
 
+        }
         public static void AABBvLineVisualizer(Vector2 lineStart, Vector2 lineEnd, float lineWidth)
         {
             Texture2D blankTexture = Terraria.GameContent.TextureAssets.Extra[195].Value;

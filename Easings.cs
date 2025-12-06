@@ -39,6 +39,17 @@ namespace KirboMod
         {
             return -(MathF.Cos(MathF.PI * progress) - 1) / 2;
         }
+        public static float EaseInOutSquare(float progress)
+        {
+            if(progress < .5f)
+            {
+                return 2 * progress * progress;
+            }
+            progress = (-2 * progress + 2);
+            progress *= progress;
+            progress /= 2;
+            return 1 - progress;
+        }
         public static float EaseOutSine(float progress)
         {
             return MathF.Sin((progress * MathF.PI) / 2);

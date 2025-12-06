@@ -2,6 +2,7 @@ using KirboMod.Bestiary;
 using KirboMod.Items.Zero;
 using KirboMod.Projectiles;
 using KirboMod.Projectiles.ZeroDashHitbox;
+using KirboMod.Projectiles.ZeroOrbs;
 using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -25,20 +26,24 @@ namespace KirboMod.NPCs
     {
         public enum ZeroAttackType : byte
         {
-            DecideNext,//0
-            BloodShots,//1
-            Dash,//2
-            DarkMatterShots,//3
-            Sparks,//4
-            ThornTail,//5
-            BackgroundShots,//6
+            JustSpawned = 0,
+            DecideNext,//1
+            BloodShots,//2
+            Dash,//3
+            DarkMatterShots,//4
+            Sparks,//5
+            ThornTail,//6
+            BackgroundShots,//7
+            BGOrbWindmill,//8
+            BGOrbRings,//9
+            BGOrbCross,//10
         }
         public static bool calamityEnabled;
         static int AttackCooldown => Main.expertMode ? 20 : 100;
         private short animation = 1; //frame cycles
 
-        private ZeroAttackType lastattacktype = ZeroAttackType.DecideNext; //sets last attack type
-        public ZeroAttackType attacktype = ZeroAttackType.DecideNext; //decides the attack
+        private ZeroAttackType lastattacktype = ZeroAttackType.JustSpawned; //sets last attack type
+        public ZeroAttackType attacktype = ZeroAttackType.JustSpawned; //decides the attack
                                                                       //public to check zero's dash
         private float backupoffset = 0; //offset goto position when backing up
 
@@ -265,7 +270,7 @@ namespace KirboMod.NPCs
                 {
                     if (NPC.GetLifePercent() <= 0.55) //55%
                     {
-                        //background attack is done every 3 attacks when zero's health gets low enough
+                        //background attack is done every 5 attacks when zero's health gets low enough
                         //(does it the next cycle upon initally dropping low enough)
 
                         if (backgroundAttackCountDown <= 0) //equal or less than zero
@@ -288,7 +293,7 @@ namespace KirboMod.NPCs
             }
             else //attacking
             {
-                switch (attacktype) //blood shots
+                switch (attacktype)
                 {
                     case ZeroAttackType.BloodShots:
                         Attack_BloodShots(player, playerRightDistance, playerLeftDistance, speed);
@@ -308,25 +313,105 @@ namespace KirboMod.NPCs
                     case ZeroAttackType.BackgroundShots:
                         Attack_BGShots(player);
                         break;
+                        case ZeroAttackType.BGOrbRings:
+                        Attack_BGOrbRings(player, playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
+                        break;
+                    case ZeroAttackType.BGOrbCross:
+                        Attack_BGOrbCross(player, playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
+                        break;
+                    case ZeroAttackType.BGOrbWindmill:
+                        Attack_BGOrbWindmill(player, playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
+                        break;
                 }
+            }
+        }
+        public static int WindmillStartup => 12;
+        public static int WindmillTimeToReach => 70;
+        public static int WindmillCount => 1;
+        public static int WindmillExtraWait => 10;
+        public static int WindmillEndTime => ZeroOrbWindmill.WindmillSpawnCount * ZeroOrbWindmill.WindmillSpawnRate + WindmillTimeToReach + WindmillExtraWait;
+        private void Attack_BGOrbWindmill(Player player, Vector2 playerDistance, Vector2 playerRightDistance, Vector2 playerLeftDistance, float speed, float inertia)
+        {
+            float timer = NPC.ai[0] - AttackCooldown;
+            DefaultMovement(playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
+            if(timer == WindmillStartup)
+            {
+                ZeroOrbWindmill.SpawnOrbWindmillAt(NPC.GetSource_FromAI(), player.Center + player.velocity * WindmillTimeToReach, WindmillTimeToReach, 100, BGShotDamage);
+            }
+            if(timer >= WindmillEndTime)
+            {
+                NPC.ai[0] = 0;
+            }
+        }
+        public static int BgOrbCrossStartup => 12;
+        public static int BgOrbCrossTimeToReach => 40;
+        public static int BgOrbCrossCount => 1;
+        public static int BgOrbCrossExtraWait => 30;
+        public static int BgOrbCrossEndTime => ZeroBGOrbCross.SpawnCount * ZeroBGOrbCross.SpawnRate + BgOrbCrossTimeToReach + BgOrbCrossExtraWait;
+
+        private void Attack_BGOrbCross(Player player, Vector2 playerDistance, Vector2 playerRightDistance, Vector2 playerLeftDistance, float speed, float inertia)
+        {
+            float timer = NPC.ai[0] - AttackCooldown;
+            DefaultMovement(playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
+            if (timer == BgOrbCrossStartup)
+            {
+                ZeroBGOrbCross.SpawnCrossAt(NPC.GetSource_FromAI(), player.Center + player.velocity * 20, WindmillTimeToReach, 100, BGShotDamage);
+            }
+            if (timer >= BgOrbCrossEndTime)
+            {
+                NPC.ai[0] = 0;
+            }
+        }
+
+        public static int BgOrbRingsStartup => 12;
+        public static int BgOrbRingsTimeToReach => 100;
+        public static int BgOrbRingsCount => 1;
+        public static int BgOrbRingsExtraWait => 30;
+        public static int BgOrbRingsEndTime => ZeroBGOrbRings.RingSpawnCount * ZeroBGOrbRings.RingSpawnRate + BgOrbCrossTimeToReach + BgOrbRingsExtraWait;
+
+        private void Attack_BGOrbRings(Player player, Vector2 playerDistance, Vector2 playerRightDistance, Vector2 playerLeftDistance, float speed, float inertia)
+        {
+            float timer = NPC.ai[0] - AttackCooldown;
+            DefaultMovement(playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
+            if (timer == BgOrbRingsStartup)
+            {
+                ZeroBGOrbRings.SpawnOrbRingsAt(NPC.GetSource_FromAI(), player.Center + player.velocity * WindmillTimeToReach, WindmillTimeToReach, 100, BGShotDamage);
+            }
+            if (timer >= BgOrbRingsEndTime)
+            {
+                NPC.ai[0] = 0;
             }
         }
 
         private void Attack_BGShots(Player player)
         {
-            float minScale = 0.4f;
+            float maxZPos = 50;
             Vector2 targetPos = player.Center;
-            float acc = 1f;
-            float topSpeed = 30f;
-            float maxXDist = 500;
-            targetPos.X += NPC.direction * Utils.Remap(NPC.ai[0], AttackCooldown, AttackCooldown + 360, -maxXDist, maxXDist);
+            float acc = 0.006f;
+    
+            float topSpeed = 80f;
+            float maxXDist = 1500;
+            float atkProgress = Utils.GetLerpValue(AttackCooldown, AttackCooldown + 360, NPC.ai[0], true);
+           // if (atkProgress > .98f)
+            {
+               // acc = 0.1f;
+                //topSpeed = 50f;
+            }
+            float offset = Utils.Remap(NPC.ai[0], AttackCooldown, AttackCooldown + 360, -maxXDist, maxXDist);
+            if(offset > maxXDist / 2)
+            {
+                offset = maxXDist / 2;
+            }
+            offset *= NPC.direction;
+            targetPos.X += offset;
+            targetPos.Y -= 500 * Easings.EaseOutSquare(Utils.GetLerpValue(0, .25f, atkProgress, true) * Utils.GetLerpValue(.9f, .65f, atkProgress, true));
             AccelerateTowards(targetPos, acc, topSpeed);
 
             if (NPC.ai[0] <= AttackCooldown + 60) //backup
             {
                 NPC.TargetClosest(false); //don't face player during attack
 
-                zPos = Utils.Remap(NPC.ai[0], AttackCooldown, AttackCooldown + 60, 1f, minScale); //get smaller
+                zPos = Helper.RemapEased(NPC.ai[0], AttackCooldown, AttackCooldown + 60, 1f, maxZPos, Easings.EaseInOutSquare); //get smaller
                 NPC.behindTiles = true;
                 NPC.damage = 0;
                 NPC.dontTakeDamage = true;
@@ -337,20 +422,20 @@ namespace KirboMod.NPCs
             {
                 NPC.TargetClosest(false);
 
-                if (NPC.ai[0] % 9 == 0 && NPC.ai[0] < AttackCooldown + 360) //shoot projectiles before getting big again
+                float scaleupDuration = 45;
+                int endTime = AttackCooldown + 360;
+                zPos = Helper.RemapEased(NPC.ai[0], endTime, endTime - scaleupDuration, 1f, maxZPos, Easings.EaseInOutSquare); //get smaller                
+                if ((NPC.ai[0] - AttackCooldown - 60) % 20 == 1 && NPC.ai[0] < AttackCooldown + 360 && zPos == maxZPos) //shoot projectiles before getting big again
                 {
-                    Vector2 BackgroundplayerDistance = player.Center + (player.velocity * 5) - NPC.Center;
+                    Vector2 BackgroundplayerDistance = player.Center + (player.velocity * 60) - NPC.Center;
 
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, BackgroundplayerDistance / 60, ModContent.ProjectileType<ZeroScreenBlood>(), BGShotDamage, 1f, Main.myPlayer, 0, NPC.ai[0] % 2 == 0 ? 0 : 1);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, BackgroundplayerDistance / 60, ModContent.ProjectileType<ZeroScreenBlood>(), BGShotDamage, 1f, Main.myPlayer, 0, NPC.ai[0] % 2 == 0 ? 0 : 1, zPos);
                     }
                     SoundEngine.PlaySound(SoundID.NPCHit9.WithVolumeScale(0.8f), NPC.Center); //leech hit
 
                 }
-                float scaleupDuration = 15;
-                int endTime = AttackCooldown + 360;
-                zPos = Utils.Remap(NPC.ai[0], endTime, endTime - scaleupDuration, 1f, minScale); //get smaller                
             }
             else //reset
             {
@@ -361,15 +446,16 @@ namespace KirboMod.NPCs
                 NPC.scale = 1; //just in case
                 NPC.behindTiles = false;
             }
+
         }
         void AccelerateTowards(Vector2 targetPos, float acc, float topSpeed)
         {
             Vector2 toTargetPos = (targetPos - NPC.Center);
             float distToTarget = toTargetPos.Length();
-            topSpeed *= Utils.GetLerpValue(64, 0, distToTarget, true);
+            topSpeed *= Utils.GetLerpValue(0, 64, distToTarget, true);
             Vector2 targetVel = NPC.DirectionTo(targetPos);
             targetVel *= topSpeed;
-            NPC.velocity = NPC.velocity.MoveTowards(targetVel, acc);
+            NPC.velocity = Vector2.Lerp(NPC.velocity, targetVel, acc);
         }
         private void Attack_ThornTail(ref Vector2 playerAboveDistance, ref float speed, float inertia)
         {
@@ -668,11 +754,11 @@ namespace KirboMod.NPCs
 
         void AttackDecideNext()
         {
-            List<ZeroAttackType> possibleAttacks = new() { ZeroAttackType.BloodShots, ZeroAttackType.Dash, ZeroAttackType.DarkMatterShots, ZeroAttackType.Sparks, ZeroAttackType.ThornTail };
+            List<ZeroAttackType> possibleAttacks = new() { ZeroAttackType.BackgroundShots, ZeroAttackType.BloodShots, ZeroAttackType.Dash, ZeroAttackType.DarkMatterShots, ZeroAttackType.Sparks, ZeroAttackType.ThornTail, ZeroAttackType.BGOrbWindmill, ZeroAttackType.BGOrbRings, ZeroAttackType.BGOrbCross };
 
             possibleAttacks.Remove(lastattacktype);
 
-            if (NPC.GetLifePercent() >= 0.97f)
+            if (attacktype == ZeroAttackType.JustSpawned && lastattacktype == ZeroAttackType.JustSpawned)
             {
                 attacktype = ZeroAttackType.BloodShots;
             }
@@ -886,7 +972,7 @@ namespace KirboMod.NPCs
 
         public override void DrawBehind(int index)
         {
-            if (attacktype == ZeroAttackType.BackgroundShots &&  NPC.ai[0] > 120)
+            if (zPos > 0)
             {
                 NPC.hide = true;
                 Main.instance.DrawCacheNPCsMoonMoon.Add(index);//be drawn behind things like moonlord(?)
@@ -935,7 +1021,7 @@ namespace KirboMod.NPCs
 
 
             spriteBatch.Draw(zero, center, Animation(), new Color(r, g, b), NPC.rotation,
-                new Vector2(400, 400), NPC.scale, direction, 0f);
+                new Vector2(400, 400), scaleMult * NPC.scale, direction, 0f);
             if (attacktype == ZeroAttackType.Dash)
             {
                 //intentionally unclamped

@@ -24,7 +24,7 @@ namespace KirboMod.Projectiles
 			DrawOffsetX = 4;
 			Projectile.friendly = false;
 			Projectile.hostile = true;
-			Projectile.timeLeft = 60;
+			Projectile.timeLeft = 10;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 			Projectile.scale = 1;
