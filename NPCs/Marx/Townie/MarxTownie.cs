@@ -98,7 +98,7 @@ namespace KirboMod.NPCs.Marx.Townie
 			NPC.width = 36;
 			NPC.height = 36;
             DrawOffsetY = 32;
-			NPC.aiStyle = 7;
+			NPC.aiStyle = NPCAIStyleID.Passive;
 			NPC.damage = 0;
 			NPC.defense = 30;
 			NPC.lifeMax = 25000;
@@ -148,11 +148,6 @@ namespace KirboMod.NPCs.Marx.Townie
 		public override ITownNPCProfile TownNPCProfile() {
 			return NPCProfile;
 		}
-
-        public override void AI()
-        {
-            NPCID.Sets.IsTownPet[Type] = false; //set to not pet when spawning back in after death
-        }
 
 		public override List<string> SetNPCNameList() 
 		{
@@ -417,14 +412,7 @@ namespace KirboMod.NPCs.Marx.Townie
             #endregion Help Text
         }
 
-        public override bool CheckDead()
-        {
-            if (NPC.life <= 0)
-            {
-                NPCID.Sets.IsTownPet[Type] = true; //set to pet last second to make the "-has left!" text appear (is constantly reveresed in AI())
-            }
-            return base.CheckDead();
-        }
+        public override LocalizedText DeathMessage => Language.GetText("Mods.KirboMod.NPCs.MarxTownie.Leave");
 
         public override bool CanGoToStatue(bool toKingStatue) => true;
 

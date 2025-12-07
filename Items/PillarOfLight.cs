@@ -69,8 +69,10 @@ namespace KirboMod.Items
 		public override void AddRecipes()
         {
 			Recipe recipe = CreateRecipe();//the result is totem
-			recipe.AddIngredient(ModContent.ItemType<Items.PurifiedMaterial>()); //1 purified matter
-			recipe.AddIngredient(ItemID.LunarBar, 5); //5 luminite bars
+			recipe.AddIngredient(ModContent.ItemType<DarkMaterial>(), 3);
+            recipe.AddIngredient(ModContent.ItemType<SoulMatter>(), 3);
+            recipe.AddIngredient(ModContent.ItemType<HeartMatter>(), 10);
+            recipe.AddIngredient(ItemID.LunarBar, 5); //5 luminite bars
 			recipe.AddTile(TileID.LunarCraftingStation); //crafted at ancient manipulator
 			recipe.Register(); //adds this recipe to the game
 		}

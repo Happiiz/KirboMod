@@ -85,14 +85,7 @@ public class ZeroAchievement : ModAchievement
     {
         Achievement.SetCategory(AchievementCategory.Slayer);
 
-        if (Main.expertMode)
-        {
-            AddNPCKilledCondition(ModContent.NPCType<ZeroEye>());
-        }
-        else
-        {
-            AddNPCKilledCondition(ModContent.NPCType<Zero>());
-        }
+        AddNPCKilledCondition(ModContent.NPCType<ZeroEye>());
     }
 
     public override Position GetDefaultPosition() => new After("CHAMPION_OF_TERRARIA");

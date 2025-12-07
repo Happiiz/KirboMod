@@ -238,7 +238,7 @@ namespace KirboMod.NPCs
                     Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center, velocity, ModContent.ProjectileType<NightmareLightningOrb>(), 40, 0, -1, ai0, ai1, ai2);
                 }
             }
-            if (timer > firerate * (numOrbs + 1))
+            if (timer > firerate * (numOrbs + 3)) //give a little bit of buffer time before re-cloaking
             {
                 animation = 0;
             }
@@ -282,7 +282,7 @@ namespace KirboMod.NPCs
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, default, ModContent.ProjectileType<NightmareLightningOrbHoming>(), 40, 0, -1, NPC.target, NightmareLightningOrbHoming.GetMaxSpeed(firerate, numOrbs, start, (int)timer));
                 }
             }
-            if (timer > firerate * numOrbs)
+            if (timer > firerate * (numOrbs + 2)) //give a little bit of buffer time before re-cloaking
             {
                 animation = 0;
             }

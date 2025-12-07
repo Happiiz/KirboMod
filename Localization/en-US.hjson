@@ -9,6 +9,7 @@ Mods: {
 			ShroomiteHelmetBenefitDowngrades: This weapon and its downgrades benefit from the [i:1548] Shroomite Helmet
 			ShroomiteHelmetBenefit: This weapon benefits from the [i:1548] Shroomite Helmet
 			UnimplementedAbilityHat: "'What could've been...'"
+			Unobtainable: Currently unobtainable
 		}
 
 		ProgressionDescription: {
@@ -626,7 +627,11 @@ Mods: {
 
 			PurifiedMaterial: {
 				DisplayName: Purified Matter
-				Tooltip: Broken away fron darkness, this matter beams with happy thoughts and emotions
+				Tooltip:
+					'''
+					Broken away fron darkness, this matter beams with happy thoughts and emotions
+					{$CommonItemTooltip.Unobtainable}
+					'''
 			}
 
 			DesertDrop: {
@@ -1141,7 +1146,7 @@ Mods: {
 				Tooltip:
 					'''
 					Mighty staff of the Jamba followers
-					Currently unobtainable
+					{$CommonItemTooltip.Unobtainable}
 					'''
 			}
 
@@ -1797,7 +1802,7 @@ Mods: {
 			BadStar.DisplayName: Night Star
 			BallOfImpendingDoom.DisplayName: Ball Of Impending Doom
 			BeamBad.DisplayName: Beam Attack
-			BeamWhipProj.DisplayName: Beam Attack
+			BeamWhipProj.DisplayName: "{$Projectiles.BeamBad.DisplayName}"
 			BeamBig.DisplayName: Beam
 			BigRangerStar.DisplayName: Big Ranger Star
 			BioDagger.DisplayName: Kunai
@@ -1808,14 +1813,14 @@ Mods: {
 			BladoProj.DisplayName: Blado
 			BlizzardFormation.DisplayName: Blizzard Formation
 			BlizzardIcicle.DisplayName: Blizzard Icicle
-			BombExplosive.DisplayName: Jolly Bomb
+			BombExplosive.DisplayName: "{$Projectiles.BombProj.DisplayName}"
 			BombProj.DisplayName: Jolly Bomb
 			BonkersSmash.DisplayName: Smash
 			BouncyGordo.DisplayName: Gordo
 			BroomHatterDustCloud.DisplayName: Dust Cloud
 			BurningLeoMinion.DisplayName: Burning Leo
 			BuzzCutterProj.DisplayName: Buzz-Saw
-			ChainBombExplosion.DisplayName: Chain Bomb
+			ChainBombExplosion.DisplayName: "{$Projectiles.ChainBombProj.DisplayName}"
 			ChainBombProj.DisplayName: Chain Bomb
 			ChakramCutterProj.DisplayName: Chakram Cutter
 			ChargedArrowProj.DisplayName: Magic-Star Arrow
@@ -1846,7 +1851,7 @@ Mods: {
 			ExplosiveCoconut.DisplayName: Explosive Coconut
 			FighterUppercut.DisplayName: Rising Break
 			FinalCutterBlade.DisplayName: Final Cutter Blade
-			FireFire.DisplayName: Fire Fire
+			FireFire.DisplayName: "{$Projectiles.BadFire.DisplayName}"
 			FireSphere.DisplayName: Fire Sphere
 			FleurTornadoFeather.DisplayName: Fleur Tornado Feather
 			FleurTornadoNado.DisplayName: Fleur Tornado
@@ -1873,15 +1878,15 @@ Mods: {
 			HardenedPebble.DisplayName: Hardened Pebble
 			HardenedSlam.DisplayName: Hardened Slam
 			HeroSlash.DisplayName: Hero Slash
-			HomingBombExplosion.DisplayName: Homing Bomb
+			HomingBombExplosion.DisplayName: "{$Projectiles.HomingBombProj.DisplayName}"
 			HomingBombProj.DisplayName: Homing Bomb
 			HomingNightStar.DisplayName: Night Star
 			IceChunk.DisplayName: Ice Chunk
-			IceIce.DisplayName: Ice Ice
+			IceIce.DisplayName: "{$Projectiles.BadIce.DisplayName}"
 			JoeBlast.DisplayName: Smash Punch
 			KirbyBallProj.DisplayName: Friend Ball
 			KrackoLightning.DisplayName: Lightning
-			LaserBeamLaser.DisplayName: Laser beam
+			LaserBeamLaser.DisplayName: Laser Beam
 			LightBeamLaser.DisplayName: Light Beam
 			LoveDot.DisplayName: Love Dot
 			LoveLoves.DisplayName: Love Heart
@@ -1890,7 +1895,7 @@ Mods: {
 			MaskedHammerThrow.DisplayName: Masked Hammer Throw
 			MasterDash.DisplayName: Master Dash
 			MasterSwing.DisplayName: Master Swing
-			MasterSwordProj.DisplayName: Master Sword Proj
+			MasterSwordProj.DisplayName: Master Sword
 			MatterOrb.DisplayName: Dark Petal
 			MetaKnightSwing.DisplayName: Meta Knight Swing
 			MetalFighterSpike.DisplayName: Metal Fighter Spike
@@ -1899,8 +1904,8 @@ Mods: {
 			MetalUppercut.DisplayName: Metal Uppercut
 			MetaSlash.DisplayName: Meta Slash
 			MinionBeam.DisplayName: Minion Beam
-			MinionFire.DisplayName: Minion Fire
-			MinionIce.DisplayName: Minion Ice
+			MinionFire.DisplayName: "{$Projectiles.BadFire.DisplayName}"
+			MinionIce.DisplayName: "{$Projectiles.BadIce.DisplayName}"
 			MiniWhispy.DisplayName: Mini Whispy
 			NebulaStar.DisplayName: Dark Nebula Star
 			NeedleBall.DisplayName: Needle Ball
@@ -1908,7 +1913,7 @@ Mods: {
 			NewHammerMissile.DisplayName: Hammer Missile
 			NewHammerShockwave.DisplayName: Shockwave
 			NightSlash.DisplayName: Night Slash
-			ParosolHitbox.DisplayName: Parosol Hitbox
+			ParosolHitbox.DisplayName: Parasol Swing
 			ParosolMinion.DisplayName: Parasol Waddle Dee
 			PersonalCloud.DisplayName: Personal Cloud
 			PersonalCloudBeam.DisplayName: Personal Cloud Beam
@@ -1937,8 +1942,8 @@ Mods: {
 			RisingRainbowBeam.DisplayName: Casting light
 			SmallApple.DisplayName: Small Apple
 			SmallDarkMatterShot.DisplayName: Dark Matter
-			SmolApple.DisplayName: Smol Apple
-			SmullApple.DisplayName: Smull Apple
+			SmolApple.DisplayName: "{$Projectiles.SmallApple.DisplayName}"
+			SmullApple.DisplayName: "{$Projectiles.SmallApple.DisplayName}"
 			SpaceRangerBlast.DisplayName: Space Blast
 			SpaceRangerBlastExplosion.DisplayName: Space Explosion
 			SpaceRangerOrb.DisplayName: Space Orb
@@ -1965,15 +1970,15 @@ Mods: {
 			ZeroEyeBlood.DisplayName: Blood Trail
 			ZeroScreenBlood.DisplayName: Blood Shot
 			ZeroSpark.DisplayName: Spark
-			ZeroSparkExplosion.DisplayName: Spark
-			ZeroThornJuice.DisplayName: Thorn Juice
+			ZeroSparkExplosion.DisplayName: Spark Explosion
+			ZeroThornJuice.DisplayName: Thorn Drop
 			GigantSlash.DisplayName: Gigant Slash
 			BodyIce.DisplayName: Body Ice
 			BombExplosion.DisplayName: Jolly Bomb Explosion
 			NightCrownEffect.DisplayName: Night Crown Effect
 			CyclingStar.DisplayName: Cycling Star
 			BioSparkSlashHitbox.DisplayName: Slash
-			BioMinionSlashHitbox.DisplayName: Slash
+			BioMinionSlashHitbox.DisplayName: "{$Projectiles.BioSparkSlashHitbox.DisplayName}"
 			RainbowSwordHeld.DisplayName: Rainbow Sword Held
 			RainbowSwordCraftingAnimation.DisplayName: Rainbow Sword Crafting Animation
 			DarkSwordBeam.DisplayName: Dark Sword Beam
@@ -1983,23 +1988,23 @@ Mods: {
 			DarkMatterLaser.DisplayName: Dark Matter Laser
 			DarkMatterLaserTelegraph.DisplayName: Dark Matter Laser Telegraph
 			MatterOrbVertical.DisplayName: Matter Orb
-			KrackoJrCannonball.DisplayName: Kracko Jr Cannonball
-			KrackoJrBomb.DisplayName: Kracko Jr Bomb
+			KrackoJrCannonball.DisplayName: Kracko Jr. Cannonball
+			KrackoJrBomb.DisplayName: Kracko Jr. Bomb
 			LightningProj.DisplayName: Lightning Proj
-			MinionFireSpread.DisplayName: Minion Fire Spread
+			MinionFireSpread.DisplayName: "{$Projectiles.BadFire.DisplayName}"
 			MinionBeamSpread.DisplayName: Minion Beam Spread
-			DuoMinionFireSpread.DisplayName: Duo Minion Fire Spread
-			BadIceChunkMist.DisplayName: Bad Ice Chunk Mist
+			DuoMinionFireSpread.DisplayName: "{$Projectiles.BadFire.DisplayName}"
+			BadIceChunkMist.DisplayName: Icy Mist
 			NightmareLightningOrb.DisplayName: Nightmare Lightning Orb
-			GoodDarkMatterLaser.DisplayName: Good Dark Matter Laser
-			GooeyDarkMatterLaser.DisplayName: Gooey Dark Matter Laser
+			GoodDarkMatterLaser.DisplayName: "{$Projectiles.DarkMatterLaser.DisplayName}"
+			GooeyDarkMatterLaser.DisplayName: "{$Projectiles.DarkMatterLaser.DisplayName}"
 			NightmareShockOrb.DisplayName: Nightmare Shock Orb
-			NightmareLightningOrbHoming.DisplayName: Nightmare Lightning Orb Homing
+			NightmareLightningOrbHoming.DisplayName: Nightmare Lightning Orb
 			DededeDropStar.DisplayName: Drop Star
 			BasicTestTornado.DisplayName: Basic Test Tornado
-			VolcanoFireFire1.DisplayName: Volcano Fire Fire1
-			VolcanoFireFire2.DisplayName: Volcano Fire Fire2
-			VolcanoFireFire3.DisplayName: Volcano Fire Fire3
+			VolcanoFireFire1.DisplayName: Volcano Fire
+			VolcanoFireFire2.DisplayName: Volcano Fire
+			VolcanoFireFire3.DisplayName: Volcano Fire
 			ZeroDamageHitbox.DisplayName: Zero Dash
 			HammerSwing.DisplayName: Hammer Swing
 			ToyHammerSwing.DisplayName: Toy Hammer Swing
@@ -2014,37 +2019,37 @@ Mods: {
 			NewWhispyTornado.DisplayName: Tornado
 			NewWhispyWind.DisplayName: Wind
 			NewWhispySpike.DisplayName: Spike
-			NewWhispySpiralingWind.DisplayName: Wind
-			NewWhispySplittingWind.DisplayName: Wind
+			NewWhispySpiralingWind.DisplayName: "{$Projectiles.NewWhispyWind.DisplayName}"
+			NewWhispySplittingWind.DisplayName: "{$Projectiles.NewWhispyWind.DisplayName}"
 			NewWhispySummonTileDustGenerator.DisplayName: New Whispy Summon Tile Dust Generator
 			NewWhispyAppleMedium.DisplayName: Apple
 			HardenedFighterUppercut.DisplayName: Hardened Fighter Uppercut
 			MetalKick.DisplayName: Metal Kick
 			NightmareOrbFirstHitShine.DisplayName: Nightmare Orb First Hit Shine
-			KrackoBGOrbBig.DisplayName: Kracko B G Orb Big
+			KrackoBGOrbBig.DisplayName: Kracko Orb
 			KrackoCloud.DisplayName: Kracko Cloud
-			KrackoBGOrbBigFrag.DisplayName: Kracko B G Orb Big Frag
-			KrackoBGOrbSmall.DisplayName: Kracko B G Orb Small
+			KrackoBGOrbBigFrag.DisplayName: Kracko Orb Fragment
+			KrackoBGOrbSmall.DisplayName: Small Kracko Orb
 			WingedBullet.DisplayName: Winged Bullet
 			WingedSlash.DisplayName: Condor Slash
 			PaintBlob.DisplayName: Paint Blob
 			Paintings.DisplayName: Drawings
 			BomberRocketProj.DisplayName: Bomber Rocket
 			BatafireFire.DisplayName: Fireball
-			BandanaDeeSpearHeld.DisplayName: Bandana Dee Spear Held
+			BandanaDeeSpearHeld.DisplayName: Spear
 			BandanaWaddleDee.DisplayName: Bandana Waddle Dee
-			BandanaDeeSpearThrown.DisplayName: Bandana Dee Spear Thrown
+			BandanaDeeSpearThrown.DisplayName: Throwing Spear
 			UFOMountLaser.DisplayName: UFO Laser
 			CannonNightStar.DisplayName: Nightmare Star
-			MarxCutter.DisplayName: Marx Cutter
-			MarxIceBomb.DisplayName: Marx Ice Bomb
-			MarxIceBombFrag.DisplayName: Marx Ice Bomb Frag
-			MarxBall.DisplayName: Marx Ball
-			MarxMassiveLaser.DisplayName: Marx Massive Laser
-			MarxVine.DisplayName: Marx Vine
-			MarxVineSeed.DisplayName: Marx Vine Seed
+			MarxCutter.DisplayName: Cutter
+			MarxIceBomb.DisplayName: Ice Bomb
+			MarxIceBombFrag.DisplayName: Ice Bomb Fragment
+			MarxBall.DisplayName: Ball
+			MarxMassiveLaser.DisplayName: Massive Laser
+			MarxVine.DisplayName: Vine
+			MarxVineSeed.DisplayName: Vine Seed
 			FlyingSparklingSoul.DisplayName: Flying Sparkling Soul
-			MarxBlackHole.DisplayName: Marx Black Hole
+			MarxBlackHole.DisplayName: Black Hole
 			MatterOrbHoming.DisplayName: Matter Orb
 			ZeroEyeless.DisplayName: Zero Eyeless
 			KingDededead.DisplayName: King Dededead
@@ -2231,6 +2236,8 @@ Mods: {
 					LikeNPC_Princess: "{NPCName}'s personality makes me gag... but she also gives me food, which is always appreciated!"
 					Princess_LovesNPC: "{NPCName} may seem shifty, but as long as you keep him fed he'll always be a wonderful ally!"
 				}
+
+				Leave: Marx has escaped!
 			}
 
 			MarxTownieDown.DisplayName: Suspicious Looking Jester

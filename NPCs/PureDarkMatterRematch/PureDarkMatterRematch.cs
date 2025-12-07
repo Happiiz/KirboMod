@@ -681,6 +681,18 @@ namespace KirboMod.NPCs.PureDarkMatterRematch
                 }
             }
         }
+
+        public override void BossLoot(ref int potionType)
+        {
+            potionType = ItemID.None;
+        }
+        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
+        {
+            scale = 1.5f;
+
+            return true;
+        }
+
         public override void FindFrame(int frameHeight)
         {
             NPC.frameCounter += 1.0;

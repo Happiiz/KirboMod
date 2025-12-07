@@ -10,7 +10,7 @@ namespace KirboMod.Items.Placeables.MusicBoxes
 			ItemID.Sets.CanGetPrefixes[Type] = false; // music boxes can't get prefixes in vanilla
 			ItemID.Sets.ShimmerTransformToItem[Type] = ItemID.MusicBox; // recorded music boxes transform into the basic form in shimmer
 
-			//MusicLoader.AddMusicBox(Mod, MusicLoader.GetMusicSlot(Mod, "Music/Photonic0_BatafireBattle_WithLoopMetadata"), ModContent.ItemType<BatafireMusicBox>(), ModContent.TileType<BatafireMusicBoxTile>());
+			MusicLoader.AddMusicBox(Mod, MusicLoader.GetMusicSlot(Mod, "Music/Photonic0_KirbyModBonkersBattle_WithLoopMetadata"), ModContent.ItemType<BonkersMusicBox>(), ModContent.TileType<BonkersMusicBoxTile>());
 		}
 
 		public override void SetDefaults() {

@@ -28,13 +28,13 @@ namespace KirboMod.Items
 			Item.maxStack = 9999;
 		}
 
-		public override void AddRecipes()
+		/*public override void AddRecipes()
 		{
 			Recipe recipe = CreateRecipe();
 			recipe.AddIngredient(ModContent.ItemType<DarkMaterial>(), 3);
 			recipe.AddIngredient(ModContent.ItemType<HeartMatter>(), 2);
 			recipe.AddTile(TileID.MythrilAnvil);
 			recipe.Register();
-		}
+		}*/
 	}
 }
