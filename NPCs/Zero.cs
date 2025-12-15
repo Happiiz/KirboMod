@@ -54,7 +54,7 @@ namespace KirboMod.NPCs
         public static int SparkDamage => (calamityEnabled ? 180 : 100) / 2;
         static int ThornDamage => (calamityEnabled ? 180 : 100) / 2;
         public static int BGShotDamage => (calamityEnabled ? 180 : 100) / 2;
-        static int DashDamage => (calamityEnabled ? 180 : 100) / 2;
+        public static int DashDamage => (calamityEnabled ? 180 : 100) / 2;
 
         private int deathcounter = 0; //for death animation
 
@@ -78,7 +78,7 @@ namespace KirboMod.NPCs
                 PortraitPositionXOverride = 120,
                 Position = new Vector2(100, 0),
                 Scale = 0.75f,
-
+                Hide = true,
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true; //immune to not mess up movement
@@ -97,7 +97,7 @@ namespace KirboMod.NPCs
             NPC.lifeMax = 280000;
             NPC.HitSound = SoundID.NPCHit1; //slime
             NPC.DeathSound = SoundID.NPCDeath1;
-            NPC.value = Item.buyPrice(0, 38, 18, 10); // money it drops
+            NPC.value = Item.buyPrice(1, 0, 0, 0); // money it drops
             NPC.knockBackResist = 0f;
             NPC.aiStyle = -1;
             NPC.npcSlots = 16;
@@ -139,7 +139,7 @@ namespace KirboMod.NPCs
                 new HyperzoneBackgroundProvider(), //I totally didn't reference the vanilla code what no way
 
 				//bestiary description
-				new FlavorTextBestiaryInfoElement("The ultimate leader of all dark matter. Uses its legion to blanket entire worlds in darkness.")
+				new FlavorTextBestiaryInfoElement(Language.GetTextValue("Mods.KirboMod.NPCs.Bestiary.Zero"))
             });
         }
 
@@ -268,27 +268,7 @@ namespace KirboMod.NPCs
 
                 if (NPC.ai[0] == AttackCooldown)
                 {
-                    if (NPC.GetLifePercent() <= 0.55) //55%
-                    {
-                        //background attack is done every 5 attacks when zero's health gets low enough
-                        //(does it the next cycle upon initally dropping low enough)
-
-                        if (backgroundAttackCountDown <= 0) //equal or less than zero
-                        {
-                            attacktype = ZeroAttackType.BackgroundShots; //background attack
-                            lastattacktype = ZeroAttackType.BackgroundShots;
-                            backgroundAttackCountDown = 5; //restart
-                        }
-                        else //do regular attack
-                        {
-                            backgroundAttackCountDown--; //go down by 1
-                            AttackDecideNext();
-                        }
-                    }
-                    else
-                    {
-                        AttackDecideNext();
-                    }
+                    AttackDecideNext();
                 }
             }
             else //attacking
@@ -839,15 +819,8 @@ namespace KirboMod.NPCs
                 NPC.velocity *= 0.95f;
                 animation = 0; //regular
 
-                if (Main.expertMode)
-                {
-                    NPC.rotation = MathHelper.ToRadians(90); //up
-                    NPC.direction = -1; //to make sure it doesn't face down
-                }
-                else
-                {
-                    NPC.rotation += MathHelper.ToRadians(5); //rotate
-                }
+                NPC.rotation = MathHelper.ToRadians(90); //up
+                NPC.direction = -1; //to make sure it doesn't face down
 
                 if (deathcounter % 5 == 0) //effects
                 {
@@ -862,49 +835,36 @@ namespace KirboMod.NPCs
                         d.noGravity = true;
                     }
                 }
-
-                if ((deathcounter == 260 || deathcounter == 280) && !Main.expertMode) //only in normal mode
-                {
-                    for (int i = 0; i < 40; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
-                    {
-                        Vector2 speed = Main.rand.NextVector2Unit(); //circle edge
-                        Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.Redsidue>(), speed * 20, Scale: 4); //Makes dust in a messy circle
-                        d.noGravity = true;
-                    }
-
-                    SoundEngine.PlaySound(SoundID.NPCDeath1, NPC.Center);
-                }
             }
             else if (deathcounter > 0)
             {
                 deathcounter = 99999999;
-                if (Main.expertMode)
+
+                string notif = ("Zero's eye has ejected from its body!");
+
+                if (Main.netMode == NetmodeID.SinglePlayer)
                 {
-                    for (int i = 0; i < 40; i++)
-                    {
-                        Vector2 speed = Main.rand.NextVector2Unit(); //circle edge
-                        Dust d = Dust.NewDustPerfect(NPC.Center + new Vector2(0, -200), ModContent.DustType<Dusts.Redsidue>(), speed * 20, Scale: 4); //Makes dust in a messy circle
-                        d.noGravity = true;
-                    }
-                    Dust.NewDustPerfect(NPC.position + new Vector2(-200, -200), ModContent.DustType<Dusts.ZeroEyeless>(), new Vector2(0, 5), 0);
-                    if (Main.netMode != NetmodeID.MultiplayerClient) //don't use SpawnBoss() as we need the special status message
-                    {
-                        ZeroEye.GetAIValues(out float[] ai2s);
-                        for (int i = 0; i < ai2s.Length; i++)
-                        {
-                            NPC.NewNPC(NPC.GetSource_FromThis(), (int)NPC.Center.X, (int)NPC.Center.Y - 15, ModContent.NPCType<ZeroEye>(), ai2: ai2s[i]);
-                        }
+                    Main.NewText(notif, 175, 75);
+                }
+                else if (Main.netMode == NetmodeID.Server)
+                {
+                    ChatHelper.BroadcastChatMessage(NetworkText.FromKey(notif), new Color(175, 75, 255));
+                }
 
-                        string notif = ("Zero's eye has ejected from its body!");
+                for (int i = 0; i < 40; i++)
+                {
+                    Vector2 speed = Main.rand.NextVector2Unit(); //circle edge
+                    Dust d = Dust.NewDustPerfect(NPC.Center + new Vector2(0, -200), ModContent.DustType<Dusts.Redsidue>(), speed * 20, Scale: 4); //Makes dust in a messy circle
+                    d.noGravity = true;
+                }
+                Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center, Vector2.UnitY * 5, ModContent.ProjectileType<Projectiles.BossDeaths.ZeroEyeless>(), 0, 0);
 
-                        if (Main.netMode == NetmodeID.SinglePlayer)
-                        {
-                            Main.NewText(notif, 175, 75);
-                        }
-                        else if (Main.netMode == NetmodeID.Server)
-                        {
-                            ChatHelper.BroadcastChatMessage(NetworkText.FromKey(notif), new Color(175, 75, 255));
-                        }
+                if (Main.netMode != NetmodeID.MultiplayerClient) //don't use SpawnBoss() as we need the special status message
+                {
+                    ZeroEye.GetAIValues(out float[] ai2s);
+                    for (int i = 0; i < ai2s.Length; i++)
+                    {
+                        NPC.NewNPC(NPC.GetSource_FromThis(), (int)NPC.Center.X, (int)NPC.Center.Y - 15, ModContent.NPCType<ZeroEye>(), ai2: ai2s[i]);
                     }
                 }
                 NPC.dontTakeDamage = false;
@@ -913,9 +873,8 @@ namespace KirboMod.NPCs
             }
         }
 
-        public override void BossLoot(ref string name, ref int potionType)
+        public override void BossLoot(ref int potionType)
         {
-            name = "Zero"; //_ has been defeated!
             potionType = ItemID.SuperHealingPotion; //potion it drops
         }
 
@@ -941,15 +900,9 @@ namespace KirboMod.NPCs
             }
         }
 
-        public override void OnKill()
-        {
-            if (!Main.expertMode && !Main.masterMode) //only register when not expert mode and master mode
-            {
-                NPC.SetEventFlagCleared(ref DownedBossSystem.downedZeroBoss, -1);
-            }
-        }
+        //zero's eye drops the goods
 
-        public override void ModifyNPCLoot(NPCLoot npcLoot)
+        /*public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<ZeroBag>())); //only drops in expert
 
@@ -968,7 +921,7 @@ namespace KirboMod.NPCs
             // add the rules
             npcLoot.Add(notExpertRule);
             npcLoot.Add(masterMode);
-        }
+        }*/
 
         public override void DrawBehind(int index)
         {
@@ -988,10 +941,7 @@ namespace KirboMod.NPCs
             boundingBox = NPC.Hitbox;
         }
 
-
-
         //MANUAL DRAWING INBOUND!
-
 
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {

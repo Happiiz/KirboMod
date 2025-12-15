@@ -14,6 +14,7 @@ using System.Collections.Specialized;
 using System.IO;
 using KirboMod.Projectiles;
 using System.Collections.Generic;
+using Terraria.Localization;
 
 namespace KirboMod.NPCs
 {
@@ -22,15 +23,23 @@ namespace KirboMod.NPCs
 	{
 		private int deathcounter = 0; //for death animation
 
+        SoundStyle Death = new("KirboMod/Sounds/NPC/ZeroDeathSound");
+
         public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Eye of Zero");
 			Main.npcFrameCount[NPC.type] = 1;
 
-            NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
-            {
-                Hide = true // Hides this NPC from the Bestiary, useful for multi-part NPCs whom you only want one entry.
-            };
+			NPCID.Sets.NPCBestiaryDrawModifiers value = new()
+			{
+				CustomTexturePath = "KirboMod/NPCs/BestiaryTextures/ZeroPortrait",
+				PortraitScale = 1f, // Portrait refers to the full picture when clicking on the icon in the bestiary
+				PortraitPositionYOverride = 0,
+				PortraitPositionXOverride = 120,
+				Position = new Vector2(100, 0),
+				Scale = 0.75f,
+
+			};
             NPCID.Sets.NPCBestiaryDrawOffset.Add(NPC.type, value);
 
             NPCDebuffImmunityData debuffData = new NPCDebuffImmunityData
@@ -48,14 +57,10 @@ namespace KirboMod.NPCs
 			NPC.height = 110;
             NPC.defense = 60;
             NPC.lifeMax = 40000;
-			NPC.damage = 200;
-			if (Zero.calamityEnabled)
-			{
-				NPC.lifeMax *= 2;
-			}
+			NPC.damage = Zero.calamityEnabled ? 360 : 200;
 			NPC.HitSound = SoundID.NPCHit1;
-			NPC.DeathSound = SoundID.NPCDeath1;
-			NPC.value = Item.buyPrice(0, 38, 18, 10); // money it drops
+			NPC.DeathSound = Death;
+			NPC.value = Item.buyPrice(1, 0, 0, 0); // money it drops
 			NPC.knockBackResist = 0f; //how much knockback applies
 			NPC.aiStyle = -1;
 			NPC.noGravity = true;
@@ -66,8 +71,8 @@ namespace KirboMod.NPCs
 			NPC.lavaImmune = true;
 
             Music = MusicLoader.GetMusicSlot(Mod, "Music/02NewerWithMetadata");
-            SceneEffectPriority = SceneEffectPriority.BossHigh; // By default, musicPriority is BossLow		
-		}
+            SceneEffectPriority = SceneEffectPriority.BossHigh; // By default, musicPriority is BossLow
+        }
 
         public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */
 		{
@@ -82,7 +87,7 @@ namespace KirboMod.NPCs
                 new HyperzoneBackgroundProvider(), //I totally didn't reference the vanilla code what no way
 
 				//bestiary description
-				new FlavorTextBestiaryInfoElement("I see you (unused)")
+				new FlavorTextBestiaryInfoElement(Language.GetTextValue("Mods.KirboMod.NPCs.Bestiary.Zero")),
             });
         }
 
@@ -106,7 +111,7 @@ namespace KirboMod.NPCs
 		}
         public override void AI() //constantly cycles each time
 		{
-			NPC.target = (int)NPC.ai[2];
+            NPC.target = (int)NPC.ai[2];
 			Player player = Main.player[NPC.target];
             
 
@@ -146,6 +151,7 @@ namespace KirboMod.NPCs
 			float inertia = 50f;
 			float chargespeed = 40;
 			float chargereduce = 0; //shortens the time between charges and the time of charges
+			float chargePoint = 300;
 
             bool spewFaster = false; //decide if to spew blood faster (whether or not eye is low)
 
@@ -153,15 +159,15 @@ namespace KirboMod.NPCs
             {
                 speed *= 2; //double speed
             }
-            else if (NPC.GetLifePercent() <= 0.3f && NPC.ai[0] == 0) //low
+            else if (NPC.GetLifePercent() <= 0.3f && Main.expertMode) //low & in expert mode
 			{
 				speed *= 1.25f; //25% faster speed
-				inertia *= 1.25f; //25% faster acceleration
+				inertia *= 1.5f; //50% faster acceleration
 
-                chargespeed = 60;
-                chargereduce = 150;
+                chargereduce = chargePoint * 0.75f;
+                chargespeed += 20;
 
-                spewFaster = true;
+				spewFaster = true;
             }
 
 			Vector2 moveTo = player.Center;
@@ -171,34 +177,29 @@ namespace KirboMod.NPCs
 
             NPC.ai[0]++;
 
-            if (NPC.ai[0] < 300 - chargereduce)
+            if (NPC.ai[0] < chargePoint - chargereduce)
 			{
 				NPC.velocity = (NPC.velocity * (inertia - 1) + direction) / inertia; //follow player
-			}
 
-			if (NPC.ai[0] % (spewFaster ? 7 : 10) == 0 && NPC.ai[0] < 300 - chargereduce) //only do this if less than 300 (or less)
-			{
-				//divide damage by 2 once so it doesn't double damage in expert mode
-				//and divide damage by 2 another time so it doesn't double damage by default
-				if (Main.netMode != NetmodeID.MultiplayerClient)
-				{
-					Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity * 0.01f, Mod.Find<ModProjectile>("ZeroEyeBlood").Type, NPC.damage / 4, 2f, Main.myPlayer);
-				}
-			}
+                if (NPC.ai[0] % (spewFaster ? 7 : 10) == 0) //only do this if less than 300 (or less)
+                {
+                    SpewEyeBlood();
+                }
+            }
 
-			if (NPC.ai[0] >= 300 - chargereduce)
+			if (NPC.ai[0] >= chargePoint - chargereduce)
 			{
                 Vector2 chargedirection = player.Center - NPC.Center; //start - end
 
                 if (NPC.GetLifePercent() <= 0.6f) //initate dash
 				{
-					if (NPC.ai[0] < 360 - chargereduce) //stop
+					if (NPC.ai[0] < chargePoint + 60 - chargereduce) //stop
 					{
 						NPC.velocity *= 0.01f; //freeze to warn player
                     }
-					else if (NPC.ai[0] < 390 - chargereduce) //initiate dash
+					else if (NPC.ai[0] < chargePoint + 90 - chargereduce) //initiate dash
 					{
-						if (NPC.ai[0] == 360 - chargereduce)
+						if (NPC.ai[0] == chargePoint + 60 - chargereduce)
 						{
                             chargedirection.Normalize();
                             chargedirection *= chargespeed; //changes depending whether or not eye has less than 25% health
@@ -207,11 +208,8 @@ namespace KirboMod.NPCs
 
 						if (NPC.ai[0] % 2 == 0)
 						{
-							if (Main.netMode != NetmodeID.MultiplayerClient)
-							{
-								Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, NPC.velocity * 0.01f, ModContent.ProjectileType<ZeroEyeBlood>(), NPC.damage / 4, 2f, Main.myPlayer);
-							}
-						}
+                            SpewEyeBlood();
+                        }
 					}
 					else
 					{
@@ -240,9 +238,18 @@ namespace KirboMod.NPCs
 			}
 		}
 
-		public override void BossLoot(ref string name, ref int potionType)
+		private int? SpewEyeBlood()
 		{
-			name = "Zero"; //_ has been defeated!
+			if (Main.netMode != NetmodeID.MultiplayerClient)
+			{
+				return Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<ZeroEyeBlood>(), NPC.damage / 4, 2f, Main.myPlayer);
+			}
+
+			return null;
+        }
+
+		public override void BossLoot(ref int potionType)
+		{
 			potionType = ItemID.SuperHealingPotion; //potion it drops
 		}
 
@@ -256,17 +263,17 @@ namespace KirboMod.NPCs
         {
             npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<ZeroBag>())); //only drops in expert
 
-            LeadingConditionRule notExpertRule = new LeadingConditionRule(new Conditions.NotExpert()); //checks if not expert
-            LeadingConditionRule masterMode = new LeadingConditionRule(new Conditions.IsMasterMode()); //checks if master mode
+            LeadingConditionRule notExpertRule = new(new Conditions.NotExpert()); //checks if not expert
+            LeadingConditionRule masterMode = new(new Conditions.IsMasterMode()); //checks if master mode
 
             notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<ZeroMask>(), 7));
             notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<Items.MiracleMatter>(), 1, 2, 2));
 
-            ItemDropRule.Common(ModContent.ItemType<Items.Zero.ZeroTrophy>(), 10); //drop trophy
+            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Items.Zero.ZeroTrophy>(), 10)); //drop trophy
 
             npcLoot.Add(ItemDropRule.MasterModeCommonDrop(ModContent.ItemType<Items.Placeables.BossRelics.ZeroRelic>()));
 
-			masterMode.OnSuccess(ItemDropRule.Common(ModContent.ItemType<Items.Zero.ZeroPetItem>(), 4));
+            masterMode.OnSuccess(ItemDropRule.Common(ModContent.ItemType<Items.Zero.ZeroPetItem>(), 4));
 
             // add the rules
             npcLoot.Add(notExpertRule);
@@ -333,8 +340,8 @@ namespace KirboMod.NPCs
 
 				for (int i = 0; i < 3; i++) //first section makes variable //second declares the conditional // third declares the loop
 				{
-					Vector2 speed = Main.rand.NextVector2Circular(20f, 20f); //circle
-					Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.Redsidue>(), speed, Scale: 2); //Makes dust in a messy circle
+					Vector2 speed = Main.rand.NextVector2Circular(40f, 40f); //circle
+					Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.Redsidue>(), speed, Scale: 2.5f); //Makes dust in a messy circle
 					d.noGravity = true;
 				}
 			}
@@ -342,13 +349,13 @@ namespace KirboMod.NPCs
 			{
                 NPC.HideStrikeDamage = true;
                 NPC.SimpleStrikeNPC(999999, 1, false, 0, null, false, 0, false);
-                for (int i = 0; i < 60; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
+                for (int i = 0; i < 120; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 				{
-					Vector2 speed = Main.rand.NextVector2Circular(40f, 40f);
-					Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.Redsidue>(), speed, Scale: 3); //Makes dust in a messy circle
+					Vector2 speed = Main.rand.NextVector2Circular(60f, 60f);
+					Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.Redsidue>(), speed, Scale: 3.5f); //Makes dust in a messy circle
 					d.noGravity = true;
 				}
-			}
+            }
 
 		}
 	}
