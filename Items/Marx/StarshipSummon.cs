@@ -4,7 +4,7 @@ using Terraria.ModLoader;
 using Terraria;
 using Microsoft.Xna.Framework;
 
-namespace KirboMod.Items.Accesories
+namespace KirboMod.Items.Marx
 {
 	public class StarshipSummon : ModItem
 	{
