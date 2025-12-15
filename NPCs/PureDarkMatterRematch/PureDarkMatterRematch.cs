@@ -280,7 +280,7 @@ namespace KirboMod.NPCs.PureDarkMatterRematch
 
             Vector2 move = player.Center + new Vector2(0, -200) - NPC.Center; //move above
 
-            float rotationSpeed = Main.expertMode ? 2.2f : 3.1f;
+            float rotationSpeed = Main.expertMode ? 3.1f : 2.2f;
             float start = 50;
             float stayStillDuration = 60;
             float rotationDuration = 720f / rotationSpeed;//2 full spins
