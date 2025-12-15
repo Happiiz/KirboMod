@@ -162,9 +162,9 @@ namespace KirboMod.NPCs
             else if (NPC.GetLifePercent() <= 0.3f && Main.expertMode) //low & in expert mode
 			{
 				speed *= 1.25f; //25% faster speed
-				inertia *= 1.5f; //50% faster acceleration
+				inertia *= 0.75f; //25% shorter acceleration
 
-                chargereduce = chargePoint * 0.75f;
+                chargereduce = chargePoint * 0.35f;
                 chargespeed += 20;
 
 				spewFaster = true;
