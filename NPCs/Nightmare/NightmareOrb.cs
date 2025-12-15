@@ -10,6 +10,8 @@ namespace KirboMod.NPCs
 {
     public partial class NightmareOrb : ModNPC
     {
+        public static float FTWSpeedMult => 1.4f;
+        public static float FTWTripleStarShotCountMult => 2;
         public override string HeadTexture => "KirboMod/NPCs/Nightmare/NightmareOrb_Head_Boss";
         public override string Texture => "KirboMod/NPCs/Nightmare/NightmareOrb";
         Vector2 GetTargetPosOffset(float changeRate = 0.05f)
@@ -62,7 +64,7 @@ namespace KirboMod.NPCs
                 else //regular attack stuff
                 {
                     //checks if should go frenzy (expert mode special phase)
-                    if (Main.expertMode && NPC.GetLifePercent() <= 0.4f && AttackType == NightmareOrbAtkType.DecideNext)
+                    if ((Main.getGoodWorld) || (Main.expertMode && NPC.GetLifePercent() <= 0.4f && AttackType == NightmareOrbAtkType.DecideNext))
                     {
                         Frenzy = true;
                     }
@@ -148,6 +150,7 @@ namespace KirboMod.NPCs
             }
             if (NPC.ai[0] >= 400)
             {
+                DoneFirstHit = true;
                 EndAttack();
             }
         }
@@ -199,10 +202,15 @@ namespace KirboMod.NPCs
         }
         private void AttackTripleStar()
         {
-            int startTime = Frenzy ? 40 : 60;
+            int startTime = GetValueDividedDependingOnPhaseAndDifficulty(60, 1.5f, 1.5f);
             int fireRate = Frenzy ? 20 : 35;
             fireRate = GetValueDividedDependingOnPhaseAndDifficulty(fireRate);
+          
             int numberOfShots = 4;
+            if (Main.getGoodWorld)
+            {
+                numberOfShots = (int)(numberOfShots * FTWTripleStarShotCountMult);
+            }
             if ((NPC.ai[0] - startTime) % fireRate == 0)
             {
                 if (Main.netMode != NetmodeID.MultiplayerClient)
@@ -225,9 +233,13 @@ namespace KirboMod.NPCs
         }
         private void AttackHomingStar()
         {
-            int startTime = Frenzy ? 40 : 60;
-            int fireRate = Frenzy ? 40 : 60;
+            int startTime = GetValueDividedDependingOnPhaseAndDifficulty(60, 1.5f, 1.5f);
+            int fireRate = GetValueDividedDependingOnPhaseAndDifficulty(60, 1.5f, 1.5f);
             int numberOfShots = 3;
+            if (Main.getGoodWorld)
+            {
+                numberOfShots = (int)(numberOfShots * FTWSpeedMult);
+            }
             if ((NPC.ai[0] - startTime) % fireRate == 0 && (NPC.ai[0] - startTime) <= numberOfShots * fireRate) //homing stars go behind it
             {
                 PlayHomingStarsSpawnSFX();
@@ -264,6 +276,15 @@ namespace KirboMod.NPCs
             int fireRate = Frenzy ? 12 : 15;
             int startTime = 49;
             int numberOfShots = Frenzy ? 13 : 8;
+
+            if (Main.getGoodWorld)
+            {
+                shootVel *= FTWSpeedMult;
+                fireRate = (int)(fireRate / FTWSpeedMult);
+                startTime = (int)(startTime / FTWSpeedMult);
+                numberOfShots = (int)(numberOfShots * FTWSpeedMult);
+            }
+
             if ((NPC.ai[0] - startTime) % fireRate == 0)
             {
                 if (Main.netMode != NetmodeID.MultiplayerClient)
@@ -364,12 +385,18 @@ namespace KirboMod.NPCs
         {
             value *= Main.expertMode ? expertMultiplier : 1;
             value *= Frenzy ? frenzyMultiplier : 1;
+            float ftwMult = (expertMultiplier > 1f ? FTWSpeedMult : (1f / FTWSpeedMult));
+            value *= Main.getGoodWorld ? ftwMult : 1;
             return (int)value;
         }
         int GetValueDividedDependingOnPhaseAndDifficulty(float value, float expertDivisor = 1.2f, float frenzyDivisor = 1.2f)
         {
             value /= Main.expertMode ? expertDivisor : 1;
             value /= Frenzy ? frenzyDivisor : 1;
+            float ftwDiv = (expertDivisor > 1f ? FTWSpeedMult : (1f / FTWSpeedMult));
+
+            value /= Main.getGoodWorld ? ftwDiv : 1;
+
             return (int)value;
         }
         private void EndAttack(int delayBeforeNextAttack = 0)

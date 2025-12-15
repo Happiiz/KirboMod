@@ -3,6 +3,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework.Graphics;
 using KirboMod.NPCs;
+using KirboMod.Systems;
 
 namespace KirboMod.Dusts
 {
@@ -61,7 +62,7 @@ namespace KirboMod.Dusts
             Vector2 origin = new Vector2(frame.Width / 2, frame.Height / 2);
             Vector2 screenCenter = Main.screenPosition + new Vector2(Main.screenWidth / 2, Main.screenHeight / 2);
             Color col = dust.GetAlpha(Color.White);
-            float scaleMult = Kracko.GetScaleFor3D(GetZPos(dust));
+            float scaleMult = Draw3D.GetScaleFor3D(GetZPos(dust));
             drawPos = Vector2.Lerp(screenCenter, drawPos, scaleMult);
             drawPos -= Main.screenPosition;
             Main.EntitySpriteDraw(tex, drawPos, frame, col, dust.rotation, origin, dust.scale * scaleMult, (SpriteEffects)(dust.dustIndex % 2));

@@ -57,12 +57,18 @@ namespace KirboMod.Projectiles
             }
 
             //player here too incase pvp
+            Player owner = Main.player[Projectile.owner];
+            //hostile means if pvp enabled
+            if (!owner.hostile)
+            {
+                return;
+            }
             for (int i = 0; i < Main.maxPlayers; i++) //loop statement that cycles completely every tick
             {
                 Player player = Main.player[i]; //any player
 
                 //hitboxes touching and player is on opposing team
-                if (player.Hitbox.Intersects(Projectile.Hitbox) && player.InOpposingTeam(Main.player[Projectile.owner]))
+                if (player.Hitbox.Intersects(Projectile.Hitbox) && player.InOpposingTeam(owner))
                 {
                     Explode();
                     return;
@@ -71,7 +77,7 @@ namespace KirboMod.Projectiles
         }
         void Explode()
         {
-            if (Main.netMode != NetmodeID.MultiplayerClient)
+            if (Main.myPlayer == Projectile.owner)
             {
                 Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * 0.01f, //no zero else it won't launch right
     ModContent.ProjectileType<Projectiles.RangerStarExplode>(), Projectile.damage, 8, Projectile.owner);

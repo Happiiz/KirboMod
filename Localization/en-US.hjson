@@ -2055,6 +2055,10 @@ Mods: {
 			KingDededead.DisplayName: King Dededead
 			StarshipStar.DisplayName: Starship Star
 			MarxPet.DisplayName: Mini Nova
+			KrackoEye.DisplayName: Kracko Eye
+			ZeroBGOrbCross.DisplayName: Zero B G Orb Cross
+			ZeroBGOrbRings.DisplayName: Zero B G Orb Rings
+			ZeroOrbWindmill.DisplayName: Zero Orb Windmill
 		}
 
 		NPCs: {

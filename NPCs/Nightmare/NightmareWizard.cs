@@ -209,7 +209,7 @@ namespace KirboMod.NPCs
         Vector2 GetTeleportLocation(int framesAhead)
         {
             Player plr = Main.player[NPC.target];
-            Vector2 result = new Vector2(0, -100) + plr.velocity * framesAhead;
+            Vector2 result = new Vector2(0, -200) + plr.velocity * framesAhead;
             ClampLength(ref result);
             return result;
         }
@@ -223,7 +223,7 @@ namespace KirboMod.NPCs
             {
                 NPC.ai[1] = timer; //time to start teleport
             }
-            Teleport(timer - NPC.ai[1], player, new Vector2(0, -100) + GetTeleportLocation(30));
+            Teleport(timer - NPC.ai[1], player, new Vector2(0, -200) + GetTeleportLocation(30));
             if (timer > start)
             {
                 animation = 5; //damageable

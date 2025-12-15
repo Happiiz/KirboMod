@@ -68,6 +68,10 @@ namespace KirboMod.NPCs
             NPC.lavaImmune = true;
             NPC.npcSlots = 6;
             NPC.dontTakeDamage = true;
+            if (Main.getGoodWorld)
+            {
+                NPC.scale = .7f;
+            }
             if (!Main.dedServ)//if not dedicated server
             {
                 int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Photonic0_NightmareOrb");

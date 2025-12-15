@@ -1,3 +1,5 @@
+using KirboMod.Dusts.MarxPurpleSmoke;
+using KirboMod.Dusts.MarxSparks;
 using KirboMod.NPCs.Marx.SpecialFX;
 using KirboMod.Projectiles.Marx.GiantBlackHoleOfDoom;
 using KirboMod.Projectiles.Marx.IceBomb;
@@ -145,9 +147,17 @@ namespace KirboMod.NPCs.Marx
             {
                 NPC.dontTakeDamage = false;
             }
-            if (AttackTimer > HorizontalSplitStart + 3 + MarxBlackHole.SuckDuration + MarxBlackHole.ScaleUpDuration)
+            float endTime = HorizontalSplitStart + 3 + MarxBlackHole.SuckDuration + MarxBlackHole.ScaleUpDuration;
+            if (AttackTimer >= endTime)
             {
-                EndState(AttackType.DashFromBelow, Animation.ShadowHole);
+                if (AttackTimer == endTime)
+                {
+                    ChangeAnimation(Animation.TeleportIn);
+                }
+                if (AttackTimer > endTime + TotalTeleportInOutDuration / 2)
+                {
+                    EndState();
+                }
             }
 
         }
@@ -480,11 +490,11 @@ namespace KirboMod.NPCs.Marx
             // Define canonical comparison
             //Name comes from math:
             //"relating to a general rule or standard formula."
-            AttackType GetCanonicalType(AttackType type) =>
-                type == AttackType.DashFromBelow ? AttackType.TeleportFrenzy : type;
+            AttackType GetCanonicalType(AttackType type) => type;
+            // type == AttackType.DashFromBelow ? AttackType.TeleportFrenzy : type;
 
             // Fetch durations for each attack
-            GetAttackDurations(out float cutterDuration, out float iceBombDuration, out float blackHoleDuration, out float laserDuration, out float vineDuration, out _);
+            GetAttackDurations(out float cutterDuration, out float iceBombDuration, out float blackHoleDuration, out float laserDuration, out float vineDuration, out _, out float dashFromBelowDuration);
 
             Dictionary<AttackType, float> durations = new()
             {
@@ -493,8 +503,9 @@ namespace KirboMod.NPCs.Marx
                 { AttackType.MassiveLaser, laserDuration },
                 { AttackType.IceBomb, iceBombDuration },
                 { AttackType.Vine, vineDuration },
+                { AttackType.DashFromBelow, dashFromBelowDuration },
             };
-
+            //TODO: FIX DASH FROM BELOW??? LIKE FINISH MAKING IT A UNIQUE ATTACK
             // Exclude the last attack, using canonical type to treat some as equivalent
             AttackType lastCanonical = GetCanonicalType(lastattacktype);
 
@@ -531,9 +542,10 @@ namespace KirboMod.NPCs.Marx
                 }
             }
 
+
+            AttackTimer = 0;
             // Update lastattacktype based on canonical type
             lastattacktype = attacktype;
-            AttackTimer = 0;
             return;
 
             //old attack distribution code
@@ -563,10 +575,10 @@ namespace KirboMod.NPCs.Marx
             //attacktype = AttackType.Vine; //debug
             AttackTimer = 0;
         }
-        private void GetAttackDurations(out float cutterDuration, out float iceBombDuration, out float blackHoleDuration, out float laserDuration, out float vineDuration, out float sum)
+        private void GetAttackDurations(out float cutterDuration, out float iceBombDuration, out float blackHoleDuration, out float laserDuration, out float vineDuration, out float sum, out float dashFromBelowDuration)
         {
-            blackHoleDuration = DashFromBelowChaseDuration + DashFromBelowTelegraphDuration + DashFromBelowDashUpDuration;
-            blackHoleDuration += TeleportFrenzyTpCount * TeleportFrenzyTpRate;
+            dashFromBelowDuration = TotalTeleportInOutDuration + DashFromBelowChaseDuration + DashFromBelowTelegraphDuration + DashFromBelowDashUpDuration;
+            blackHoleDuration = TeleportFrenzyTpCount * TeleportFrenzyTpRate;
             blackHoleDuration += HorizontalSplitStart + 3 + MarxBlackHole.SuckDuration + MarxBlackHole.ScaleUpDuration;
 
             cutterDuration = CutterRoundDuration * CutterRounds - CutterExtraWaitAfterRound + CutterExtraWaitAfterAllRounds;
@@ -589,10 +601,18 @@ namespace KirboMod.NPCs.Marx
         }
         private void State_DashFromBelow()
         {
+            ///add teleport
             Player plr = Main.player[NPC.target];
+
+
+
+
             if (AttackTimer == 1)
             {
                 ChangeAnimation(Animation.ShadowHole);
+            }
+            if(AttackTimer - 1 == TotalTeleportInOutDuration / 2)
+            {
                 NPC.Center = plr.Center;
             }
             float chaseDuration = DashFromBelowChaseDuration;
@@ -601,17 +621,24 @@ namespace KirboMod.NPCs.Marx
             float dashUpSpeed = DashFromBelowDashUpSpeed;
             if (AttackTimer < chaseDuration)
             {
-
-                NPC.Center = Vector2.Lerp(NPC.Center, plr.Center, .05f);
+                if (AttackTimer - 1 >= TotalTeleportInOutDuration)
+                {
+                    NPC.Center = Vector2.Lerp(NPC.Center, plr.Center, .05f);
+                }
             }
             else if (AttackTimer < chaseDuration + riseTelegraphDuration)
             {
                 NPC.velocity = Vector2.Zero;
+                Vector2 shadowHolePos = SearchForShadowHolePosition();
+                if (AttackTimer == chaseDuration)
+                {
+                    SoundEngine.PlaySound(ShadowHoleStop, shadowHolePos);
+                }
                 for (int i = 0; i < 5; i++)
                 {
                     Vector2 pos = Main.rand.BetterNextVector2Circular(200);
                     pos.Y *= .5f;
-                    pos += SearchForShadowHolePosition();
+                    pos += shadowHolePos;
 
                     Dust d = Dust.NewDustPerfect(pos, DustID.Shadowflame);
                     d.noGravity = true;
@@ -624,6 +651,25 @@ namespace KirboMod.NPCs.Marx
                 if (AttackTimer == chaseDuration + riseTelegraphDuration)
                 {
                     NPC.Center = SearchForShadowHolePosition();
+                    SoundEngine.PlaySound(ShadowHoleDash, NPC.Center);
+                    float maxWidth = 250;
+                    float maxHeight = 50;
+                    int dustID = ModContent.DustType<MarxSparks>();
+                    for (int i = 0; i < 45; i++)
+                    {
+                        Vector2 offset = new(Main.rand.NextFloat(-maxWidth / 2, maxWidth / 2), -Main.rand.NextFloat(maxHeight));
+                        Vector2 vel = offset * .2f;
+                        vel += Main.rand.NextVector2Circular(5, 5);
+                        Dust.NewDustPerfect(NPC.Center + offset, dustID, vel, 0, Color.White, 1f);
+                    }
+                    dustID = ModContent.DustType<PurpleSmoke>();
+                    for (int i = 0; i < 10; i++)
+                    {
+                        Vector2 offset = new(Main.rand.NextFloat(-maxWidth / 2, maxWidth / 2), -Main.rand.NextFloat(maxHeight));
+                        Vector2 vel = offset * .2f;
+                        vel += Main.rand.NextVector2Circular(5, 5);
+                        Dust.NewDustPerfect(NPC.Center + offset, dustID, vel, 0, Color.Purple, 0.35f);
+                    }
                 }
                 NPC.velocity.Y = -dashUpSpeed;
                 NPC.velocity.X = 0;
@@ -720,7 +766,7 @@ namespace KirboMod.NPCs.Marx
         }
         void ChangeAnimation(Animation newAnimation)
         {
-            //set to -1 instead of 0 because timer increments before it is read
+            //set to -1  instead of 0 because timer increments before it is read
             NPC.frameCounter = -1;
             animation = newAnimation;
         }
@@ -734,8 +780,29 @@ namespace KirboMod.NPCs.Marx
 
             if (animation == Animation.ShadowHole)
             {
+                if (NPC.frameCounter == -1)
+                {
+                    SoundEngine.PlaySound(TpSFX, NPC.Center);
+                }
+                if (NPC.frame.Y < frameHeight * TeleportFrameStart)
+                {
+                    NPC.frameCounter = -1;
+                    NPC.frame.Y = frameHeight * TeleportFrameStart;
+                }
                 NPC.frameCounter++;
                 NPC.dontTakeDamage = true;
+                int frameIndex = (TeleportFrameStart + (int)NPC.frameCounter / TeleportFrameDuration);
+                //drawing code will check if frame Y is out of sheet bounds so it can actually draw the hole
+                //transitioning to this from the black hole will
+                //start the frame counter value from the one where the tp animation ends
+                //because marx already teleports away during the black hole attack
+                if (NPC.frameCounter / TeleportFrameDuration == TeleportFrameEnd - TeleportFrameStart)
+                {
+                    SoundEngine.PlaySound(ShadowHoleAppear, NPC.Center);
+                }
+                NPC.frame.Y = frameHeight * frameIndex;
+                //no need to change frame.Y because next part of code does that
+
             }
 
             if (animation == Animation.TeleportOut)

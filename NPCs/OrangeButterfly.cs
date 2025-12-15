@@ -20,7 +20,7 @@ namespace KirboMod.NPCs
 		public override void SetDefaults() {
 			NPC.width = 24;
 			NPC.height = 24;
-			NPC.defense = 0; 
+			NPC.defense = 86_555; 
             //underscore just for clarity (86 million HP)
 			NPC.lifeMax = 86_000_000;
 			NPC.damage = 0;

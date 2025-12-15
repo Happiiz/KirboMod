@@ -52,6 +52,7 @@ namespace KirboMod.Projectiles
                 if (npc.Hitbox.Intersects(Projectile.Hitbox) && npc.CanBeChasedBy()) //hitboxes touching
                 {
                     Projectile.Kill();
+                    return;
                 }
             }
 
@@ -64,6 +65,7 @@ namespace KirboMod.Projectiles
                 if (player.Hitbox.Intersects(Projectile.Hitbox) && player.InOpposingTeam(Main.player[Projectile.owner])) 
                 {
                     Projectile.Kill();
+                    return;
                 }
             }
             Dust dust = Dust.NewDustPerfect(Projectile.Center + (Projectile.rotation - MathF.PI / 2).ToRotationVector2() * 26, DustID.Torch);

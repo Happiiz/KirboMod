@@ -47,7 +47,11 @@ namespace KirboMod.NPCs.Marx
         MarxWingRenderer wingRenderer = new();
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            if (animation == Animation.ShadowHole)
+            Main.instance.LoadNPC(Type);
+            Texture2D texture = TextureAssets.Npc[Type].Value;
+            //check if frame value is out of bounds, because framing code intentionally sets it as out of bounds to know
+            //if it should be rendering the shadow hole
+            if (animation == Animation.ShadowHole && NPC.frame.Y >= texture.Height)
             {
                 //-2 because framecounter is effectively 2(?) frames delayed from attack timer
                 bool big = NPC.frameCounter > DashFromBelowChaseDuration - 2;
@@ -58,8 +62,6 @@ namespace KirboMod.NPCs.Marx
             MarxWingRenderer.Initialize();
             wingRenderer ??= new MarxWingRenderer();
             wingRenderer.Update();
-            Main.instance.LoadNPC(Type);
-            Texture2D texture = TextureAssets.Npc[Type].Value;
             Rectangle frame = NPC.frame;
             int frameHeight = texture.Height / Main.npcFrameCount[Type];
             int frameIndex = NPC.frame.Y / frameHeight;

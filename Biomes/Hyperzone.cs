@@ -8,6 +8,7 @@ namespace KirboMod.Biomes
 {
     public class Hyperzone : ModSceneEffect
     {
+        public const string BiomeName = "KirboMod:HyperZone";
         public override bool IsSceneEffectActive(Player player)
         {
             if (NPC.AnyNPCs(ModContent.NPCType<Zero>()) || NPC.AnyNPCs(ModContent.NPCType<ZeroEye>()) || NPC.AnyNPCs(ModContent.NPCType<PureDarkMatterRematch>()))
@@ -25,7 +26,7 @@ namespace KirboMod.Biomes
         }
         public override void SpecialVisuals(Player player, bool isActive)
         {
-            player.ManageSpecialBiomeVisuals("KirboMod:HyperZone", isActive, default);
+            player.ManageSpecialBiomeVisuals(BiomeName, isActive, default);
         }
     }
 }

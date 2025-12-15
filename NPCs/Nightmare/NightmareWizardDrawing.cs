@@ -15,13 +15,17 @@ namespace KirboMod.NPCs
         static Asset<Texture2D> palette1;
         static Asset<Texture2D> palette2;
         static Asset<Texture2D> bodyMap;
-        
+
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             TpEffectDraw();
-            shader ??= ModContent.Request<Effect>("KirboMod/NPCs/Nightmare/WizardShader", AssetRequestMode.ImmediateLoad);
-           
-            Texture2D texture = ModContent.Request<Texture2D>("KirboMod/NPCs/Nightmare/NightmareWizard_ForShader").Value;
+            if (shader == null)
+            {
+                InitializedTextures = false;
+                shader = ModContent.Request<Effect>("KirboMod/NPCs/Nightmare/WizardShader", AssetRequestMode.ImmediateLoad);
+            }
+
+            Texture2D texture = ModContent.Request<Texture2D>("KirboMod/NPCs/Nightmare/NightmareWizard").Value;
             Rectangle frame = NPC.frame;
             if (!InitializedTextures)
             {
@@ -30,7 +34,7 @@ namespace KirboMod.NPCs
                 perlinTexture ??= ModContent.Request<Texture2D>("KirboMod/NPCs/Nightmare/PerlinRGBA", AssetRequestMode.ImmediateLoad);
                 palette1 ??= ModContent.Request<Texture2D>("KirboMod/NPCs/Nightmare/BodyPalette1", AssetRequestMode.ImmediateLoad);
                 palette2 ??= ModContent.Request<Texture2D>("KirboMod/NPCs/Nightmare/BodyPalette2", AssetRequestMode.ImmediateLoad);
-                bodyMap ??= ModContent.Request<Texture2D>("KirboMod/NPCs/Nightmare/BodyMap",AssetRequestMode.ImmediateLoad);
+                bodyMap ??= ModContent.Request<Texture2D>("KirboMod/NPCs/Nightmare/BodyMap", AssetRequestMode.ImmediateLoad);
                 shader.Value.Parameters["capeTexture"].SetValue(starryTexture.Value);
                 shader.Value.Parameters["perlinTexture"].SetValue(perlinTexture.Value);
                 shader.Value.Parameters["randTexture"].SetValue(randTexture.Value);
@@ -52,7 +56,7 @@ namespace KirboMod.NPCs
             {
                 CullMode = CullMode.None,
                 ScissorTestEnable = true
-            } : rasterizerState;    
+            } : rasterizerState;
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, rasterizer, shader.Value, matrix);
             if (NPC.IsABestiaryIconDummy)

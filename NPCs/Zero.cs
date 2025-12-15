@@ -824,7 +824,7 @@ namespace KirboMod.NPCs
 
         public override bool PreKill()
         {
-            return !Main.expertMode;
+            return false;
         }
 
         private void DoDeathAnimation()
@@ -995,7 +995,6 @@ namespace KirboMod.NPCs
 
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-
             Texture2D zero = TextureAssets.Npc[Type].Value; //get the texture but actually
 
             //fade in stuff (fades in from black but it looks cool so I'm keeping it)
@@ -1034,25 +1033,35 @@ namespace KirboMod.NPCs
                 VFX.DrawPrettyStarSparkle(opacity, drawpos, Color.Black, Color.Black, 1, 0, .9f, 1.1f, 2, rotation, new Vector2(size) * 2, new Vector2(4 * scaleMult));
                 VFX.DrawPrettyStarSparkle(opacity, drawpos, new Color(255, 255, 255, 0), Color.Red, 1, 0, .9f, 1.1f, 2, rotation, new Vector2(size), new Vector2(2 * scaleMult));
             }
+            else if (attacktype == ZeroAttackType.BGOrbRings || attacktype == ZeroAttackType.BGOrbWindmill || attacktype == ZeroAttackType.BGOrbCross)
+            {
+                if (NPC.ai[0] < AttackCooldown)
+                {
+                    return false;
+                }
+                Color outerColor = attacktype switch
+                {
+                    ZeroAttackType.BGOrbWindmill => Color.Blue,
+                    ZeroAttackType.BGOrbRings => Color.Green,
+                    _ => Color.Yellow,
+                };
+                float progress = Utils.GetLerpValue(0, 240, NPC.ai[0]);
+                float size = Easings.EaseOut(progress, 3) * 5 + 1;
+                size *= scaleMult;
+                float opacity = Easings.RemapProgress(0, 10, 300, 310, NPC.ai[0]);
+                Vector2 drawpos = center + new Vector2(NPC.direction * 135, 2) * scaleMult;
+                float rotation = Easings.InOutCirc(progress) * MathF.Tau * 6;
+
+                VFX.DrawPrettyStarSparkle(opacity, drawpos, outerColor, outerColor, 1, 0, .9f, 1.1f, 2, rotation, new Vector2(size) * 2, new Vector2(4 * scaleMult));
+                VFX.DrawPrettyStarSparkle(opacity, drawpos, new Color(255, 255, 255, 0), Color.Black, 1, 0, .9f, 1.1f, 2, rotation, new Vector2(size), new Vector2(2 * scaleMult));
+            }
             return false;
         }
         float GetScaleFor3D()
         {
-            return GetScaleFor3D(zPos);
+            return Draw3D.GetScaleFor3D(zPos);
         }
-        public static float GetScaleFor3D(float zPos)
-        {
-            //lower camera pos = smaller
-            //higher z pos = smaller
-            float safeDivisor = zPos / 16f + 1f;
 
-            if (safeDivisor <= 0f || float.IsNaN(safeDivisor))
-            {
-                return 0f;
-            }
-            float scale = 1f / safeDivisor;
-            return scale;
-        }
         private Rectangle Animation() //make the dimensions for the frames
         {
             //inital

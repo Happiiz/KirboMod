@@ -1,4 +1,5 @@
 using KirboMod.NPCs;
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -18,14 +19,14 @@ namespace KirboMod.Projectiles
         }
         public override void SetDefaults()
         {
-            Projectile.width = 30;
-            Projectile.height = 30;
+            Projectile.width = 60;
+            Projectile.height = 60;
             Projectile.friendly = false;
             //Projectile.hostile = true;//dont deal damage
             Projectile.tileCollide = false;
             Projectile.penetrate = 1;
             Projectile.hide = true;
-            Projectile.scale = 2;
+            Projectile.scale = 1.2f;
         }
         public ref float ZPos => ref Projectile.ai[2];
         public ref float MaxZPos => ref Projectile.localAI[2];
@@ -94,7 +95,7 @@ namespace KirboMod.Projectiles
             Vector2 screenCenter = Main.screenPosition;
             screenCenter.X += Main.screenWidth / 2;
             screenCenter.Y += Main.screenHeight / 2;
-            float scaleMult = Zero.GetScaleFor3D(ZPos);
+            float scaleMult = Draw3D.GetScaleFor3D(ZPos);
             drawPos = Vector2.Lerp(screenCenter, drawPos, scaleMult);
             drawPos -= Main.screenPosition;
             Main.EntitySpriteDraw(tex, drawPos, null, Color.White, Projectile.rotation, origin, Projectile.scale * scaleMult, Projectile.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);

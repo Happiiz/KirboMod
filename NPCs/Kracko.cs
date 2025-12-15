@@ -4,6 +4,7 @@ using KirboMod.Projectiles.KrackoBgOrbBig;
 using KirboMod.Projectiles.KrackoBGOrbSmall;
 using KirboMod.Projectiles.KrackoCloud;
 using KirboMod.Projectiles.Lightnings;
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -675,7 +676,7 @@ namespace KirboMod.NPCs
         }
         float GetScaleFor3D()
         {
-            return GetScaleFor3D(zPos);
+            return Draw3D.GetScaleFor3D(zPos);
         }
         public static float GetScaleFor3D(float zPos)
         {

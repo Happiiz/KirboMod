@@ -1,4 +1,5 @@
 ﻿using KirboMod.NPCs;
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -107,7 +108,7 @@ namespace KirboMod.Projectiles.KrackoBgOrbBig
         float GetScaleFor3D(int timeOffset)
         {
             float zPos = Helper.Remap(Timer - ScaleupDuration - StayStillDuration + timeOffset, 0, TravelDuration, Kracko.TargetZPosForBGAttacks, 0f);
-            return Kracko.GetScaleFor3D(zPos);
+            return Draw3D.GetScaleFor3D(zPos);
         }
         public override bool PreDraw(ref Color lightColor)
         {

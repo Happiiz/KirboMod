@@ -57,7 +57,7 @@ namespace KirboMod.NPCs
             orbShader.Value.Parameters["rotationAmount"].SetValue(1.5f * Main.GlobalTimeWrappedHourly);
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, orbShader.Value, matrix);
-            spriteBatch.Draw(orbMask.Value, NPC.Center - screenPos, null, Color.White, NPC.rotation, orbMask.Size() / 2, 1, SpriteEffects.FlipHorizontally, 0);
+            spriteBatch.Draw(orbMask.Value, NPC.Center - screenPos, null, Color.White, NPC.rotation, orbMask.Size() / 2, NPC.scale, SpriteEffects.FlipHorizontally, 0);
 
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, sampler, DepthStencilState.None, Main.Rasterizer, null, matrix);

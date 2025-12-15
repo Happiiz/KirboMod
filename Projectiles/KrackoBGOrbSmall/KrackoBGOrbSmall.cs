@@ -7,6 +7,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria;
 using Microsoft.Xna.Framework;
+using KirboMod.Systems;
 
 namespace KirboMod.Projectiles.KrackoBGOrbSmall
 {
@@ -97,7 +98,7 @@ namespace KirboMod.Projectiles.KrackoBGOrbSmall
         float GetScaleFor3D(int timeOffset)
         {
             float zPos = Helper.Remap(Timer - ScaleupDuration - StayStillDuration + timeOffset, 0, TravelDuration, Kracko.TargetZPosForBGAttacks, 0f);
-            return Kracko.GetScaleFor3D(zPos);
+            return Draw3D.GetScaleFor3D(zPos);
         }
         public override bool PreDraw(ref Color lightColor)
         {

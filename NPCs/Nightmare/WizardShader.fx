@@ -139,14 +139,32 @@ float4 wizardShader(float4 color : COLOR0, float2 coords : TEXCOORD0) : COLOR0
 {
     //pixelate
     //coords.x *= frameSize.x;
-    //coords.y *= frameSize.y;
+    //coords.y *= frameSize.y * 25;
     //coords = ceil(coords);
     //coords.x /= frameSize.x;
-    //coords.y /= frameSize.y; 
+    //coords.y /= frameSize.y * 25; 
     //end of pixelation
     float4 currentCol = tex2D(uImage0, coords);
-    
-    if (currentCol.g == 1 && currentCol.b == 1 && currentCol.r == 0)
+    float2 randOffsetCoords = coords;
+    float2 coordsForRand = coords;
+    coordsForRand.y *= 10;
+    coordsForRand.x /= 10;
+    float4 randWithTime = random(coordsForRand + 2 + time * 0.1);
+    randOffsetCoords.x += (randWithTime.z - .5) * 0.2;
+    randOffsetCoords.y += (randWithTime.g) * 0.1 * (1.0 / 25.0);
+    float3 bodyColor = float3(0, 1, 1);
+    float3 backColor = float3(0, 1, 0);
+    float4 offsetColor = tex2D(uImage0, randOffsetCoords);
+    bool currIsBodyColor = distance(currentCol.rgb, bodyColor) == 0;
+    bool overrideableColor = currIsBodyColor || distance(currentCol.rgb, backColor) == 0 || currentCol.a == 0;
+    //if a back or body color, can offset 
+    if (overrideableColor && (distance(offsetColor.rgb, bodyColor) == 0 || currIsBodyColor))
+    {
+        coords = randOffsetCoords;
+        currentCol = tex2D(uImage0, coords);
+
+    }
+    if (currentCol.r == 0 && currentCol.g == 1 && currentCol.b == 1)
     {
         float2 origCoords = coords;
         coords.x *= frameSize.x / 2;
@@ -155,7 +173,6 @@ float4 wizardShader(float4 color : COLOR0, float2 coords : TEXCOORD0) : COLOR0
         coords = ceil(coords);
         coords.x /= frameSize.x / 2;
         coords.y /= frameSize.y / 2;
-        float4 randWithTime = random(coords.xy + 2 + time * 0.1);
         float body = tex2D(bodyMap, coords);
         if (body > .5)
         {
@@ -163,7 +180,7 @@ float4 wizardShader(float4 color : COLOR0, float2 coords : TEXCOORD0) : COLOR0
         }
         return deathFade(origCoords, tex2D(palette2, float2(time / 4, 0))); //4 is length of palette
     }
-    else if (currentCol.r == 0 && currentCol.g == 0 && currentCol.b == 0 && currentCol.a == 1)
+    else if (currentCol.r == backColor.r && currentCol.g == backColor.g && currentCol.b == backColor.b)
     {
         float2 origCoords = coords;
         coords.x += time * 0.02;
@@ -197,7 +214,7 @@ float4 wizardShader(float4 color : COLOR0, float2 coords : TEXCOORD0) : COLOR0
         float4 black = 0;
       
         //noiseSample = noiseSample * noiseSample * noiseSample;
-        float4 finalCol =  lerp(black, blue, noiseSample);
+        float4 finalCol = lerp(black, blue, noiseSample);
         finalCol.xyz *= 0.6;
         return deathFade(origCoords, finalCol);
         //coords.x += time;
@@ -234,9 +251,9 @@ float4 wizardShader(float4 color : COLOR0, float2 coords : TEXCOORD0) : COLOR0
         noiseSample %= 1;
         //noiseSample = sqrt(noiseSample);
         //noiseSample = abs(frac((noiseSample - 1) / (2)) * 2.0 - 1);
-        float4 purple = float4(89.0/255.0, 0, 103.0/255.0, 1); // float4(89.0 / 255.0, 0, 103.0 / 255.0, 0);
+        float4 purple = float4(89.0 / 255.0, 0, 103.0 / 255.0, 1); // float4(89.0 / 255.0, 0, 103.0 / 255.0, 0);
         float4 brightBlue = float4(0.0, 0.0, 0.6, 1.0);
-        float4 blue = float4(0, 16.0/255.0, 103.0/255.0, 1); //float4(0, 16.0/255.0, 103.0 / 255.0, 0);
+        float4 blue = float4(0, 16.0 / 255.0, 103.0 / 255.0, 1); //float4(0, 16.0/255.0, 103.0 / 255.0, 0);
         float4 black = float4(0, 0, 0, 1);
         //noiseSample = noiseSample * noiseSample * noiseSample;
         return deathFade(origCoords, lerp(black, blue, noiseSample));

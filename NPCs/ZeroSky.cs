@@ -1,3 +1,4 @@
+using KirboMod.Biomes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -163,6 +164,19 @@ namespace KirboMod.NPCs
         {
             return isActive;
         }
+        public override void OnLoad()
+        {
+            On_Main.SetBackColor += On_Main_SetBackColor;
+        }
 
+        private void On_Main_SetBackColor(On_Main.orig_SetBackColor orig, Main.InfoToSetBackColor info, out Color sunColor, out Color moonColor)
+        {
+            orig(info, out sunColor, out moonColor);
+            //make it so the night doesn't make hyper zone effect look like an ugly dark blue from the transparency + dark night background
+            if (SkyManager.Instance[Hyperzone.BiomeName].IsActive())
+            {
+                Main.ColorOfTheSkies = Color.White;
+            }
+        }
     }
 }

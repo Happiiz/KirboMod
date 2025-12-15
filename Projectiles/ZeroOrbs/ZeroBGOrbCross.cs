@@ -1,4 +1,5 @@
 ﻿using KirboMod.NPCs;
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -55,7 +56,7 @@ namespace KirboMod.Projectiles.ZeroOrbs
             Timer++;
             float lastWaveTimer = Timer - SpawnCount * SpawnRate;
             float lastWaveZPos = GetZPos(lastWaveTimer, TimeToReach, StartingZPos);
-            float scale = Zero.GetScaleFor3D(lastWaveZPos);
+            float scale = Draw3D.GetScaleFor3D(lastWaveZPos);
             if (scale < float.Epsilon)
             {
                 Projectile.Kill();
@@ -179,7 +180,7 @@ namespace KirboMod.Projectiles.ZeroOrbs
                 //tomar remedio dps
                 Vector2[] orbPositions = GetOrbPositions(center, timer, StartingZPos, TimeToReach, Projectile.rotation + RotationOffset);
                 float zPos = GetZPos(timer, TimeToReach, StartingZPos);
-                float scale3D = Zero.GetScaleFor3D(zPos);
+                float scale3D = Draw3D.GetScaleFor3D(zPos);
                 if ((scale3D < 1 && CurrentDrawPassIsBehindNPCsAndTiles) || (scale3D >= 1 && CurrentDrawPassIsOverPlayers))
                 {
                     for (int j = 0; j < orbPositions.Length; j++)

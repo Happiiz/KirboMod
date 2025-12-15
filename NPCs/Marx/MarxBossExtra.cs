@@ -1,4 +1,5 @@
 using KirboMod.Bestiary;
+using KirboMod.Dusts.MarxSparks;
 using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using System;
@@ -92,6 +93,7 @@ namespace KirboMod.NPCs.Marx
             }
             MarxWingRenderer.Initialize();
             wingRenderer = new();
+            MarxSparks.LoadTextureIfNeeded();
         }
 
         public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)
