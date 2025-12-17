@@ -27,6 +27,7 @@ namespace KirboMod.NPCs
         public override void SetDefaults()
         {
             Projectile.tileCollide = false;
+            Projectile.hide = true;
         }
 
         public override void OnSpawn(IEntitySource source)

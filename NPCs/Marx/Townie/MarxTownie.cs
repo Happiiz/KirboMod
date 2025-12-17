@@ -265,7 +265,7 @@ namespace KirboMod.NPCs.Marx.Townie
 			{
                 GetHint();
 
-                if (hint > 15)  //restart if too high
+                if (hint > 16)  //restart if too high
                 {
                     hint = -1;
                     GetHint(); //try again
@@ -354,30 +354,34 @@ namespace KirboMod.NPCs.Marx.Townie
                         }
                         else if (hint == 12)
                         {
-                            if (!DownedBossSystem.downedMarxBoss)
-                                chosenText = Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Help.HMarx");
+                            if (!DownedBossSystem.downedDarkMatterBoss)
+                                chosenText = Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Help.HDarkMatter");
                             else
                                 hint++;
                         }
+                        else if (hint == 13)
+                        {
+                            chosenText = Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Help.HRainbowSword");
+                        }
                         else if (NPC.downedGolemBoss)
                         {
-                            if (hint == 13)
+                            if (hint == 14)
                             {
-                                if (!DownedBossSystem.downedDarkMatterBoss)
-                                    chosenText = Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Help.HDarkMatter");
+                                if (!DownedBossSystem.downedMarxBoss)
+                                    chosenText = Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Help.HMarx");
                                 else
                                     hint++;
                             }
                             else if (NPC.downedMoonlord)
                             {
-                                if (hint == 14)
+                                if (hint == 15)
                                 {
                                     if (!DownedBossSystem.downedZeroBoss)
                                         chosenText = Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Help.HZero");
                                     else
                                         hint++;
                                 }
-                                else if (hint == 15)
+                                else if (hint == 16)
                                 {
                                     chosenText = Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Help.HPostZero");
                                 }

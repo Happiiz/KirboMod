@@ -94,43 +94,21 @@ namespace KirboMod.NPCs
 
 			NPC.ai[0]++;
 
-            if (NPC.velocity.Y == 0) //not flying
-            {
-				NPC.ai[0] = 0; //reset
-            }
-
             //float
             if (NPC.ai[0] < 60)
             {
-				NPC.velocity.Y = -1f; //rise up initally
-
-				NPC.velocity.X *= 0.01f;
+				NPC.velocity.Y = -1.2f; //rise up initally
             }
             else
 			{
-                NPC.velocity.Y = (float)Math.Sin(NPC.position.X / 20) * 2;
-				
-                //movement
-                float speed = 1f;
-                float inertia = 20f;
-
-                Vector2 moveTo = NPC.Center + new Vector2(NPC.direction * 200, 0);
-                Vector2 direction = moveTo - NPC.Center; //start - end
-                direction.Normalize();
-                direction *= speed;
-                NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
-
+                NPC.velocity.Y = NPC.Center.Y + MathF.Sin(MathF.Tau / 60 * (NPC.ai[0] - 60)) * 2 - NPC.Center.Y;
 
                 //switching directions
-                Point tileNPCIsOn = NPC.Center.ToTileCoordinates();
-                Tile frontOfNPC = Main.tile[tileNPCIsOn.X + NPC.direction, tileNPCIsOn.Y];
-
-                //tile in front of npc
-                if (WorldGen.SolidOrSlopedTile(frontOfNPC))
+                if (NPC.collideX)
                 {
                     NPC.ai[1]++;
 
-                    if (NPC.ai[1] >= 120)
+                    if (NPC.ai[1] >= 60)
                     {
                         NPC.direction *= -1; //reverse direction
                         NPC.ai[1] = 0;
@@ -141,9 +119,19 @@ namespace KirboMod.NPCs
                     NPC.ai[1] = 0;
                 }
             }
-		}
 
-		private void CheckPlatform() //trust me this is totally unique and original code and definitely not stolen from Spirit Mod's public source code(thx so much btw you don't know the hell I went through with this)
+            //movement
+            float speed = 1f;
+            float inertia = 20f;
+
+            Vector2 moveTo = NPC.Center + new Vector2(NPC.direction * 200, 0);
+            Vector2 direction = moveTo - NPC.Center; //start - end
+            direction.Normalize();
+            direction *= speed;
+            NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
+        }
+
+        private void CheckPlatform() //trust me this is totally unique and original code and definitely not stolen from Spirit Mod's public source code(thx so much btw you don't know the hell I went through with this)
 		{
 			bool onplatform = true;
 			for (int i = (int)NPC.position.X; i < NPC.position.X + NPC.width; i += NPC.width / 4)

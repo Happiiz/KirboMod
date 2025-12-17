@@ -145,11 +145,11 @@ namespace KirboMod.NPCs.DarkMatter
                 {
                     if (phase == 3)
                     {
-                        EnrageOrbs();
+                        EnrageOrbs(NPC.ai[0] - 30); //uses a parameter for a timer since it doesn't account for the 30 tick downtime
                     }
                     else
                     {
-                        AttackOrbs();
+                        AttackOrbs(NPC.ai[0] - 30); //uses a parameter for a timer since it doesn't account for the 30 tick downtime
                     }
                 }
             }
@@ -315,7 +315,7 @@ namespace KirboMod.NPCs.DarkMatter
                 }
             }
         }
-        void AttackOrbs()
+        void AttackOrbs(float timer)
         {
             Player player = Main.player[NPC.target];
             NPC.TargetClosest();
@@ -323,11 +323,11 @@ namespace KirboMod.NPCs.DarkMatter
 
             NPC.velocity *= 0.9f; //slow
 
-            if (NPC.ai[0] < 20)
+            if (timer < 20)
             {
                 NPC.alpha += 30; //lemme be clear
             }
-            else if (NPC.ai[0] == 20)
+            else if (timer == 20)
             {
                 playerTargetArea = player.Center; //set dash target 
 
@@ -344,7 +344,7 @@ namespace KirboMod.NPCs.DarkMatter
             }
 
 
-            if (NPC.ai[0] > 20)
+            if (timer > 20)
             {
                 NPC.alpha -= 30;
             }
@@ -354,7 +354,7 @@ namespace KirboMod.NPCs.DarkMatter
             //normal mode above half
             if (phase == 1)
             {
-                if (NPC.ai[0] == shootingStart) //shoot
+                if (timer == shootingStart) //shoot
                 {
                     Vector2 Yoffset = new(0, -150);
 
@@ -365,7 +365,7 @@ namespace KirboMod.NPCs.DarkMatter
                     PlayBallChargeSoundEffect(NPC.Center + Yoffset);
                 }
 
-                if (NPC.ai[0] > shootingStart + extraWaitTime)
+                if (timer > shootingStart + extraWaitTime)
                 {
                     NPC.alpha = 0;
                     NPC.ai[0] = 0;
@@ -374,9 +374,9 @@ namespace KirboMod.NPCs.DarkMatter
             //normal mode below half or expert mode above half
             else
             {
-                if (NPC.ai[0] >= shootingStart && NPC.ai[0] <= shootingStart + p2ShootingDuration) //shoot
+                if (timer >= shootingStart && timer <= shootingStart + p2ShootingDuration) //shoot
                 {
-                    if (NPC.ai[0] % 30 == 0) //shoot
+                    if (timer % 30 == 0) //shoot
                     {
                         Vector2 Yoffset = new(0, -170);
                         if (Main.netMode != NetmodeID.MultiplayerClient)
@@ -530,7 +530,7 @@ namespace KirboMod.NPCs.DarkMatter
                 NPC.ai[0] = 0; //restart
             }
         }
-        void EnrageOrbs()
+        void EnrageOrbs(float timer)
         {
             NPC.TargetClosest();
             Player player = Main.player[NPC.target];
@@ -542,18 +542,18 @@ namespace KirboMod.NPCs.DarkMatter
             float orbShootCount = 9;
             float orbShootStartTime = 70;
             float extraWait = 40;
-            if (NPC.ai[0] < tpTime)
+            if (timer < tpTime)
             {
                 NPC.alpha += 30; //lemme be clear
             }
-            else if (NPC.ai[0] < orbShootStartTime)
+            else if (timer < orbShootStartTime)
             {
                 //teleport to left side of the player
                 NPC.Center = player.Center + new Vector2(500, 0);
             }
-            if (NPC.ai[0] >= orbShootStartTime && NPC.ai[0] <= orbShootStartTime + orbShootCount * orbShootRate) //shoot
+            if (timer >= orbShootStartTime && timer <= orbShootStartTime + orbShootCount * orbShootRate) //shoot
             {
-                if ((NPC.ai[0] - orbShootStartTime) % orbShootRate == 0) //shoot
+                if ((timer - orbShootStartTime) % orbShootRate == 0) //shoot
                 {
 
                     Vector2 Yoffset = new(0, -150);
@@ -564,17 +564,17 @@ namespace KirboMod.NPCs.DarkMatter
                     PlayBallChargeSoundEffect(NPC.Center + Yoffset);
                 }
                 //spin around player
-                NPC.Center = player.Center + new Vector2(MathF.Cos((NPC.ai[0] - orbShootStartTime) / 30) * 500, MathF.Sin((NPC.ai[0] - orbShootStartTime) / 30) * 500);
+                NPC.Center = player.Center + new Vector2(MathF.Cos((timer - orbShootStartTime) / 30) * 500, MathF.Sin((timer - orbShootStartTime) / 30) * 500);
             }
 
             playerTargetArea = player.Center; //set dash target 
 
-            if (NPC.ai[0] > tpTime)
+            if (timer > tpTime)
             {
                 NPC.alpha -= 30;
             }
 
-            if (NPC.ai[0] > orbShootStartTime + orbShootCount * orbShootRate + extraWait)
+            if (timer > orbShootStartTime + orbShootCount * orbShootRate + extraWait)
             {
                 NPC.alpha = 0;
                 NPC.ai[0] = 0;

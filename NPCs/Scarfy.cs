@@ -81,9 +81,9 @@ namespace KirboMod.NPCs
         }
         public override void AI() //constantly cycles each time
         {
+            NPC.TargetClosest(false);
             if (NPC.localAI[0] == 0)
             {
-                NPC.TargetClosest();
                 if (NPC.HasValidTarget)
                 {
                     NPC.direction = MathF.Sign(Main.player[NPC.target].Center.X - NPC.Center.X);
@@ -95,6 +95,7 @@ namespace KirboMod.NPCs
                 }
                 NPC.localAI[0] = 1;
             }
+            NPC.spriteDirection = NPC.direction;
             CheckPlatform();
 
             if (Angry == false) //if neutral
@@ -102,43 +103,20 @@ namespace KirboMod.NPCs
                 //float
                 NPC.ai[0]++;
 
-                if (NPC.velocity.Y == 0) //not flying
-                {
-                    NPC.ai[0] = 0; //reset
-                }
-
-                //float
                 if (NPC.ai[0] < 60)
                 {
-                    NPC.velocity.Y = -1f; //rise up initally
-
-                    NPC.velocity.X *= 0.01f;
+                    NPC.velocity.Y = -1.2f; //rise up initally
                 }
                 else
                 {
-                    NPC.velocity.Y = (float)Math.Sin(NPC.position.X / 20) * 2;
-
-                    //movement
-                    float speed = 1f;
-                    float inertia = 20f;
-
-                    Vector2 moveTo = NPC.Center + new Vector2(NPC.direction * 200, 0);
-                    Vector2 direction = moveTo - NPC.Center; //start - end
-                    direction.Normalize();
-                    direction *= speed;
-                    NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
-
+                    NPC.velocity.Y = NPC.Center.Y + MathF.Sin(MathF.Tau / 60 * (NPC.ai[0] - 60)) * 2 - NPC.Center.Y;
 
                     //switching directions
-                    Point tileNPCIsOn = NPC.Center.ToTileCoordinates();
-                    Tile frontOfNPC = Main.tile[tileNPCIsOn.X + NPC.direction, tileNPCIsOn.Y];
-
-                    //tile in front of npc
-                    if (WorldGen.SolidOrSlopedTile(frontOfNPC))
+                    if (NPC.collideX)
                     {
                         NPC.ai[1]++;
 
-                        if (NPC.ai[1] >= 120)
+                        if (NPC.ai[1] >= 60)
                         {
                             NPC.direction *= -1; //reverse direction
                             NPC.ai[1] = 0;
@@ -150,11 +128,16 @@ namespace KirboMod.NPCs
                     }
                 }
 
-                if (NPC.life < NPC.lifeMax) //not at max health
-                {
-                    Angry = true;
-                    NPC.ai[0] = 0;
-                }
+                //movement
+                float speed = 1f;
+                float inertia = 20f;
+
+                Vector2 moveTo = NPC.Center + new Vector2(NPC.direction * 200, 0);
+                Vector2 direction = moveTo - NPC.Center; //start - end
+                direction.Normalize();
+                direction *= speed;
+                NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
+
             }
             else //angry
             {
@@ -167,6 +150,10 @@ namespace KirboMod.NPCs
                     {
                         NPC.TargetClosest(true); //face perpetrator for one tick
                     }
+                    else
+                    {
+                        NPC.TargetClosest(false);
+                    }
 
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
@@ -177,7 +164,7 @@ namespace KirboMod.NPCs
                 }
                 else
                 {
-                    NPC.TargetClosest();
+                    NPC.TargetClosest(true);
                     Player player = Main.player[NPC.target];
                     if (player.Hitbox.Intersects(NPC.Hitbox))
                     {

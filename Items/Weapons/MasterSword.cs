@@ -151,7 +151,7 @@ namespace KirboMod.Items.Weapons
                 {
                     dash = Main.MouseWorld - player.Center;
                     dash.Normalize(); //reduce to a unit of 1
-                    dash *= 48; //make a speed of 48
+                    dash *= 36; //make a speed of 36
                     player.velocity = dash;
 
                     player.immuneTime = player.itemAnimationMax / 2; //for invincibility timer

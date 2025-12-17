@@ -1,5 +1,6 @@
 using KirboMod.NPCs;
 using KirboMod.NPCs.DarkMatter;
+using KirboMod.NPCs.Marx;
 using KirboMod.NPCs.NewWhispy;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -164,10 +165,9 @@ namespace KirboMod.Systems
             //NIGHTMARE
 
             var nightmarePortrait = (SpriteBatch sb, Rectangle rect, Color color) => {
-                Texture2D texture = ModContent.Request<Texture2D>("KirboMod/NPCs/Nightmare/NightmareOrb").Value;
+                Texture2D texture = ModContent.Request<Texture2D>("KirboMod/NPCs/BestiaryTextures/NightmareWizardBossChecklistPortrait").Value;
                 Vector2 centered = new Vector2(rect.X + (rect.Width / 2), rect.Y + (rect.Height / 2));
-                Rectangle frame = new(0, 0, texture.Width, texture.Height / 4);
-                sb.Draw(texture, centered, frame, color, 0, frame.Size() / 2, 1f, SpriteEffects.None, 0);
+                sb.Draw(texture, centered, null, color, 0, texture.Size() / 2, 1f, SpriteEffects.None, 0);
             };
 
             List<int> nightmareCollectibles = new List<int>()
@@ -215,7 +215,7 @@ namespace KirboMod.Systems
                 "LogBoss",
                 Mod,
                 nameof(PureDarkMatter),
-                13.8f, //before Duke Fishron
+                12.5f, //before Golem
                 () => DownedBossSystem.downedDarkMatterBoss,
                 ModContent.NPCType<DarkMatter>(),
                 new Dictionary<string, object>()
@@ -227,6 +227,42 @@ namespace KirboMod.Systems
                 }
             );
 
+
+            //MARX
+
+            var marxPortrait = (SpriteBatch sb, Rectangle rect, Color color) => {
+                Texture2D texture = ModContent.Request<Texture2D>("KirboMod/NPCs/BestiaryTextures/MarxBossChecklistPortrait").Value;
+                Vector2 centered = new Vector2(rect.X + (rect.Width / 2), rect.Y + (rect.Height / 2));
+                sb.Draw(texture, centered, null, color, 0, texture.Size() / 2, 0.6f, SpriteEffects.None, 0);
+            };
+
+            List<int> marxCollectibles = new List<int>()
+            {
+                ModContent.ItemType<Items.Placeables.BossRelics.MarxRelicItem>(),
+                ModContent.ItemType<Items.Marx.MarxPetItem>(),
+                ModContent.ItemType<Items.Marx.MarxTrophy>(),
+                ModContent.ItemType<Items.Marx.MarxMask>()
+            };
+
+            summonItem = ModContent.ItemType<Items.SparklingSoul>();
+
+            bossChecklistMod.Call(
+                "LogBoss",
+                Mod,
+                nameof(MarxBoss),
+                13.6f, //before Martian Madness
+                () => DownedBossSystem.downedMarxBoss,
+                ModContent.NPCType<MarxBoss>(),
+                new Dictionary<string, object>()
+                {
+                    ["spawnInfo"] = Language.GetText($"Mods.KirboMod.ProgressionDescription.Marx").WithFormatArgs(summonItem),
+                    ["spawnItems"] = ModContent.ItemType<Items.SparklingSoul>(),
+                    ["despawnMessage"] = Language.GetText("Mods.KirboMod.DespawnMessage.Marx"),
+                    ["collectibles"] = marxCollectibles,
+                    ["customPortrait"] = marxPortrait,
+                    ["availability"] = () => DownedBossSystem.downedMarxBoss,
+                }
+            );
 
             //ZERO
 

@@ -13,11 +13,12 @@ Mods: {
 		}
 
 		ProgressionDescription: {
-			Whispy: Place down a [i:{0}] and right click it.
+			Whispy: Place down a [i:{0}] and right click it in a large, flat area.
 			Kracko: Kill a naturally spawning Kracko Jr. or use a [i:{0}] to summon one.
 			Dedede: Use a [i:{0}].
 			Nightmare: Use a [i:{0}] at a Fountain of Dreams during night.
 			DarkMatter: Use a [i:{0}].
+			Marx: Use a [i:{0}].
 			Zero: Use a [i:{0}] and prepare for what comes next.
 		}
 
@@ -27,6 +28,7 @@ Mods: {
 			Dedede: The King gives up the chase...
 			Nightmare: The nightmare has passed...
 			DarkMatter: It slips back into the shadows...
+			Marx: This is getting boring! I'll conquer the world another time...
 			Zero: The darkness clears...
 		}
 
@@ -2217,9 +2219,10 @@ Mods: {
 					HEvoWeapons: With rare stones, you could upgrade some weapons to a fuller potential! Though these recipes aren't cheap, you seem like a skilled blacksmith!
 					HNightmare: The Fountain of Dreams was an interesting landmark of our world. I wonder if you could recreate it with this world's materials. It would even be fun if we could attract another... what? I wasn't saying anything!
 					HHeartMatter: Love is something I find quite icky, but those burning wishes, dreams, and that energy of life can be channeled into a powerful resource to be used!
-					HMarx: I've appreciated your help thus far, but now I have something to ask of you: an awful evil slowly descends upon this world, but I figured out that if we use the power of the spirits of light and dark of this world with the care and compassion of our world, then we could influence the released souls to fight back against the enemy! Whaddya say?
 					HDarkMatter: There existed a terrible force in our world, but it has mostly since been wiped out. I wonder if this world contains its own dark forces. Try attracting them using some dark, nightmarish stuff! It should be interesting...
-					HZero: Ever since the darkness has been wiped away, our world hasn't had as many omnipresent adversaries... but with these alien materials, a ritual to resurect the heart of the darkness might be possible... That's a final battle I'd want to see!
+					HRainbowSword: Hey! You've heard about a legend of a prismatic sword of light that can thwart all darkness forged with all the colors of the world? Ridiculous, I know!
+					HMarx: I've appreciated your help thus far, but now I have something to ask of you: an awful evil slowly descends upon this world, but I figured out that if we use the power of the spirits of light and dark of this world with the care and compassion of our world, then we could influence the released souls to fight back against the enemy! Whaddya say?
+					HZero: Ever since the darkness has been wiped away, our world hasn't had as many dominant threats... but with those bars of evil alien origins, a ritual to resurect the very core of the darkness might be possible... Now THAT's a final battle I'd want to see!
 					HPostZero: ...What? I don't have anything else to tell you. Friends are only useful for so long.
 				}
 
