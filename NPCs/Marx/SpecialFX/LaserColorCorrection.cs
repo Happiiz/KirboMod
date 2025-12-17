@@ -24,6 +24,12 @@ namespace KirboMod.NPCs.Marx.SpecialFX
             Filters.Scene[FilterName] = new Filter(new ScreenShaderData(effect, "SplitPass"), EffectPriority.Medium);
             Filters.Scene[FilterName].Load();
         }
+        public static void CallOnWorldLoad()
+        {
+            deactivated = true;
+            time = -1;
+            Filters.Scene.Deactivate(FilterName);
+        }
         public static void ActivateScreenSaturation(float duration, bool includeFadeDuration = true)
         {
             deactivated = false;
@@ -60,6 +66,10 @@ namespace KirboMod.NPCs.Marx.SpecialFX
     }
     public class LaserColorCorrectionUpdateSystem : ModSystem
     {
+        public override void OnWorldLoad()
+        {
+            LaserColorCorrection.CallOnWorldLoad();
+        }
         public override void Load()
         {
             LaserColorCorrection.CallOnLoad();
