@@ -28,7 +28,7 @@ Mods: {
 			Dedede: The King gives up the chase...
 			Nightmare: The nightmare has passed...
 			DarkMatter: It slips back into the shadows...
-			Marx: This is getting boring! I'll conquer the world another time...
+			Marx: I'm hungry! I'll conquer the world another time...
 			Zero: The darkness clears...
 		}
 
@@ -1514,6 +1514,7 @@ Mods: {
 				DisplayName: Sparkling Soul
 				Tooltip: A star-shaped heart fused by the spirits to control the spirits
 				Summon: Summons Marx
+				Notice: Marx won't move back into town until he is defeated
 			}
 
 			BeamAbilityHat: {
@@ -2259,6 +2260,7 @@ Mods: {
 					1Stranger: You thought I wouldn't notice you trying to obtain this?
 					2Stranger: Pretending is my forte, and so is jumping in at the right moment!
 					Rematch: You know how much I want that, so how about I just fight you already!
+					Retry: You just don't know when to quit!
 				}
 			}
 

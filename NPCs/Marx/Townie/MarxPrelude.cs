@@ -30,7 +30,7 @@ namespace KirboMod.NPCs.Marx.Townie
             NPCID.Sets.NPCBestiaryDrawOffset.Add(NPC.type, value);
         }
 
-        int transPoint = DownedBossSystem.downedMarxBoss ? 120 : 300; //shorten timer if Marx has been downed
+        int transPoint = DownedBossSystem.downedMarxBoss ? 120 : MarxSpawningSystem.MarxActive ? 60 : 300; //shorten timer if Marx has been downed (and even more if active)
 
         public override void SetDefaults()
         {
@@ -72,6 +72,13 @@ namespace KirboMod.NPCs.Marx.Townie
                     ChatHelper.BroadcastChatMessage(NetworkText.FromKey("Mods.KirboMod.NPCs.MarxPrelude.Dialogue.Rematch"), Color.Violet);
                 }
             }
+            else if (MarxSpawningSystem.MarxActive)
+            {
+                if (NPC.ai[0] == 1)
+                {
+                    ChatHelper.BroadcastChatMessage(NetworkText.FromKey("Mods.KirboMod.NPCs.MarxPrelude.Dialogue.Retry"), Color.Violet);
+                }
+            }
             else if (MarxSpawningSystem.UnlockedMarx)
             {
                 if (NPC.ai[0] == 1)
@@ -109,6 +116,11 @@ namespace KirboMod.NPCs.Marx.Townie
                 if (Main.netMode != NetmodeID.MultiplayerClient) // If not a client
                 {
                     NPC.SpawnBoss((int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<MarxBoss>(), NPC.target);
+
+                    if (!DownedBossSystem.downedMarxBoss) //once Marx is defeated once he will no longer desert the player's town indefinitely
+                    {
+                        MarxSpawningSystem.MarxActive = true;  //Marx Townie can't spawn anymore until Marx Boss is defeated
+                    }
                 }
             }
         }

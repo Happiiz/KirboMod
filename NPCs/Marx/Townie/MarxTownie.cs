@@ -74,6 +74,8 @@ namespace KirboMod.NPCs.Marx.Townie
 			NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
 
 			NPC.Happiness
+                .SetBiomeAffection<CorruptionBiome>(AffectionLevel.Love)
+                .SetBiomeAffection<CrimsonBiome>(AffectionLevel.Love)
                 .SetBiomeAffection<HallowBiome>(AffectionLevel.Like)
                 .SetBiomeAffection<JungleBiome>(AffectionLevel.Like)
                 .SetBiomeAffection<ForestBiome>(AffectionLevel.Hate)
@@ -142,7 +144,8 @@ namespace KirboMod.NPCs.Marx.Townie
 
         public override bool CanTownNPCSpawn(int numTownNPCs)
         {
-            return MarxSpawningSystem.UnlockedMarx && !NPC.AnyNPCs(ModContent.NPCType<MarxBoss>()) && !NPC.AnyNPCs(ModContent.NPCType<MarxPrelude>());
+            return MarxSpawningSystem.UnlockedMarx && !NPC.AnyNPCs(ModContent.NPCType<MarxBoss>()) 
+                && !NPC.AnyNPCs(ModContent.NPCType<MarxPrelude>()) && !MarxSpawningSystem.MarxActive;
         }
 
 		public override ITownNPCProfile TownNPCProfile() {
@@ -184,7 +187,10 @@ namespace KirboMod.NPCs.Marx.Townie
 
             if (DownedBossSystem.downedMarxBoss)
             {
-                chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DPostMarx"));
+                for (int i = 0; i < 5; i++) //a bit more common
+                {
+                    chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DPostMarx"));
+                }
             }
             else if (NPC.downedPlantBoss)
             {

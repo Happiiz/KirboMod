@@ -1,10 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Security.Policy;
 using KirboMod.NPCs;
 using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Security.Policy;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.ID;
+using Terraria.Map;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.UI;
@@ -16,10 +19,14 @@ namespace KirboMod.Systems
         public static bool CanMarxAppear = false;
         public static bool MarxHasAppeared = false;
         public static bool UnlockedMarx = false;
+        /// <summary>
+        /// Checks whether or not Marx Boss has been summoned and not defeated in that world before
+        /// </summary>
+        public static bool MarxActive = false;
 
         public override void PostUpdateWorld()
         {
-            if (!MarxHasAppeared && !UnlockedMarx && (DownedBossSystem.downedWhispyBoss || DownedBossSystem.downedKrackoBoss || DownedBossSystem.downedKrackoBoss || Main.hardMode))
+            if (!MarxHasAppeared && !UnlockedMarx && (DownedBossSystem.downedWhispyBoss || DownedBossSystem.downedKrackoBoss || DownedBossSystem.downedKingDededeBoss || Main.hardMode))
             {
                 CanMarxAppear = true;
             }
@@ -28,7 +35,12 @@ namespace KirboMod.Systems
                 CanMarxAppear = false;
             }
 
-            if (CanMarxAppear && NPC.AnyDanger()) //rift spawning
+            if (DownedBossSystem.downedMarxBoss)
+            {
+                MarxActive = false; //an extra measure just in case it doesn't disable in boss code for whatever reason
+            }
+
+            if (CanMarxAppear && !NPC.AnyDanger()) //rift spawning
             {
                 bool anyRifts = false;
 
@@ -42,10 +54,32 @@ namespace KirboMod.Systems
                         break;
                     }
                 }
+                
+                Player player = Main.LocalPlayer; //initial set for singleplayer
 
-                Player player = Main.LocalPlayer;
+                bool foundPlayer = true; //always have a player in singleplayer
 
-                if (!anyRifts && player.ZoneForest) //no marx rifts and the player is in a forest
+                if (Main.netMode == NetmodeID.Server) //if being executed on the server
+                {
+                    foundPlayer = false; //the server now needs to find a player
+
+                    for (int i = 0; i < Main.maxPlayers; i++)
+                    {
+                        Player Itplayer = Main.player[i];
+
+                        if (!Itplayer.dead && Itplayer.active) //first check if the player isn't dead and is active...
+                        {
+                            if (Itplayer.ZoneForest) //...then check if they're in the right place. If so, then focus on that player and stop the loop
+                            {
+                                foundPlayer = true;
+                                player = Itplayer;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (!anyRifts && player.ZoneForest && !player.dead && foundPlayer) //no marx rifts and a player is in a forest
                 {
                     for (int w = 20; w > 0; w--)
                     {
@@ -65,6 +99,8 @@ namespace KirboMod.Systems
             }
         }
 
+        //pretty much doing the same thing as downedbosssystem vvv
+
         public override void SaveWorldData(TagCompound tag)
         {
             if (CanMarxAppear)
@@ -78,6 +114,10 @@ namespace KirboMod.Systems
             if (UnlockedMarx)
             {
                 tag.Add("UnlockedMarx", UnlockedMarx);
+            }
+            if (MarxActive)
+            {
+                tag.Add("MarxActive", MarxActive);
             }
         }
 
@@ -95,6 +135,30 @@ namespace KirboMod.Systems
             {
                 UnlockedMarx = tag.Get<bool>("UnlockedMarx");
             }
+            if (tag.ContainsKey("MarxActive"))
+            {
+                MarxActive = tag.Get<bool>("MarxActive");
+            }
+        }
+
+
+        public override void NetSend(BinaryWriter writer)
+        {
+            var flags = new BitsByte();
+            flags[0] = CanMarxAppear;
+            flags[1] = MarxHasAppeared;
+            flags[2] = UnlockedMarx;
+            flags[3] = MarxActive;
+            writer.Write(flags);
+        }
+
+        public override void NetReceive(BinaryReader reader)
+        {
+            BitsByte flags = reader.ReadByte();
+            CanMarxAppear = flags[0];
+            MarxHasAppeared = flags[1];
+            UnlockedMarx = flags[2];
+            MarxActive = flags[3];
         }
     }
 }

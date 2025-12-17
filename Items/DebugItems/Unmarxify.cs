@@ -40,6 +40,7 @@ namespace KirboMod.Items.DebugItems
             MarxSpawningSystem.UnlockedMarx = false;
             MarxSpawningSystem.MarxHasAppeared = false;
             MarxSpawningSystem.CanMarxAppear = false;
+            MarxSpawningSystem.MarxActive = false;
             DownedBossSystem.downedMarxBoss = false;
             Main.NewText("Marx has been reborn", Color.Yellow);
 

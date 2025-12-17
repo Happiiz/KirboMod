@@ -42,21 +42,6 @@ namespace KirboMod.Projectiles.Marx
 
             Projectile.ai[0]++;
 
-			if (Projectile.ai[0] == 1 && NPC.AnyNPCs(ModContent.NPCType<MarxTownie>()))
-			{
-                NPC marx = Main.npc[NPC.FindFirstNPC(ModContent.NPCType<MarxTownie>())];
-
-                if (Main.netMode != NetmodeID.Server)
-                {
-                    for (int i = 0; i < 10; i++) //cloud particles to signify "leave of absence"
-                    {
-                        Gore.NewGorePerfect(marx.GetSource_FromThis(), marx.Center, Main.rand.NextVector2Circular(5, 5), Main.rand.Next(11, 14), Main.rand.NextFloat() * 0.5f + 0.5f);
-                    }
-                }
-
-                marx.active = false; //delete first Marx
-            }
-
 			if (Projectile.ai[0] < 300)
             {
                 Vector2 speed = Main.rand.NextVector2Circular(20, 20);

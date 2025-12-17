@@ -27,6 +27,7 @@ namespace KirboMod.Items.Weapons
 			Item.useTime = 16;
             Item.useAnimation = Item.useTime;
 			Item.useStyle = ItemUseStyleID.Swing;
+            Item.UseSound = SoundID.Item1;
             Item.damage = 800;
 			Item.knockBack = 12;
 			Item.shoot = ModContent.ProjectileType<Projectiles.BomberRocketProj>();

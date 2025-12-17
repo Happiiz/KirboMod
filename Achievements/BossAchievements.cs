@@ -64,7 +64,7 @@ public class MarxAchievement : ModAchievement
         AddNPCKilledCondition(ModContent.NPCType<NPCs.Marx.MarxBoss>());
     }
 
-    public override Position GetDefaultPosition() => new After("THE_GREAT_SOUTHERN_PLANTKILL");
+    public override Position GetDefaultPosition() => new After("FISH_OUT_OF_WATER");
 }
 
 public class DarkMatterAchievement : ModAchievement
@@ -76,7 +76,7 @@ public class DarkMatterAchievement : ModAchievement
         AddNPCKilledCondition(ModContent.NPCType<PureDarkMatter>());
     }
 
-    public override Position GetDefaultPosition() => new After("FISH_OUT_OF_WATER");
+    public override Position GetDefaultPosition() => new After("THE_GREAT_SOUTHERN_PLANTKILL");
 }
 
 public class ZeroAchievement : ModAchievement

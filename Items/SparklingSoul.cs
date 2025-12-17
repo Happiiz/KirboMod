@@ -64,7 +64,9 @@ namespace KirboMod.Items
 
         public override bool? UseItem(Player player)
         {
-            if (!DownedBossSystem.downedMarxBoss)
+            SearchAndDestroy(); //destroy the first Townie Marx found for continuity
+
+            if (CanShoot(player))
             {
                 return null;
             }
@@ -86,9 +88,41 @@ namespace KirboMod.Items
             return true;
         }
 
+        private void SearchAndDestroy()
+        {
+            if (NPC.AnyNPCs(ModContent.NPCType<MarxTownie>()))
+            {
+                NPC marx = Main.npc[NPC.FindFirstNPC(ModContent.NPCType<MarxTownie>())];
+
+                if (Main.netMode != NetmodeID.Server)
+                {
+                    for (int i = 0; i < 10; i++) //cloud particles to signify "leave of absence"
+                    {
+                        Gore.NewGorePerfect(marx.GetSource_FromThis(), marx.Center, Main.rand.NextVector2Circular(5, 5), Main.rand.Next(11, 14), Main.rand.NextFloat() * 0.5f + 0.5f);
+                    }
+                }
+
+                marx.active = false; //delete first Marx
+            }
+            else if (NPC.AnyNPCs(ModContent.NPCType<MarxTownieDown>()))
+            {
+                NPC marx = Main.npc[NPC.FindFirstNPC(ModContent.NPCType<MarxTownieDown>())];
+
+                if (Main.netMode != NetmodeID.Server)
+                {
+                    for (int i = 0; i < 10; i++) //cloud particles to signify "leave of absence"
+                    {
+                        Gore.NewGorePerfect(marx.GetSource_FromThis(), marx.Center, Main.rand.NextVector2Circular(5, 5), Main.rand.Next(11, 14), Main.rand.NextFloat() * 0.5f + 0.5f);
+                    }
+                }
+
+                marx.active = false; //delete first Marx Down
+            }
+        }
+
         public override bool CanShoot(Player player)
         {
-            if (DownedBossSystem.downedMarxBoss)
+            if (DownedBossSystem.downedMarxBoss || MarxSpawningSystem.MarxActive)
             {
                 return false;
             }
@@ -109,9 +143,13 @@ namespace KirboMod.Items
         {
             Player player = Main.LocalPlayer;
 
-            if (DownedBossSystem.downedMarxBoss)
+            if (DownedBossSystem.downedMarxBoss || MarxSpawningSystem.MarxActive)
             {
                 tooltips.Add(new TooltipLine(Mod, "TooltipLine1", Language.GetTextValue("Mods.KirboMod.Items.SparklingSoul.Summon")));
+            }
+            if (MarxSpawningSystem.MarxActive)
+            {
+                tooltips.Add(new TooltipLine(Mod, "TooltipLine2", Language.GetTextValue("Mods.KirboMod.Items.SparklingSoul.Notice")));
             }
         }
 

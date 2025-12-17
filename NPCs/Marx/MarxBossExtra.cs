@@ -1,5 +1,7 @@
 using KirboMod.Bestiary;
 using KirboMod.Dusts.MarxSparks;
+using KirboMod.Items;
+using KirboMod.Items.Accesories.Wings;
 using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using System;
@@ -11,6 +13,7 @@ using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.UI;
 
 namespace KirboMod.NPCs.Marx
 {
@@ -125,28 +128,31 @@ namespace KirboMod.NPCs.Marx
         public override void OnKill()
         {
             NPC.SetEventFlagCleared(ref DownedBossSystem.downedMarxBoss, -1);
+
+            MarxSpawningSystem.MarxActive = false; //Marx Townie can spawn again
         }
 
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
-            /*npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<MarxBag>())); //only drops in expert
+            npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<Items.Marx.MarxBag>())); //only drops in expert
 
             LeadingConditionRule notExpertRule = new(new Conditions.NotExpert()); //checks if not expert
             LeadingConditionRule masterMode = new(new Conditions.IsMasterMode()); //checks if master mode
 
-            notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<InsertMarxSpecialDropHere>(), x));
+            notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<SoulMatter>(), 1, 20, 20));
+            notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<MarxWings>(), 10));
 
-            notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<MarxMask>(), 7));
+            notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<Items.Marx.MarxMask>(), 7));
 
-            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<MarxTrophy>(), 10));
+            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Items.Marx.MarxTrophy>(), 10));
 
-            npcLoot.Add(ItemDropRule.MasterModeCommonDrop(ModContent.ItemType<Items.Placeables.BossRelics.MarxRelic>()));
+            npcLoot.Add(ItemDropRule.MasterModeCommonDrop(ModContent.ItemType<Items.Placeables.BossRelics.MarxRelicItem>()));
 
             masterMode.OnSuccess(ItemDropRule.Common(ModContent.ItemType<Items.Marx.MarxPetItem>(), 4));
 
             // add the rules
             npcLoot.Add(notExpertRule);
-            npcLoot.Add(masterMode);*/
+            npcLoot.Add(masterMode);
         }
 
         public override void BossLoot(ref int potionType)
