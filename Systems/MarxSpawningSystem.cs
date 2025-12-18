@@ -1,4 +1,5 @@
 using KirboMod.NPCs;
+using KirboMod.NPCs.MidBosses;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -40,7 +41,9 @@ namespace KirboMod.Systems
                 MarxActive = false; //an extra measure just in case it doesn't disable in boss code for whatever reason
             }
 
-            if (CanMarxAppear && !NPC.AnyDanger()) //rift spawning
+            bool anyMidBosses = NPC.AnyNPCs(ModContent.NPCType<Bonkers>()) || NPC.AnyNPCs(ModContent.NPCType<MrFrosty>()) || NPC.AnyNPCs(ModContent.NPCType<Batafire>());
+
+            if (CanMarxAppear && !NPC.AnyDanger() && !anyMidBosses) //spawn rift if there's no bosses and marx can appear
             {
                 bool anyRifts = false;
 
@@ -54,12 +57,12 @@ namespace KirboMod.Systems
                         break;
                     }
                 }
-                
+
                 Player player = Main.LocalPlayer; //initial set for singleplayer
 
                 bool foundPlayer = true; //always have a player in singleplayer
 
-                if (Main.netMode == NetmodeID.Server) //if being executed on the server
+                if (Main.dedServ) //if being executed on the server
                 {
                     foundPlayer = false; //the server now needs to find a player
 

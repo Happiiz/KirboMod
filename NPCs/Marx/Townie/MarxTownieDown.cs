@@ -18,6 +18,7 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using Terraria.ModLoader.Utilities;
 using Terraria.Utilities;
 
 namespace KirboMod.NPCs.Marx.Townie
@@ -47,6 +48,7 @@ namespace KirboMod.NPCs.Marx.Townie
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath6;
 			NPC.knockBackResist = 0.5f;
+            NPC.rarity = 1;
         }
 
         public override void OnSpawn(IEntitySource source)
@@ -56,14 +58,11 @@ namespace KirboMod.NPCs.Marx.Townie
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
-            if (spawnInfo.Player.ZoneForest && !spawnInfo.Water && MarxSpawningSystem.MarxHasAppeared && NPC.AnyNPCs(Type))
+            if (!MarxSpawningSystem.UnlockedMarx && !NPC.AnyNPCs(Type) && !MarxSpawningSystem.MarxActive) //spawn if Marx is around and there's no one Marx
             {
-                return 0.1f;
+                return SpawnCondition.OverworldDay.Chance * 0.1f;
             }
-            else
-            {
-                return 0f;
-            }
+            return 0f;
         }
 
         public override bool CanChat()
@@ -94,6 +93,10 @@ namespace KirboMod.NPCs.Marx.Townie
 
         public override string GetChat()
         {
+            if (DownedBossSystem.downedMarxBoss)
+            {
+                return Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DDefeat");
+            }
             return Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DInitial");
         }
 

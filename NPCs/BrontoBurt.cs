@@ -17,7 +17,7 @@ namespace KirboMod.NPCs
 			// DisplayName.SetDefault("Bronto Burt");
 			Main.npcFrameCount[NPC.type] = 4;
 
-            NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers(0)
+            NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers()
             {
                 Direction = -1,
             };
@@ -124,11 +124,7 @@ namespace KirboMod.NPCs
             float speed = 1f;
             float inertia = 20f;
 
-            Vector2 moveTo = NPC.Center + new Vector2(NPC.direction * 200, 0);
-            Vector2 direction = moveTo - NPC.Center; //start - end
-            direction.Normalize();
-            direction *= speed;
-            NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
+            Helper.BasicEnemyWalk(ref NPC.velocity.X, speed, inertia, NPC.direction);
         }
 
         private void CheckPlatform() //trust me this is totally unique and original code and definitely not stolen from Spirit Mod's public source code(thx so much btw you don't know the hell I went through with this)

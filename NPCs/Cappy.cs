@@ -106,13 +106,8 @@ namespace KirboMod.NPCs
 
 			float inertia = 20f;
 
-			Vector2 moveTo = NPC.Center + new Vector2(NPC.direction * 200, 0);
-			Vector2 direction = moveTo - NPC.Center; //start - end
-			direction.Normalize();
-			direction *= speed;
-
-			//Don't negate X movement in the air else Cappy flies large distances
-            NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
+            //Don't negate X movement in the air since Cappy hops
+            Helper.BasicEnemyWalk(ref NPC.velocity.X, speed, inertia, NPC.direction);
 
             //Jump When land
 

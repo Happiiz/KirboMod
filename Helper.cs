@@ -43,6 +43,12 @@ namespace KirboMod
                 lifemax = (int)(lifemax * expertMultiplier * balance);
             }
         }
+
+        public static void BasicEnemyWalk(ref float currVel, float speed, float inertia, int direction)
+        {
+            currVel = Math.Clamp(currVel + speed * direction / inertia, -speed, speed);
+        }
+
         public static void Homing(Projectile proj, float maxVel, ref float targetIndex, ref float homingTimer, float maxHomingStrength = .1f, float range = 1500)
         {
             float rangeSQ = range * range;

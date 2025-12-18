@@ -132,11 +132,7 @@ namespace KirboMod.NPCs
                 float speed = 1f;
                 float inertia = 20f;
 
-                Vector2 moveTo = NPC.Center + new Vector2(NPC.direction * 200, 0);
-                Vector2 direction = moveTo - NPC.Center; //start - end
-                direction.Normalize();
-                direction *= speed;
-                NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
+                Helper.BasicEnemyWalk(ref NPC.velocity.X, speed, inertia, NPC.direction);
 
             }
             else //angry

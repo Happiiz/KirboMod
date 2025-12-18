@@ -2080,6 +2080,7 @@ Mods: {
 				BossChecklistIntegration: {
 					SpawnInfo: Throw out a [i:5575] and right click towards it with a [i:5665].
 					DespawnMessage: The invader disappears to which it came...
+					EntryName: Dark Matter
 				}
 			}
 
@@ -2108,7 +2109,11 @@ Mods: {
 			KrackoJr.DisplayName: Kracko Jr.
 			Bonkers.DisplayName: Bonkers
 			MrFrosty.DisplayName: Mr. Frosty
-			NightmareOrb.DisplayName: Power Orb
+
+			NightmareOrb: {
+				DisplayName: Power Orb
+				BossChecklistIntegration.EntryName: Nightmare
+			}
 
 			NightmareWizard: {
 				DisplayName: Nightmare
@@ -2183,6 +2188,7 @@ Mods: {
 					DDownedWOF: Wow! Seeing that guide disintegrate into ashes was... bad. Very bad. Yes.
 					DPrePlant: Ever since those souls were released I've been thinking up a way to use them for our own benefit! My plan will be done soon...
 					DPreMarx: Y'know, I think I've been a great friend helping you through all this. Maybe it's time you help me for once? Just gotta hear me out...
+					DDefeat: So... about that... I guess I'm not quite me when I'm hungry!
 					DPostMarx: Sorry about that fight... I was feeling a little hangry, is all!
 					DPreMoonLord: I can feel cosmic horrors are loomimg above us... just the usual.
 					DPreMoonLord2: I feel a powerful presence at the dungeon beckoning incomprehensible evil... not again.
@@ -2265,7 +2271,11 @@ Mods: {
 			}
 
 			MarxBoss.DisplayName: Marx
-			PureDarkMatterRematch.DisplayName: Dark Matter
+
+			PureDarkMatterRematch: {
+				DisplayName: Dark Matter
+				BossChecklistIntegration.EntryName: Zero
+			}
 
 			Bestiary: {
 				BioSpark: An elite ninja that hides deep within the caverns, training to become stronger. Ambushes targets with a flurry of attacks.

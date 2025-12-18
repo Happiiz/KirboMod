@@ -93,7 +93,7 @@ namespace KirboMod.NPCs.Twister
 
             direction.Normalize();
             direction *= speed;
-            NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
+            Helper.BasicEnemyWalk(ref NPC.velocity.X, speed, inertia, NPC.direction);
 
             //for stepping up tiles
             Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);

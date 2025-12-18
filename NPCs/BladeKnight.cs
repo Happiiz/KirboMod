@@ -212,17 +212,13 @@ namespace KirboMod.NPCs
             float speed = 1f; //top speed
             if (Main.expertMode)
 				speed *= 1.3334f;
-			float inertia = 10f; //acceleration and decceleration speed
+			float inertia = 10f; //resistence
 			float jumpSpeed = 7;
-			Vector2 direction = NPC.Center + new Vector2( NPC.direction * 50, 0) - NPC.Center; //start - end 
-			//we put this instead of player.Center so it will always be moving top speed instead of slowing down when player is near
 
-			direction.Normalize();
-			direction *= speed;
 			if (NPC.velocity.Y == 0 || jumped == true) //walking/jumping (so it doesn't interfere with knockback)
 			{
-				NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
-			}
+                Helper.BasicEnemyWalk(ref NPC.velocity.X, speed, inertia, NPC.direction);
+            }
 
             if (NPC.collideX && NPC.velocity.Y == 0) //hop if touching wall
             {

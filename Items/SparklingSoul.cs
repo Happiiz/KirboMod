@@ -31,7 +31,7 @@ namespace KirboMod.Items
 			Item.width = 40;
 			Item.height = 40;
 			Item.value = Item.buyPrice(0, 0, 10, 0);
-			Item.rare = ItemRarityID.Lime;
+			Item.rare = ItemRarityID.Yellow;
 			Item.maxStack = 1;
 			Item.useTime = 16;
 			Item.useAnimation = 16;

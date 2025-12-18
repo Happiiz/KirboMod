@@ -24,7 +24,7 @@ namespace KirboMod.NPCs.MidBosses
             if(NPC.AnyNPCs(ModContent.NPCType<Bonkers>()))
             {
                 //curMusic = (short)MusicLoader.GetMusicSlot(path + "Happiz_BonkersBattle");
-                curMusic = (short)MusicLoader.GetMusicSlot(path + "Photonic0_BonkersBattle_WithLoopMetadata");
+                curMusic = (short)MusicLoader.GetMusicSlot(path + "Photonic0_KirbyModBonkersBattle_WithLoopMetadata");
                 return true;
             }
             if (NPC.AnyNPCs(ModContent.NPCType<MrFrosty>()))

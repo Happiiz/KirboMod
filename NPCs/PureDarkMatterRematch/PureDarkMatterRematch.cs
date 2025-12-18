@@ -239,7 +239,6 @@ namespace KirboMod.NPCs.PureDarkMatterRematch
         {
             NPC.direction = NPC.spriteDirection = 1;
             NPC.velocity.Y -= 2;
-            NPC.timeLeft = 29;
             NPC.EncourageDespawn(30);
         }
 

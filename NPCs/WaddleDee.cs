@@ -139,14 +139,10 @@ namespace KirboMod.NPCs
             float speed = 0.7f;
 			float inertia = 20f;
 
-			Vector2 moveTo = NPC.Center + new Vector2(NPC.direction * 200, 0);
-			Vector2 direction = moveTo - NPC.Center; //start - end
-			direction.Normalize();
-			direction *= speed;
 			if (NPC.velocity.Y == 0) //on ground (so it doesn't interfere with knockback)
 			{
-				NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
-			}
+                Helper.BasicEnemyWalk(ref NPC.velocity.X, speed, inertia, NPC.direction);
+            }
 
 			//for stepping up tiles
 			Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);

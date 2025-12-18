@@ -179,6 +179,7 @@ namespace KirboMod.Systems
             };
 
             summonItem = ModContent.ItemType<Items.Weapons.StarRod>();
+            List<int> nightmareNPCs = [ModContent.NPCType<NPCs.NightmareOrb>(), ModContent.NPCType<NightmareWizard>()];
 
             bossChecklistMod.Call(
                 "LogBoss",
@@ -186,7 +187,7 @@ namespace KirboMod.Systems
                 nameof(NightmareWizard),
                 11.75f, //before Plantera
                 () => DownedBossSystem.downedNightmareBoss,
-                ModContent.NPCType<NPCs.NightmareWizard>(),
+                nightmareNPCs,
                 new Dictionary<string, object>()
                 {
                     ["spawnInfo"] = Language.GetText($"Mods.KirboMod.ProgressionDescription.Nightmare").WithFormatArgs(summonItem),
@@ -210,6 +211,7 @@ namespace KirboMod.Systems
             };
 
             summonItem = ModContent.ItemType<Items.DarkMirror>();
+            List<int> darkMatterNPCs = [ModContent.NPCType<DarkMatter>(), ModContent.NPCType<PureDarkMatter>()];
 
             bossChecklistMod.Call(
                 "LogBoss",
@@ -217,7 +219,7 @@ namespace KirboMod.Systems
                 nameof(PureDarkMatter),
                 12.5f, //before Golem
                 () => DownedBossSystem.downedDarkMatterBoss,
-                ModContent.NPCType<DarkMatter>(),
+                darkMatterNPCs,
                 new Dictionary<string, object>()
                 {
                     ["spawnInfo"] = Language.GetText($"Mods.KirboMod.ProgressionDescription.DarkMatter").WithFormatArgs(summonItem),
@@ -282,6 +284,7 @@ namespace KirboMod.Systems
             };
 
             summonItem = ModContent.ItemType<Items.PillarOfLight>();
+            List<int> zeroNPCs = [ModContent.NPCType<NPCs.PureDarkMatterRematch.PureDarkMatterRematch>(), ModContent.NPCType<NPCs.Zero>(), ModContent.NPCType<NPCs.ZeroEye>()];
 
             bossChecklistMod.Call(
                 "LogBoss",
@@ -289,7 +292,7 @@ namespace KirboMod.Systems
                 nameof(Zero),
                 22f, //after Moon Lord
                 () => DownedBossSystem.downedZeroBoss,
-                ModContent.NPCType<NPCs.Zero>(),
+                zeroNPCs,
                 new Dictionary<string, object>()
                 {
                     ["spawnInfo"] = Language.GetText($"Mods.KirboMod.ProgressionDescription.Zero").WithFormatArgs(summonItem),

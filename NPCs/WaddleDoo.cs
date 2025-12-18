@@ -282,17 +282,11 @@ namespace KirboMod.NPCs
                 speed *= SpawnedFromKracko ? 1.5f : 1f;
                 speed *= Main.expertMode ? 1.5f : 1f;
                 //top speed
-                float inertia = 20f; //acceleration and decceleration speed
+                float inertia = 20f; //resistence
 
-                //we put this instead of player.Center so it will always be moving top speed instead of slowing down when player is near
-                Vector2 direction = NPC.Center + new Vector2(NPC.direction * 50, 0) - NPC.Center; //start - end 
-
-
-                direction.Normalize();
-                direction *= speed;
                 if (NPC.velocity.Y == 0 || jumped == true) //walking/jumping (so it doesn't interfere with knockback)
                 {
-                    NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
+                    Helper.BasicEnemyWalk(ref NPC.velocity.X, speed, inertia, NPC.direction);
                 }
                 NPC.ai[0] = 0;
 

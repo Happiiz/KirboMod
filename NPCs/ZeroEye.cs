@@ -23,6 +23,8 @@ namespace KirboMod.NPCs
 	{
 		private int deathcounter = 0; //for death animation
 
+        ref float Phase => ref NPC.ai[2];
+
         SoundStyle Death = new("KirboMod/Sounds/NPC/ZeroDeathSound");
 
         public override void SetStaticDefaults()
@@ -159,18 +161,27 @@ namespace KirboMod.NPCs
             {
                 speed *= 2; //double speed
             }
-            else if (NPC.GetLifePercent() <= 0.3f && Main.expertMode) //low & in expert mode
+            else
 			{
-				speed *= 1.25f; //25% faster speed
-				inertia *= 0.75f; //25% shorter acceleration
+                if (NPC.GetLifePercent() <= 0.3f && Main.expertMode && NPC.ai[0] == 0 && Phase != 1) //low & in expert mode
+                {
+                    Phase = 1;
+                }
 
-                chargereduce = chargePoint * 0.35f;
-                chargespeed += 20;
+                if (Phase == 1) //if in expert phase
+                {
+                    speed *= 1.25f; //25% faster speed
+                    inertia *= 0.75f; //25% shorter acceleration
 
-				spewFaster = true;
+                    chargereduce = chargePoint * 0.35f;
+                    chargespeed += 20;
+
+                    spewFaster = true;
+
+                }
             }
 
-			Vector2 moveTo = player.Center;
+            Vector2 moveTo = player.Center;
 			Vector2 direction = moveTo - NPC.Center; //start - end
 			direction.Normalize();
 			direction *= speed;
@@ -256,7 +267,7 @@ namespace KirboMod.NPCs
         public override void OnKill()
         {
 			if(!NPC.AnyNPCs(ModContent.NPCType<ZeroEye>()))
-            NPC.SetEventFlagCleared(ref DownedBossSystem.downedZeroBoss, -1);
+				NPC.SetEventFlagCleared(ref DownedBossSystem.downedZeroBoss, -1);
         }
 
         public override void ModifyNPCLoot(NPCLoot npcLoot)
