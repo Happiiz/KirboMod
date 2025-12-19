@@ -15,6 +15,7 @@ namespace KirboMod.Projectiles.Marx.IceBombFrag
 
         public override void SetDefaults()
         {
+            Projectile.hostile = true;
             Projectile.coldDamage = true;
             Projectile.width = Projectile.height = 60;
             Projectile.tileCollide = false;

@@ -49,7 +49,8 @@ namespace KirboMod.NPCs.Marx
             Split,
             Intro,
             PuffUp,
-            ShadowHole
+            ShadowHole,
+            Defeat
         }
 
         public override void SetStaticDefaults()
@@ -166,9 +167,37 @@ namespace KirboMod.NPCs.Marx
             return true;
         }
 
+        public override void ModifyHoverBoundingBox(ref Rectangle boundingBox) 
+        {
+            if (attacktype == AttackType.BlackHole || (attacktype == AttackType.DashFromBelow 
+                && AttackTimer < DashFromBelowChaseDuration + DashFromBelowTelegraphDuration))
+            {
+                boundingBox = Rectangle.Empty;
+            }
+            else
+            {
+                boundingBox = NPC.Hitbox;
+            }
+        }
+
         public override void HitEffect(NPC.HitInfo hit)
         {
-            
+            if (NPC.life <= 0)
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    // go around in a octogonal pattern
+                    Vector2 speed = new((float)Math.Cos(MathHelper.ToRadians(i * 45)) * 25, (float)Math.Sin(MathHelper.ToRadians(i * 45)) * 25);
+
+                    Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.BoldStar>(), speed, Scale: 3f); //Makes dust in a messy circle
+                    d.noGravity = true;
+                }
+                for (int i = 0; i < 20; i++)
+                {
+                    Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
+                    Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center, speed, Main.rand.Next(11, 13), Scale: 2f); //double jump smoke
+                }
+            }
         }
 
         public override Color? GetAlpha(Color lightColor)

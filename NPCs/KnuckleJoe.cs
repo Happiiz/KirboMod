@@ -91,7 +91,14 @@ namespace KirboMod.NPCs
         public override void AI() //constantly cycles each time
         {
             Timer++;
-            NPC.TargetClosest(true);
+            if (Timer % 30 == 0) //only turn towards player on certain intervals so it doesn't spin in place when the player is too high
+            {
+                NPC.TargetClosest(true);
+            }
+            else
+            {
+                NPC.TargetClosest(false);
+            }
             NPC.spriteDirection = NPC.direction;
             if (!NPC.HasValidTarget)
             {

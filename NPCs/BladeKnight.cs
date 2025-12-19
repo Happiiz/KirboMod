@@ -288,5 +288,6 @@ namespace KirboMod.NPCs
                 }
             }
         }
+        public override void ModifyHoverBoundingBox(ref Rectangle boundingBox) => boundingBox = NPC.Hitbox;
     }
 }

@@ -1,3 +1,4 @@
+using KirboMod.Dusts.MarxSparks;
 using KirboMod.Items.Weapons;
 using KirboMod.NPCs.MidBosses;
 using KirboMod.Systems;
@@ -116,6 +117,20 @@ namespace KirboMod.NPCs.Marx.Townie
                 if (Main.netMode != NetmodeID.MultiplayerClient) // If not a client
                 {
                     NPC.SpawnBoss((int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<MarxBoss>(), NPC.target);
+
+                    SoundEngine.PlaySound(MarxBoss.ShadowHoleStop, NPC.Center);
+                    for (int i = 0; i < 70; i++)
+                    {
+                        Vector2 vel = Main.rand.NextVector2Circular(40f, 40f); //circle
+                        Dust d = Dust.NewDustPerfect(NPC.Center, DustID.Shadowflame, vel, Scale:Main.rand.NextFloat(1, 3));
+                        d.noGravity = true;
+                    }
+                    for (int i = 0; i < 20; i++)
+                    {
+                        Vector2 vel = Main.rand.NextVector2Circular(40f, 40f); //circle
+                        Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<MarxSparks>(), vel);
+                        d.noGravity = true;
+                    }
 
                     if (!DownedBossSystem.downedMarxBoss) //once Marx is defeated once he will no longer desert the player's town indefinitely
                     {

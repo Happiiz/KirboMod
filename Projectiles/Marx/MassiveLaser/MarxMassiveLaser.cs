@@ -10,6 +10,7 @@ namespace KirboMod.Projectiles.Marx.MassiveLaser
 {
     public class MarxMassiveLaser : ModProjectile
     {
+        static bool[] playersHit;
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.CanHitPastShimmer[Type] = true;
@@ -25,6 +26,7 @@ namespace KirboMod.Projectiles.Marx.MassiveLaser
             Projectile.tileCollide = false;
             Projectile.scale = 1f / 5f;
             Projectile.penetrate = -1;
+            playersHit = new bool[Main.maxPlayers];
         }
         //debug value, change be later
         static int LaserLength => 16 * 400;
@@ -97,8 +99,6 @@ namespace KirboMod.Projectiles.Marx.MassiveLaser
             end = Projectile.Center - Projectile.velocity.Normalized(LaserLength);
         }
 
-
-
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
             if(Timer < 5 || Timer > LaserDuration - 5)
@@ -108,6 +108,15 @@ namespace KirboMod.Projectiles.Marx.MassiveLaser
             float colPoint = 0;
             GetLaserCollisionParams(out Vector2 start, out Vector2 end, out float width);
             return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), start, end, width, ref colPoint);
+        }
+
+        public override void OnHitPlayer(Player target, Player.HurtInfo info)
+        {
+            playersHit[target.whoAmI] = true;
+        }
+        public override bool CanHitPlayer(Player target)
+        {
+            return !playersHit[target.whoAmI];
         }
     }
 }

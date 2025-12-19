@@ -45,6 +45,13 @@ namespace KirboMod.Items
             recipe.AddIngredient(ModContent.ItemType<TreasureStone>());
             recipe.AddTile(TileID.MythrilAnvil);
             recipe.Register(); //adds this recipe to the game
+
+            //here for people that collected many rare stones before 1.3 for a non-melee class
+            Recipe rareStoneConvert = CreateRecipe();
+            rareStoneConvert.AddIngredient(ModContent.ItemType<RareStone>());
+            rareStoneConvert.AddIngredient(ItemID.FallenStar, 10);
+            rareStoneConvert.AddTile(TileID.MythrilAnvil);
+            rareStoneConvert.Register(); //adds this recipe to the game
         }
     }
 }

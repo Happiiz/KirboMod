@@ -24,6 +24,10 @@ namespace KirboMod.NPCs.Marx
         public static SoundStyle ShadowHoleStop => new("KirboMod/Sounds/NPC/Marx/ShadowHoleStop");
         public static SoundStyle ShadowHoleAppear => new("KirboMod/Sounds/NPC/Marx/ShadowHoleAppear");
         public static SoundStyle ShadowHoleDash => new("KirboMod/Sounds/NPC/Marx/ShadowHoleDash");
+        public static SoundStyle VineSeedSpawn => new("KirboMod/Sounds/NPC/Marx/VineSeedSpawn");
+        public static SoundStyle VineGrow => new("KirboMod/Sounds/NPC/Marx/VineGrow");
+        public static SoundStyle MarxAmbientLaugh => new("KirboMod/Sounds/NPC/Marx/MarxAmbientLaugh");
+        public static SoundStyle MarxDefeat => new("KirboMod/Sounds/NPC/Marx/MarxDeath");
         public static int CutterDamage => 80 / 2;//ADJUST LATER
         public static int MassiveLaserDamage => Main.getGoodWorld ? 9999 : (150 / 2);
         public static int ThornSeedDamage => 50 / 2;

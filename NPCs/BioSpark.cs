@@ -138,7 +138,15 @@ namespace KirboMod.NPCs
         }
         private void Walk() //walk towards player
         {
-            NPC.TargetClosest(true);
+            if (WalkTimer % 15 == 0) //only turn towards player on certain intervals so it doesn't spin in place when the player is too high (faster than knuckle joe however)
+            {
+                NPC.TargetClosest(true);
+            }
+            else
+            {
+                NPC.TargetClosest(false);
+            }
+
             Player player = Main.player[NPC.target];
             Vector2 distance = player.Center - NPC.Center;
 

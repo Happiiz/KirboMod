@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
+using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -38,6 +39,7 @@ namespace KirboMod.Projectiles.Marx.VineSeed
                 Projectile.velocity = Vector2.Zero;
                 if (Timer < TimerValExplodeStart)
                 {
+                    SoundEngine.PlaySound(MarxBoss.VineSeedSpawn with { MaxInstances = 0 }, Projectile.Center);
                     Timer = TimerValExplodeStart;
                 }
                 if(Timer > TimerValExplodeStart + StayStillDuration)
@@ -85,6 +87,7 @@ namespace KirboMod.Projectiles.Marx.VineSeed
         }
         private void SpawnThorns()
         {
+            SoundEngine.PlaySound(MarxBoss.VineGrow with { Volume = 0.35f, MaxInstances = 0 }, Projectile.Center);
             Vector2[] directions = GetThornParams(out float thornLength);
             for (int i = 0; i < directions.Length; i++)
             {

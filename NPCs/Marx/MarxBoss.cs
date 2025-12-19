@@ -36,7 +36,7 @@ namespace KirboMod.NPCs.Marx
         static int IceBombExtraWait => 30;
         static float IceBombAimAheadAmount => 7f;
         static int DashFromBelowChaseDuration => 80;
-        static int DashFromBelowTelegraphDuration => Main.expertMode ? 30 : 100;
+        static int DashFromBelowTelegraphDuration => Main.expertMode ? 20 : 40;
         static int DashFromBelowDashUpDuration => 20;
         static int DashFromBelowDashUpSpeed => 50;
         //I don't remember why there is a +4, but keep it
@@ -61,10 +61,13 @@ namespace KirboMod.NPCs.Marx
         private AttackType lastattacktype = AttackType.DecideNext;
 
 
-        static int DeathAnimDuration => 360;
+        static int DeathAnimDuration => 220;
         public static int IntroDuration => 60;
         ref float AttackTimer { get => ref NPC.ai[0]; }
         ref float DeathCounter { get => ref NPC.ai[1]; }
+
+        Vector2 DeathLocation;
+
         Vector2 TargetTPPos
         {
             get
@@ -99,7 +102,7 @@ namespace KirboMod.NPCs.Marx
             NPC.TargetClosest(false);
             if (DeathCounter > 0)
             {
-                //DoDeathAnimation();
+                DoDeathAnimation();
             }
             else if (attacktype == AttackType.Intro && AttackTimer <= IntroDuration + 1) //intro
             {
@@ -108,15 +111,14 @@ namespace KirboMod.NPCs.Marx
                     EndState();
                 }
             }
-            else if (NPC.target < 0 || NPC.target == 255 || player.dead || !player.active) //Despawn
+            else if ((NPC.target < 0 || NPC.target == 255 || player.dead || !player.active) && AttackTimer == 1) //Despawn
             {
-
+                Despawn();
             }
             else //regular attack
             {
                 AttackCycle();
             }
-
 
             //if (AttackTimer == 59)
             //{
@@ -156,7 +158,7 @@ namespace KirboMod.NPCs.Marx
                 }
                 if (AttackTimer > endTime + TotalTeleportInOutDuration / 2)
                 {
-                    EndState();
+                    EndState_DontSetLastAttackType();
                 }
             }
 
@@ -266,7 +268,10 @@ namespace KirboMod.NPCs.Marx
             }
             else if (AttackTimer < VineSeedStartup + VineSeedRate * VineSeedCount + VineSeedExtraWait)
             {
-
+                if (AttackTimer < VineSeedStartup + VineSeedRate * VineSeedCount + VineSeedExtraWait / 2) //while waiting
+                {
+                    SoundEngine.PlaySound(MarxAmbientLaugh, NPC.Center);  //do a little laugh
+                }
             }
             else
             {
@@ -542,6 +547,8 @@ namespace KirboMod.NPCs.Marx
                 }
             }
 
+            if (Main.rand.NextBool(1, Math.Max((int)(NPC.GetLifePercent() * 10), 1))) //gets more common as health goes down (consequent can't be less than antecedent)
+                SoundEngine.PlaySound(MarxAmbientLaugh, NPC.Center);
 
             AttackTimer = 0;
             // Update lastattacktype based on canonical type
@@ -717,7 +724,7 @@ namespace KirboMod.NPCs.Marx
             Vector2 deltaPos = targetPos - NPC.Center;
             float dist = deltaPos.Length();
             float speedMult = Utils.GetLerpValue(16 * 3, 16 * 10, dist, true);
-            Vector2 targetVel = deltaPos / dist;
+            Vector2 targetVel = deltaPos.SafeNormalize(Vector2.Zero);
             targetVel *= maxSpeed * speedMult;
             NPC.velocity = Vector2.Lerp(NPC.velocity, targetVel, lerpAmount);
         }
@@ -770,6 +777,117 @@ namespace KirboMod.NPCs.Marx
             NPC.frameCounter = -1;
             animation = newAnimation;
         }
+
+        public override bool CheckDead()
+        {
+            if (DeathCounter <= DeathAnimDuration)
+            {
+                NPC.active = true;
+                NPC.life = 1;
+
+                if (DeathCounter == 0)
+                {
+                    DeathLocation = NPC.Center; //only set once
+
+                    SoundEngine.PlaySound(MarxDefeat with { MaxInstances = 0 }, NPC.Center);
+
+                    SoundEngine.PlaySound(SoundID.NPCDeath1, NPC.Center);
+
+                    DeathCounter++; //start going up
+                }
+
+                return false;
+            }
+            return true;
+        }
+
+        void DoDeathAnimation()
+        {
+            int slowRotDuration = 100;
+            AttackTimer = 0;
+            NPC.velocity = Vector2.Zero;
+
+            if (DeathCounter >= 0 && DeathCounter <= DeathAnimDuration)
+            {
+                NPC.dontTakeDamage = true;
+
+                ChangeAnimation(Animation.Defeat);
+
+                if (DeathCounter < slowRotDuration)
+                {
+                    NPC.rotation += MathF.PI / (4 * slowRotDuration);
+                }
+                else
+                {
+                    NPC.rotation += MathF.Tau / 20;
+
+                    float spinTime = MathF.Tau / 30 * (DeathCounter - 30);
+                    NPC.Center = DeathLocation + new Vector2(MathF.Cos(spinTime), MathF.Sin(spinTime)) * (DeathAnimDuration - DeathCounter) * 5;
+
+                    if (DeathCounter % 10 == 0 && DeathCounter != DeathAnimDuration)
+                    {
+                        BossDeathExplosion();
+                    }
+
+                    //if (DeathCounter % 2 == 0)
+                    //{
+                    //    int randomCell = Main.rand.NextBool(2) ? ModContent.GoreType<WingCell1>() :
+                    //        ModContent.GoreType<WingCell2>();
+
+                    //    int g = Gore.NewGore(NPC.GetSource_FromThis(), NPC.position, Main.rand.NextVector2CircularEdge(5, 5),
+                    //        randomCell, 1f);
+                    //}
+                }
+            }
+            else
+            {
+                NPC.HideStrikeDamage = true;
+                NPC.SimpleStrikeNPC(999999, 1, false, 0, null, false, 0, false);
+
+                BossDeathExplosion();
+
+                //spawn a marx
+                int index = -1;
+
+                if (Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    index = NPC.NewNPC(NPC.GetSource_FromThis(), (int)NPC.Center.X, (int)NPC.Center.Y,
+                                ModContent.NPCType<Townie.MarxTownieDown>());
+                }
+
+                if (index != -1)
+                    NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, index);
+            }
+
+            DeathCounter++; //keep going up
+        }
+
+        void BossDeathExplosion()
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                // go around in a octogonal pattern
+                Vector2 speed = new((float)Math.Cos(MathHelper.ToRadians(i * 45)) * 25, (float)Math.Sin(MathHelper.ToRadians(i * 45)) * 25);
+
+                Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.BoldStar>(), speed, Scale: 3f); //Makes dust in a messy circle
+                d.noGravity = true;
+            }
+            for (int i = 0; i < 20; i++)
+            {
+                Vector2 speed = Main.rand.NextVector2Circular(10f, 10f); //circle
+                Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center, speed, Main.rand.Next(11, 13), Scale: 2f); //double jump smoke
+            }
+        }
+
+        void Despawn()
+        {
+            AttackTimer = 0;
+            NPC.velocity.X = 0;
+            NPC.velocity.Y -= 1;
+            ChangeAnimation(Animation.Rise);
+            NPC.EncourageDespawn(60);
+        }
+
         public override void FindFrame(int frameHeight) // animation
         {
 
@@ -958,7 +1076,11 @@ namespace KirboMod.NPCs.Marx
             {
                 NPC.dontTakeDamage = true;
             }
-            NPC.damage = (NPC.dontTakeDamage) ? 0 : NPC.defDamage;
+            if (animation == Animation.Defeat)
+            {
+                NPC.frame.Y = frameHeight * 3;
+            }
+            NPC.damage = NPC.dontTakeDamage || attacktype != AttackType.DashFromBelow ? 0 : NPC.defDamage;
         }
     }
 }
