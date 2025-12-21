@@ -31,6 +31,12 @@ namespace KirboMod.Items.Kracko
 			player.GetModPlayer<KirbPlayer>().personalcloud = true;
         }
 
+        public override void UpdateVanity(Player player)
+        {
+            player.GetModPlayer<KirbPlayer>().personalcloud = true;
+            player.GetModPlayer<KirbPlayer>().personalcloudVanity = true;
+        }
+
         public override int ChoosePrefix(UnifiedRandom rand) {
 			// When the item is given a prefix, only roll the best modifiers for accessories
 			return 0;

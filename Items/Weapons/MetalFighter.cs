@@ -5,6 +5,7 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace KirboMod.Items.Weapons
@@ -21,7 +22,10 @@ namespace KirboMod.Items.Weapons
         }
 		public static float ShootSpeed => 60f;
 		public static int UseTime => 6;
-		public override void SetDefaults()
+
+        static int ArmPen = 36;
+        public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(ArmPen);
+        public override void SetDefaults()
 		{
 			Item.damage = 22;
             Item.DamageType = DamageClass.Melee/* tModPorter Suggestion: Consider MeleeNoSpeed for no attack speed scaling */;
@@ -39,7 +43,7 @@ namespace KirboMod.Items.Weapons
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<Projectiles.MetalFistProj>();
 			Item.shootSpeed = 50f;
-			Item.ArmorPenetration = 36;
+			Item.ArmorPenetration = ArmPen;
 		}
 
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)

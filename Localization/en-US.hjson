@@ -965,6 +965,7 @@ Mods: {
 					'''
 					Uppercutting releases a barrage of bouncing rocks
 					Doesn't have a cooldown in the air
+					{$CommonItemTooltip.DefensePenetration}
 					'''
 			}
 
@@ -1062,6 +1063,7 @@ Mods: {
 					'''
 					Right click while holding down instead to do a dive kick move
 					'Float like a ballistic missile, sting like a ballistic missile'
+					{$CommonItemTooltip.DefensePenetration}
 					'''
 			}
 
@@ -1904,9 +1906,9 @@ Mods: {
 			MetalFighterSpike.DisplayName: Metal Fighter Spike
 			MetalFistProj.DisplayName: Metal Fist
 			MetalSlam.DisplayName: Metal Slam
-			MetalUppercut.DisplayName: Metal Uppercut
+			MetalUppercut.DisplayName: Metal Break
 			MetaSlash.DisplayName: Meta Slash
-			MinionBeam.DisplayName: Minion Beam
+			MinionBeam.DisplayName: "{$Projectiles.BeamBad.DisplayName}"
 			MinionFire.DisplayName: "{$Projectiles.BadFire.DisplayName}"
 			MinionIce.DisplayName: "{$Projectiles.BadIce.DisplayName}"
 			MiniWhispy.DisplayName: Mini Whispy
@@ -2026,7 +2028,7 @@ Mods: {
 			NewWhispySplittingWind.DisplayName: "{$Projectiles.NewWhispyWind.DisplayName}"
 			NewWhispySummonTileDustGenerator.DisplayName: New Whispy Summon Tile Dust Generator
 			NewWhispyAppleMedium.DisplayName: Apple
-			HardenedFighterUppercut.DisplayName: Hardened Fighter Uppercut
+			HardenedFighterUppercut.DisplayName: Hardened Break
 			MetalKick.DisplayName: Metal Kick
 			NightmareOrbFirstHitShine.DisplayName: Nightmare Orb First Hit Shine
 			KrackoBGOrbBig.DisplayName: Kracko Orb
@@ -2349,6 +2351,18 @@ Mods: {
 					Tooltip: Enable or disable the clouds present during the Zero fight
 				}
 			}
+
+			GeneralConfig: {
+				DisplayName: General Client Config
+
+				FighterMeter: {
+					Header: Fighter Glove Meter Offset
+					X: X Offset
+					Y: Y Offset
+				}
+			}
+
+			GeneralClientConfig.DisplayName: General Client Config
 		}
 
 		Emotes.MarxTownieEmote.Command: Marx

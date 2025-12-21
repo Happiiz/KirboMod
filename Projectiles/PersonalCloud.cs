@@ -41,27 +41,22 @@ namespace KirboMod.Projectiles
                 Projectile.netUpdate = true; //sync projectile position change due to player
             }
 
+            KirbPlayer kirbPlayer = player.GetModPlayer<KirbPlayer>();
+
             //equipping accesory
-            if (player.GetModPlayer<KirbPlayer>().personalcloud)
+            if (kirbPlayer.personalcloud)
             {
                 Projectile.timeLeft = 2; //keep being on the brink of death until accesory is no longer equipped
             }
 
+            Vector2 center = Projectile.Center;
+
             //TARGETING
             int targetIndex = -1;
-            const float attackRangeSQ = 700 * 700;
-            Vector2 center = Projectile.Center;
-            for (int i = 0; i < Main.maxNPCs; i++)
-            {
-                NPC compare = Main.npc[i];
-                if (!compare.CanBeChasedBy())
-                    continue;
-                if (targetIndex == -1 || compare.DistanceSQ(center) < Main.npc[targetIndex].DistanceSQ(center))
-                {
-                    targetIndex = i;
-                }
-            }
-            if (targetIndex > 0 && Main.npc[targetIndex].DistanceSQ(center) <= attackRangeSQ) //ATTACK
+            Projectile.Minion_FindTargetInRange(700, ref targetIndex, true, null);
+
+            //attack if target is in range and cloud is not in vanity slot (and it's still equipped)
+            if (targetIndex >= 0 && !kirbPlayer.personalcloudVanity && kirbPlayer.personalcloud)
             {
                 animation = 2;
 
@@ -93,6 +88,10 @@ namespace KirboMod.Projectiles
                     LightningZap(target.Center, center);
                     Projectile.ai[0] = 0;
                 }
+            }
+            else
+            {
+                animation = 1;
             }
 
             //animation

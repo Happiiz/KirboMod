@@ -68,6 +68,7 @@ namespace KirboMod
 
         public bool personalcloud; //checks if have personal cloud accesory
         public bool personalcloudalive = false; //checks if personal cloud is alive
+        public bool personalcloudVanity; //checks if have personal cloud is in vanity slot
 
         public bool royalslippers;
         public int falltime = 0;
@@ -123,6 +124,7 @@ namespace KirboMod
             nightmareeffect = false;
             darkShield = false;
             personalcloud = false;
+            personalcloudVanity = false;
             royalslippers = false;
             badgeofgloom = false;
 

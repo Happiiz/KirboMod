@@ -7,7 +7,6 @@ using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.UI;
-using static Terraria.ModLoader.ModContent;
 
 namespace KirboMod.UI
 {
@@ -65,7 +64,7 @@ namespace KirboMod.UI
 
             // This prevents drawing unless we are using a fighter glove or metal fighter glove
             int heldItemType = Main.LocalPlayer.HeldItem.type;
-            if (heldItemType == ModContent.ItemType<FighterGlove>() || heldItemType == ItemType<HardenedFighter>() || heldItemType == ItemType<MetalFighter>())
+            if (heldItemType == ModContent.ItemType<FighterGlove>() || heldItemType == ModContent.ItemType<HardenedFighter>() || heldItemType == ModContent.ItemType<MetalFighter>())
             {
                 base.Draw(spriteBatch);
             }
@@ -118,7 +117,11 @@ namespace KirboMod.UI
             {
                 text.TextColor = Color.White;
             }
-            base.Update(gameTime);
+
+            GeneralClientConfig config = ModContent.GetInstance<GeneralClientConfig>();
+
+            area.HAlign = 0.5f + config.FighterMeterXOffset;
+            area.VAlign = 0.5f - config.FighterMeterYOffset; //minus since positive goes down and vice versa, so reverse for player convenience
         }
     }
 }
