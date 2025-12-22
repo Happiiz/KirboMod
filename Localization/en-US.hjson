@@ -1362,8 +1362,8 @@ Mods: {
 				DisplayName: Dimensional Destabilizer
 				Tooltip:
 					'''
-					Summons a dimensional rift containing a powerful enemy at the cursor's position
-					Enemy summoned depends on the biome you're in
+					Summons a dimensional rift containing a mid-boss at the cursor's position
+					Mid-boss summoned depends on the biome you're in
 					Consumes 25 starbits per use
 					Can't activate within caverns
 					'''
@@ -2216,22 +2216,22 @@ Mods: {
 				}
 
 				Help: {
-					HStarbits: First of all, don't underestimate these guys! They carry with them their burning wishes to make a name for themselves! Though, you should know that using other people's desires for your own gain is quite a good plan!
-					HWeapons: When my guys were brought here, they scurried all over the place! Try searching around! You might 'finesse' something useful from them!
+					HStarbits: Don't underestimate my guys! They carry with them their burning wishes to make a name for themselves! Though defeating them releases these wishes as tiny stars! Perfectly usable for your own purposes!
+					HWeapons: When my guys were brought here, they scurried all over the place! Try searching around! You might get something handy from them!
 					HBosses: If there's something our worlds have in common, is that really powerful foes lurk in every corner! Surely some were carried here, too! Defeat them and earn some REAL valuable goodies!
-					HWhispyWoods: There is quite an infamous tree that often gets in our way within the woods. You might be able to grow one with an acorn imbued with burning wishes... and then chop it down!
-					HKracko: In the skies, a powerful cloud lurks to keep them clear. Its baby form has probably worked its way here! Try hunting it!
-					HKingDedede: I wonder if that fat slob of a king was brought into this world with everyone else... we just need something precious to him that he'll hunt down from a mile away!
-					HMidbosses: Star rifts are what brought us all here. But they appear so sporadically! I wonder if there's a way to force them to appear... you could probably round up some of the more stubborn characters who defy the rift's pull!
-					HDreamMatter: With the true form of this world unveiled, some of my guys might've began to venture once more! Go look again! The skies! The caves! The ends of the world! Go look now that their dreams of fitting in have been stirred!
-					HRareStones: With all these rifts in space, some of these guys had outta pick up some rare stones! Though they'd have to have the power to be able to retrieve them. The same power that resists the rifts, probably.
+					HWhispyWoods: There is quite an infamous tree that often gets in our way within the woods. You might be able to grow one with an acorn imbued with those burning wishes... and then chop it down!
+					HKracko: In our skies, a powerful cloud dominates with its power to work up a storm. I bet its juvenile form might've wandered into your skies!
+					HKingDedede: I wonder if that fat slob of a king was brought into this world with everyone else... you just need something precious to him that he'll hunt down from a mile away!
+					HMidbosses: Star rifts are what brought us all here, but they've stopped appering since! Hey, meteors are rumored to be associated with interdimensional capabilities! Perhaps you could cobble something together?
+					HDreamMatter: Since the true form of this world has been revealed, I've been noticing some more of my guys being transported here. Something about them makes me think they have something more powerful than stars...
+					HRareStones: Hey, hey, hey! Ever heard of rare stones? They can only be found in between dimensions, so maybe pulling someone through a star rift might net you one!
 					HEvoWeapons: With rare stones, you could upgrade some weapons to a fuller potential! Though these recipes aren't cheap, you seem like a skilled blacksmith!
-					HNightmare: The Fountain of Dreams was an interesting landmark of our world. I wonder if you could recreate it with this world's materials. It would even be fun if we could attract another... what? I wasn't saying anything!
-					HHeartMatter: Love is something I find quite icky, but those burning wishes, dreams, and that energy of life can be channeled into a powerful resource to be used!
-					HDarkMatter: There existed a terrible force in our world, but it has mostly since been wiped out. I wonder if this world contains its own dark forces. Try attracting them using some dark, nightmarish stuff! It should be interesting...
+					HNightmare: The Fountain of Dreams and the Star Rod, two artifacts of our world that make dreams come true! But with how much evil seems to arise at night in this world, would dreams only turn into nightmares? Only one way to find out!
+					HHeartMatter: Love is something I find quite icky, but I think with some wishes, dreams, and those ores of life energy in the jungle, you could make quite the valuable resource!
+					HDarkMatter: There existed a dark force in our world, but it has mostly since been wiped out. Though I wonder if this world contains its own dark forces, and if it's possible to lure them out...
 					HRainbowSword: Hey! You've heard about a legend of a prismatic sword of light that can thwart all darkness forged with all the colors of the world? Ridiculous, I know!
-					HMarx: I've appreciated your help thus far, but now I have something to ask of you: an awful evil slowly descends upon this world, but I figured out that if we use the power of the spirits of light and dark of this world with the care and compassion of our world, then we could influence the released souls to fight back against the enemy! Whaddya say?
-					HZero: Ever since the darkness has been wiped away, our world hasn't had as many dominant threats... but with those bars of evil alien origins, a ritual to resurect the very core of the darkness might be possible... Now THAT's a final battle I'd want to see!
+					HMarx: Hey, hey, hey! An awful evil slowly descends upon this world, but I have a plan: You know all those released spirits? What if we were able to use them to our advantage? All you have to do is to find many souls and combine them with the power of love to make the Sparkling Soul! Whaddya say?
+					HZero: The Moon Lord sometimes makes me miss having an evil intergalatic force of darkness... but those ores from that diabolical god might have enough darkness to resurect their ruler once more. Now THAT's a final battle I'd want to see!
 					HPostZero: ...What? I don't have anything else to tell you. Friends are only useful for so long.
 				}
 
