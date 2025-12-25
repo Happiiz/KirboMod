@@ -1,8 +1,10 @@
+using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
+using Terraria.GameContent.Prefixes;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -19,11 +21,12 @@ namespace KirboMod.Items.DarkSword
         public override void SetStaticDefaults()
         {
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research 
+            PrefixLegacy.ItemSets.SwordsHammersAxesPicks[Type] = true;//able to get legendary
         }
 
         public override void SetDefaults()
         {
-            Item.damage = 150;
+            Item.damage = 100;
             Item.DamageType = DamageClass.Melee/* tModPorter Suggestion: Consider MeleeNoSpeed for no attack speed scaling */;
             Item.width = 40;
             Item.height = 40;
@@ -42,7 +45,6 @@ namespace KirboMod.Items.DarkSword
 
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
-
             KirbPlayer mPlayer = player.GetModPlayer<KirbPlayer>();
             mPlayer.GetDarkSwordSwingStats(out int direction, out ProjectileShootType projToShoot);
             if (Main.myPlayer == player.whoAmI)
@@ -55,7 +57,7 @@ namespace KirboMod.Items.DarkSword
             switch (projToShoot)
             {
                 case ProjectileShootType.DarkOrb:
-                    SoundEngine.PlaySound(NPCs.DarkMatter.DarkMatter.OrbShoot, position);
+                    SoundEngine.PlaySound(NPCs.DarkMatter.DarkMatter.OrbShoot.WithVolumeScale(0.8f), position);
                     if (Main.myPlayer != player.whoAmI)
                         return false;
                     int amountOfOrbs = 4;
@@ -66,7 +68,9 @@ namespace KirboMod.Items.DarkSword
                         float delay = -i * delayMultiplier;
                         if (direction == -1)
                             delay = Utils.Remap(delay, 0, -delayMultiplier, -delayMultiplier, 0, false);
-                        Projectile.NewProjectile(source, position, shootVel, ModContent.ProjectileType<DarkSwordOrb>(), damage, knockback, player.whoAmI, delay);
+                        Projectile darkOrbSample = ContentSamples.ProjectilesByType[ModContent.ProjectileType<DarkSwordOrb>()];
+                        darkOrbSample.SetDefaults(darkOrbSample.type);
+                        Projectile.NewProjectile(source, position, shootVel / darkOrbSample.MaxUpdates, ModContent.ProjectileType<DarkSwordOrb>(), damage, knockback, player.whoAmI, delay);
                     }
                     break;
                 case ProjectileShootType.DarkBeam:
@@ -84,9 +88,8 @@ namespace KirboMod.Items.DarkSword
                     }
                     break;
                 case ProjectileShootType.DarkWave:
-                    SoundEngine.PlaySound(SoundID.Item79 with { Pitch = -1, MaxInstances = 0 }, position);
-                    SoundEngine.PlaySound(SoundID.Item79 with { Pitch = -0.5f, MaxInstances = 0 }, position);
-                    SoundEngine.PlaySound(SoundID.Item79 with { Pitch = 1.5f, MaxInstances = 0 }, position);
+                    float vol = 0.65f;
+                    SoundEngine.PlaySound(SoundID.Item71 with { Pitch = 0f, MaxInstances = 0, Volume = vol }, position);
                  //   SoundEngine.PlaySound(SoundID.Item15 with { Pitch = 1.5f, MaxInstances = 0 }, position);
                     if (Main.myPlayer != player.whoAmI)
                         return false;

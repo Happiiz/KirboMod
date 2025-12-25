@@ -23,31 +23,31 @@ namespace KirboMod.Systems
             float width;
             Color startColor;
             Color endColor;
-            public static void AddSubtractive(Projectile proj, float width, Color startColor, Color endColor)
+            public static void AddSubtractive(Projectile proj, float width, Color startColor, Color endColor, float extraOffset = 20)
             {
-                Trail trail = TrailFromProj(proj, width, startColor, endColor);
+                Trail trail = TrailFromProj(proj, width, startColor, endColor, extraOffset);
                 if (trail != null)
                 {
                     AddToArray(trail, ref subtractiveTrails);
                 }
             }
-            public static void AddAlphaBlend(Projectile proj, float width, Color startColor, Color endColor)
+            public static void AddAlphaBlend(Projectile proj, float width, Color startColor, Color endColor, float extraOffset = 20)
             {
-                Trail trail = TrailFromProj(proj, width, startColor, endColor);
+                Trail trail = TrailFromProj(proj, width, startColor, endColor, extraOffset);
                 if (trail != null)
                 {
                     AddToArray(trail, ref alphaBlendTrails);
                 }
             }
-            public static void AddAdditive(Projectile proj, float width, Color startColor, Color endColor)
+            public static void AddAdditive(Projectile proj, float width, Color startColor, Color endColor, float extraOffset = 20)
             {
-                Trail trail = TrailFromProj(proj, width, startColor, endColor);
+                Trail trail = TrailFromProj(proj, width, startColor, endColor, extraOffset);
                 if (trail != null)
                 {
                     AddToArray(trail, ref additiveTrails);
                 }
             }
-            static Trail TrailFromProj(Projectile proj, float width, Color startColor, Color endColor)
+            static Trail TrailFromProj(Projectile proj, float width, Color startColor, Color endColor, float extraOffset = 20)
             {
                 Trail trail = new Trail();
                 int trailLength = 0;
@@ -66,10 +66,10 @@ namespace KirboMod.Systems
                 trail.rotations = new float[trailLength];
                 for (int i = 1; i < trailLength; i++)
                 {
-                    trail.positions[i] = proj.oldPos[i - 1] + proj.Size / 2 + (proj.oldRot[i - 1] - MathF.PI / 4).ToRotationVector2() * 20;
+                    trail.positions[i] = proj.oldPos[i - 1] + proj.Size / 2 + (proj.oldRot[i - 1] - MathF.PI / 4).ToRotationVector2() * extraOffset;
                     trail.rotations[i] = proj.oldRot[i - 1];
                 }
-                trail.positions[0] = proj.Center - (proj.rotation - MathF.PI / 4).ToRotationVector2() * 20; ;
+                trail.positions[0] = proj.Center - (proj.rotation - MathF.PI / 4).ToRotationVector2() * extraOffset;
                 trail.rotations[0] = proj.rotation;
                 trail.width = width;
                 trail.startColor = startColor;

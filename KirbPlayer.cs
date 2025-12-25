@@ -3,10 +3,10 @@ using KirboMod.Items.Weapons;
 using KirboMod.Mounts;
 using KirboMod.NPCs;
 using KirboMod.Projectiles;
-using KirboMod.Projectiles.Pets;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -36,7 +36,7 @@ namespace KirboMod
 
         public bool[] HasTripleStars = { false, false, false }; //targeting
         public int tripleStarRotationCounter = 0;
-        public int[] tripleStarIndexes = new int[3];
+        public int[] tripleStarIdentities = new int[3] { -1, -1, -1 };
 
         public bool nightcrown; //for nightmare crown accesory true or false
         public bool nightmareeffect; // nightmare crown effect
@@ -191,11 +191,20 @@ namespace KirboMod
         public TripleStarStar GetAvailableTripleStarStar()
         {
             TripleStarStar availableStar;
-            for (int i = 0; i < tripleStarIndexes.Length; i++)
+            for (int i = 0; i < tripleStarIdentities.Length; i++)
             {
-                if (tripleStarIndexes[i] != -1)
+                if (tripleStarIdentities[i] != -1)
                 {
-                    availableStar = Main.projectile[tripleStarIndexes[i]].ModProjectile as TripleStarStar;
+                    Projectile availableStarProj = Main.projectile.FirstOrDefault(p => p.active && p.identity == tripleStarIdentities[i] && p.type == ModContent.ProjectileType<TripleStarStar>() && p.owner == Player.whoAmI);
+                    if(availableStarProj == null)
+                    {
+                        continue;
+                    }
+                    availableStar = availableStarProj.ModProjectile as TripleStarStar;
+                    if(availableStar == null)
+                    {
+                        continue;
+                    }
                     if (availableStar.AvailableForUse)
                     {
                         return availableStar;
@@ -224,68 +233,68 @@ namespace KirboMod
                 fighterGloveLevelOneCooldown = 0;
             }
 
+            UpdateTripleStar();
 
-            //TRIPLE STAR STARS
-            tripleStarRotationCounter += 1;
-
-            int tripleStarID = ModContent.ItemType<TripleStar>();
-            if (Main.netMode == NetmodeID.SinglePlayer)
-            {
-                if (Player.HeldItem.type == tripleStarID && !Player.dead && Player.active)
-                {
-                    float finalDamage = Player.GetTotalDamage(Player.HeldItem.DamageType).ApplyTo(Player.HeldItem.damage); //final damage calculated
-                    for (int i = 0; i < tripleStarIndexes.Length; i++)
-                    {
-                        if (tripleStarIndexes[i] == -1 || !Main.projectile[tripleStarIndexes[i]].active)
-                        {
-                            tripleStarIndexes[i] = Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, Vector2.Zero,
-                                    ModContent.ProjectileType<TripleStarStar>(), (int)finalDamage, 0, Player.whoAmI, 0, 0);
-                        }
-                        else
-                        {
-                            Projectile tripleStar = Main.projectile[tripleStarIndexes[i]];
-                            tripleStar.timeLeft = 2;
-                        }
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < tripleStarIndexes.Length; i++)
-                    {
-                        if (tripleStarIndexes[i] != -1)
-                        {
-                            Main.projectile[tripleStarIndexes[i]].Kill();
-                            tripleStarIndexes[i] = -1;
-                        }
-                    }
-                }
-            }
-            else if (Player.HeldItem.type == tripleStarID && !Player.dead && Player.active)
-            {
-                if ((int)Main.timeForVisualEffects % 20 == 0 && Player.whoAmI == Main.myPlayer)//hits are local anyway so
-                {
-                    int finalDamage = (int)Player.GetTotalDamage(Player.HeldItem.DamageType).ApplyTo(Player.HeldItem.damage);
-                    bool crit = Main.rand.Next(100) < Player.GetCritChance(Player.HeldItem.DamageType) + Player.HeldItem.crit;
-                    float kb = Player.GetKnockback(Player.HeldItem.DamageType).ApplyTo(Player.HeldItem.knockBack);
-                    for (int i = 0; i < Main.maxNPCs; i++)
-                    {
-                        NPC npc = Main.npc[i];
-                        if (Helper.CheckCircleCollision(npc.Hitbox, Player.Center, 100))
-                        {
-                            npc.SimpleStrikeNPC(finalDamage, MathF.Sign(npc.Center.X - Player.Center.X), crit, kb, Player.HeldItem.DamageType, false, Player.luck);
-                        }
-                    }
-                }
-                Dust d = Dust.NewDustPerfect(Player.Center + Main.rand.NextFloat(MathF.Tau).ToRotationVector2() * 100, DustID.BlueTorch, Player.velocity, 0, default, 2);
-                d.noGravity = true;
-            }
-            //Plasma
+            //else if (Player.HeldItem.type == tripleStarID && !Player.dead && Player.active)
+            //{
+            //    if ((int)Main.timeForVisualEffects % 20 == 0 && Player.whoAmI == Main.myPlayer)//hits are local anyway so
+            //    {
+            //        int finalDamage = (int)Player.GetTotalDamage(Player.HeldItem.DamageType).ApplyTo(Player.HeldItem.damage);
+            //        bool crit = Main.rand.Next(100) < Player.GetCritChance(Player.HeldItem.DamageType) + Player.HeldItem.crit;
+            //        float kb = Player.GetKnockback(Player.HeldItem.DamageType).ApplyTo(Player.HeldItem.knockBack);
+            //        for (int i = 0; i < Main.maxNPCs; i++)
+            //        {
+            //            NPC npc = Main.npc[i];
+            //            if (Helper.CheckCircleCollision(npc.Hitbox, Player.Center, 100))
+            //            {
+            //                npc.SimpleStrikeNPC(finalDamage, MathF.Sign(npc.Center.X - Player.Center.X), crit, kb, Player.HeldItem.DamageType, false, Player.luck);
+            //            }
+            //        }
+            //    }
+            //    Dust d = Dust.NewDustPerfect(Player.Center + Main.rand.NextFloat(MathF.Tau).ToRotationVector2() * 100, DustID.BlueTorch, Player.velocity, 0, default, 2);
+            //    d.noGravity = true;
+            //}
 
             UpdatePlasmaCharge();
 
             UpdateRightClicksArray();
             UpdateFinalCutter();
         }
+
+        private void UpdateTripleStar()
+        {
+            tripleStarRotationCounter += 1;
+
+            int tripleStarID = ModContent.ItemType<TripleStar>();
+            if (Player.HeldItem.type == tripleStarID && !Player.dead && Player.active)
+            {
+                float finalDamage = Player.GetTotalDamage(Player.HeldItem.DamageType).ApplyTo(Player.HeldItem.damage); //final damage calculated
+                for (int i = 0; i < tripleStarIdentities.Length; i++)
+                {
+                    if (tripleStarIdentities[i] == -1)
+                    {
+                        if (Main.myPlayer == Player.whoAmI)
+                        {
+                            tripleStarIdentities[i] = Projectile.NewProjectileDirect(Player.GetSource_FromThis(), Player.Center, Vector2.Zero,
+                                    ModContent.ProjectileType<TripleStarStar>(), (int)finalDamage, 0, Player.whoAmI, 0, 0).identity;
+                            if (Main.netMode == NetmodeID.MultiplayerClient)
+                            {
+                                NetMethods.SendNewTripleStarStarIdentity((byte)Player.whoAmI, (short)tripleStarIdentities[i]);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Projectile tripleStar = Main.projectile.FirstOrDefault(p => p.active && p.identity == tripleStarIdentities[i] && p.type == ModContent.ProjectileType<TripleStarStar>() && p.owner == Player.whoAmI);
+                        if (tripleStar != null)
+                        {
+                            tripleStar.timeLeft = 10000;
+                        }
+                    }
+                }
+            }
+        }
+
         public override void PreUpdateMovement()
         {
             UpdateFighterManeuvers();
@@ -453,7 +462,7 @@ namespace KirboMod
 
                         int damage = 40 + Player.statDefense / 2;
                         Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center,
-                            Main.rand.NextVector2Circular(20, 20), ModContent.ProjectileType<SmallDarkMatterShot>(), damage, 8f, Main.myPlayer, 0, Player.whoAmI);
+                            Main.rand.BetterNextVector2Circular(20), ModContent.ProjectileType<SmallDarkMatterShot>(), damage, 8f, Main.myPlayer, 0, Player.whoAmI);
 
                         gloombadgeattackcount = 0;
                     }

@@ -56,7 +56,7 @@ namespace KirboMod.NPCs.Marx
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[NPC.type] = 25;
-
+            NPCID.Sets.NeedsExpertScaling[Type] = true;
             NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new()
             {
                 PortraitScale = 1f, // Portrait refers to the full picture when clicking on the icon in the bestiary
@@ -67,7 +67,8 @@ namespace KirboMod.NPCs.Marx
 
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true; //immune to not mess up movement
         }
-
+        public static int MaxHP => 56000;
+        public static int Defense => 40;
         public override void SetDefaults()
         {
             NPC.width = 400;
@@ -76,8 +77,8 @@ namespace KirboMod.NPCs.Marx
             NPC.damage = 70;
             NPC.noTileCollide = true;
             NPC.friendly = false;
-            NPC.lifeMax = 25000;
-            NPC.defense = 25;
+            NPC.lifeMax = MaxHP;
+            NPC.defense = Defense;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath1;
             NPC.value = Item.buyPrice(0, 15, 0, 0);

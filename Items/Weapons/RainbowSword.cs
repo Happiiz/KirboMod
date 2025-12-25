@@ -63,7 +63,6 @@ namespace KirboMod.Items.RainbowSword
 		public override bool MeleePrefix() => true;
         public override void SetDefaults()
 		{
-			ItemID.Sets.ItemNoGravity[Type] = false;
 			Item.damage = 211;//it has a relatively slow base use time so this compensates(+ also shorter range relatively)
 			Item.DamageType = DamageClass.Melee; 
 			Item.width = 40;
@@ -103,8 +102,20 @@ namespace KirboMod.Items.RainbowSword
 			recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.EvilDrop>());
 			recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.HellDrop>());
 			recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.OceanDrop>());
+			recipe.AddIngredient<SoulMatter>(3);
 			recipe.AddTile(TileID.MythrilAnvil);
 			recipe.Register();
-		}
+
+            recipe = CreateRecipe();
+            recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.SnowDrop>());
+            recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.JungleDrop>());
+            recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.DesertDrop>());
+            recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.EvilDrop>());
+            recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.HellDrop>());
+            recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.OceanDrop>());
+            recipe.AddIngredient(ItemID.EmpressBlade);//terraprisma
+            recipe.AddTile(TileID.MythrilAnvil);
+            recipe.Register();
+        }
 	}
 }

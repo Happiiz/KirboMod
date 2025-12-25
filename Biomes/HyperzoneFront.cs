@@ -1,4 +1,5 @@
-﻿using KirboMod.NPCs;
+﻿using KirboMod.Configs;
+using KirboMod.NPCs;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent.Events;
@@ -16,7 +17,7 @@ namespace KirboMod.Biomes
         private void On_ScreenObstruction_Draw(On_ScreenObstruction.orig_Draw orig, SpriteBatch spriteBatch)
         {
             orig(spriteBatch);
-            if (!SkyManager.Instance["KirboMod:HyperZone"].IsActive() || !ModContent.GetInstance<KirbConfig>().HyperzoneClouds)
+            if (!SkyManager.Instance["KirboMod:HyperZone"].IsActive() || !ModContent.GetInstance<HyperZoneConfig>().DisableClouds)
                 return;
             ZeroSky.DrawFrontLayer(spriteBatch);
         }

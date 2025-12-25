@@ -43,8 +43,8 @@ namespace KirboMod.NPCs.Marx.Townie
             DrawOffsetY = 32;
 			NPC.aiStyle = 0;
 			NPC.damage = 0;
-			NPC.defense = 30;
-			NPC.lifeMax = 25000;
+			NPC.defense = MarxBoss.Defense;
+			NPC.lifeMax = MarxBoss.MaxHP;
 			NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath6;
 			NPC.knockBackResist = 0.5f;

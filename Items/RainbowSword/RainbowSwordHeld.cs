@@ -61,11 +61,11 @@ namespace KirboMod.Items.RainbowSword
             float derivative = 3 * c3 * MathF.Pow(progress - 1, 2) + 2 * c1 * (progress - 1);
             return derivative;
         }
-        float GetSparkleVel(Vector2 hitPoint)
+        static float GetSparkleVel(Vector2 hitPoint, byte ownerIndex, float progress)
         {
-            Player player = Main.player[Projectile.owner];
+            Player player = Main.player[ownerIndex];
             Vector2 origin = player.RotatedRelativePoint(player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation));
-            return Derivative(Progress) * Utils.Remap(hitPoint.Distance(origin) * 0.02f, 0, 20, 2, 20, false);
+            return Derivative(progress) * Utils.Remap(hitPoint.Distance(origin) * 0.02f, 0, 20, 2, 20, false);
         }
         static float AngleLerpLongWay(float curAngle, float targetAngle, float amount)
         {
@@ -128,9 +128,9 @@ namespace KirboMod.Items.RainbowSword
             if(progress < 1)
             SparklesFromSwing(progress, lightStart, lightEnd);
         }
-        Vector2 GetOrigin()
+        static Vector2 GetOrigin(byte plrIndex)
         {
-            Player player = Main.player[Projectile.owner];
+            Player player = Main.player[plrIndex];
             return player.RotatedRelativePoint(player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation));
         }
         private void MakePlayerHoldMe()
@@ -173,10 +173,19 @@ namespace KirboMod.Items.RainbowSword
             float a = 0;
             if (Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center - VisualRotation.ToRotationVector2() * 170 * Projectile.scale, Projectile.Center + VisualRotation.ToRotationVector2() * 170 * Projectile.scale, 70, ref a))
             {
-                HitEffect(targetHitbox);
                 return true;
             }
             return false;
+        }
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            Vector2 targetPos = target.Center;
+            float progress = Progress;
+            if (Main.netMode != NetmodeID.SinglePlayer)
+            {
+                NetMethods.SendRainbowSwordHit(targetPos, (sbyte)SwingDir, (byte)Projectile.owner, progress);
+            }
+            HitEffect(targetPos, (int)SwingDir, (byte)Projectile.owner, progress);
         }
         private static void LoadShaderIfNeeded()
         {
@@ -185,24 +194,24 @@ namespace KirboMod.Items.RainbowSword
                 rainbowEffect = ModContent.Request<Effect>("KirboMod/Items/RainbowSword/RainbowSwordHeldShader", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
             }
         }
-        private void HitEffect(Rectangle targetHitbox)
-        {
-            SoundEngine.PlaySound((Main.rand.NextBool() ? SoundID.Item67 : SoundID.Item68) with { MaxInstances = 0, Volume = 0.4f }, Projectile.Center);
+        public static void HitEffect(Vector2 targetPos, int swingDir, byte projOwner, float progress)
+        {    
+            SoundEngine.PlaySound((Main.rand.NextBool() ? SoundID.Item67 : SoundID.Item68) with { MaxInstances = 0, Volume = 0.4f }, targetPos);
             for (int j = 0; j < 10; j++)
             {
-                SparkleFromHit(targetHitbox);
+                SparkleFromHit(targetPos, swingDir, projOwner, progress);
             }
         }
-        private void SparkleFromHit(Rectangle targetHitbox)
+        private static void SparkleFromHit(Vector2 targetPos, int swingDir, byte plrIndex, float progress)
         {
             Vector2 extraVel = Main.rand.NextVector2Circular(1000, 1000) / 200;
-            extraVel += Vector2.Normalize(targetHitbox.Center.ToVector2() - GetOrigin()).RotatedBy(SwingDir * MathF.PI / 2) * GetSparkleVel(targetHitbox.Center());
+            extraVel += Vector2.Normalize(targetPos - GetOrigin(plrIndex)).RotatedBy(swingDir * MathF.PI / 2) * GetSparkleVel(targetPos, plrIndex, progress);
             Vector2 centerVel = extraVel;
             extraVel = extraVel.RotatedByRandom(0.3f);
             extraVel *= MathHelper.Lerp(0.9f, 1.5f, Main.rand.NextFloat());
             float hue = Utils.Remap((centerVel - extraVel).ToRotation(), -MathF.PI, MathF.PI, 0, 1);
             Sparkle spalrkle = new Sparkle(
-                targetHitbox.Center.ToVector2() - centerVel * 5 + Main.rand.NextVector2Circular(1000, 1000) / 80,
+                targetPos - centerVel * 5 + Main.rand.NextVector2Circular(1000, 1000) / 80,
                 Main.hslToRgb(hue, 1, 0.5f),
                 extraVel,
                 new Vector2(1, 1.5f) * 1.6f);
@@ -212,17 +221,17 @@ namespace KirboMod.Items.RainbowSword
         private void SparklesFromSwing(float progress, Vector2 lightStart, Vector2 lightEnd)
         {
             float sparkleChance = MathHelper.Lerp(0.5f, 1, Main.gfxQuality);
-            {
+            {//TODO: MAKE CONFIG FOR SPARKLES????????? AND MARX LASER
                 if (Main.rand.NextFloat() > sparkleChance)
                     return;
                 // float extraProgress = Utils.GetLerpValue(0, 15, i) / UseTime;
 
                 Vector2 spawnPos = (Projectile.rotation - MathF.PI / 4).ToRotationVector2() * 140 * Projectile.scale + Projectile.Center;
-                Vector2 origin = GetOrigin();
+                Vector2 origin = GetOrigin((byte)Projectile.owner);
                 float backFactor = Main.rand.NextFloat();
                 backFactor = 1 - (1 - backFactor) * (1 - backFactor);
                 Vector2 spawnPosOffset = Vector2.Lerp(origin, spawnPos, MathHelper.Lerp(0.5f, 1f, backFactor));
-                Sparkle sparkle = new(spawnPos + (spawnPosOffset - spawnPos), Main.DiscoColor, VisualRotation.ToRotationVector2().RotatedBy(SwingDir * MathF.PI / 2).RotatedByRandom(0.3f) * GetSparkleVel(spawnPos/*, -extraProgress*/) * backFactor, new Vector2(1, 1.5f) * 1.5f, Vector2.One * 1.5f, 30);
+                Sparkle sparkle = new(spawnPos + (spawnPosOffset - spawnPos), Main.DiscoColor, VisualRotation.ToRotationVector2().RotatedBy(SwingDir * MathF.PI / 2).RotatedByRandom(0.3f) * GetSparkleVel(spawnPos/*, -extraProgress*/, (byte)Projectile.owner, progress) * backFactor, new Vector2(1, 1.5f) * 1.5f, Vector2.One * 1.5f, 30);
                 sparkle.RotateToVel();
                 sparkle.Confirm();
             }
@@ -261,14 +270,16 @@ namespace KirboMod.Items.RainbowSword
             float timeLeft = UseTime - Timer;
 
             float fade = Utils.GetLerpValue(0, 5, timeLeft, true);
+            float extraTrailOffset = 50;
+            float trailWidth = 260;
             if (!HeldProjTrailSystem.IsDarkEnvironment(Main.player[Projectile.owner], out byte spaceAlpha))
             {
                 Color color = Main.DiscoColor with { A = spaceAlpha };
-                HeldProjTrailSystem.Trail.AddAlphaBlend(Projectile, 270, color * fade, color * fade);
+                HeldProjTrailSystem.Trail.AddAlphaBlend(Projectile, trailWidth, color * fade, color * fade, extraTrailOffset);
             }
             else
             {
-                HeldProjTrailSystem.Trail.AddAdditive(Projectile, 270, Main.DiscoColor * fade, Main.DiscoColor * fade);
+                HeldProjTrailSystem.Trail.AddAdditive(Projectile, trailWidth, Main.DiscoColor * fade, Main.DiscoColor * fade, extraTrailOffset);
             }
         }
     }

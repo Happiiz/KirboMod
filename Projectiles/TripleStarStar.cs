@@ -1,8 +1,10 @@
+using KirboMod.Items.Weapons;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -35,7 +37,7 @@ namespace KirboMod.Projectiles
             Projectile.height = 50;
             Projectile.friendly = true;
             Projectile.DamageType = DamageClass.Magic;
-            Projectile.timeLeft = 500;
+            Projectile.timeLeft = 2;
             Projectile.tileCollide = false;
             Projectile.penetrate = -1;
             Projectile.scale = 1f;
@@ -88,16 +90,42 @@ namespace KirboMod.Projectiles
                 Vector2 targetPos = targetIndex == -1 ? Main.MouseWorld : Main.npc[targetIndex].Center;
                 float velLength = MathF.Max((targetPos - Projectile.Center).Length() / 20, 50f);
                 Projectile.velocity = targetIndex == -1 ? Vector2.Normalize(targetPos - Projectile.Center) * velLength : Helper.GetPredictiveAimVelocity(Projectile.Center, velLength, targetPos, Main.npc[targetIndex].velocity);
-                Projectile.netUpdate = true;
+                NetMessage.SendData(MessageID.SyncProjectile, -1, -1, null, Projectile.whoAmI);
             }
             SoundEngine.PlaySound(SoundID.Item9, Projectile.position); //star sound       
         }
         int AfterImgDrawCancelCount { get => (int)Projectile.localAI[0]; set => Projectile.localAI[0] = value; }
+        int PositioningTimer { get => (int)Projectile.localAI[1]; set => Projectile.localAI[1] = value; }
         public bool AvailableForUse { get => BehaviourMode == TripleStarBehaviourMode.CirclingPlayer; }
         TripleStarBehaviourMode BehaviourMode { get => (TripleStarBehaviourMode)(int)Projectile.ai[1]; set => Projectile.ai[1] = (int)value; }
         public override void AI()
         {
+            PositioningTimer++;
             Player player = Main.player[Projectile.owner];
+            if(player.CCed || player.dead || !player.active || player.HeldItem.type != ModContent.ItemType<TripleStar>())
+            {
+                if (Main.netMode == NetmodeID.MultiplayerClient)
+                {
+                    if (Main.myPlayer == Projectile.owner && player.active)
+                    {
+                        NetMethods.SendClearTripleStarStarIdentity((byte)Projectile.owner, (short)Projectile.identity);
+                        Projectile.Kill();
+                    }
+                }
+                else
+                {
+                    int[] identities = player.GetModPlayer<KirbPlayer>().tripleStarIdentities;
+                    for (int i = 0; i < identities.Length; i++)
+                    {
+                        if (identities[i] == Projectile.identity)
+                        {
+                            identities[i] = -1;
+                        }
+                    }
+                    Projectile.Kill();
+                }
+                return;
+            }
             Lighting.AddLight(Projectile.Center, 0.255f, 0.255f, 0f);
             Projectile.rotation += 0.3f; // rotates projectile
             int dustIndex = Dust.NewDust(Projectile.position, 50, 50, DustID.BlueTorch, Scale: 2f); //dust
@@ -125,6 +153,10 @@ namespace KirboMod.Projectiles
                     if (Projectile.ai[0] >= 25)//time before returning to player
                     {
                         BehaviourMode = TripleStarBehaviourMode.ReturningToPlayer;
+                        if (Main.myPlayer == Projectile.owner)
+                        {
+                            Projectile.netUpdate = true;
+                        }
                     }
                     break;
                 case TripleStarBehaviourMode.ReturningToPlayer:
@@ -134,6 +166,10 @@ namespace KirboMod.Projectiles
                     if (Projectile.DistanceSQ(targetPos) < 16 * 16 * 3 * 3) //if at least less than 3 tile away from player
                     {
                         BehaviourMode = TripleStarBehaviourMode.CirclingPlayer;
+                        if (Main.myPlayer == Projectile.owner)
+                        {
+                            Projectile.netUpdate = true;
+                        }
                     }
                     break;
             }
@@ -154,17 +190,22 @@ namespace KirboMod.Projectiles
         }
         Vector2 GetWeirdAsfPosOffsetForCirclingPlayer()
         {
+            int identity = Projectile.identity;
             //this is copied from EoL's dash effect lol
             float offsetDistanceMultiplier = 200;//default value 200
-            float timer = (float)Main.timeForVisualEffects / 60f * (Projectile.whoAmI % 2 * 2 - 1) + Projectile.whoAmI;
+            float timer = (float)PositioningTimer / 60f * (identity % 2 * 2 - 1) + identity;
             Vector3 offset3D = Vector3.Transform(Vector3.Forward,
-                Matrix.CreateRotationX((timer - 0.3f * Projectile.whoAmI * 1f) * 0.7f * MathF.Tau) *
-                Matrix.CreateRotationY((timer - 0.8f * Projectile.whoAmI * 3f) * 0.7f * MathF.Tau) *
-                Matrix.CreateRotationZ(timer * Projectile.whoAmI * 5 * 0.1f * MathF.Tau));
+                Matrix.CreateRotationX((timer - 0.3f * identity * 1f) * 0.7f * MathF.Tau) *
+                Matrix.CreateRotationY((timer - 0.8f * identity * 3f) * 0.7f * MathF.Tau) *
+                Matrix.CreateRotationZ(timer * identity * 5 * 0.1f * MathF.Tau));
             offsetDistanceMultiplier += Utils.GetLerpValue(-1f, 1f, offset3D.Z, clamped: true) * 150f;
             offsetDistanceMultiplier = Utils.GetLerpValue(100, 150, offsetDistanceMultiplier, true) * 80f + 80f;
             Vector2 offset = new Vector2(offset3D.X, offset3D.Y) * offsetDistanceMultiplier;
             return Main.player[Projectile.owner].Center + offset.RotatedBy((float)Main.timeForVisualEffects / 180f * MathF.Tau) * 0.3f;
+        }
+        public override void OnKill(int timeLeft)
+        {
+
         }
         public override Color? GetAlpha(Color lightColor) => Color.White;
         public override bool PreDraw(ref Color lightColor)
@@ -178,7 +219,7 @@ namespace KirboMod.Projectiles
             {
                 startCount = Projectile.oldPos.Length - AfterImgDrawCancelCount;
                 startCount = (int)MathHelper.Clamp(startCount, 0, Projectile.oldPos.Length - 1);
-                endCount = 0; ;
+                endCount = 0;
             }
             for (int k = startCount; k >= endCount; k--)
             {

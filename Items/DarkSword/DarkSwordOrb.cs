@@ -18,6 +18,7 @@ namespace KirboMod.Items.DarkSword
         }
         public override void SetDefaults()
         {
+            Projectile.extraUpdates = 2;
             Projectile.width = 90;
             Projectile.height = 90;
             Projectile.friendly = true;
@@ -26,11 +27,9 @@ namespace KirboMod.Items.DarkSword
             Projectile.penetrate = 1;
             Projectile.alpha = 255;
             Projectile.usesLocalNPCImmunity = true;
-            Projectile.localNPCHitCooldown = 4;
+            Projectile.localNPCHitCooldown = 8;
         }
         ref float Timer { get => ref Projectile.ai[0]; }
-
-        float bouncesLeft { get => Projectile.ai[1]; set => Projectile.ai[1] = value; }
 
         public override void AI()
         {
@@ -98,32 +97,33 @@ namespace KirboMod.Items.DarkSword
             }
             if (Projectile.penetrate == 1)
                 return;
-            Projectile.Hitbox = Utils.CenteredRectangle(Projectile.Center, Projectile.Size * 3);
+            Projectile.Hitbox = Utils.CenteredRectangle(Projectile.Center, new Vector2(500));
+            //Dust.DrawDebugBox(Projectile.Hitbox);
             ParticleEffect();
             SoundEngine.PlaySound(SoundID.DD2_ExplosiveTrapExplode, Projectile.Center);
-            ParticleEffect();
+            //ParticleEffect();
             Projectile.Damage();
         }
 
         void ParticleEffect()
         {
-            for (int i = 0; i < 4; i++)
-            {
-                Ring ring = new Ring(Projectile.Center);
-                ring.color = Color.Purple;
-                ring.scaleUpTime = 20;
-                ring.timeLeft = 20;
-                ring.fadeOutTime = 10;
-                ring.minScale = .8f + i * .3f;
-                ring.shineBrightness = .7f;
-                ring.maxScale = 1.2f + i * .5f;
-                ring.Confirm();
-            }
+           // for (int i = 0; i < 4; i++)
+            //{
+            //    Ring ring = new Ring(Projectile.Center);
+            //    ring.color = Color.Purple;
+            //    ring.scaleUpTime = 10;
+            //    ring.timeLeft = 14;
+            //    ring.fadeOutTime = 4;
+            //    ring.minScale = .8f + i * .3f;
+            //    ring.shineBrightness = .7f;
+            //    ring.maxScale = 1.2f + i * .5f;
+            //    ring.Confirm();
+            //}
             Vector2 scale = new Vector2(4);
-            Sparkle.EyeShine(Projectile.Center, Color.Purple, scale, scale, 30);
-            Sparkle.NewSparkle(Projectile.Center, Color.Purple, scale, Vector2.Zero, 30, scale);
+            Sparkle.EyeShine(Projectile.Center, Color.Purple, scale, scale, 10);
+            Sparkle.NewSparkle(Projectile.Center, Color.Purple, scale, Vector2.Zero, 7, scale);
             scale *= .5f;
-            Array.ForEach(Sparkle.EyeShine(Projectile.Center, Color.Purple, scale, scale, 30), s => { s.rotation += MathF.PI / 4f; s.velocity = s.velocity.RotatedBy(MathHelper.PiOver4); });
+            Array.ForEach(Sparkle.EyeShine(Projectile.Center, Color.Purple, scale, scale, 10), s => { s.rotation += MathF.PI / 4f; s.velocity = s.velocity.RotatedBy(MathHelper.PiOver4); });
         }
     }
 }

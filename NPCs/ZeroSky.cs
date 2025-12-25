@@ -1,8 +1,8 @@
 using KirboMod.Biomes;
+using KirboMod.Configs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using System;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.Graphics.Effects;
@@ -13,16 +13,13 @@ namespace KirboMod.NPCs
     public class ZeroSky : CustomSky
     {
 
-        private readonly Random _random = new Random();
         private bool isActive;
-        private Asset<Texture2D> cloudstexture;
-        private bool playerleaving;
-        static float fadeCounter; 
-        private static int bgOffset = 0;
+        static float fadeCounter;
+        private static float bgOffset = 0;
         static float fgOffset = 0;
-        const int slideSpeed = 5;
+        public const float slideSpeed = 5;
         public static float FadeInSpeed => 1f / 40f;
-        public static float FadeOutSpeed => 1f / 70f;
+        public static float FadeOutSpeed => 1f / 300f;
         public override void Update(GameTime gameTime)
         {
             if (Main.gamePaused || !Main.hasFocus)
@@ -31,8 +28,8 @@ namespace KirboMod.NPCs
             }
             Fading();
 
-            bgOffset += slideSpeed; //go faster than special sky in sonic mod
-            fgOffset += slideSpeed * Helper.Phi;
+            bgOffset += SafeFloat(HyperZoneConfig.Instance.HyperZoneBackScrollSpeed); //go faster than special sky in sonic mod
+            fgOffset += SafeFloat(HyperZoneConfig.Instance.HyperZoneFrontScrollSpeed);
             fgOffset %= 1024;
             if (fgOffset >= 1024)
             {
@@ -44,7 +41,15 @@ namespace KirboMod.NPCs
             }
 
         }
-
+        static float SafeFloat(float input)
+        {
+            //not NaN, or infinity I think?
+            if (float.IsNormal(input))
+            {
+                return input;
+            }
+            return 0;
+        }
         private void Fading()
         {
             if (isActive)
@@ -65,7 +70,7 @@ namespace KirboMod.NPCs
 
         public override Color OnTileColor(Color inColor)
         {
-            float intensity = GetIntensity();
+            float intensity = GetIntensity() * GetOpacity();
             return new Color(Vector4.Lerp(new Vector4(0.75f, 0.75f, 1f, 1f), inColor.ToVector4(), 1f - intensity));
         }
 
@@ -78,18 +83,21 @@ namespace KirboMod.NPCs
             float opacity = GetOpacity();
             if (maxDepth >= 0f && minDepth < 0f)
             {
-                spriteBatch.Draw(TextureAssets.BlackTile.Value, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.Blue * .4f * opacity);
+                Color tintColor = HyperZoneConfig.Instance.HyperZoneBackgroundTintColor * HyperZoneConfig.Instance.HyperZoneBackgroundTintOpacity * opacity;
+                spriteBatch.Draw(TextureAssets.BlackTile.Value, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), tintColor);
             }
-            //Main cloud
-            if (ModContent.GetInstance<KirbConfig>().HyperzoneClouds) //enabled in the config
+            //background clouds
+            if (ModContent.GetInstance<HyperZoneConfig>().DisableClouds) //enabled in the config
             {
                 Main.spriteBatch.End();
                 Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
                 hyperZoneFront ??= ModContent.Request<Texture2D>("KirboMod/ExtraTextures/HyperZoneFront");
                 hyperZoneBack ??= ModContent.Request<Texture2D>("KirboMod/ExtraTextures/HyperZoneBack");
                 Texture2D back = hyperZoneBack.Value;
-                Vector2 texSize = hyperZoneBack.Size();
                 Vector2 plrPos = Main.screenPosition;
+                Vector2 texSize = hyperZoneBack.Size();
+                Color drawCol = HyperZoneConfig.Instance.HyperZoneCloudsBackColor;
+                drawCol *= opacity * HyperZoneConfig.Instance.HyperZoneCloudsBackOpacity;
                 for (int i = -2; i < 3; i++)
                 {
                     for (int j = 0; j < 3; j++)
@@ -98,11 +106,11 @@ namespace KirboMod.NPCs
                         int offsetY = (int)(j * texSize.Y);
                         offsetX -= (int)(plrPos.X % texSize.X);
                         offsetY -= (int)(plrPos.Y % texSize.Y);
-                        offsetX += bgOffset;
-                        offsetY -= bgOffset;
-                        Rectangle destination = new Rectangle(offsetX, offsetY, (int)texSize.X, (int)texSize.Y);
-                        
-                        spriteBatch.Draw(back, destination, Color.Black * opacity);
+                        offsetX += (int)bgOffset;
+                        offsetY -= (int)bgOffset;
+                        Rectangle destination = new(offsetX, offsetY, (int)texSize.X, (int)texSize.Y);
+
+                        spriteBatch.Draw(back, destination, drawCol);
                     }
                 }
                 //what spritebatch was before
@@ -117,23 +125,29 @@ namespace KirboMod.NPCs
             Vector2 texSize = hyperZoneFront.Size();
             Vector2 referencePos = Main.screenPosition;
             float opacity = GetOpacity();
+            Color drawCol = HyperZoneConfig.Instance.HyperZoneCloudsFrontColor;
+
+            drawCol *= HyperZoneConfig.Instance.HyperZoneCloudsFrontOpacity * opacity;
             for (int i = 0; i < 4; i++)
             {
                 for (int j = -1; j < 3; j++)
                 {
-                    float offsetX = i * texSize.X;
-                    float offsetY = j * texSize.Y;
+                    float offsetX = i * (texSize.X);
+
+                    float offsetY = j * (texSize.Y + 1);
+
                     offsetX -= referencePos.X % texSize.X;
                     offsetY -= referencePos.Y % texSize.Y;
                     offsetX -= fgOffset;
                     offsetY += fgOffset;
-                    sb.Draw(front, new Rectangle((int)(offsetX + .5f), (int)(offsetY + .5f), (int)(texSize.X), (int)(texSize.Y)), Color.Black * .35f * opacity);
+                    sb.Draw(front, new Rectangle((int)(offsetX), (int)(offsetY), (int)(texSize.X), (int)(texSize.Y)), drawCol);
                 }
             }
 
         }
         private void HyperZoneBG_Old(SpriteBatch spriteBatch)
         {
+            int offset = (int)bgOffset;
             for (int i = -1000; i < 4000; i++) //y
             {
                 if (i % 200 == 0) //get remainder 
@@ -144,11 +158,11 @@ namespace KirboMod.NPCs
                         {
                             BlueCloud = ModContent.Request<Texture2D>("KirboMod/NPCs/DarkCloud2");
                             //this one goes left and down (also shifted to the left a bit)
-                            spriteBatch.Draw(BlueCloud.Value, new Rectangle(j - bgOffset - 200, i + bgOffset * 1, BlueCloud.Width(), BlueCloud.Height()), new Color(255, 255, 255));
+                            spriteBatch.Draw(BlueCloud.Value, new Rectangle(j - offset - 200, i + offset * 1, BlueCloud.Width(), BlueCloud.Height()), new Color(255, 255, 255));
 
                             Cloud = ModContent.Request<Texture2D>("KirboMod/NPCs/DarkCloud");
                             //this one goes up and right
-                            spriteBatch.Draw(Cloud.Value, new Rectangle(j + bgOffset, i + bgOffset * -1, Cloud.Width(), Cloud.Height()), new Color(255, 255, 255));
+                            spriteBatch.Draw(Cloud.Value, new Rectangle(j + offset, i + offset * -1, Cloud.Width(), Cloud.Height()), new Color(255, 255, 255));
                         }
                     }
                 }
@@ -160,19 +174,18 @@ namespace KirboMod.NPCs
         }
         public override float GetCloudAlpha()
         {
-            return 0f;
+            //so regular clouds fade out
+            return Easings.EaseOutSquare(1f - GetOpacity());
         }
 
         public override void Activate(Vector2 position, params object[] args)
         {
             isActive = true;
-            playerleaving = false;
         }
 
         public override void Deactivate(params object[] args)
         {
             isActive = false;
-            playerleaving = true;
         }
 
         public override void Reset()
@@ -194,10 +207,10 @@ namespace KirboMod.NPCs
         {
             orig(info, out sunColor, out moonColor);
             //make it so the night doesn't make hyper zone effect look like an ugly dark blue from the transparency + dark night background
-            int skyColor = 200;
+            int skyColor = HyperZoneConfig.Instance.HyperZoneSkyBrightness;
             if (SkyManager.Instance[Hyperzone.BiomeName].IsActive())
             {
-                Main.ColorOfTheSkies = Color.Lerp(Main.ColorOfTheSkies, new Color(skyColor,skyColor,skyColor), GetOpacity());
+                Main.ColorOfTheSkies = Color.Lerp(Main.ColorOfTheSkies, new Color(skyColor, skyColor, skyColor), GetOpacity());
             }
         }
     }

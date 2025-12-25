@@ -1216,8 +1216,11 @@ Mods: {
 					{$CommonItemTooltip.DefensePenetration}
 					Shoots out a maximum of three ricocheting stars that hit any enemies in their paths
 					Right click to shoot all three stars out at once at the cost of more mana
-					Stars not shot out will rotate around the player and deal damage to nearby enemies...
-					...Except in multiplayer because brother in christ this functionality does not like multiplayer, so it makes a damaging aura instead
+					Stars not shot out will rotate around the player and deal damage to nearby enemies
+
+					[c/ff0000:If] this item is [c/ff0000: not working, right click] it in the [c/ff0000: inventory], while having it [c/ff0000: not selected]
+					You should receive a message talking about star projectile identities being reset.
+					In multiplayer, ask if every other player also got a message talking about this.
 					'''
 			}
 
@@ -2350,6 +2353,122 @@ Mods: {
 					Label: Enable Hyperzone Clouds
 					Tooltip: Enable or disable the clouds present during the Zero fight
 				}
+
+				HyperZoneCloudsFrontColor: {
+					Label: Hyper Zone Clouds Front Color
+					Tooltip: ""
+				}
+
+				HyperZoneCloudsFrontOpacity: {
+					Label: Hyper Zone Clouds Front Opacity
+					Tooltip: ""
+				}
+
+				HyperZoneBackgroundTintOpacity: {
+					Label: Hyper Zone Background Tint Opacity
+					Tooltip: ""
+				}
+
+				HyperZoneBackgroundTintColor: {
+					Label: Hyper Zone Background Tint Color
+					Tooltip: ""
+				}
+
+				HyperZoneCloudsBackColor: {
+					Label: Hyper Zone Clouds Back Color
+					Tooltip: ""
+				}
+
+				HyperZoneCloudsBackOpacity: {
+					Label: Hyper Zone Clouds Back Opacity
+					Tooltip: ""
+				}
+
+				HyperZoneSkyBrightnessOverride: {
+					Label: Hyper Zone Sky Brightness Override
+					Tooltip: ""
+				}
+			}
+
+			HyperZoneConfig: {
+				DisplayName: Hyper Zone Config
+
+				HyperzoneClouds: {
+					Label: Hyperzone Clouds
+					Tooltip: ""
+				}
+
+				HyperZoneCloudsFrontColor: {
+					Label: Hyper Zone Clouds Front Color
+					Tooltip: ""
+				}
+
+				HyperZoneCloudsFrontOpacity: {
+					Label: Hyper Zone Clouds Front Opacity
+					Tooltip: ""
+				}
+
+				HyperZoneBackgroundTintOpacity: {
+					Label: Hyper Zone Background Tint Opacity
+					Tooltip: ""
+				}
+
+				HyperZoneBackgroundTintColor: {
+					Label: Hyper Zone Background Tint Color
+					Tooltip: ""
+				}
+
+				HyperZoneCloudsBackColor: {
+					Label: Hyper Zone Clouds Back Color
+					Tooltip: ""
+				}
+
+				HyperZoneCloudsBackOpacity: {
+					Label: Hyper Zone Clouds Back Opacity
+					Tooltip: ""
+				}
+
+				HyperZoneSkyBrightnessOverride: {
+					Label: Hyper Zone Sky Brightness Override
+					Tooltip: ""
+				}
+
+				HyperZoneSkyBrightness: {
+					Label: Hyper Zone Sky Brightness
+					Tooltip: ""
+				}
+
+				HyperZoneBackScrollSpeed: {
+					Label: Hyper Zone Back Scroll Speed
+					Tooltip: ""
+				}
+
+				HyperZoneFrontScrollSpeed.Tooltip: ""
+
+				RegularPalette: {
+					Label: Regular Palette
+					Tooltip: ""
+				}
+
+				BossButchPalette: {
+					Label: Boss Butch Palette
+					Tooltip: ""
+				}
+
+				TintOnly: {
+					Label: Tint Only
+					Tooltip: ""
+				}
+
+				StationaryClouds: {
+					Label: Stationary Clouds
+					Tooltip: ""
+				}
+
+				DisableClouds: {
+					Label: Disable Clouds
+					Tooltip: ""
+				}
 			}
 
 			GeneralConfig: {
@@ -2366,5 +2485,6 @@ Mods: {
 		}
 
 		Emotes.MarxTownieEmote.Command: Marx
+		HyperZoneConfig.HyperZoneFrontScrollSpeed.Label: Hyper Zone Front Scroll Speed
 	}
 }

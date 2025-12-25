@@ -1,5 +1,4 @@
 using KirboMod.Bestiary;
-using KirboMod.Items.Zero;
 using KirboMod.Projectiles;
 using KirboMod.Projectiles.ZeroDashHitbox;
 using KirboMod.Projectiles.ZeroOrbs;
@@ -14,7 +13,6 @@ using Terraria.Audio;
 using Terraria.Chat;
 using Terraria.GameContent;
 using Terraria.GameContent.Bestiary;
-using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -44,7 +42,7 @@ namespace KirboMod.NPCs
 
         private ZeroAttackType lastattacktype = ZeroAttackType.JustSpawned; //sets last attack type
         public ZeroAttackType attacktype = ZeroAttackType.JustSpawned; //decides the attack
-                                                                      //public to check zero's dash
+                                                                       //public to check zero's dash
         private float backupoffset = 0; //offset goto position when backing up
 
         //so that the music box can update automatically whenever the song is changed
@@ -293,7 +291,7 @@ namespace KirboMod.NPCs
                     case ZeroAttackType.BackgroundShots:
                         Attack_BGShots(player);
                         break;
-                        case ZeroAttackType.BGOrbRings:
+                    case ZeroAttackType.BGOrbRings:
                         Attack_BGOrbRings(player, playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
                         break;
                     case ZeroAttackType.BGOrbCross:
@@ -314,11 +312,11 @@ namespace KirboMod.NPCs
         {
             float timer = NPC.ai[0] - AttackCooldown;
             DefaultMovement(playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
-            if(timer == WindmillStartup)
+            if (timer == WindmillStartup)
             {
                 ZeroOrbWindmill.SpawnOrbWindmillAt(NPC.GetSource_FromAI(), player.Center + player.velocity * WindmillTimeToReach, WindmillTimeToReach, 100, BGShotDamage);
             }
-            if(timer >= WindmillEndTime)
+            if (timer >= WindmillEndTime)
             {
                 NPC.ai[0] = 0;
             }
@@ -368,17 +366,17 @@ namespace KirboMod.NPCs
             float maxZPos = 50;
             Vector2 targetPos = player.Center;
             float acc = 0.006f;
-    
+
             float topSpeed = 80f;
             float maxXDist = 1500;
             float atkProgress = Utils.GetLerpValue(AttackCooldown, AttackCooldown + 360, NPC.ai[0], true);
-           // if (atkProgress > .98f)
+            // if (atkProgress > .98f)
             {
-               // acc = 0.1f;
+                // acc = 0.1f;
                 //topSpeed = 50f;
             }
             float offset = Utils.Remap(NPC.ai[0], AttackCooldown, AttackCooldown + 360, -maxXDist, maxXDist);
-            if(offset > maxXDist / 2)
+            if (offset > maxXDist / 2)
             {
                 offset = maxXDist / 2;
             }
@@ -527,10 +525,12 @@ namespace KirboMod.NPCs
         {
             NPC.TargetClosest(true); //face player during attack
 
-            int burstInterval = 3;
+            int burstInterval = Main.getGoodWorld ?  50 : Main.expertMode ? 60 : 100;
             int burstIndex = (int)((NPC.ai[0] - AttackCooldown) / burstInterval);
-
-            if (Main.netMode != NetmodeID.MultiplayerClient && (NPC.ai[0] - AttackCooldown) % burstInterval == 0)
+            int extraWait = 130;
+            int amountOfBursts = 5;
+            float relativeTimer = NPC.ai[0] - AttackCooldown;
+            if (Main.netMode != NetmodeID.MultiplayerClient && (relativeTimer) % burstInterval == 0 && relativeTimer < burstInterval * amountOfBursts)
             {
                 List<Player> players = new(8);
                 foreach (Player plr in Main.ActivePlayers)//need to index this and count length
@@ -538,30 +538,19 @@ namespace KirboMod.NPCs
                     players.Add(plr);
                 }
                 player = players[burstIndex % players.Count];
-                for (int i = 0; i < 2 * burstInterval; i++)
-                {
 
-                    Vector2 velocity = Main.rand.NextVector2Unit();
-                    float range = Utils.GetLerpValue(0, 60, (NPC.ai[0] / burstInterval) % 60);
-                    if (i % 2 == 0)
-                    {
-                        range = 1 - range;
-                    }
-                    range = MathF.Sqrt(range);
 
-                    float deviation = range;
-                    deviation *= 1000;
-                    Vector2 from = NPC.Center + new Vector2(NPC.direction * 150, 0);
-                    //0.043f is what made it behave right
-                    velocity *= deviation;
-                    velocity = (ZeroSpark.AccountForVelocity(player.Center + velocity, player.velocity) - from) * .043f;
 
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), from,
-                        velocity,
-                        ModContent.ProjectileType<ZeroSpark>(), SparkDamage, 0, Main.myPlayer, 0, 0);
-                }
+
+                Vector2 from = NPC.Center + new Vector2(NPC.direction * 150, 0);
+                //0.043f is what made it behave right
+                Vector2 velocity = player.Center + player.velocity * (ZeroSpark.Lifetime / 2f);
+                Projectile.NewProjectile(NPC.GetSource_FromAI(), from,
+                    velocity,
+                    ModContent.ProjectileType<ZeroSpark>(), SparkDamage, 0, Main.myPlayer, 0, 0, Main.rand.Next(int.MaxValue));
+
             }
-            if ((NPC.ai[0] - AttackCooldown) % 5 == 0)
+            if ((NPC.ai[0] - AttackCooldown) % burstInterval == 0)
             {
                 SoundEngine.PlaySound(SoundID.Item39.WithVolumeScale(1.4f), NPC.Center);
             }
@@ -570,7 +559,7 @@ namespace KirboMod.NPCs
 
             DefaultMovement(playerDistance, playerRightDistance, playerLeftDistance, speed, inertia);
 
-            if ((NPC.ai[0] - AttackCooldown) >= 240)
+            if ((NPC.ai[0] - AttackCooldown) >= burstInterval * amountOfBursts + extraWait)
             {
                 NPC.ai[0] = 0;
             }
@@ -864,7 +853,7 @@ namespace KirboMod.NPCs
                     ZeroEye.GetAIValues(out float[] ai2s);
                     for (int i = 0; i < ai2s.Length; i++)
                     {
-                        NPC.NewNPC(NPC.GetSource_FromThis(), (int)NPC.Center.X, (int)NPC.Center.Y - 15, ModContent.NPCType<ZeroEye>(), ai2: ai2s[i]);
+                        NPC.NewNPC(NPC.GetSource_FromThis(), (int)NPC.Center.X, (int)NPC.Center.Y - 15, ModContent.NPCType<ZeroEye>(), ai2: ai2s[i], ai3: -1);
                     }
                 }
                 NPC.dontTakeDamage = false;

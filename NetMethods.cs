@@ -1,14 +1,17 @@
 ﻿using KirboMod.Items.NewWhispy;
+using KirboMod.Items.RainbowSword;
 using KirboMod.NPCs;
-using KirboMod.Systems;
+using KirboMod.Projectiles;
 using KirboMod.Tiles;
 using Microsoft.Xna.Framework;
 using System;
 using System.IO;
 using System.Linq;
+using System.Security.Principal;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 
 namespace KirboMod
 {
@@ -79,7 +82,27 @@ namespace KirboMod
             /// short: proj identity of the projectile being synced<br/>
             /// byte: whoAmI of the npc hit<br/>
             /// </summary>
-            ProjHitCdSync = 14
+            ProjHitCdSync = 14,
+            /// <summary>
+            /// byte: proj owner
+            /// short: proj identity
+            /// </summary>
+            NewTripleStarStarIdentity = 15,
+            /// <summary>
+            /// byte: proj owner
+            /// short: proj identity
+            /// </summary>
+            ClearTripleStarStarIdentity = 16,
+            /// <summary>
+            /// byte: client to reset the identities of
+            /// </summary>
+            BugfixResetTripleStarStarIdentities = 17,
+            /// <summary>
+            /// vector2 = hit effect position<br></br>
+            /// sbyte = sword hit direction sign<br></br>
+            /// byte = player whoAmI that is using the sword
+            /// </summary>
+            RainbowSwordHit = 18,
         }
         //initially called on the client that owns the projectile
         public static void SyncProjPosition(Projectile proj, byte playerWhoAmI)
@@ -271,6 +294,18 @@ namespace KirboMod
                 case ModPacketType.ProjHitCdSync:
                     ReadProjHitCdSync(reader);
                     break;
+                case ModPacketType.ClearTripleStarStarIdentity:
+                    ReadClearTripleStarStarIdentity(reader);
+                    break;
+                case ModPacketType.NewTripleStarStarIdentity:
+                    ReadNewTripleStarStarIdentity(reader);
+                    break;
+                case ModPacketType.BugfixResetTripleStarStarIdentities:
+                    ReadBugfixTripleStarStarIdentities(reader);
+                    break;
+                case ModPacketType.RainbowSwordHit:
+                    ReadRainbowSwordHit(reader);
+                    break;
             }
         }
 
@@ -280,7 +315,7 @@ namespace KirboMod
         {
             byte npcIndex = reader.ReadByte();
             NPC butterfly = Main.npc[npcIndex];
-            if(butterfly.active && butterfly.type == ModContent.NPCType<OrangeButterfly>())
+            if (butterfly.active && butterfly.type == ModContent.NPCType<OrangeButterfly>())
             {
                 butterfly.active = false;
                 OrangeButterfly.FailedCatchDust(butterfly.Center);
@@ -325,15 +360,15 @@ namespace KirboMod
         }
         public static void SyncProjHitCd(Projectile proj, int npcHitIndex)
         {
-            if(Main.netMode == NetmodeID.SinglePlayer)
+            if (Main.netMode == NetmodeID.SinglePlayer)
             {
                 return;
             }
-            if(npcHitIndex < 0 || npcHitIndex >= Main.maxNPCs)
+            if (npcHitIndex < 0 || npcHitIndex >= Main.maxNPCs)
             {
                 return;
             }
-           
+
             ModPacket p = KirboMod.instance.GetPacket();
             p.Write((byte)ModPacketType.ProjHitCdSync);
             p.Write((short)proj.identity);
@@ -345,8 +380,8 @@ namespace KirboMod
         {
             int projIdentity = reader.ReadInt16();
             int npcHitIndex = reader.ReadByte();
-            Projectile proj = Main.projectile.FirstOrDefault(x => (x.active && x.identity == projIdentity));          
-            if(proj == null)
+            Projectile proj = Main.projectile.FirstOrDefault(x => (x.active && x.identity == projIdentity));
+            if (proj == null)
             {
                 return;
             }
@@ -356,6 +391,138 @@ namespace KirboMod
             {
                 SyncProjHitCd(proj, npcHitIndex);
             }
+        }
+
+        internal static void SendNewTripleStarStarIdentity(byte owner, short identity)
+        {
+            ModPacket p = KirboMod.instance.GetPacket();
+            p.Write((byte)ModPacketType.NewTripleStarStarIdentity);
+            p.Write(owner);
+            p.Write(identity);
+            p.Send();
+        }
+
+        internal static void SendClearTripleStarStarIdentity(byte owner, short identity)
+        {
+            ModPacket p = KirboMod.instance.GetPacket();
+            p.Write((byte)ModPacketType.ClearTripleStarStarIdentity);
+            p.Write(owner);
+            p.Write(identity);
+            p.Send();
+        }
+        static void ReadClearTripleStarStarIdentity(BinaryReader reader)
+        {
+            byte owner = reader.ReadByte();
+            short identity = reader.ReadInt16();
+            Player plr = Main.player[owner];
+            Projectile proj = Main.projectile.FirstOrDefault(p => p.active && p.identity == identity && p.type == ModContent.ProjectileType<TripleStarStar>() && p.owner == owner);
+            KirbPlayer kplr = plr.GetModPlayer<KirbPlayer>();
+            for (int i = 0; i < kplr.tripleStarIdentities.Length; i++)
+            {
+                if (kplr.tripleStarIdentities[i] == identity)
+                {
+                    kplr.tripleStarIdentities[i] = -1;
+                    break;
+                }
+            }
+            if (proj != null)
+            {
+                proj.Kill();
+            }
+            if (Main.dedServ)
+            {
+                SendClearTripleStarStarIdentity(owner, identity);
+            }
+        }
+        static void ReadNewTripleStarStarIdentity(BinaryReader reader)
+        {
+            byte owner = reader.ReadByte();
+            short identity = reader.ReadInt16();
+            Player plr = Main.player[owner];
+            Projectile proj = Main.projectile.FirstOrDefault(p => p.active && p.identity == identity && p.type == ModContent.ProjectileType<TripleStarStar>() && p.owner == plr.whoAmI);
+            KirbPlayer kplr = plr.GetModPlayer<KirbPlayer>();
+            for (int i = 0; i < kplr.tripleStarIdentities.Length; i++)
+            {
+                if (kplr.tripleStarIdentities[i] == -1)
+                {
+                    kplr.tripleStarIdentities[i] = identity;
+                    break;
+                }
+            }
+            if (Main.dedServ)
+            {
+                SendNewTripleStarStarIdentity(owner, identity);
+            }
+        }
+
+        public static void SendBugfixResetTripleStarStarIdentities(Player player)
+        {
+
+            if(player  != null && player.whoAmI < Main.maxPlayers && player.whoAmI >= 0)
+            {
+                SendBugfixResetTripleStarStarIdentities(player.whoAmI);
+            }
+
+        }
+        public static void SendBugfixResetTripleStarStarIdentities(int plrIndex)
+        {
+            if(plrIndex < 0 || plrIndex >= Main.maxPlayers)
+            {
+                return;
+            }
+            ModPacket p = KirboMod.instance.GetPacket();
+            p.Write((byte)ModPacketType.BugfixResetTripleStarStarIdentities);
+            p.Write(plrIndex);
+            p.Send();
+        }
+        public static void ReadBugfixTripleStarStarIdentities(BinaryReader reader)
+        {
+            int plrIndex = reader.ReadByte();
+            if(plrIndex < 0 || plrIndex >= Main.maxPlayers || plrIndex == Main.myPlayer)
+            {
+                return;
+            }
+            Player plr = Main.player[plrIndex];
+            KirbPlayer kplr = plr.GetModPlayer<KirbPlayer>();
+            for (int i = 0; i < kplr.tripleStarIdentities.Length; i++)
+            {
+                kplr.tripleStarIdentities[i] = -1;
+            }
+            if (Main.dedServ)
+            {
+                SendBugfixResetTripleStarStarIdentities(plrIndex);
+            }
+            else
+            {
+                Main.NewText(plr.name + "'s triple star identities have been reset! Tell them this message appeared for you!", Color.Magenta);
+            }
+        }
+
+        public static void SendRainbowSwordHit(Vector2 targetPos, sbyte swingDir, byte projOwner, float progress)
+        {
+            if (projOwner < 0 || projOwner >= Main.maxPlayers)
+            {
+                return;
+            }
+            ModPacket p = KirboMod.instance.GetPacket();
+            p.Write((byte)ModPacketType.RainbowSwordHit);
+            p.WriteVector2(targetPos);
+            p.Write(swingDir);
+            p.Write(projOwner);
+            p.Write(progress);
+            p.Send(-1, projOwner);
+        }
+        static void ReadRainbowSwordHit(BinaryReader reader)
+        {
+            Vector2 targetPos = reader.ReadVector2();
+            sbyte swingDir = reader.ReadSByte();
+            byte projOwner = reader.ReadByte();
+            float progress = reader.ReadSingle();
+            if(Main.dedServ)
+            {
+                SendRainbowSwordHit(targetPos, swingDir, projOwner, progress);
+            } 
+            RainbowSwordHeld.HitEffect(targetPos, swingDir, projOwner, progress);
         }
     }
 }

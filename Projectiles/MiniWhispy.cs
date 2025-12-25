@@ -191,7 +191,7 @@ namespace KirboMod.Projectiles
         }
 
         //thank you chatgpt
-        static Vector2 CalculateInterceptVelocityIterative(Vector2 start, Vector2 target, Vector2 targetVelocity, float launchSpeed, float gravity, int iterations = 3)
+        public static Vector2 CalculateInterceptVelocityIterative(Vector2 start, Vector2 target, Vector2 targetVelocity, float launchSpeed, float gravity, int iterations = 3)
         {
             Vector2 predictedTarget = target + targetVelocity;
             for (int i = 0; i < iterations; i++)

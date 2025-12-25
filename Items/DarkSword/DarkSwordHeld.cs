@@ -143,7 +143,7 @@ namespace KirboMod.Items.DarkSword
             timeLeft /= Projectile.MaxUpdates;
             float fade = Utils.GetLerpValue(0, 5, timeLeft, true);
             fade *= Projectile.Opacity;
-            HeldProjTrailSystem.Trail.AddSubtractive(Projectile, 200, Color.Green * fade, Color.Gray * fade);
+            HeldProjTrailSystem.Trail.AddSubtractive(Projectile, 230, Color.Green * fade, Color.Gray * fade);
         }
     }
 }

@@ -14,6 +14,7 @@ namespace KirboMod.Projectiles.Marx
 
 			Main.projFrames[Projectile.type] = 1;
 		}
+		public static Vector2 Gravity => new Vector2(0f, 0.2f);
 		public override void SetDefaults()
 		{
 			Projectile.width = 32;
@@ -26,7 +27,7 @@ namespace KirboMod.Projectiles.Marx
 		}
 		public override void AI()
 		{
-			Projectile.velocity.Y += 0.4f;
+			Projectile.velocity += Gravity;
 			Projectile.rotation += Projectile.velocity.X * 0.5f; // rotates projectile
 		}
 
