@@ -29,8 +29,8 @@ namespace KirboMod.NPCs.MidBosses
             }
             if (NPC.AnyNPCs(ModContent.NPCType<MrFrosty>()))
             {
-                curMusic = (short)MusicLoader.GetMusicSlot(path + "Photonic0_FrostyBattle_WithLoopMetadata");
-                //return true;
+                curMusic = (short)MusicLoader.GetMusicSlot(path + "Photonic0_FrostyBattle");
+                return true;
             }
             curMusic = -1;
             return false;

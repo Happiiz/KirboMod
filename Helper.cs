@@ -49,6 +49,53 @@ namespace KirboMod
             currVel = Math.Clamp(currVel + speed * direction / inertia, -speed, speed);
         }
 
+
+
+        /// <summary>
+        /// For checking if this grounded NPC could climb tiles. Optionally can trigger complementary ClimbTiles() method with doClimbTiles
+        /// </summary>
+        public static bool CheckClimbTiles(NPC npc, Player player, bool doClimbTiles = false)
+        {
+            bool climableTiles = false;
+            for (int i = 0; i < npc.height; i += 16)
+            {
+                if (npc.direction == 1)
+                {
+                    //checks for tiles on right side of NPC
+                    Point tileLocation = new Vector2(npc.Right.X + 1, npc.position.Y + i).ToTileCoordinates();
+                    climableTiles = WorldGen.SolidTile3(tileLocation.X, tileLocation.Y);
+                }
+                else
+                {
+                    //checks for tiles on left side of NPC
+                    Point tileLocation = new Vector2(npc.Left.X - 1, npc.position.Y + i).ToTileCoordinates();
+                    climableTiles = WorldGen.SolidTile3(tileLocation.X, tileLocation.Y);
+                }
+                if (climableTiles)
+                {
+                    if (doClimbTiles)
+                    {
+                        ClimbTiles(npc, player);
+                    }
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// For passing through tiles blocking the NPCs way. Runs the CheckClimbTiles() by default so using that method isn't necessary to use this one.
+        /// </summary>
+        public static void ClimbTiles(NPC npc, Player player, float stepSpeed = 8f)
+        {
+            if (CheckClimbTiles(npc, player, false))
+            {
+                npc.noTileCollide = true;
+                npc.velocity.Y = -stepSpeed;
+            }
+        }
+
         public static void Homing(Projectile proj, float maxVel, ref float targetIndex, ref float homingTimer, float maxHomingStrength = .1f, float range = 1500)
         {
             float rangeSQ = range * range;

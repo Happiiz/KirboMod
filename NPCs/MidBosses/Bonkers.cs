@@ -13,6 +13,7 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Utilities;
 using SoundEngine = Terraria.Audio.SoundEngine;
+using static KirboMod.Helper;
 
 namespace KirboMod.NPCs.MidBosses
 {
@@ -62,7 +63,9 @@ namespace KirboMod.NPCs.MidBosses
 			NPC.noGravity = false;
 			NPC.rarity = 1; //1 is dungeon slime, 4 is mimic
 			NPC.lavaImmune = true;
-		}
+            NPC.GravityIgnoresLiquid = true;
+            NPC.GravityIgnoresSpace = true;
+        }
 
 		public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */
 		{
@@ -234,7 +237,7 @@ namespace KirboMod.NPCs.MidBosses
             speed *= Main.hardMode ? 1.5f : 1;
             float inertia = 15f; //acceleration and decceleration speed
 
-            ClimbTiles(player);
+            ClimbTiles(NPC, player);
 
             MoveX(player, speed, inertia);
             Rectangle hitbox = Utils.CenteredRectangle(NPC.Center, new Vector2(NPC.width + 140, NPC.height + 500));
@@ -260,6 +263,7 @@ namespace KirboMod.NPCs.MidBosses
 
             if (NPC.ai[1] < 60) //charge
             {
+                NPC.noTileCollide = false;
                 NPC.TargetClosest(true); //face player
 
                 if (NPC.ai[1] < 30)
@@ -344,7 +348,7 @@ namespace KirboMod.NPCs.MidBosses
             Player player = Main.player[NPC.target];
             NPC.velocity.X *= 0.8f; //slow
             NPC.TargetClosest(true); //face player
-         
+            NPC.noTileCollide = false;
 
             if (NPC.ai[1] == (Main.expertMode ? 15 : 30))
             {
@@ -373,44 +377,9 @@ namespace KirboMod.NPCs.MidBosses
             }
         }
 
-        private void ClimbTiles(Player player)
-        {
-            bool climableTiles = false;
-
-            for (int i = 0; i < NPC.height; i++)
-            {
-                if (NPC.direction == 1)
-                {
-                    //checks for tiles on right side of NPC
-                    Point tileLocation = new Vector2(NPC.Right.X + 1, NPC.position.Y + i).ToTileCoordinates();
-                    climableTiles = WorldGen.SolidTile2(tileLocation.X, tileLocation.Y) || Main.tile[tileLocation.X, tileLocation.Y].Slope > 0;
-                }
-                else
-                {
-                    //checks for tiles on left side of NPC
-                    Point tileLocation = new Vector2(NPC.Left.X - 1, NPC.position.Y + i).ToTileCoordinates();
-                    climableTiles = WorldGen.SolidTile2(tileLocation.X, tileLocation.Y) || Main.tile[tileLocation.X, tileLocation.Y].Slope > 0;
-                }
-
-                if (climableTiles)
-                {
-                    NPC.noTileCollide = true;
-
-                    if (player.Center.Y < NPC.Center.Y && !player.dead) //higher than NPC or not dead
-                    {
-                        NPC.velocity.Y = -4f;
-                    }
-
-                    break;
-                }
-            }
-        }
-
         private void MoveX(Player player, float speed, float inertia) //move X position toward player
         {
-            Vector2 direction = new Vector2(NPC.direction, 0);
-            direction *= speed;
-            NPC.velocity.X = (NPC.velocity.X * (inertia - 1) + direction.X) / inertia; //use .X so it only effects horizontal movement
+            BasicEnemyWalk(ref NPC.velocity.X, speed, inertia, NPC.direction);
         }
 
         private void CheckPlatform(Player player) //trust me this is totally unique and original code and definitely not stolen from Spirit Mod's public source code(thx so much btw you don't know the hell I went through with this)

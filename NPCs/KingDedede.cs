@@ -17,6 +17,7 @@ using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using static KirboMod.Helper;
 
 namespace KirboMod.NPCs
 {
@@ -107,6 +108,8 @@ namespace KirboMod.NPCs
             NPC.boss = true;
             NPC.noGravity = false;
             NPC.lavaImmune = true;
+            NPC.GravityIgnoresLiquid = true;
+            NPC.GravityIgnoresSpace = true;
             if (!Main.dedServ)
             {
                 int slot = MusicLoader.GetMusicSlot(Mod, "Music/Photonic0_DededeStarStackerWithLoopMetadata");
@@ -508,7 +511,7 @@ namespace KirboMod.NPCs
                     SoundEngine.PlaySound(Walk, NPC.Center);
                 }
 
-                ClimbTiles(player);
+                ClimbTiles(NPC, player);
 
                 if (Math.Abs(distance.X) <= 300 && distance.Y <= 100 && distance.Y >= -200) //range
                 {
@@ -596,7 +599,7 @@ namespace KirboMod.NPCs
                     SoundEngine.PlaySound(Walk, NPC.Center);
                 }
 
-                ClimbTiles(player);
+                ClimbTiles(NPC,player);
 
                 if (Math.Abs(distance.X) <= 150) //range
                 {
@@ -801,9 +804,6 @@ namespace KirboMod.NPCs
             if (attack > (phase == 3 ? 90 : 120) - phaseThreeSpeedUp
                 && attack < (phase == 3 ? 390 : 420) - phaseThreeSpeedUp) //fall for 5 seconds
             {
-                NPC.GravityIgnoresLiquid = true;
-                NPC.GravityIgnoresSpace = true;
-
                 ChooseAnimation(10); //jump
 
                 if (NPC.Bottom.Y + NPC.velocity.Y < player.position.Y || NPC.velocity.Y < 0)/* (NPC.Bottom.Y < player.Top.Y - 100 || NPC.velocity.Y < 0) *///higher than player (adjusts to velocity) or going up
@@ -1078,38 +1078,6 @@ namespace KirboMod.NPCs
             if (NPC.position.Y > player.Bottom.Y + 400 || distanceUnit >= 1500 || stuck)
             {
                 shouldSlam = true;
-            }
-        }
-        private void ClimbTiles(Player player)
-        {
-            bool climableTiles = false;
-
-            for (int i = 0; i < NPC.height; i++)
-            {
-                if (NPC.direction == 1)
-                {
-                    //checks for tiles on right side of NPC
-                    Point tileLocation = new Vector2(NPC.Right.X + 1, NPC.position.Y + i).ToTileCoordinates();
-                    climableTiles = WorldGen.SolidTile2(tileLocation.X, tileLocation.Y) || Main.tile[tileLocation.X, tileLocation.Y].Slope > 0;
-                }
-                else
-                {
-                    //checks for tiles on left side of NPC
-                    Point tileLocation = new Vector2(NPC.Left.X - 1, NPC.position.Y + i).ToTileCoordinates();
-                    climableTiles = WorldGen.SolidTile2(tileLocation.X, tileLocation.Y) || Main.tile[tileLocation.X, tileLocation.Y].Slope > 0;
-                }
-
-                if (climableTiles || NPC.velocity.X == 0)
-                {
-                    NPC.noTileCollide = true;
-
-                    if (player.Bottom.Y < NPC.Bottom.Y && !player.dead) //higher than NPC or not dead
-                    {
-                        NPC.velocity.Y = -4f;
-                    }
-
-                    break;
-                }
             }
         }
 
