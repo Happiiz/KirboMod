@@ -61,6 +61,7 @@ namespace KirboMod.Projectiles
                 {
                     hitboxes[i] = Utils.CenteredRectangle(sparkTargetPositions[i], new Vector2(100));
                 }
+                SoundEngine.PlaySound(SoundID.Item14.WithVolumeScale(1.2f), Projectile.Center);//boom
             }
         }
 

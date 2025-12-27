@@ -1215,10 +1215,10 @@ Mods: {
 					'''
 					{$CommonItemTooltip.DefensePenetration}
 					Shoots out a maximum of three ricocheting stars that hit any enemies in their paths
-					Right click to shoot all three stars out at once at the cost of more mana
+					Right click to shoot all held stars out at once at the cost of more mana
 					Stars not shot out will rotate around the player and deal damage to nearby enemies
 
-					[c/ff0000:If] this item is [c/ff0000: not working, right click] it in the [c/ff0000: inventory], while having it [c/ff0000: not selected]
+					[c/ff0000:If] this item is [c/ff0000:not working, right click] it in the [c/ff0000:inventory], while having it [c/ff0000:not selected]
 					You should receive a message talking about star projectile identities being reset.
 					In multiplayer, ask if every other player also got a message talking about this.
 					'''
