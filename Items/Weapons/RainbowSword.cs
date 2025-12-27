@@ -1,3 +1,4 @@
+using KirboMod.Items.RainbowDrops;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -94,28 +95,30 @@ namespace KirboMod.Items.RainbowSword
 			return false;
         }
 		public override void AddRecipes()
-		{
-			Recipe recipe = CreateRecipe();
-			recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.SnowDrop>());
-			recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.JungleDrop>());
-			recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.DesertDrop>());
-			recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.EvilDrop>());
-			recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.HellDrop>());
-			recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.OceanDrop>());
-			recipe.AddIngredient<SoulMatter>(3);
-			recipe.AddTile(TileID.MythrilAnvil);
-			recipe.Register();
+        {
+            Recipe recipe = CreateRecipe();
+            AddDropsAndAnvilToRecipe(recipe);
+            recipe.AddIngredient<SoulMatter>(3);
+            recipe.Register();
 
             recipe = CreateRecipe();
+			AddDropsAndAnvilToRecipe(recipe);
+            recipe.AddIngredient(ItemID.EmpressBlade);//terraprisma
+            recipe.Register();
+        }
+
+        private static void AddDropsAndAnvilToRecipe(Recipe recipe)
+        {
             recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.SnowDrop>());
             recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.JungleDrop>());
             recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.DesertDrop>());
             recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.EvilDrop>());
             recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.HellDrop>());
             recipe.AddIngredient(ModContent.ItemType<Items.RainbowDrops.OceanDrop>());
-            recipe.AddIngredient(ItemID.EmpressBlade);//terraprisma
+            recipe.AddIngredient<HallowDrop>();
+            recipe.AddIngredient<SpaceDrop>();
             recipe.AddTile(TileID.MythrilAnvil);
-            recipe.Register();
+
         }
-	}
+    }
 }

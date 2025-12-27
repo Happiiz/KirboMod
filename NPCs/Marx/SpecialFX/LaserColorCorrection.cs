@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using KirboMod.Configs;
+using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.Graphics.Effects;
@@ -11,12 +12,11 @@ namespace KirboMod.NPCs.Marx.SpecialFX
     {
         public const string FilterName = "LaserColorCorrect";
         public static float time;
-        public static float IntensityMult => 1f;
-        public static float MaxExposureIncrease => 1f;
+        public static float MaxSaturation => GFXConfig.Instance.MaxSaturationIncrease;
+        public static float MaxExposureIncrease => GFXConfig.Instance.MaxExposureIncrease;
         public static float FadeDuration => 20;
-        public static float Intensity => 1f + Utils.GetLerpValue(0, FadeDuration, time, true) * IntensityMult;
+        public static float Saturation => Utils.Remap(time, 0, FadeDuration, 1f, 1f + MaxSaturation);// 1f + Utils.GetLerpValue(0, FadeDuration, time, true) * MaxSaturation;
         public static float ExposureIntensity => 1f + Utils.GetLerpValue(0, FadeDuration, time, true) * MaxExposureIncrease;
-        static bool deactivated = true;
         public static void CallOnLoad()
         {
             time = 100;
@@ -26,19 +26,17 @@ namespace KirboMod.NPCs.Marx.SpecialFX
         }
         public static void CallOnWorldLoad()
         {
-            deactivated = true;
             time = -1;
             Filters.Scene.Deactivate(FilterName);
         }
         public static void ActivateScreenSaturation(float duration, bool includeFadeDuration = true)
         {
-            deactivated = false;
             time = duration;
             if (includeFadeDuration)
             {
                 time += FadeDuration;
             }
-            float intensity = Intensity;
+            float intensity = Saturation;
             ScreenShaderData shader = Filters.Scene[FilterName].GetShader();
             shader.UseIntensity(intensity);
             shader.UseProgress(ExposureIntensity);
@@ -47,19 +45,19 @@ namespace KirboMod.NPCs.Marx.SpecialFX
         public static void Update()
         {
             time--;
-            float intensity = Intensity;
+            float saturation = Saturation;
             //Main.NewText("intens: " + intensity + ", t: " + time + ", deactivated flag: " + deactivated + ", active: " 
             //    + Filters.Scene[FilterName].Active, Main.DiscoColor);
-            if (time >= 0)
+            Filter filter = Filters.Scene[FilterName];
+            if (time >= 0 && filter != null)
             {
                 ScreenShaderData shader = Filters.Scene[FilterName].GetShader();
-                shader.UseIntensity(intensity);
+                shader.UseIntensity(saturation);
                 shader.UseProgress(ExposureIntensity);
                 Filters.Scene.Activate(FilterName);
             }
-            else if (Filters.Scene[FilterName].Active && intensity == 1)
+            else if (filter != null && filter.Active && saturation == 1)
             {
-                deactivated = true;
                 Filters.Scene.Deactivate(FilterName);
             }
         }

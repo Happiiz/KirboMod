@@ -99,7 +99,6 @@ namespace KirboMod.Configs
         public float HyperZoneBackScrollSpeed;
 
         //is this right??
-        [LabelKey("$Mods.KirboMod.HyperZoneConfig.HyperZoneFrontScrollSpeed.Label")]
         //text should say
         //Default value is the Default Back scroll speed * 1.618
         [DefaultValue(ZeroSky.slideSpeed * Helper.Phi)]

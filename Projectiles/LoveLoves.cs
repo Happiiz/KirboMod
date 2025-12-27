@@ -34,6 +34,13 @@ namespace KirboMod.Projectiles
 		}
 		public override void AI()
 		{
+			//initialize homing index as invalid so it doesn't automatically home on the NPC on slot 0 when it's spawned
+			if (Projectile.localAI[1] == 0)
+			{
+				Projectile.ai[0] = -1;
+				Projectile.localAI[1] = 1;
+			}
+
 			Projectile.rotation = Projectile.velocity.ToRotation();
 			Projectile.direction = Main.rand.Next ((Projectile.direction - 5), (Projectile.direction + 5));
 			if (++Projectile.frameCounter >= 5) //changes frames every 5 ticks 

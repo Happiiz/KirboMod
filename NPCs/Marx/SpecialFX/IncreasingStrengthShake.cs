@@ -10,7 +10,6 @@ namespace KirboMod.NPCs.Marx.SpecialFX
         float time;
         float maxStrength;
         float duration;
-        float spiralingRate;
         public string UniqueIdentity => "MarxLaserPre";
 
         public bool Finished => time > duration;
@@ -24,12 +23,11 @@ namespace KirboMod.NPCs.Marx.SpecialFX
             Vector2 offset = direction.ToRotationVector2() * strength;
             cameraPosition.CameraPosition += offset;
         }
-        public static void Add(float duration = 10, float maxStrength = 30, float spiralingRate = 1f)
+        public static void Add(float duration = 10, float maxStrength = 30)
         {
             IncreasingStrengthShake shake = new();
             shake.duration = duration;
             shake.maxStrength = maxStrength;
-            shake.spiralingRate = spiralingRate;
             shake.time = 0;
             Main.instance.CameraModifiers.Add(shake);
         }

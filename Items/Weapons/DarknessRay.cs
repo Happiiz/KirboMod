@@ -21,12 +21,12 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 138;
+			Item.damage = 188;
 			Item.DamageType = DamageClass.Magic;
 			Item.noMelee = true;
 			Item.width = 22;
 			Item.height = 22;
-			Item.useAnimation = Item.useTime = 12;
+			Item.useAnimation = Item.useTime = 20;
 			Item.useStyle = ItemUseStyleID.Shoot;
 			Item.knockBack = 4;
 			Item.value = Item.buyPrice(0, 5, 50, 50);
@@ -35,7 +35,7 @@ namespace KirboMod.Items.Weapons
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<GoodDarkMatterLaser>();
 			Item.shootSpeed = 24f;
-			Item.mana = 5;
+			Item.mana = 26;
 		}
 
         public override bool AltFunctionUse(Player player)

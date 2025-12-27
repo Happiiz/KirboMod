@@ -1,3 +1,4 @@
+using KirboMod.NPCs.Marx;
 using KirboMod.Tiles.MusicBoxes;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -10,7 +11,7 @@ namespace KirboMod.Items.Placeables.MusicBoxes
 			ItemID.Sets.CanGetPrefixes[Type] = false; // music boxes can't get prefixes in vanilla
 			ItemID.Sets.ShimmerTransformToItem[Type] = ItemID.MusicBox; // recorded music boxes transform into the basic form in shimmer
 
-			MusicLoader.AddMusicBox(Mod, MusicLoader.GetMusicSlot(Mod, "Music/DeathZ_Marx"), ModContent.ItemType<MarxMusicBox>(), ModContent.TileType<MarxMusicBoxTile>());
+			MusicLoader.AddMusicBox(Mod, MusicLoader.GetMusicSlot(Mod, "Music/" + MarxBoss.MusicFileName), ModContent.ItemType<MarxMusicBox>(), ModContent.TileType<MarxMusicBoxTile>());
 		}
 
 		public override void SetDefaults() {

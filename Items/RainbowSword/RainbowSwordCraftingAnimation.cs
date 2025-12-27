@@ -85,9 +85,10 @@ namespace KirboMod.Items.RainbowSword
             origin = tex.Size() / 2;
             return tex;
         }
-        static int[] rainbowDrops = new int[6] { ModContent.ItemType<DesertDrop>(), ModContent.ItemType<EvilDrop>(), ModContent.ItemType<HellDrop>(), ModContent.ItemType<JungleDrop>(), ModContent.ItemType<OceanDrop>(), ModContent.ItemType<SnowDrop>() };
+        static int[] rainbowDrops = new int[8] { ModContent.ItemType<DesertDrop>(), ModContent.ItemType<EvilDrop>(), ModContent.ItemType<HellDrop>(), ModContent.ItemType<JungleDrop>(), ModContent.ItemType<OceanDrop>(), ModContent.ItemType<SnowDrop>(), ModContent.ItemType<HallowDrop>(), ModContent.ItemType<SpaceDrop>() };
         public override bool PreDraw(ref Color lightColor)
         {
+            rainbowDrops = new int[8] { ModContent.ItemType<DesertDrop>(), ModContent.ItemType<EvilDrop>(), ModContent.ItemType<HellDrop>(), ModContent.ItemType<JungleDrop>(), ModContent.ItemType<OceanDrop>(), ModContent.ItemType<SnowDrop>(), ModContent.ItemType<HallowDrop>(), ModContent.ItemType<SpaceDrop>() };
             for (int i = 0; i < rainbowDrops.Length; i++)
             {
                 int rainbowDropSpacing = 55;
@@ -113,7 +114,10 @@ namespace KirboMod.Items.RainbowSword
         }
         static float GetRainbowDropAngle(int index)
         {
-            return index switch
+            float progress = index / rainbowDrops.Length;
+            progress *= MathF.Tau + (progress / 2);
+            return progress;
+            return (index % 6) switch
             {
                 0 => 0,
                 1 => (2 * MathF.Tau) / 6f,
@@ -128,7 +132,7 @@ namespace KirboMod.Items.RainbowSword
     {
         static bool IsARainbowDropID(int id)
         {
-            int[] rainbowDrops = new int[6] { ModContent.ItemType<DesertDrop>(), ModContent.ItemType<EvilDrop>(), ModContent.ItemType<HellDrop>(), ModContent.ItemType<JungleDrop>(), ModContent.ItemType<OceanDrop>(), ModContent.ItemType<SnowDrop>() };
+            int[] rainbowDrops = new int[8] { ModContent.ItemType<DesertDrop>(), ModContent.ItemType<EvilDrop>(), ModContent.ItemType<HellDrop>(), ModContent.ItemType<JungleDrop>(), ModContent.ItemType<OceanDrop>(), ModContent.ItemType<SnowDrop>(), ModContent.ItemType<HallowDrop>(), ModContent.ItemType<SpaceDrop>() };
             return rainbowDrops.Contains(id);
         }
         static bool skipPlaySoundAndPopupText = false;
@@ -194,7 +198,7 @@ namespace KirboMod.Items.RainbowSword
 
         private class JustSoItsNotNull : IEntitySource
         {
-            public string Context => "aeoufabvou";//awesome!!
+            public string Context => "RainbowSwordCraftingAnimation";
         }
     }
 }

@@ -18,13 +18,13 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 26;
+			Item.damage = 13;
 			Item.knockBack = 4f;
 			Item.mana = 7;
 			Item.width = 40;
 			Item.height = 40;
 			Item.useTime = 36;
-			Item.useAnimation = 36;
+			Item.useAnimation = 24;
 			Item.useStyle = ItemUseStyleID.Swing;
 			Item.value = Item.buyPrice(0, 1, 20, 0);
 			Item.rare = ItemRarityID.Lime;
@@ -52,7 +52,9 @@ namespace KirboMod.Items.Weapons
 			Recipe bandanaSpear = CreateRecipe();
             bandanaSpear.AddIngredient(ModContent.ItemType<Parosol>());
             bandanaSpear.AddIngredient(ModContent.ItemType<DooStaff>());
-            bandanaSpear.AddIngredient(ItemID.PygmyStaff);
+            bandanaSpear.AddIngredient(ItemID.SoulofSight, 1);
+            bandanaSpear.AddIngredient(ItemID.SoulofMight, 1);
+            bandanaSpear.AddIngredient(ItemID.SoulofFright, 1);
             bandanaSpear.AddIngredient(ModContent.ItemType<HeartMatter>(), 3);
             bandanaSpear.AddTile(TileID.MythrilAnvil);
             bandanaSpear.Register();

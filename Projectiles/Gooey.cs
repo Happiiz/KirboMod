@@ -550,19 +550,19 @@ namespace KirboMod.Projectiles
                 Projectile.velocity.X *= 0.8f;
 
                 //attack 2 times
-                if (attack == 3)
+                if (attack == 20)
                 {
                     Projectile.frame = 2; //attacks
                     Vector2 xoffset = new(Projectile.direction * 25, 0);
-                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + xoffset, Projectile.velocity * 0, ModContent.ProjectileType<GooeyHitbox>(), Projectile.damage, 4, player.whoAmI);
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + xoffset, Projectile.velocity * 0, ModContent.ProjectileType<GooeyHitbox>(), Projectile.damage / 2, 4, player.whoAmI);
                 }
-                if (attack == 6)
+                if (attack == 40)
                 {
                     Projectile.frame = 3;
                     Vector2 xoffset = new(Projectile.direction * 25, 0);
-                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + xoffset, Projectile.velocity * 0, ModContent.ProjectileType<GooeyHitbox>(), Projectile.damage, 4, player.whoAmI);
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + xoffset, Projectile.velocity * 0, ModContent.ProjectileType<GooeyHitbox>(), Projectile.damage / 2, 4, player.whoAmI);
                 }
-                if (attack > 8)
+                if (attack > 40)
                 {
                     attacking = false;
                     attack = 0;
@@ -620,7 +620,7 @@ namespace KirboMod.Projectiles
                 {
                     Projectile.frame = 6;
                 }
-                else if (attack >= 5 && attack % 5 == 0) //attack with umbrella (every 5th tick)
+                else if (attack >= 5 && attack % 20 == 0) //attack with umbrella (every 10th tick)
                 {
                     Projectile.frame = 7;
                     Vector2 offset = new(Projectile.direction * 10, -50); //go up and back a bit from origin

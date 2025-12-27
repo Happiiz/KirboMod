@@ -69,6 +69,8 @@ namespace KirboMod.NPCs.Marx
         }
         public static int MaxHP => 56000;
         public static int Defense => 40;
+        public static string MusicFileName => "DeathZ_Marx_Loopable";
+        public static string MusicPath => "KirboMod/Music/" + MusicFileName;
         public override void SetDefaults()
         {
             NPC.width = 400;
@@ -90,7 +92,7 @@ namespace KirboMod.NPCs.Marx
             NPC.npcSlots = 8;
             if (!Main.dedServ)//if not dedicated server
             {
-                int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/DeathZ_Marx");
+                int musicSlot = MusicLoader.GetMusicSlot(MusicPath);
                 Music = musicSlot;
                 Main.musicFade[musicSlot] = 1;
                 Main.musicNoCrossFade[musicSlot] = true;

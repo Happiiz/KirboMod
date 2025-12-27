@@ -58,7 +58,7 @@ namespace KirboMod.NPCs.NewWhispy
         public override string Texture => "KirboMod/NPCs/NewWhispy/NewWhispyBase_Placeholder";
         public override void SetStaticDefaults()
         {
-            Main.musicNoCrossFade[MusicLoader.GetMusicSlot(Mod, "Music/Evobyte_K1Boss")] = true;
+            Main.musicNoCrossFade[MusicLoader.GetMusicSlot(Mod, "Music/Evobyte_KdlBoss")] = true;
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true;
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Poisoned] = true;
 
@@ -104,7 +104,7 @@ namespace KirboMod.NPCs.NewWhispy
             if (!Main.dedServ)//if not dedicated server
             {
                 LoadTextures();
-                int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Evobyte_K1Boss");
+                int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Evobyte_KdlBoss");
                 Music = musicSlot;
                 Main.musicFade[musicSlot] = 1;
                 Main.musicNoCrossFade[musicSlot] = true;

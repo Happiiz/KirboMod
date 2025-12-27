@@ -10,6 +10,7 @@ using Terraria.ID;
 using Terraria.Audio;
 using KirboMod.Particles;
 using KirboMod.Systems;
+using KirboMod.Configs;
 
 namespace KirboMod.Items.RainbowSword
 {
@@ -197,7 +198,8 @@ namespace KirboMod.Items.RainbowSword
         public static void HitEffect(Vector2 targetPos, int swingDir, byte projOwner, float progress)
         {    
             SoundEngine.PlaySound((Main.rand.NextBool() ? SoundID.Item67 : SoundID.Item68) with { MaxInstances = 0, Volume = 0.4f }, targetPos);
-            for (int j = 0; j < 10; j++)
+            int sparkleAmount = GFXConfig.Instance.RainbowSwordHitSparklesAmount;
+            for (int j = 0; j < sparkleAmount; j++)
             {
                 SparkleFromHit(targetPos, swingDir, projOwner, progress);
             }
@@ -220,7 +222,12 @@ namespace KirboMod.Items.RainbowSword
         }
         private void SparklesFromSwing(float progress, Vector2 lightStart, Vector2 lightEnd)
         {
-            float sparkleChance = MathHelper.Lerp(0.5f, 1, Main.gfxQuality);
+            float sparkleChance = 1f;
+            if (GFXConfig.Instance.ScaleSparkleAmountDependingOnQualitySetting)
+            {
+                sparkleChance *= MathHelper.Lerp(0.5f, 1, Main.gfxQuality);
+            }
+            sparkleChance *= GFXConfig.Instance.RainbowSwordSwingSparklesAmount;
             {//TODO: MAKE CONFIG FOR SPARKLES????????? AND MARX LASER
                 if (Main.rand.NextFloat() > sparkleChance)
                     return;
@@ -267,9 +274,18 @@ namespace KirboMod.Items.RainbowSword
 
         public void AddTrail()
         {
+            if (!GFXConfig.Instance.Trail)
+            {
+                return;
+            }
+            float fade = GFXConfig.Instance.TrailOpacity;
+            if(fade <= 0)
+            {
+                return;
+            }
             float timeLeft = UseTime - Timer;
 
-            float fade = Utils.GetLerpValue(0, 5, timeLeft, true);
+            fade *= Utils.GetLerpValue(0, 5, timeLeft, true);
             float extraTrailOffset = 50;
             float trailWidth = 260;
             if (!HeldProjTrailSystem.IsDarkEnvironment(Main.player[Projectile.owner], out byte spaceAlpha))

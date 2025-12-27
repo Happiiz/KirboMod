@@ -287,19 +287,17 @@ namespace KirboMod.Projectiles.BandanaDee
 
                 Vector2 direction = aggroTarget.Center - Projectile.Center; //start - end
 
-                //summon spear to jab enemies
-                if (attack == 1)
-                {
-                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, ModContent.ProjectileType<BandanaDeeSpearHeld>(), Projectile.damage / 5, 1, player.whoAmI, ai1: Projectile.whoAmI);
-                }
+                //summon spear to jab enemies if there is no spear
 
+                bool foundASpear = false;
                 for (int i = 0; i < Main.maxProjectiles; i++)
                 {
                     Projectile spear = Main.projectile[i];
 
                     //my spear proj
-                    if (!spear.active && spear.type == ModContent.ProjectileType<BandanaDeeSpearHeld>() && spear.ai[1] == Projectile.whoAmI)
+                    if (spear.active && spear.owner == Projectile.owner && spear.type == ModContent.ProjectileType<BandanaDeeSpearHeld>() && spear.ai[1] == Projectile.identity)
                     {
+                        foundASpear = true;
                         spear.rotation = direction.ToRotation(); //constantly rotate towards target
                         break;
                     }
@@ -308,7 +306,10 @@ namespace KirboMod.Projectiles.BandanaDee
                         continue;
                     }
                 }
-
+                if (!foundASpear)
+                {
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, direction, ModContent.ProjectileType<BandanaDeeSpearHeld>(), Projectile.damage, Projectile.knockBack, player.whoAmI, ai1: Projectile.whoAmI);
+                }
                 if (attack >= 1) //jab animation
                 {
                     Projectile.frameCounter++;
@@ -338,20 +339,25 @@ namespace KirboMod.Projectiles.BandanaDee
 
                 attack++;
 
-                if (attack == 1)
+                int attackTime1 = 5;
+                int attackTime2 = -100;
+                int framesBeforeShootingToSetReadySpearFrame = 2;
+                if (attack == (attackTime1 - framesBeforeShootingToSetReadySpearFrame) || attack == (attackTime2 - framesBeforeShootingToSetReadySpearFrame))
                 {
                     Projectile.frame = 12; //ready spear frame
                 }
 
-                if (attack == 5)
+                if (attack == attackTime1 || attack == attackTime2)
                 {
+                    //Utils.ChaseResults results = Utils.GetChaseResults(Projectile.Center, effectiveShootSpeed, aggroTarget.Center, aggroTarget.velocity);
+                    //Vector2 spearDirection = results.InterceptionHappens ? results.ChaserVelocity : (Vector2.Normalize(aggroTarget.Center - Projectile.Center * shootSpeed));
+                    //spearDirection.Y -= results.InterceptionTime * BandanaDeeSpearThrown.Gravity; //adjust for gravity
+
                     int type = ModContent.ProjectileType<BandanaDeeSpearThrown>();
-                    float shootSpeed = 30f / ContentSamples.ProjectilesByType[type].MaxUpdates;
-                    Utils.ChaseResults results = Utils.GetChaseResults(Projectile.Center, shootSpeed, aggroTarget.Center, aggroTarget.velocity);
-                    Vector2 spearDirection = results.InterceptionHappens ? results.ChaserVelocity : (Vector2.Normalize(aggroTarget.Center - Projectile.Center * shootSpeed));
+                    float shootSpeed = 30f;
+                    float effectiveShootSpeed = shootSpeed * ContentSamples.ProjectilesByType[type].MaxUpdates;
 
-                    spearDirection.Y -= results.InterceptionTime * BandanaDeeSpearThrown.Gravity; //adjust for gravity
-
+                    Vector2 spearDirection = Helper.PredictiveAimWithGravity(Projectile.Center, aggroTarget.Center, aggroTarget.velocity, effectiveShootSpeed, BandanaDeeSpearThrown.Gravity);
                     Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, spearDirection, type,
                         Projectile.damage, Projectile.knockBack, player.whoAmI);
                     SoundEngine.PlaySound(SoundID.Item1, Projectile.Center);

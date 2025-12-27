@@ -49,7 +49,7 @@ namespace KirboMod.Projectiles
 
 			if (Projectile.ai[0] == 40 && Projectile.owner == Main.myPlayer)
             {
-                SoundEngine.PlaySound(PureDarkMatter.PetalThrowSFX with { Volume = .4f, MaxInstances = 1 }, player.Center);
+                SoundEngine.PlaySound(PureDarkMatter.PetalThrowSFX with { Volume = .3f, MaxInstances = 1 }, player.Center);
                 Vector2 move = Main.MouseWorld - Projectile.Center;
 				move.Normalize();
 				move *= 18;

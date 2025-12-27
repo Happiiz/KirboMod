@@ -316,6 +316,74 @@ namespace KirboMod
             // Back to original space
             return fromMin + (fromMax - fromMin) * t;
         }
+        public static Vector2 PredictiveAimWithGravity(Vector2 start, Vector2 target, Vector2 targetVelocity, float launchSpeed, float gravity, int iterations = 3)
+        {
+            Vector2 predictedTarget = target + targetVelocity;
+            for (int i = 0; i < iterations; i++)
+            {
+                // Recalculate the velocity needed to hit the current prediction
+                Vector2 launchVelocity = CalculateLaunchVelocity(start, predictedTarget, launchSpeed, gravity);
 
+                // If launchVelocity is zero (no solution), break early
+                if (launchVelocity == Vector2.Zero)
+                    break;
+
+                // Estimate travel time using actual velocity vector
+                float time = (predictedTarget - start).Length() / launchVelocity.Length();
+
+                // Predict target's future position using that time
+                predictedTarget = target + targetVelocity * time;
+            }
+            // After iterations, calculate final velocity to predicted position
+            Vector2 result = CalculateLaunchVelocity(start, predictedTarget, launchSpeed, gravity);
+
+            if (result == Vector2.Zero)
+            {//throw straight as failsafe
+                result = (target - start);
+                result.SafeNormalize(-Vector2.UnitY);
+                result *= launchSpeed;
+            }
+            return result;
+        }
+
+        static Vector2 CalculateLaunchVelocity(Vector2 start, Vector2 target, float launchSpeed, float gravity)
+        {
+            Vector2 delta = target - start;
+            float dx = delta.X;
+            float dy = delta.Y;
+
+            // Quadratic formula coefficients
+            float g = gravity;
+            float v = launchSpeed;
+            float v2 = v * v;
+
+            float A = (g * dx * dx) / (2f * v2);
+            float B = dx;
+            float C = A - dy;
+
+            float discriminant = B * B - 4f * A * C;
+
+            if (discriminant < 0f)
+            {
+                // No real solution: target is out of range
+                return Vector2.Zero;
+            }
+
+            float sqrtDiscriminant = (float)System.Math.Sqrt(discriminant);
+
+            // Two possible solutions for k (slope of velocity vector)
+            float k1 = (-B + sqrtDiscriminant) / (2f * A);
+            float k2 = (-B - sqrtDiscriminant) / (2f * A);
+
+            // Pick the k that gives lower time (i.e., flatter arc = smaller |k|)
+            float k = System.Math.Abs(k1) < System.Math.Abs(k2) ? k1 : k2;
+
+            // Now recover vx and vy
+            float vx = v / (float)System.Math.Sqrt(1f + k * k);
+            vx *= dx < 0f ? -1f : 1f; // Fix direction based on dx
+            float vy = k * vx;
+
+            return new Vector2(vx, vy);
+        }
     }
 }

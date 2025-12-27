@@ -1794,6 +1794,16 @@ Mods: {
 				Tooltip: "'This gaudy hat gives you the confidence you need to grill your opponents in any challenge!'"
 				DisplayName: Stacker Witch's Hat
 			}
+
+			HallowDrop: {
+				DisplayName: Hallow Drop
+				Tooltip: ""
+			}
+
+			SpaceDrop: {
+				DisplayName: Space Drop
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {
@@ -2346,56 +2356,12 @@ Mods: {
 		}
 
 		Configs: {
-			KirbConfig: {
-				DisplayName: Kirb Config
-
-				HyperzoneClouds: {
-					Label: Enable Hyperzone Clouds
-					Tooltip: Enable or disable the clouds present during the Zero fight
-				}
-
-				HyperZoneCloudsFrontColor: {
-					Label: Hyper Zone Clouds Front Color
-					Tooltip: ""
-				}
-
-				HyperZoneCloudsFrontOpacity: {
-					Label: Hyper Zone Clouds Front Opacity
-					Tooltip: ""
-				}
-
-				HyperZoneBackgroundTintOpacity: {
-					Label: Hyper Zone Background Tint Opacity
-					Tooltip: ""
-				}
-
-				HyperZoneBackgroundTintColor: {
-					Label: Hyper Zone Background Tint Color
-					Tooltip: ""
-				}
-
-				HyperZoneCloudsBackColor: {
-					Label: Hyper Zone Clouds Back Color
-					Tooltip: ""
-				}
-
-				HyperZoneCloudsBackOpacity: {
-					Label: Hyper Zone Clouds Back Opacity
-					Tooltip: ""
-				}
-
-				HyperZoneSkyBrightnessOverride: {
-					Label: Hyper Zone Sky Brightness Override
-					Tooltip: ""
-				}
-			}
-
 			HyperZoneConfig: {
 				DisplayName: Hyper Zone Config
 
 				HyperzoneClouds: {
 					Label: Hyperzone Clouds
-					Tooltip: ""
+					Tooltip: This will disable the clouds, but ont the sky tint
 				}
 
 				HyperZoneCloudsFrontColor: {
@@ -2443,16 +2409,19 @@ Mods: {
 					Tooltip: ""
 				}
 
-				HyperZoneFrontScrollSpeed.Tooltip: ""
+				HyperZoneFrontScrollSpeed: {
+					Tooltip: By default, 1.618x faster than the default back scroll speed"
+					Label: Hyper Zone Front Scroll Speed
+				}
 
 				RegularPalette: {
 					Label: Regular Palette
-					Tooltip: ""
+					Tooltip: A blue background, and black clouds
 				}
 
 				BossButchPalette: {
 					Label: Boss Butch Palette
-					Tooltip: ""
+					Tooltip: A pastel yellow background, pastel red front clouds, and pastel blue back clouds
 				}
 
 				TintOnly: {
@@ -2482,6 +2451,56 @@ Mods: {
 			}
 
 			GeneralClientConfig.DisplayName: General Client Config
+
+			GFXConfig: {
+				DisplayName: Graphical Effects Config
+				RainbowSwordGFXHeader: Rainbow Sword
+
+				RainbowSwordHitSparklesAmount: {
+					Label: Hit Sparkle Amount
+					Tooltip: How many sparkle particles will appear out of an enemy when they are hit by the rainbow sword
+				}
+
+				RainbowSwordSwingSparklesAmount.Label: Swing Sparkle Amount
+				RainbowSwordSwingSparklesAmountTooltip: The lower this number, the fewer sparkles will appear during the swing
+				ScaleSparkleAmountDependingOnQualitySetting.Label: Scale Sparkle Amount Depending On Quality Setting
+				ScaleSparkleAmountDependingOnQualitySettingTooltip: If enabled, lower quality will make fewer sparkles appear. Stacks with the above config
+				MarxGFXHeader: Marx's laser effects
+
+				MaxExposureIncrease: {
+					Label: Max Exposure Increase
+					Tooltip: How much brighter the screen becomes
+				}
+
+				MaxSaturationIncrease: {
+					Label: Max Saturation Increase
+					Tooltip: How much more vivid the colors become
+				}
+
+				MaxLaserShootShakeStrength: {
+					Label: Max Laser Shoot Shake Strength
+					Tooltip:
+						'''
+						This is the shake amount right at the frame where the laser is fired.
+						The shaking decreases linearly
+						'''
+				}
+
+				MaxLaserChargeShake: {
+					Label: Max Laser Charge Shake
+					Tooltip: This is for the shake before the laser fires.
+				}
+
+				Trail: {
+					Label: Trail
+					Tooltip: If enabled, the rainbow sword will have a rainbow trail
+				}
+
+				TrailOpacity: {
+					Label: Trail Opacity
+					Tooltip: The lower the number, the fainter rainbow sword's trail will be
+				}
+			}
 		}
 
 		Emotes.MarxTownieEmote.Command: Marx

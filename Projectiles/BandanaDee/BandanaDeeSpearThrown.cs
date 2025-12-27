@@ -34,6 +34,8 @@ namespace KirboMod.Projectiles.BandanaDee
 			Projectile.scale = 1f;
 			Projectile.aiStyle = -1;
 			Projectile.ignoreWater = true;
+			Projectile.localNPCHitCooldown = 20 * Projectile.MaxUpdates;
+			Projectile.usesLocalNPCImmunity = true;
 		}
 
         public override bool PreDraw(ref Color lightColor)

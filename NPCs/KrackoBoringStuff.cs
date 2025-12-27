@@ -233,7 +233,7 @@ namespace KirboMod.NPCs
             NPC.buffImmune[BuffID.Confused] = true;
             if (!Main.dedServ)//if not dedicated server
             {
-                int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Evobyte_K1Boss");
+                int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Evobyte_KdlBoss");
                 Music = musicSlot;
                 Main.musicFade[musicSlot] = 1;
                 Main.musicNoCrossFade[musicSlot] = true;

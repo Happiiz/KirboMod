@@ -2,6 +2,7 @@ using KirboMod.Projectiles.BandanaDee;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
@@ -29,21 +30,27 @@ namespace KirboMod.Projectiles.BandanaDee
             Projectile.penetrate = -1;
             Projectile.aiStyle = -1;
             Projectile.usesLocalNPCImmunity = true;
-            Projectile.localNPCHitCooldown = 2;
-            Projectile.ArmorPenetration = 9999;
-
+            Projectile.localNPCHitCooldown = 10;
         }
         static float Range => 160;
         static float HitboxWidth => 100;
         public override void AI()
         {
-            owner = Main.projectile[(int)Projectile.ai[1]];
-
+            InitializeRotation();
+            owner = Main.projectile.FirstOrDefault(p => p.active && p.owner == Projectile.owner && p.identity == Projectile.ai[1]);
+            if (owner == null)//can happen if the minion is desummoned at the right time
+            {
+                Projectile.Kill();
+                return;
+            }
             BandanaWaddleDee bandanaDee = owner.ModProjectile as BandanaWaddleDee;
-
+            if (bandanaDee == null)//can happen if the minion is desummoned at the right time
+            {
+                Projectile.Kill();
+                return;
+            }
             Vector2 center = owner.Center;
             Projectile.direction = owner.direction;
-            Projectile.timeLeft = 2;
             Projectile.Center = center;
             Projectile.ai[0] += 1f;
             if (Projectile.ai[0] >= 8f)
@@ -60,7 +67,7 @@ namespace KirboMod.Projectiles.BandanaDee
             {
                 Vector2 targetVel = center + bandanaDee.Projectile.velocity;
 
-                if (bandanaDee.aggroTarget.active)
+                if (bandanaDee.aggroTarget != null && bandanaDee.aggroTarget.active)
                 {
                     targetVel = bandanaDee.aggroTarget.Center - center;
                 }
@@ -86,8 +93,20 @@ namespace KirboMod.Projectiles.BandanaDee
             }
             Projectile.Center = center - Projectile.velocity;
         }
+
+        private void InitializeRotation()
+        {
+            if (Projectile.localAI[0] == 0)
+            {
+                Projectile.localAI[1] = 1;
+                Projectile.rotation = Projectile.velocity.ToRotation();
+            }
+        }
+
         public override bool PreDraw(ref Color lightColor)
         {
+            InitializeRotation();
+
             Texture2D texture = TextureAssets.Projectile[Type].Value;
             float staffLength = 1.41f * texture.Width - 10;//sqrt2 * width since texture is square, -10 to compensate for the nubs
             Vector2 rangeVector = Vector2.Normalize(Projectile.velocity) * staffLength;

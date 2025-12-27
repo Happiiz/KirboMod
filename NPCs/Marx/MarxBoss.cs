@@ -1,3 +1,4 @@
+using KirboMod.Configs;
 using KirboMod.Dusts.MarxPurpleSmoke;
 using KirboMod.Dusts.MarxSparks;
 using KirboMod.NPCs.Marx.SpecialFX;
@@ -315,7 +316,8 @@ namespace KirboMod.NPCs.Marx
             {
                 if (relativeTimer == MathF.Max(MassiveLaserChargeupTime - 65, 0))
                 {
-                    IncreasingStrengthShake.Add(MassiveLaserChargeupTime, 4, 2f);
+                    //default max shoot charge strength value is 4    
+                    IncreasingStrengthShake.Add(MassiveLaserChargeupTime, GFXConfig.Instance.MaxLaserChargeShake);
                     SoundEngine.PlaySound(MassiveLaserCharge.WithPitchOffset(0f), NPC.Center);
                 }
             }
@@ -325,7 +327,8 @@ namespace KirboMod.NPCs.Marx
                 if (relativeTimer == MassiveLaserChargeupTime)
                 {
                     ChangeAnimation(Animation.Blast);
-                    DecreasingStrengthShake.Add(MassiveLaserDuration, 10);
+                    //default max shoot shake strength value is 10    
+                    DecreasingStrengthShake.Add(MassiveLaserDuration, GFXConfig.Instance.MaxLaserShootShakeStrength);
                     LaserColorCorrection.ActivateScreenSaturation(MassiveLaserDuration, false);
                     ShootMassiveLaser();
                 }

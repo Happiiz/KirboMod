@@ -34,7 +34,7 @@ namespace KirboMod.Items.RainbowDrops
 			recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
 			recipe.AddIngredient(ModContent.ItemType<NightCloth>(), 5);
 			recipe.AddIngredient(ItemID.Deathweed, 3);
-			recipe.AddIngredient(ItemID.SoulofNight, 10);
+			recipe.AddIngredient(ItemID.SoulofNight, 30);
 			recipe.AddIngredient(ItemID.CursedFlame, 5);
 			recipe.AddTile(TileID.MythrilAnvil);
 			recipe.Register();
@@ -43,7 +43,7 @@ namespace KirboMod.Items.RainbowDrops
 			recipe2.AddIngredient(ModContent.ItemType<Starbit>(), 20);
 			recipe2.AddIngredient(ModContent.ItemType<NightCloth>(), 5);
 			recipe2.AddIngredient(ItemID.Deathweed, 3);
-			recipe2.AddIngredient(ItemID.SoulofNight, 10);
+			recipe2.AddIngredient(ItemID.SoulofNight, 30);
 			recipe2.AddIngredient(ItemID.Ichor, 5);
 			recipe2.AddTile(TileID.MythrilAnvil);
 			recipe2.Register();

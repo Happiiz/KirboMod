@@ -22,7 +22,7 @@ namespace KirboMod.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			Item.damage = 34;
+			Item.damage = 48;
 			Item.knockBack = 3f;
 			Item.mana = 16;
 			Item.width = 40;
