@@ -16,7 +16,7 @@ namespace KirboMod.Projectiles.Marx.GiantBlackHoleOfDoom
         static float MaxScale => 2f;
         static float SuckStrengthMin => 8f * SuckStrengthMult;
         static float SuckStrengthMax => 60f * SuckStrengthMult;
-        static float SuckStrengthMult => Main.expertMode ? 1.7f : 1.05f;
+        static float SuckStrengthMult => Main.expertMode ? 1.5f : 1.05f;
         static float SuckStrengthMinDist => 120f;
         static float SuckStrengthMaxDist => 2000f;
         static float NoMoreSuckDist => 2500f;

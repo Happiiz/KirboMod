@@ -37,9 +37,9 @@ namespace KirboMod.NPCs.Marx
         static int IceBombExtraWait => 30;
         static float IceBombAimAheadAmount => 7f;
         static int DashFromBelowChaseDuration => 80;
-        static int DashFromBelowTelegraphDuration => Main.expertMode ? 20 : 40;
+        static int DashFromBelowTelegraphDuration => Main.expertMode ? 25 : 40;
         static int DashFromBelowDashUpDuration => 20;
-        static int DashFromBelowDashUpSpeed => 50;
+        static int DashFromBelowDashUpSpeed => 60;
         //I don't remember why there is a +4, but keep it
         static int TeleportFrenzyTpRate => TeleportFrameDuration * (TeleportFrameEnd - TeleportFrameStart + 4);
         static int TeleportFrenzyTpCount => Main.getGoodWorld ? 2 : 6;
@@ -395,6 +395,7 @@ namespace KirboMod.NPCs.Marx
                 NPC.velocity *= .9f;
                 if (relativeTimer == moveDuration + chargeDuration + 1)
                 {
+                    DecreasingStrengthShake.Add(10, 10);
                     ShootCutters();
                 }
             }
@@ -492,14 +493,9 @@ namespace KirboMod.NPCs.Marx
                 EndState(AttackType.BlackHole, Animation.Idle);
             }
         }
-        //thank you chatgpt for this code
+        //thank you chatgpt for part of this code
         private void DecideNextState()
         {
-            // Define canonical comparison
-            //Name comes from math:
-            //"relating to a general rule or standard formula."
-            AttackType GetCanonicalType(AttackType type) => type;
-            // type == AttackType.DashFromBelow ? AttackType.TeleportFrenzy : type;
 
             // Fetch durations for each attack
             GetAttackDurations(out float cutterDuration, out float iceBombDuration, out float blackHoleDuration, out float laserDuration, out float vineDuration, out _, out float dashFromBelowDuration);
@@ -513,12 +509,9 @@ namespace KirboMod.NPCs.Marx
                 { AttackType.Vine, vineDuration },
                 { AttackType.DashFromBelow, dashFromBelowDuration },
             };
-            //TODO: FIX DASH FROM BELOW??? LIKE FINISH MAKING IT A UNIQUE ATTACK
-            // Exclude the last attack, using canonical type to treat some as equivalent
-            AttackType lastCanonical = GetCanonicalType(lastattacktype);
 
             List<KeyValuePair<AttackType, float>> candidates = durations
-                .Where(kvp => GetCanonicalType(kvp.Key) != lastCanonical)
+                .Where(kvp => kvp.Key != lastattacktype)
                 .ToList();
 
             // Build a list of (AttackType, Weight) pairs where weight is 1/duration
@@ -633,7 +626,12 @@ namespace KirboMod.NPCs.Marx
             {
                 if (AttackTimer - 1 >= TotalTeleportInOutDuration)
                 {
-                    NPC.Center = Vector2.Lerp(NPC.Center, plr.Center, .05f);
+                    Vector2 targetPos = plr.Center;
+                    //if (Main.expertMode)
+                    {
+                        targetPos.X += plr.velocity.X * 30;
+                    }
+                    NPC.Center = Vector2.Lerp(NPC.Center, targetPos, .09f);
                 }
             }
             else if (AttackTimer < chaseDuration + riseTelegraphDuration)
@@ -680,6 +678,7 @@ namespace KirboMod.NPCs.Marx
                         vel += Main.rand.NextVector2Circular(5, 5);
                         Dust.NewDustPerfect(NPC.Center + offset, dustID, vel, 0, Color.Purple, 0.35f);
                     }
+                    DecreasingStrengthShake.Add();
                 }
                 NPC.velocity.Y = -dashUpSpeed;
                 NPC.velocity.X = 0;
