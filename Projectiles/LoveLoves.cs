@@ -51,7 +51,7 @@ namespace KirboMod.Projectiles
 					Projectile.frame = 0;
 				}
 			}
-			Helper.Homing(Projectile, 50, ref Projectile.ai[0], ref Projectile.localAI[0], 16 * 2);
+			Helper.Homing(Projectile, 50, ref Projectile.ai[0], ref Projectile.localAI[0], 8f, 150);
 			Projectile.rotation = Projectile.velocity.ToRotation();
 		}
 		static List<Vector2> Heart()

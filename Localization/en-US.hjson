@@ -1797,12 +1797,12 @@ Mods: {
 
 			HallowDrop: {
 				DisplayName: Hallow Drop
-				Tooltip: ""
+				Tooltip: The rainbow drop of the mythical infection
 			}
 
 			SpaceDrop: {
 				DisplayName: Space Drop
-				Tooltip: ""
+				Tooltip: The rainbow drop of the starry expanse
 			}
 		}
 

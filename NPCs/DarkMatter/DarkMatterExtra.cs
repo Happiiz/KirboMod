@@ -61,10 +61,10 @@ namespace KirboMod.NPCs.DarkMatter
             NPC.width = 130;
             NPC.height = 130;
             DrawOffsetY = 30;
-            NPC.damage = 100;
+            NPC.damage = 70;
             NPC.noTileCollide = true;
-            NPC.defense = 50;
-            NPC.lifeMax = 32000;
+            NPC.defense = 35;
+            NPC.lifeMax = 22000;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath1;
             NPC.value = Item.buyPrice(0, 19, 9, 5); // money it drops

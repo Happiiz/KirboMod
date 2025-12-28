@@ -35,7 +35,7 @@ namespace KirboMod.Items.DarkSword
             Item.useStyle = ItemUseStyleID.Shoot; //gun/staff
             Item.knockBack = 9;
             Item.value = Item.buyPrice(0, 2, 75, 0);
-            Item.rare = ItemRarityID.Yellow;
+            Item.rare = ItemRarityID.Lime;
             Item.autoReuse = true;
             Item.shoot = ModContent.ProjectileType<DarkSwordHeld>();
             Item.shootSpeed = 48f;

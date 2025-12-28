@@ -11,14 +11,14 @@ namespace KirboMod.Items.Accesories.Wings
 	public class MarxWings : ModItem
 	{
 		public override void SetStaticDefaults() {
-			ArmorIDs.Wing.Sets.Stats[Item.wingSlot] = new WingStats(240, 8f, 0.8f); //high flight time but low acceleration
+			ArmorIDs.Wing.Sets.Stats[Item.wingSlot] = new WingStats(360, 10f, 1f); //high flight time but low acceleration
 		}
 
 		public override void SetDefaults() {
 			Item.width = 22;
 			Item.height = 20;
 			Item.value = Item.buyPrice(gold: 8);
-			Item.rare = ItemRarityID.Lime;
+			Item.rare = ItemRarityID.Yellow;
 			Item.accessory = true;
 		}
 
@@ -41,7 +41,12 @@ namespace KirboMod.Items.Accesories.Wings
             }
         }
 
-		public override bool WingUpdate(Player player, bool inUse)
+        public override void HorizontalWingSpeeds(Player player, ref float speed, ref float acceleration)
+        {
+			acceleration *= 1.5f;
+        }
+
+        public override bool WingUpdate(Player player, bool inUse)
 		{
 			bool descending = player.controlJump && player.velocity.Y != 0 && player.wingTime <= 0;
 

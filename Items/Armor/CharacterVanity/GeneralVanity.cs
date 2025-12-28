@@ -296,7 +296,7 @@ namespace KirboMod.Items.Armor.CharacterVanity
     {
         public override void SetStaticDefaults()
         {
-            ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] = false;
+            ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] = true;
             ArmorIDs.Head.Sets.IsTallHat[Item.headSlot] = true;
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1; //amount needed to research
         }

@@ -27,7 +27,7 @@ namespace KirboMod.Items.Weapons
 			Item.useAnimation = 24;
 			Item.useStyle = ItemUseStyleID.Swing;
 			Item.value = Item.buyPrice(0, 1, 20, 0);
-			Item.rare = ItemRarityID.Lime;
+			Item.rare = ItemRarityID.LightPurple;
 			Item.UseSound = SoundID.Item44;
 
 			// These below are needed for a minion weapon

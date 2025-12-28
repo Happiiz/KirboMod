@@ -30,7 +30,7 @@ namespace KirboMod.Items.Weapons
 			Item.useStyle = ItemUseStyleID.Shoot;
 			Item.knockBack = 4;
 			Item.value = Item.buyPrice(0, 5, 50, 50);
-			Item.rare = ItemRarityID.Yellow;
+			Item.rare = ItemRarityID.Lime;
 			Item.UseSound = PureDarkMatter.LaserSFX.WithVolumeScale(.25f);
 			Item.autoReuse = true;
 			Item.shoot = ModContent.ProjectileType<GoodDarkMatterLaser>();

@@ -26,7 +26,7 @@ namespace KirboMod.Items
 			Item.width = 28;
 			Item.height = 16;
 			Item.value = Item.buyPrice(0, 0, 0, 50);
-			Item.rare = ItemRarityID.Yellow; //post golem
+			Item.rare = ItemRarityID.Lime; //post plantera
 			Item.maxStack = 9999;
 		}
 
