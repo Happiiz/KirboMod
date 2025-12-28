@@ -36,7 +36,8 @@ namespace KirboMod.Items.RainbowDrops
 			recipe.AddIngredient(ItemID.Moonglow, 3);
 			recipe.AddIngredient(ItemID.Hive, 10);
 			recipe.AddIngredient(ItemID.BeetleHusk, 5);
-			recipe.AddTile(TileID.MythrilAnvil);
+            recipe.AddIngredient(ItemID.ButterflyDust);
+            recipe.AddTile(TileID.MythrilAnvil);
 			recipe.Register();
 		}
 	}

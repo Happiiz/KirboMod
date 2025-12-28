@@ -26,7 +26,6 @@ namespace KirboMod.Items.RainbowDrops
 			recipe.AddIngredient(ModContent.ItemType<Starbit>(), 20);
 			recipe.AddIngredient(ItemID.CrystalShard, 25);
 			recipe.AddIngredient(ItemID.UnicornHorn, 5);
-			recipe.AddIngredient(ItemID.ButterflyDust);
 			recipe.AddIngredient(ItemID.QueenSlimeCrystal);//gelatin crystal, summons queen slime
 			recipe.AddTile(TileID.MythrilAnvil);
 			recipe.Register();
