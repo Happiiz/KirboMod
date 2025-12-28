@@ -56,7 +56,8 @@ namespace KirboMod.Items.Weapons
 			homingbombrecipe.AddIngredient(ItemID.ChlorophyteBullet, 5); //5 Chlorophyte Bullets
 			homingbombrecipe.AddIngredient(ModContent.ItemType<Items.Starbit>(), 30);
 			homingbombrecipe.AddIngredient(ModContent.ItemType<TreasureStone>(), 1); //1 rare stone
-			homingbombrecipe.AddTile(TileID.Anvils); //crafted at anvil
+            homingbombrecipe.AddIngredient(ModContent.ItemType<SoulMatter>(), 1); //soul matter
+            homingbombrecipe.AddTile(TileID.Anvils); //crafted at anvil
 			homingbombrecipe.Register(); //adds this recipe to the game
 		}
     }

@@ -49,7 +49,7 @@ namespace KirboMod.Items
 			//here for people that collected many rare stones before 1.3 for a non-melee class
             Recipe rareStoneConvert = CreateRecipe();
             rareStoneConvert.AddIngredient(ModContent.ItemType<RareStone>());
-            rareStoneConvert.AddIngredient(ItemID.TitaniumBar, 10);
+            rareStoneConvert.AddIngredient(ItemID.ChlorophyteBar, 10);
             rareStoneConvert.AddTile(TileID.MythrilAnvil);
             rareStoneConvert.Register(); //adds this recipe to the game
         }

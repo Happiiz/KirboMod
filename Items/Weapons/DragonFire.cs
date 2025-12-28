@@ -75,11 +75,12 @@ namespace KirboMod.Items.Weapons
         public override void AddRecipes()
         {
             Recipe recipe1 = CreateRecipe();//the result is dragonfire
-            recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.VolcanoFire>()); //Volcano Fire
+            recipe1.AddIngredient(ModContent.ItemType<VolcanoFire>()); //Volcano Fire
             recipe1.AddIngredient(ItemID.ShadowbeamStaff); //Shadowbeam Staff
             recipe1.AddIngredient(ItemID.LaserMachinegun); //Laser Machinegun
-            recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 100); //100 starbits
-            recipe1.AddIngredient(ModContent.ItemType<Items.MysticalStone>(), 2); //2 rare stones
+            recipe1.AddIngredient(ModContent.ItemType<Starbit>(), 100); //100 starbits
+            recipe1.AddIngredient(ModContent.ItemType<MysticalStone>(), 2); //2 rare stones
+            recipe1.AddIngredient(ModContent.ItemType<SoulMatter>(), 5); //soul matter
             recipe1.AddTile(TileID.MythrilAnvil); //crafted at mythril/orichalcum anvil
             recipe1.Register(); //adds this recipe to the game
         }

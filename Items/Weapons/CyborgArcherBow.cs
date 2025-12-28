@@ -99,12 +99,13 @@ namespace KirboMod.Items.Weapons
         public override void AddRecipes()
 		{
 			Recipe recipe1 = CreateRecipe();//the result is gigantsword
-			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.HunterArcherBow>()); //Hunter Archer Bow
+			recipe1.AddIngredient(ModContent.ItemType<HunterArcherBow>()); //Hunter Archer Bow
 			recipe1.AddIngredient(ItemID.StakeLauncher);
             recipe1.AddIngredient(ItemID.ChlorophyteShotbow);
-            recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 100); //100 starbits
-			recipe1.AddIngredient(ModContent.ItemType<Items.TreasureStone>(), 2); //2 rare stones
-			recipe1.AddTile(TileID.MythrilAnvil); //crafted at mythril/orichalcum anvil
+            recipe1.AddIngredient(ModContent.ItemType<Starbit>(), 100); //100 starbits
+			recipe1.AddIngredient(ModContent.ItemType<TreasureStone>(), 2); //2 rare stones
+            recipe1.AddIngredient(ModContent.ItemType<SoulMatter>(), 5); //soul matter
+            recipe1.AddTile(TileID.MythrilAnvil); //crafted at mythril/orichalcum anvil
 			recipe1.Register(); //adds this recipe to the game
 		}
 	}

@@ -652,7 +652,7 @@ Mods: {
 			}
 
 			JungleDrop: {
-				DisplayName: Brown  Drop
+				DisplayName: Brown Drop
 				Tooltip: The rainbow drop of the lively jungle
 			}
 
@@ -662,7 +662,7 @@ Mods: {
 			}
 
 			SnowDrop: {
-				DisplayName: White  Drop
+				DisplayName: White Drop
 				Tooltip: The rainbow drop of the snowy tundra
 			}
 

@@ -13,7 +13,6 @@ namespace KirboMod.Items.RainbowDrops
 		public override void SetDefaults() 
 		{
 			base.SetDefaults();
-			Item.rare = ItemRarityID.Lime; //post plantera
 		}
 
 		public override void AddRecipes()

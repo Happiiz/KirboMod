@@ -163,11 +163,12 @@ namespace KirboMod.Items.Weapons
         public override void AddRecipes()
         {
             Recipe recipe1 = CreateRecipe();//the result is triple star
-            recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.StarRod>()); //Star Rod
+            recipe1.AddIngredient(ModContent.ItemType<StarRod>()); //Star Rod
             recipe1.AddIngredient(ModContent.ItemType<HeartMatter>(), 5); //5 Heart Matter
-            recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 200); //200 starbits
+            recipe1.AddIngredient(ModContent.ItemType<Starbit>(), 200); //200 starbits
             recipe1.AddIngredient(ModContent.ItemType<DreamEssence>(), 50); //50 dream matter
-            recipe1.AddIngredient(ModContent.ItemType<Items.MysticalStone>(), 3); //3 rare stones
+            recipe1.AddIngredient(ModContent.ItemType<MysticalStone>(), 3); //3 rare stones
+            recipe1.AddIngredient(ModContent.ItemType<SoulMatter>(), 5); //soul matter
             recipe1.AddTile(TileID.MythrilAnvil); //crafted at hardmode anvil
             recipe1.Register(); //adds this recipe to the game
         }

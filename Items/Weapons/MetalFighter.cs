@@ -122,12 +122,13 @@ namespace KirboMod.Items.Weapons
         public override void AddRecipes()
 		{
 			Recipe recipe1 = CreateRecipe();
-			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.HardenedFighter>()); //Hardened Glove
+			recipe1.AddIngredient(ModContent.ItemType<HardenedFighter>()); //Hardened Glove
 			recipe1.AddIngredient(ItemID.PaladinsHammer); 
 			recipe1.AddIngredient(ItemID.GolemFist); 
-			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 100); 
-			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 2); 
-			recipe1.AddTile(TileID.MythrilAnvil); //crafted at mythril/orichalcum anvil
+			recipe1.AddIngredient(ModContent.ItemType<Starbit>(), 100); 
+			recipe1.AddIngredient(ModContent.ItemType<RareStone>(), 2);
+            recipe1.AddIngredient(ModContent.ItemType<SoulMatter>(), 5); //soul matter
+            recipe1.AddTile(TileID.MythrilAnvil); //crafted at mythril/orichalcum anvil
 			recipe1.Register(); //adds this recipe to the game
 		}
 	}

@@ -243,6 +243,25 @@ namespace KirboMod.NPCs
             }
 
         }
+
+        public override void OnHitByItem(Player player, Item item, NPC.HitInfo hit, int damageDone)
+        {
+            if (!Angry)
+            {
+                NPC.ai[0] = 0; //reset
+                Angry = true;
+            }
+        }
+
+        public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone)
+        {
+            if (!Angry)
+            {
+                NPC.ai[0] = 0; //reset
+                Angry = true;
+            }
+        }
+
         private void CheckPlatform() //trust me this is totally unique and original code and definitely not stolen from Spirit Mod's public source code(thx so much btw you don't know the hell I went through with this)
         {
             bool onplatform = true;

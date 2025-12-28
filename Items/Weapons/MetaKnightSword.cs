@@ -52,12 +52,13 @@ namespace KirboMod.Items.Weapons
         public override void AddRecipes()
 		{
 			Recipe recipe1 = CreateRecipe();//the result is Meta Knight sword
-			recipe1.AddIngredient(ModContent.ItemType<Items.Weapons.GigantSword>()); //Gigant Sword
+			recipe1.AddIngredient(ModContent.ItemType<GigantSword>()); //Gigant Sword
 			recipe1.AddIngredient(ItemID.ChlorophyteClaymore); //Chlorophyte Claymore
 			recipe1.AddIngredient(ItemID.InfluxWaver); //Influx Waver
-			recipe1.AddIngredient(ModContent.ItemType<Items.Starbit>(), 100); //100 starbits
-			recipe1.AddIngredient(ModContent.ItemType<Items.RareStone>(), 2); //2 rare stones
-			recipe1.AddTile(TileID.MythrilAnvil); //crafted at mythril/orichalcum anvil
+			recipe1.AddIngredient(ModContent.ItemType<Starbit>(), 100); //100 starbits
+			recipe1.AddIngredient(ModContent.ItemType<RareStone>(), 2); //2 rare stones
+            recipe1.AddIngredient(ModContent.ItemType<SoulMatter>(), 5); //soul matter
+            recipe1.AddTile(TileID.MythrilAnvil); //crafted at mythril/orichalcum anvil
 			recipe1.Register(); //adds this recipe to the game
 		}
     }
