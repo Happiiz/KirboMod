@@ -1,4 +1,5 @@
 using KirboMod.Items;
+using KirboMod.NPCs.Marx.SpecialFX;
 using KirboMod.Particles;
 using Microsoft.Xna.Framework;
 using System;
@@ -37,7 +38,7 @@ namespace KirboMod.NPCs
             NPC.height = 38;
             NPC.lifeMax = 180;
             NPC.defense = 10;
-            NPC.damage = 0;//damage will be from the explosion. Don't deal damage while passive
+            NPC.damage = 120;//damage will be set to 0 in the AI, will explode with this damage (scaled by difficulty)
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath1;
             NPC.value = Item.buyPrice(0, 0, 0, 15);
@@ -81,6 +82,7 @@ namespace KirboMod.NPCs
         }
         public override void AI() //constantly cycles each time
         {
+            NPC.damage = 0;
             NPC.TargetClosest(false);
             if (NPC.localAI[0] == 0)
             {
@@ -201,6 +203,12 @@ namespace KirboMod.NPCs
         Vector2 RndCircleOffset { get => Main.rand.NextVector2Circular(NPC.width, NPC.height); }
         void Boom()
         {
+            if (NPC.ai[3] != 0)
+            {
+                return;
+            }
+            NPC.ai[3] = 1;//flag to not explode again(so doesn't explode every frame in multiplayer before the kill packet arrives)
+            DecreasingStrengthShake.Add(10, 10);//small shake
             int max = (int)(3 * GetExplosionSizeMultiplier() * GetExplosionSizeMultiplier());
             for (int i = 0; i < max; i++)
             {
@@ -216,10 +224,17 @@ namespace KirboMod.NPCs
                 Dust.NewDustPerfect(NPC.Center + RndCircleOffset / 3, DustID.Torch, -Vector2.UnitY.RotatedByRandom(1) * (Main.rand.NextFloat() * 4 + 2), 0, default, 3);
             }
             //die from explosion
-            NPC.active = false;
+            if (Main.dedServ)
+            {
+                NPC.StrikeInstantKill();
+            }
+            else if (Main.netMode == NetmodeID.SinglePlayer)
+            {
+                NPC.active = false;
+            }
             SoundEngine.PlaySound(SoundID.Item38 with { MaxInstances = 0 }, NPC.Center);
             NPC.Hitbox = Utils.CenteredRectangle(NPC.Center, NPC.Size * GetExplosionSizeMultiplier());
-            int dmg = NPC.GetAttackDamage_ScaledByStrength(50);
+            int dmg = NPC.defDamage;
             for (int i = 0; i < Main.maxPlayers; i++)
             {
                 Player plr = Main.player[i];

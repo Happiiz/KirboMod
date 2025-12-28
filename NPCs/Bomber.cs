@@ -1,6 +1,7 @@
 using KirboMod.Bestiary;
 using KirboMod.Items;
 using KirboMod.Items.Ammo;
+using KirboMod.NPCs.Marx.SpecialFX;
 using KirboMod.Particles;
 using Microsoft.Xna.Framework;
 using System;
@@ -30,7 +31,7 @@ namespace KirboMod.NPCs
 			NPC.width = 36;
 			NPC.height = 32;
 			NPC.lifeMax = 600;
-			NPC.damage = 5;
+			NPC.damage = 250;
             NPC.HitSound = SoundID.NPCHit4; //metal
             NPC.DeathSound = SoundID.NPCDeath14; //explosive metal
             NPC.value = Item.buyPrice(0, 0, 20, 0);
@@ -78,6 +79,7 @@ namespace KirboMod.NPCs
 
         public override void AI() //constantly cycles each time
         {
+            NPC.damage = NPC.defDamage / 20;
             NPC.spriteDirection = NPC.direction;
             NPC.TargetClosest(false);
 
@@ -95,7 +97,7 @@ namespace KirboMod.NPCs
 
                 NPC.localAI[0]++;
 
-                if (NPC.localAI[0] > 30)
+                if (NPC.localAI[0] > 20)
                 {
                     falling = true;
                 }
@@ -103,6 +105,7 @@ namespace KirboMod.NPCs
 
             if (falling)
             {
+                NPC.damage = NPC.defDamage;//restore normal contact damage so the explosion can't get iframe blocked by normal contact damage
                 turnRed = true;
                 NPC.rotation = MathF.PI / 2 * NPC.direction;
 
@@ -139,15 +142,23 @@ namespace KirboMod.NPCs
 
         void Explode() //referenced from Scarfy code
         {
+            if (NPC.ai[3] != 0)
+            {
+                return;
+            }
+            NPC.ai[3] = 1;//flag to not explode again(so doesn't explode every frame in multiplayer before the kill packet arrives)
+
+            //an extreme shake is fine in this case because the player is probably gonna die anyway
+            //or if they dodge it, then there is probably not much else to avoid
+            DecreasingStrengthShake.Add(20);
             //explode
-
-            NPC.active = false;
             SoundEngine.PlaySound(SoundID.Item38 with { MaxInstances = 0 }, NPC.Center);
+            SoundEngine.PlaySound(SoundID.Item14 with { Pitch = -2, MaxInstances = 0 }, NPC.Center);
+            SoundEngine.PlaySound(SoundID.Item14 with { Pitch = -1, MaxInstances = 0 }, NPC.Center);
 
-            float sizeMult = 10;
-            NPC.Hitbox = Utils.CenteredRectangle(NPC.Center, NPC.Size * sizeMult);
-
-            for (int j = 0; j < 200; j++)
+            float size = 500;
+            NPC.Hitbox = Utils.CenteredRectangle(NPC.Center, new Vector2(size));
+            for (int j = 0; j < 250; j++)
             {
                 Vector2 pos = Main.rand.NextVector2FromRectangle(NPC.Hitbox);
                 Vector2 speed = (pos - NPC.Center) * Main.rand.NextFloat(0.02f, 0.1f); //spread outward
@@ -162,15 +173,30 @@ namespace KirboMod.NPCs
 
                 Dust d2 = Dust.NewDustDirect(NPC.position, NPC.width, NPC.height, DustID.Smoke, Scale: 2);
             }
-
+            //die from explosion
+            if (Main.dedServ)
+            {
+                NPC.StrikeInstantKill();
+            }
+            else if (Main.netMode == NetmodeID.SinglePlayer)
+            {
+                NPC.active = false;
+            }
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                NPC npc = Main.npc[i];
+                if (npc.active && npc.Hitbox.Intersects(NPC.Hitbox))
+                {
+                    npc.SimpleStrikeNPC(NPC.defDamage, NPC.direction, false, 9, noPlayerInteraction: true);
+                }
+            }
             for (int k = 0; k < Main.maxPlayers; k++)
             {
                 Player plr = Main.player[k];
                 if (plr.active && !plr.dead && plr.Hitbox.Intersects(NPC.Hitbox))
-                    plr.Hurt(PlayerDeathReason.ByNPC(NPC.whoAmI), 200, MathF.Sign(plr.Center.X - NPC.Center.X));
+                    plr.Hurt(PlayerDeathReason.ByNPC(NPC.whoAmI), NPC.defDamage, MathF.Sign(plr.Center.X - NPC.Center.X));
             }
         }
-
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Items.Weapons.BomberRocket>()));
