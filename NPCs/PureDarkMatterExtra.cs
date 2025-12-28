@@ -54,8 +54,8 @@ namespace KirboMod.NPCs
             NPC.height = 130;
             NPC.damage = 70;
             NPC.noTileCollide = true;
-            NPC.defense = 20;
-            NPC.lifeMax = 20000;
+            NPC.defense = 25;
+            NPC.lifeMax = 28000;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath1;
             NPC.value = Item.buyPrice(0, 19, 9, 5); // money it drops

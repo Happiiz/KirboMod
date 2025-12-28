@@ -95,12 +95,12 @@ namespace KirboMod.NPCs
                     }
 
                     //Enrage
-                    if (NPC.GetLifePercent() < 0.66f && Main.expertMode)
+                    if (NPC.GetLifePercent() < 0.75f && Main.expertMode)
                     {
                         phase = 3;
 
                         //Spin Move Percent
-                        if (NPC.GetLifePercent() < 0.33f && Main.expertMode)
+                        if (NPC.GetLifePercent() < 0.6f && Main.expertMode)
                         {
                             phase = 4;
                         }
@@ -154,15 +154,13 @@ namespace KirboMod.NPCs
 
             possibleAttacks.Remove(lastattacktype);
 
-            if (attackTurn > 1 && phase == 4) //below 25% on expert mode and did 2 attacks
+            if (attackTurn > (Main.getGoodWorld ? 3 : 1) && (Main.getGoodWorld || phase == 4)) //below 25% on expert mode and did 2 attacks (4 on ftw)
             {
                 attacktype = DarkMatterAttackType.Spin; //spin move
                 attackTurn = 0; //reset
             }
             else
             {
-                //DEBUG LINE
-                //attacktype = DarkMatterAttackType.Petals;
 
                 attacktype = possibleAttacks[Main.rand.Next(possibleAttacks.Count)];
                 attackTurn += 1; //add every turn 
@@ -703,9 +701,17 @@ namespace KirboMod.NPCs
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center - velocity, -velocity, ModContent.ProjectileType<AngledDarkBeam>(), damage, 4, Main.myPlayer);
                     if (Main.getGoodWorld)
                     {
-                        for (int i = 1; i < 4; i++)
+                        int spirals = 4;
+                        float atkProgress = (NPC.ai[0] - start - stayStillDuration) / (rotationDuration / ftwTurns);
+
+                        if (atkProgress > 1)
                         {
-                            velocity = velocity.RotatedBy(MathF.PI * .5f);
+                            //because past this point the attack is actually pretty easy to dodge otherwise
+                            spirals = 8;
+                        }
+                        for (int i = 1; i < spirals; i++)
+                        {
+                            velocity = velocity.RotatedBy(MathF.Tau / spirals);
                             Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center - velocity, -velocity, ModContent.ProjectileType<AngledDarkBeam>(), damage, 4, Main.myPlayer);
                         }
                     }

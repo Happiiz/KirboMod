@@ -582,6 +582,12 @@ namespace KirboMod.NPCs.DarkMatter
         }
         private void Transition() //transition to phase 2
         {
+            //in case was invisible or partially invisible when it started going to phase 2
+            NPC.alpha -= 40;
+            if(NPC.alpha < 0)
+            {
+                NPC.alpha = 0;
+            }
             NPC.ai[0]++;
             animation = 3;
             NPC.velocity *= 0.95f;

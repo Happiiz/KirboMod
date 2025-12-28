@@ -1,3 +1,4 @@
+using KirboMod.NPCs;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -21,6 +22,7 @@ namespace KirboMod.Items.RainbowDrops
             recipe.AddIngredient(ItemID.FallenStar, 7);
             recipe.AddIngredient(ItemID.Meteorite, 20);
             recipe.AddIngredient(ItemID.SoulofFlight, 20);
+            recipe.AddIngredient<KrackoSpikeItem>();
             recipe.AddTile(TileID.MythrilAnvil);
             recipe.Register();
         }
