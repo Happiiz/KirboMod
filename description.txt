@@ -15,14 +15,15 @@ It’s amazing how far this mod has come. Making it has been a very enriching ex
 - Gave all the Mid-Bosses their own songs!
 - Dark Matter has been re-tiered to pre-Golem rather than post-Golem!
 - Gave significant changes to Kracko and Zero!
-- Re-introduced the Dark Matter Rematch before Zero! Now with new attacks distinct from Dark Matter!
+- Re-introduced the Dark Matter Rematch before Zero! Now with new attacks distinct from Dark Matter AND its own music track!
 - Zero’s Eye is now a part of Zero on all difficulties!
 - Introduced many decorations and vanity items!
 - Introduced Soul Matter as a general pre-Lunar Events material! All 3rd tier evo-weapons, Triple Star and Rainbow Sword now require it!
 - Finally implemented Birdon Feathers into the mod, and with it 2 recipes for new stuff!
 - 5 new weapons!
 - 3 new mounts!
-- Revamped music for Power Orb, Dark Matter Phase 2 and Zero
+- Revamped music for Power Orb and Zero!
+- New music for Dark Matter's 2nd phase!
 - Menu music!
 - Achievements!
 - Some retextures!
