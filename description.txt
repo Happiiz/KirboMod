@@ -1,39 +1,53 @@
-A terraria mod based off of the Kirby series, integrating numerous elements from various games into Terraria!
+A terraria mod based off of the entire Kirby series, integrating numerous elements from various games into Terraria!
 
 This mod contains:
 - Over 60 weapons from the series and original to the mod!
 - Many enemies to find and fight!
-- 6 familiar bosses spread throughout all of progression!
+- several familiar bosses spread throughout all of progression!
 - Multiple materials and accessories to obtain!
 
-Update 1.2 of 5/15/2025:
+Update 1.3 of 12/28/2025: Merry (late) Christmas!
 
-The mod is finally on version 1.4.4, and with it has received multiple overhauls to its various content!
+It’s amazing how far this mod has come. Making it has been a very enriching experience! Thanks to all who took the time to indulge in it, whether that’s to play it or to help make it!
 
-- Shifted all 3rd-tier evolution weapons to post-Golem tier
-- Rare Stones are now only collectable through Mid-Bosses, which are now only summoned through the new Dimensional Destabilizer item
-- Changed up many enemy AIs and gave some expert mode changes
-- Overhauled all bosses to have entirely new attack patterns and attacks or just readjusted ones
-- 4 new music tracks for bosses by DeathZman, Evobyte, Happiz and Photonic0
-- Every weapon has been balanced, and/or overhauled
-- All minions are now a lot better at chasing enemies and dealing damage
-- Tons of sprite and visual overhauls
+- Three new enemies! Including Batafire Mid-Boss for the Underworld and Jungle!
+- Split rare stones into three types between each of the three Mid-Bosses, each type corresponding to a specific evo-weapon damage class, with recipes to help with conversion!
+- Gave all the Mid-Bosses their own songs!
+- Dark Matter has been re-tiered to pre-Golem rather than post-Golem!
+- Gave significant changes to Kracko and Zero!
+- Re-introduced the Dark Matter Rematch before Zero! Now with new attacks distinct from Dark Matter!
+- Zero’s Eye is now a part of Zero on all difficulties!
+- Introduced many decorations and vanity items!
+- Introduced Soul Matter as a general pre-Lunar Events material! All 3rd tier evo-weapons, Triple Star and Rainbow Sword now require it!
+- Finally implemented Birdon Feathers into the mod, and with it 2 recipes for new stuff!
+- 5 new weapons!
+- 3 new mounts!
+- Revamped music for Power Orb, Dark Matter Phase 2 and Zero
+- Menu music!
+- Achievements!
+- Some retextures!
+- Many edits! (Not nearly as much as the last major update, but still!)
+- An interesting new character…
+
+Full changelog can be found on the mod Discord!
+
 
 Credits:
 
 Happiz:
 - Creator of the mod
 - Programming & spritework
+- Composed the Milky Way Wishes remix
 
 Photonic0:
 - Additional programming & spritework
-- Composed the Zero, King Dedede, Pure Dark Matter and Nightmare remixes
+- Composed the remixes for the Mid-Bosses, King Dedede, Nightmare, Dark Matter Phase 2, Dark Matter Rematch and Zero
 
 Evobyte:
 - Composed the Dream Land Boss remix
 
 DeathZman:
-- Composed the Dark Matter Swordsman remix
+- Composed the Dark Matter Phase 1 remix, along with another particular remix…
 
 
 Kirby series by HAL Laboratory!

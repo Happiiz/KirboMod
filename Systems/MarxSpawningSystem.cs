@@ -104,23 +104,39 @@ namespace KirboMod.Systems
 
         //pretty much doing the same thing as downedbosssystem vvv
 
+        public override void OnWorldLoad()
+        {
+            CanMarxAppear = false;
+            MarxHasAppeared = false;
+            UnlockedMarx = false;
+            MarxActive = false;
+        }
+
+        public override void OnWorldUnload()
+        {
+            CanMarxAppear = false;
+            MarxHasAppeared = false;
+            UnlockedMarx = false;
+            MarxActive = false;
+        }
+
         public override void SaveWorldData(TagCompound tag)
         {
             if (CanMarxAppear)
             {
-                tag.Add("CanMarxAppear", CanMarxAppear);
+                tag["CanMarxAppear"] = true;
             }
             if (MarxHasAppeared)
             {
-                tag.Add("MarxHasAppeared", MarxHasAppeared);
+                tag["MarxHasAppeared"] = true;
             }
             if (UnlockedMarx)
             {
-                tag.Add("UnlockedMarx", UnlockedMarx);
+                tag["UnlockedMarx"] = true;
             }
             if (MarxActive)
             {
-                tag.Add("MarxActive", MarxActive);
+                tag["MarxActive"] = true;
             }
         }
 

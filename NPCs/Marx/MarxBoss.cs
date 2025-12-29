@@ -503,12 +503,16 @@ namespace KirboMod.NPCs.Marx
             Dictionary<AttackType, float> durations = new()
             {
                 { AttackType.Cutter, cutterDuration },
-                { AttackType.TeleportFrenzy, blackHoleDuration },
                 { AttackType.MassiveLaser, laserDuration },
                 { AttackType.IceBomb, iceBombDuration },
                 { AttackType.Vine, vineDuration },
                 { AttackType.DashFromBelow, dashFromBelowDuration },
             };
+
+            if (Main.expertMode || NPC.GetLifePercent() < 0.6f)
+            {
+                durations.Add(AttackType.TeleportFrenzy, blackHoleDuration);
+            }
 
             List<KeyValuePair<AttackType, float>> candidates = durations
                 .Where(kvp => kvp.Key != lastattacktype)

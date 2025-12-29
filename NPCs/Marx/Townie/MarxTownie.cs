@@ -193,9 +193,12 @@ namespace KirboMod.NPCs.Marx.Townie
                     chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DPostMarx"));
                 }
             }
-            else if (NPC.downedPlantBoss)
+            else if (NPC.downedGolemBoss)
             {
-                chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DPreMarx"));
+                for (int i = 0; i < 5; i++) //a bit more common
+                {
+                    chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DPreMarx"));
+                }
             }
 
             chat.Add(Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DShutTheHellUp"));
@@ -216,11 +219,6 @@ namespace KirboMod.NPCs.Marx.Townie
             }
 
             string chosenChat = chat;
-
-            if (!Main.LocalPlayer.GetModPlayer<KirbPlayer>().talkedToMarx) //first time chatting
-            {
-                chosenChat = Language.GetTextValue("Mods.KirboMod.NPCs.MarxTownie.Dialogue.DInitial"); //guaranteed
-            }
 
             if (wrathfulGodsEnabled) //only display these lines when wotg is installed
             {

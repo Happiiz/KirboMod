@@ -31,6 +31,7 @@ namespace KirboMod.Projectiles.BandanaDee
             Projectile.aiStyle = -1;
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = 10;
+            Projectile.ArmorPenetration = 20;
         }
         static float Range => 160;
         static float HitboxWidth => 100;
