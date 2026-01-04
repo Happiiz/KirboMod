@@ -110,11 +110,14 @@ namespace KirboMod.NPCs
                 //int slot = MusicLoader.GetMusicSlot(Mod, "Music/Photonic0_New02_WithLoopMetadata");
                 int slot = MusicLoader.GetMusicSlot(Mod, MusicPath);
                 Music = slot;
-                for (int i = 0; i < Main.musicFade.Length; i++)
+                if (!KirboMod.DEBUG_NoMusicFadeSkip)
                 {
-                    Main.musicFade[i] = .5f;
+                    for (int i = 0; i < Main.musicFade.Length; i++)
+                    {
+                        Main.musicFade[i] = .5f;
+                    }
+                    Main.musicFade[slot] = .5f;
                 }
-                Main.musicFade[slot] = .5f;
                 //Music = MusicID.Boss2;
             }
 

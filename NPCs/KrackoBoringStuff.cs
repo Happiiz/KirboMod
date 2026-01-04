@@ -1,6 +1,5 @@
 ﻿using KirboMod.Items;
 using KirboMod.Items.Accesories;
-using KirboMod.Items.Armor.AirWalker;
 using KirboMod.Items.Kracko;
 using KirboMod.Systems;
 using Microsoft.Xna.Framework;
@@ -50,8 +49,8 @@ namespace KirboMod.NPCs
         public static SoundStyle Dash2SFX => new SoundStyle("KirboMod/Sounds/NPC/Kracko/KrackoDash2").WithVolumeScale(1f);
         public static SoundStyle Dash3SFX => new SoundStyle("KirboMod/Sounds/NPC/Kracko/KrackoDash3").WithVolumeScale(1f);
         public static SoundStyle DashToBGSFX => new SoundStyle("KirboMod/Sounds/NPC/Kracko/KrackoDashToBG").WithPitchOffset(0.05f);
-        public static SoundStyle DashToScreenSFX => new SoundStyle("KirboMod/Sounds/NPC/Kracko/KrackoDashToScreen");
-        public static SoundStyle FlyDownDashToScreenSFX => new SoundStyle("KirboMod/Sounds/NPC/Kracko/FlyDownAfterDashToScreen");
+        public static SoundStyle DashToScreenSFX => new("KirboMod/Sounds/NPC/Kracko/KrackoDashToScreen");
+        public static SoundStyle FlyDownDashToScreenSFX => new("KirboMod/Sounds/NPC/Kracko/FlyDownAfterDashToScreen");
         public void PlayDashToScreenSFX()
         {
             SoundEngine.PlaySound(DashToScreenSFX with { MaxInstances = 0 }, NPC.Center);
@@ -205,7 +204,11 @@ namespace KirboMod.NPCs
         {
             // DisplayName.SetDefault("Kracko");
             Main.npcFrameCount[NPC.type] = 2;
-
+            if (!KirboMod.DEBUG_NoMusicFadeSkip)
+            {
+                int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Evobyte_KdlBoss");
+                Main.musicNoCrossFade[musicSlot] = true;
+            }
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true; //immune to not mess up movement
         }
 
@@ -235,8 +238,11 @@ namespace KirboMod.NPCs
             {
                 int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Evobyte_KdlBoss");
                 Music = musicSlot;
-                Main.musicFade[musicSlot] = 1;
-                Main.musicNoCrossFade[musicSlot] = true;
+                if (!KirboMod.DEBUG_NoMusicFadeSkip)
+                {
+                    Main.musicFade[musicSlot] = 1;
+                    Main.musicNoCrossFade[musicSlot] = true;
+                }
             }
         }
 

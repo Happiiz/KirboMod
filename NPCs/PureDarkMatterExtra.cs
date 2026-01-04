@@ -15,7 +15,7 @@ namespace KirboMod.NPCs
     public partial class PureDarkMatter : ModNPC
     {
         public static SoundStyle LaserSFX => new SoundStyle("KirboMod/Sounds/NPC/DarkMatter/PureDarkMatterLaser") with { MaxInstances = 0 };
-        public static SoundStyle PetalThrowSFX => new SoundStyle("KirboMod/Sounds/NPC/DarkMatter/PureDarkMatterPetalThrow");
+        public static SoundStyle PetalThrowSFX => new("KirboMod/Sounds/NPC/DarkMatter/PureDarkMatterPetalThrow");
         public static SoundStyle DashSFX => new SoundStyle("KirboMod/Sounds/NPC/DarkMatter/PureDarkMatterDash") with { Volume = 2f };
         public static SoundStyle BeamSFX => new SoundStyle("KirboMod/Sounds/NPC/DarkMatter/PureDarkMatterBeam") with { Volume = 0.8f };
         enum DarkMatterAttackType : byte
@@ -41,10 +41,12 @@ namespace KirboMod.NPCs
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(NPC.type, drawModifiers);
             string musicPath = "KirboMod/Music/Photonic0_PureDarkMatterWithLoopMetadata";
-            int musicSlot = MusicLoader.GetMusicSlot(musicPath);
-            Music = musicSlot;
-            Main.musicFade[musicSlot] = 1;
-            Main.musicNoCrossFade[musicSlot] = true;
+            if (!KirboMod.DEBUG_NoMusicFadeSkip)
+            {
+                int musicSlot = MusicLoader.GetMusicSlot(musicPath);
+                Main.musicFade[musicSlot] = 1;
+                Main.musicNoCrossFade[musicSlot] = true;
+            }
             NPCID.Sets.ImmuneToRegularBuffs[Type] = true; //immune to all buffs that aren't whips
         }
 
@@ -83,12 +85,14 @@ namespace KirboMod.NPCs
                 }
                 int musicSlot = MusicLoader.GetMusicSlot(musicPath);
                 Music = musicSlot;
-                Main.musicFade[musicSlot] = 1;
-                Main.musicNoCrossFade[musicSlot] = true;
+                if (!KirboMod.DEBUG_NoMusicFadeSkip)
+                {
+                    Main.musicFade[musicSlot] = 1;
+                    Main.musicNoCrossFade[musicSlot] = true;
 
-                musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/DeathZ_DarkMatterSwordsman");
-                Main.musicFade[musicSlot] = 0;
-
+                    musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/DeathZ_DarkMatterSwordsman");
+                    Main.musicFade[musicSlot] = 0;
+                }
             }
         }
 

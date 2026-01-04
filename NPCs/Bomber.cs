@@ -3,6 +3,7 @@ using KirboMod.Items;
 using KirboMod.Items.Ammo;
 using KirboMod.NPCs.Marx.SpecialFX;
 using KirboMod.Particles;
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using System;
 using System.IO;
@@ -182,6 +183,7 @@ namespace KirboMod.NPCs
             {
                 NPC.active = false;
             }
+            KirbyTransformationModCompatibilityHelper.Spawn5Drop(NPC.GetSource_Death(), NPC.Center, 100);
             for (int i = 0; i < Main.maxNPCs; i++)
             {
                 NPC npc = Main.npc[i];

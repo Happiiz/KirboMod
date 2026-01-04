@@ -84,15 +84,18 @@ namespace KirboMod.NPCs
             {
                 int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Evobyte_KrackoJr");
                 Music = musicSlot;
-                Main.musicFade[musicSlot] = 1;
-                Main.musicNoCrossFade[musicSlot] = true;
+                if (!KirboMod.DEBUG_NoMusicFadeSkip)
+                {
+                    Main.musicFade[musicSlot] = 1;
+                    Main.musicNoCrossFade[musicSlot] = true;
+                }
             }
         }
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
             //if player is within space height, not in hardmode, defeated evil boss but not Kracko
-            if (spawnInfo.Player.ZoneSkyHeight && NPC.downedBoss2 && !DownedBossSystem.downedKrackoBoss && !Main.hardMode) 
+            if (spawnInfo.Player.ZoneSkyHeight && NPC.downedBoss2 && !DownedBossSystem.downedKrackoBoss && !Main.hardMode)
             {
                 return (NPC.AnyNPCs(ModContent.NPCType<KrackoJr>()) || NPC.AnyNPCs(ModContent.NPCType<NPCs.Kracko>())) ? 0 : 0.05f; //return spawn rate if kracko isn't here
             }
@@ -165,7 +168,7 @@ namespace KirboMod.NPCs
                     if (Timer == 30)
                     {
                         FacePlayer();
-                        Vector2 targetOffset = new Vector2(500 * NPC.spriteDirection, -300);
+                        Vector2 targetOffset = new(500 * NPC.spriteDirection, -300);
                         NPC.velocity = player.Center + targetOffset - NPC.Center;
                         NPC.velocity *= .177f;//these numbers are just what worked idk why
                     }
@@ -279,7 +282,7 @@ namespace KirboMod.NPCs
                 }
 
                 //summon kracko
-               
+
             }
             else
             {
@@ -318,7 +321,7 @@ namespace KirboMod.NPCs
             if (NPC.IsABestiaryIconDummy)
             {
                 pupilOffset = (Main.MouseScreen - NPC.Center);//the multipier is just what looks good
-                if(pupilOffset.Length() > offsetLength)
+                if (pupilOffset.Length() > offsetLength)
                 {
                     pupilOffset.Normalize();
                     pupilOffset *= offsetLength;
@@ -368,7 +371,7 @@ namespace KirboMod.NPCs
                 shootSpeed *= 1.5f;
             }
             Player plr = Main.player[NPC.target];
-            for (float i = 0; i < numCannonballs; i ++)
+            for (float i = 0; i < numCannonballs; i++)
             {
                 float t = i / (numCannonballs - 1);
                 Vector2 velocity = NPC.DirectionTo(plr.Center);

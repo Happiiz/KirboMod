@@ -3,6 +3,7 @@ using KirboMod.NPCs.Marx.SpecialFX;
 using KirboMod.Particles;
 using Microsoft.Xna.Framework;
 using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -18,12 +19,44 @@ namespace KirboMod.NPCs
     {
         public bool Angry { get => NPC.ai[2] == 1f; set => NPC.ai[2] = value ? 1f : 0f; } //initially set to false because it doesn't start at 1f
 
+
+        //static List<int> npcIDsToSignalBeingInhaled = new();
+        //static List<Func<NPC, Player, bool>> specialNPCInhaleFunctions = new();
+
+        //static void ExampleModCall(int npcIDToAddSpecialFunction, Func<NPC, Player, bool> specialInhaleFunction)
+        //{
+        //    //under normal circumstancess, these *should* be the same length each time
+        //    //end every entry should properly match their npc id with their special inhale function
+        //    npcIDsToSignalBeingInhaled.Add(npcIDToAddSpecialFunction);
+        //    specialNPCInhaleFunctions.Add(specialInhaleFunction);
+        //}
+        //static void TryInhaleExampleFunctionIDKHowYourModWorks(NPC npcBeingInhaled, Player playerInhaling)
+        //{
+        //    //IndexOf returns -1 if the element is not in the list
+        //    int indexOfNPCBeingInhaledInSignalList = npcIDsToSignalBeingInhaled.IndexOf(npcBeingInhaled.type);
+        //    if (indexOfNPCBeingInhaledInSignalList >= 0)
+        //    {
+        //        Func<NPC, Player, bool> specialInhaleFunction = specialNPCInhaleFunctions[indexOfNPCBeingInhaledInSignalList];
+        //        if(specialInhaleFunction != null && !specialInhaleFunction(npcBeingInhaled, playerInhaling))
+        //        {
+        //            //if the special inhale function returns false
+        //            //block npc from being inhaled
+        //            return;
+        //        }
+        //        //if there is no special inhale function (failsafe) or if the special inhale function returned true
+        //        //then it will allow inhaling
+        //    }
+
+        //    //functional inhale code that pulls in and absorbs enemies and whatever else goes here
+        //}
+
         public override void SetStaticDefaults()
         {
+
             // DisplayName.SetDefault("Scarfy");
             Main.npcFrameCount[NPC.type] = 6;
 
-            NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers()
+            NPCID.Sets.NPCBestiaryDrawModifiers value = new()
             {
                 Direction = -1,
             };

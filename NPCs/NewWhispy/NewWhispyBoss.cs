@@ -16,7 +16,7 @@ namespace KirboMod.NPCs.NewWhispy
     [AutoloadBossHead]
     public partial class NewWhispyBoss : ModNPC
     {
-        public override string BossHeadTexture =>  "KirboMod/NPCs/NewWhispy/NewWhispyBoss_Head_Boss";
+        public override string BossHeadTexture => "KirboMod/NPCs/NewWhispy/NewWhispyBoss_Head_Boss";
         public const int FightAreaHeight = 448;// maybe set it as 480?
         public const int FightAreaWidth = 16 * 42 + 272 / 2;
         public const int CanopyWidth = FightAreaWidth + 16 * 6;
@@ -32,7 +32,7 @@ namespace KirboMod.NPCs.NewWhispy
         public static int SplittingWindSplitCount => Main.getGoodWorld ? 7 : Main.expertMode ? 6 : 5;
         public static float SplittingWindRadius => 16 * 4f * SplittingWindSplitCount;
         public static SoundStyle AirShotSFX => new SoundStyle("KirboMod/Sounds/Projectiles/NewWhispy/AirShot") with { Pitch = -0.8f, PitchVariance = 0.2f };
-        public static SoundStyle AirShotSplitSFX => new SoundStyle("KirboMod/Sounds/Projectiles/NewWhispy/AirShotSplit");
+        public static SoundStyle AirShotSplitSFX => new("KirboMod/Sounds/Projectiles/NewWhispy/AirShotSplit");
         public static SoundStyle ObjFallSFX => (new SoundStyle("KirboMod/Sounds/Projectiles/NewWhispy/WhispyObjFall")) with { MaxInstances = 0, Volume = 0.55f, PitchVariance = 0.2f };
         public enum AIState
         {
@@ -53,7 +53,7 @@ namespace KirboMod.NPCs.NewWhispy
         {
             Regular = 0,
             Angry = 1,
-            PuffedUpCheeksAndClosedMouth=2,
+            PuffedUpCheeksAndClosedMouth = 2,
         }
         public override string Texture => "KirboMod/NPCs/NewWhispy/NewWhispyBase_Placeholder";
         public override void SetStaticDefaults()
@@ -80,7 +80,7 @@ namespace KirboMod.NPCs.NewWhispy
         {
             NPC.immortal = true;//for intro
             NPC.width = 272;
-            NPC.height = 448-16 * 4;
+            NPC.height = 448 - 16 * 4;
             NPC.damage = 36;
             NPC.noTileCollide = false;
             NPC.defense = 14;
@@ -96,8 +96,8 @@ namespace KirboMod.NPCs.NewWhispy
             NPC.noGravity = true;
             NPC.lavaImmune = true;
             NPC.timeLeft = 60;
-            NPC.friendly = false;   
-            if(Main.netMode != NetmodeID.Server)
+            NPC.friendly = false;
+            if (Main.netMode != NetmodeID.Server)
             {
                 LoadTextures();
             }
@@ -106,8 +106,11 @@ namespace KirboMod.NPCs.NewWhispy
                 LoadTextures();
                 int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Evobyte_KdlBoss");
                 Music = musicSlot;
-                Main.musicFade[musicSlot] = 1;
-                Main.musicNoCrossFade[musicSlot] = true;
+                if (!KirboMod.DEBUG_NoMusicFadeSkip)
+                {
+                    Main.musicFade[musicSlot] = 1;
+                    Main.musicNoCrossFade[musicSlot] = true;
+                }
             }
         }
         public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
@@ -196,7 +199,7 @@ namespace KirboMod.NPCs.NewWhispy
             //if (PhaseIndex == 0)
             {
                 int playerSide = MathF.Sign(TargetedPlayer.Center.X - NPC.Center.X);
-                return NPC.Top + new Vector2((Main.rand.NextFloat(35 * 16) + NPC.width * 0.65f) * playerSide , Main.rand.NextFloat(-10, 10));
+                return NPC.Top + new Vector2((Main.rand.NextFloat(35 * 16) + NPC.width * 0.65f) * playerSide, Main.rand.NextFloat(-10, 10));
             }
             return NPC.Center;//math this later
         }
@@ -245,8 +248,8 @@ namespace KirboMod.NPCs.NewWhispy
         {
             npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<WhispyBag>())); //only drops in expert
 
-            LeadingConditionRule notExpertRule = new LeadingConditionRule(new Conditions.NotExpert()); //checks if not expert
-            LeadingConditionRule masterMode = new LeadingConditionRule(new Conditions.IsMasterMode()); //checks if master mode
+            LeadingConditionRule notExpertRule = new(new Conditions.NotExpert()); //checks if not expert
+            LeadingConditionRule masterMode = new(new Conditions.IsMasterMode()); //checks if master mode
 
             notExpertRule.OnSuccess(ItemDropRule.Common(ItemID.Wood, 1, 20, 20)); //hell yeah
 
@@ -276,13 +279,13 @@ namespace KirboMod.NPCs.NewWhispy
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
-          
+
             if (NPC.life <= 0)
             {
                 for (int i = 0; i < 8; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
                 {
                     // go around in a octogonal pattern
-                    Vector2 speed = new Vector2((float)Math.Cos(MathHelper.ToRadians(i * 45)) * 25, (float)Math.Sin(MathHelper.ToRadians(i * 45)) * 25);
+                    Vector2 speed = new((float)Math.Cos(MathHelper.ToRadians(i * 45)) * 25, (float)Math.Sin(MathHelper.ToRadians(i * 45)) * 25);
 
                     Dust d = Dust.NewDustPerfect(NPC.Center, ModContent.DustType<Dusts.BoldStar>(), speed, Scale: 3f); //Makes dust in a messy circle
                     d.noGravity = true;

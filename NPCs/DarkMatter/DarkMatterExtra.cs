@@ -1,6 +1,5 @@
 using KirboMod.Bestiary;
 using KirboMod.Items.DarkMatter;
-using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using System.IO;
 using Terraria;
@@ -14,16 +13,16 @@ using Terraria.ModLoader;
 
 namespace KirboMod.NPCs.DarkMatter
 {
-	public partial class DarkMatter : ModNPC
-	{
+    public partial class DarkMatter : ModNPC
+    {
         enum DarkMatterAttackType : byte
         {
             DarkBeams,//1
             Dash,//2
             Orbs,//3
-        }                                                                                                  
+        }
         public static SoundStyle OrbCharge => new SoundStyle("KirboMod/Sounds/NPC/DarkMatter/DarkMatterSwordsmanSwordBallCharge2") with { MaxInstances = 0 };
-        public static SoundStyle DarkBeamShoot => new SoundStyle("KirboMod/Sounds/NPC/DarkMatter/DarkMatterSwordsmanBeam");
+        public static SoundStyle DarkBeamShoot => new("KirboMod/Sounds/NPC/DarkMatter/DarkMatterSwordsmanBeam");
         public static SoundStyle OrbShoot => new SoundStyle("KirboMod/Sounds/NPC/DarkMatter/DarkMatterSwordsmanSwordBallThrow2") with { MaxInstances = 0, Volume = 1.6f };
         //public static SoundStyle 
         public override void SetStaticDefaults()
@@ -34,13 +33,13 @@ namespace KirboMod.NPCs.DarkMatter
             // Add this in for bosses that have a summon item, requires corresponding code in the item
             NPCID.Sets.MPAllowedEnemies[Type] = true;
 
-            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers()
+            NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new()
             {
                 Hide = true, //hide from bestiary
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
 
-            NPCDebuffImmunityData debuffData = new NPCDebuffImmunityData
+            NPCDebuffImmunityData debuffData = new()
             {
                 ImmuneToAllBuffsThatAreNotWhips = true,
             };
@@ -78,8 +77,12 @@ namespace KirboMod.NPCs.DarkMatter
             {
                 int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/DeathZ_DarkMatterSwordsman");
                 Music = musicSlot;
-                Main.musicFade[musicSlot] = 1;
-                Main.musicNoCrossFade[musicSlot] = true;
+                if (!KirboMod.DEBUG_NoMusicFadeSkip)
+                {
+
+                    Main.musicFade[musicSlot] = 1;
+                    Main.musicNoCrossFade[musicSlot] = true;
+                }
             }
         }
         public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */
@@ -102,8 +105,8 @@ namespace KirboMod.NPCs.DarkMatter
         public override void SendExtraAI(BinaryWriter writer)
         {
             //send non NPC.ai array info to servers
-            writer.Write((byte)attacktype); 
-            writer.Write((byte)lastattacktype); 
+            writer.Write((byte)attacktype);
+            writer.Write((byte)lastattacktype);
             writer.Write(animation);
             writer.Write(phase);
             writer.WriteVector2(playerTargetArea);
@@ -111,7 +114,7 @@ namespace KirboMod.NPCs.DarkMatter
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             //sync in multiplayer
-            attacktype = (DarkMatterAttackType)reader.ReadByte(); 
+            attacktype = (DarkMatterAttackType)reader.ReadByte();
             lastattacktype = (DarkMatterAttackType)reader.ReadByte();
 
             animation = reader.ReadInt32();
@@ -128,7 +131,7 @@ namespace KirboMod.NPCs.DarkMatter
                 return false; //no health bar
             }
             else //health bar
-            return true;
+                return true;
         }
         public override void BossLoot(ref string name, ref int potionType)
         {
@@ -170,8 +173,8 @@ namespace KirboMod.NPCs.DarkMatter
         {
             npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<DarkMatterBag>())); //only drops in expert
 
-            LeadingConditionRule notExpertRule = new LeadingConditionRule(new Conditions.NotExpert()); //checks if not expert
-            LeadingConditionRule masterMode = new LeadingConditionRule(new Conditions.IsMasterMode()); //checks if master mode
+            LeadingConditionRule notExpertRule = new(new Conditions.NotExpert()); //checks if not expert
+            LeadingConditionRule masterMode = new(new Conditions.IsMasterMode()); //checks if master mode
 
             notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<Items.DarkMaterial>(), 1, 30, 30));
             notExpertRule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<DarkMatterMask>(), 7));

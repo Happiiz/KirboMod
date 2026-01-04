@@ -78,12 +78,13 @@ namespace KirboMod.NPCs
             {
                 int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/NightmareWizardWithLoopMetadata");
                 Music = musicSlot;
-                Main.musicFade[musicSlot] = 1;
-                Main.musicNoCrossFade[musicSlot] = true;
-
-                musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Photonic0_NightmareOrb");
-                Main.musicFade[musicSlot] = 0;
-
+                if (!KirboMod.DEBUG_NoMusicFadeSkip)
+                {
+                    Main.musicFade[musicSlot] = 1;
+                    Main.musicNoCrossFade[musicSlot] = true;
+                    musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Photonic0_NightmareOrb");
+                    Main.musicFade[musicSlot] = 0;
+                }
             }
         }
 
@@ -229,7 +230,7 @@ namespace KirboMod.NPCs
         void PlayDashSFX()
         {
             SoundEngine.PlaySound(DashSFX, NPC.Center);
-        }  
+        }
         public override Color? GetAlpha(Color lightColor)
         {
             return Color.White; // Makes it uneffected by light

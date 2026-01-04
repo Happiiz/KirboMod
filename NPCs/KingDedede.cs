@@ -114,7 +114,10 @@ namespace KirboMod.NPCs
             {
                 int slot = MusicLoader.GetMusicSlot(Mod, "Music/Photonic0_DededeStarStackerWithLoopMetadata");
                 Music = slot;
-                Main.musicFade[slot] = 1f;
+                if (!KirboMod.DEBUG_NoMusicFadeSkip)
+                {
+                    Main.musicFade[slot] = 1f;
+                }
             }
 
             NPC.friendly = false;
@@ -304,7 +307,7 @@ namespace KirboMod.NPCs
                 if (attacktype == DededeAttackType.Slam)
                 {
                     NPC.noGravity = true;
-             
+
                     NPC.GravityMultiplier = MultipliableFloat.One * 3f;
                     AttackSlam(phaseThreeSpeedUp, player, distance);
                     NPC.velocity.Y += NPC.gravity;
@@ -599,7 +602,7 @@ namespace KirboMod.NPCs
                     SoundEngine.PlaySound(Walk, NPC.Center);
                 }
 
-                ClimbTiles(NPC,player);
+                ClimbTiles(NPC, player);
 
                 if (Math.Abs(distance.X) <= 150) //range
                 {
@@ -791,7 +794,7 @@ namespace KirboMod.NPCs
             }
             NPC.MaxFallSpeedMultiplier = MultipliableFloat.One;
 
-         //   NPC.noTileCollide = (NPC.Bottom.Y + NPC.velocity.Y * 2) < player.position.Y;
+            //   NPC.noTileCollide = (NPC.Bottom.Y + NPC.velocity.Y * 2) < player.position.Y;
             if (attack == (phase == 3 ? 90 : 120) - phaseThreeSpeedUp)
             {
                 NPC.noTileCollide = true; //set initially
@@ -985,7 +988,7 @@ namespace KirboMod.NPCs
             possibleAttacks.Remove(lastattacktype);
 
             attacktype = possibleAttacks[Main.rand.Next(possibleAttacks.Count)];
-          //  attacktype = DededeAttackType.Slam;//debug
+            //  attacktype = DededeAttackType.Slam;//debug
             NPC.netUpdate = true;
 
             lastattacktype = attacktype;

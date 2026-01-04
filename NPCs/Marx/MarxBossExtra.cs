@@ -94,9 +94,12 @@ namespace KirboMod.NPCs.Marx
             {
                 int musicSlot = MusicLoader.GetMusicSlot(MusicPath);
                 Music = musicSlot;
-                Main.musicFade[musicSlot] = 1;
-                Main.musicNoCrossFade[musicSlot] = true;
+                if (!KirboMod.DEBUG_NoMusicFadeSkip)
+                {
 
+                    Main.musicFade[musicSlot] = 1;
+                    Main.musicNoCrossFade[musicSlot] = true;
+                }
             }
             MarxWingRenderer.Initialize();
             wingRenderer = new();

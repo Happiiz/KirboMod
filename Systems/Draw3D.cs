@@ -3,7 +3,7 @@ using Terraria;
 
 namespace KirboMod.Systems
 {
-    internal static class Draw3D
+    public static class Draw3D
     {
         public static Vector2 ScreenCenter => new(Main.screenPosition.X + Main.screenWidth / 2, Main.screenPosition.Y + Main.screenHeight / 2);
         public static float GetScaleFor3D(IProjWithZPos proj)

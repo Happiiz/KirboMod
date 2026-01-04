@@ -50,8 +50,6 @@ namespace KirboMod.NPCs.PureDarkMatterRematch
             NPCID.Sets.NPCBestiaryDrawOffset.Add(NPC.type, drawModifiers);
             string musicPath = "KirboMod/Music/Photonic0_DarkMatterRematch_WithLoopMetadata";
             int musicSlot = MusicLoader.GetMusicSlot(musicPath);
-            Music = musicSlot;
-            Main.musicFade[musicSlot] = 1;
             Main.musicNoCrossFade[musicSlot] = true;
             NPCID.Sets.ImmuneToRegularBuffs[Type] = true; //immune to all buffs that aren't whips
         }
@@ -77,8 +75,12 @@ namespace KirboMod.NPCs.PureDarkMatterRematch
                 string musicPath = "KirboMod/Music/Photonic0_DarkMatterRematch_WithLoopMetadata";
                 int musicSlot = MusicLoader.GetMusicSlot(musicPath);
                 Music = musicSlot;
-                Main.musicFade[musicSlot] = 1;
-                Main.musicNoCrossFade[musicSlot] = true;
+                if (!KirboMod.DEBUG_NoMusicFadeSkip)
+                {
+
+                    Main.musicFade[musicSlot] = 1;
+                    Main.musicNoCrossFade[musicSlot] = true;
+                }
             }
         }
 
@@ -157,7 +159,7 @@ namespace KirboMod.NPCs.PureDarkMatterRematch
         private void Intro()
         {
             FacePlayerOrRight();
-            if(Timer == 0)
+            if (Timer == 0)
             {
                 for (int i = 0; i < 30; i++)
                 {
@@ -634,11 +636,11 @@ namespace KirboMod.NPCs.PureDarkMatterRematch
         //shorten the zero intro by one measure(or maybe half)
         public override void OnKill()
         {
-           int index =  NPC.NewNPC(NPC.GetSource_Death(), (int)((NPC.width / 2 + NPC.position.X)), (int)((NPC.height / 2 + NPC.position.Y)), ModContent.NPCType<Zero>());
+            int index = NPC.NewNPC(NPC.GetSource_Death(), (int)((NPC.width / 2 + NPC.position.X)), (int)((NPC.height / 2 + NPC.position.Y)), ModContent.NPCType<Zero>());
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            if(CurrentAttackType == AtkType.Intro)
+            if (CurrentAttackType == AtkType.Intro)
             {
                 FacePlayerOrRight();
             }

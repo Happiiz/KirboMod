@@ -75,11 +75,14 @@ namespace KirboMod.NPCs
             if (!Main.dedServ)//if not dedicated server
             {
                 int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Photonic0_NightmareOrb");
-                for (int i = 0; i < Main.maxMusic; i++)
+                if (!KirboMod.DEBUG_NoMusicFadeSkip)
                 {
-                    Main.musicFade[i] = 0;
+                    for (int i = 0; i < Main.maxMusic; i++)
+                    {
+                        Main.musicFade[i] = 0;
+                    }
+                    Main.musicFade[musicSlot] = 1;
                 }
-                Main.musicFade[musicSlot] = 1;
                 Music = musicSlot;
             }
         }
@@ -196,7 +199,7 @@ namespace KirboMod.NPCs
         void PlayDashChargeSFXMedium()
         {
             SoundEngine.PlaySound(DashChargeSFXMedium, NPC.Center);
-        }  
+        }
         void PlayHomingStarsSpawnSFX()
         {
             SoundEngine.PlaySound(HomingStarsSpawnSFX, NPC.Center);
@@ -204,7 +207,7 @@ namespace KirboMod.NPCs
         void PlayDashChargeSFXSlow()
         {
             SoundEngine.PlaySound(DashChargeSFXSlow, NPC.Center, ChargeUpdateCallback);
-        }    
+        }
         bool ChargeUpdateCallback(ActiveSound soundInstance)
         {
             //sound effect stops when dash starts

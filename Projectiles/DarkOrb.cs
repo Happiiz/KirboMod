@@ -27,7 +27,7 @@ namespace KirboMod.Projectiles
 			Projectile.hostile = false;
 			Projectile.timeLeft = 120;
 			Projectile.tileCollide = false;
-			Projectile.penetrate = 1;
+			Projectile.penetrate = -1;
 		}
 		static int TimeBeforeShoot => 37;
 		float Scale { get => Utils.GetLerpValue(0, TimeBeforeShoot - 10, Projectile.ai[0], true); }
@@ -38,7 +38,7 @@ namespace KirboMod.Projectiles
 
 			if (Main.netMode == NetmodeID.SinglePlayer)
             {
-				player = Main.player[Main.myPlayer];
+				player = Main.LocalPlayer;
 			}
 
             Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, ModContent.DustType<Dusts.DarkResidue>(), Projectile.velocity.X * 0.25f, Projectile.velocity.Y * 0.25f, 200, default, 0.8f); //dust
