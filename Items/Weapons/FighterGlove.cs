@@ -121,6 +121,7 @@ namespace KirboMod.Items.Weapons
                 Item.shoot = ModContent.ProjectileType<Projectiles.FighterUppercut>();
                 Item.shootSpeed = 0.0001f; //make it very small but not immobile
                 Item.useStyle = ItemUseStyleID.HoldUp;
+                player.GetModPlayer<KirbPlayer>().TriggerFighterUppercut();
                 player.mount.Dismount(player); //dismount mounts
                                                //player.velocity.Y = -10;
                                                //player velocity is handled in projectile

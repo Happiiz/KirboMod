@@ -26,7 +26,7 @@ namespace KirboMod.Systems
             Color endColor;
             Func<float, Color> colorFunction;
             Func<float, float> widthFunction;
-            Color DefaultColorFunction(float progress) => Color.Lerp(startColor, endColor, progress) * Utils.GetLerpValue(0, .75f, progress, true);
+            Color DefaultColorFunction(float progress) => Color.Lerp(startColor, endColor, progress) * (1f - Utils.GetLerpValue(0, .75f, progress, true));
             float DefaultWidthFunction(float progress) => width;
             public static void AddSubtractive(Projectile proj, float width, Color startColor, Color endColor)
             {

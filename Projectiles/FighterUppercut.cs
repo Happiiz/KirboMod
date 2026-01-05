@@ -41,6 +41,7 @@ namespace KirboMod.Projectiles
         public virtual float HighSpeed => 34;
         public virtual float LowSpeed => 20;
         public virtual float YMult => 3f;
+        public static FighterUppercut SampleInstance => ContentSamples.ProjectilesByType[ModContent.ProjectileType<FighterUppercut>()].ModProjectile as FighterUppercut;
         public static void GetAIValues(Player player, float fractionNeededForIframes, out float ai1)
         {
             KirbPlayer kplr = player.GetModPlayer<KirbPlayer>();
@@ -63,26 +64,52 @@ namespace KirboMod.Projectiles
                 }
                 return;
             }
-            Projectile.spriteDirection = Projectile.direction; //look in direction
+            //Projectile.spriteDirection = Projectile.direction; //look in direction
             float riseProgress = MathF.Min(1f, Timer / AnimationDuration);
             float angle = Utils.AngleLerp(0f, -MathF.PI / 2, riseProgress);
             Vector2 dir = new(MathF.Cos(angle), MathF.Sin(angle));
             dir.X *= player.direction;
             dir.Y *= YMult;
-            float decelerate = Utils.Remap(Timer, AnimationDuration - DecelerateDuration, AnimationDuration, 1f, 0.2f);
-            float speed = MakePlayerInvincible ? HighSpeed : LowSpeed;
-            Vector2 deltaPos = dir * speed * decelerate;
-            player.position += deltaPos;//setting velocity was giving some issues related to wings
-            if(Timer == AnimationDuration)
-            {
-                player.velocity = deltaPos;
-            }
+            //float decelerate = Utils.Remap(Timer, AnimationDuration - DecelerateDuration, AnimationDuration, 1f, 0.2f);
+            //float speed = MakePlayerInvincible ? HighSpeed : LowSpeed;
+            //Vector2 deltaPos = dir * speed * decelerate;
+            //player.position += deltaPos;//setting velocity was giving some issues related to wings
+            //if(Timer == AnimationDuration)
+            //{
+            //    player.velocity = deltaPos;
+            //}
             Projectile.rotation = dir.ToRotation() + MathF.PI / 2;
             Projectile.Center = player.MountedCenter + new Vector2(player.direction * 12, 0);
             if (MakePlayerInvincible)
             {
                 ClampIframes(player);
             }
+        }
+        public Vector2 GetSpeed(int direction, int timer, int plrIndex)
+        {
+            timer = AnimationDuration - timer;//invert timer
+            Projectile.spriteDirection = Projectile.direction = direction; //look in direction
+            Player player = Main.player[plrIndex];
+            float riseProgress = MathF.Min(1f, (float)timer / AnimationDuration);
+            float angle = Utils.AngleLerp(0f, -MathF.PI / 2, riseProgress);
+            Vector2 dir = new(MathF.Cos(angle), MathF.Sin(angle));
+            dir.X *= player.direction;
+            dir.Y *= YMult;
+            int whoAmI = player.whoAmI;
+            int type = Type;
+            float decelerate = Utils.Remap(timer, AnimationDuration - DecelerateDuration, AnimationDuration, 1f, 0.2f);
+            bool makeInvincible = false;
+            for (int i = 0; i < Main.maxProjectiles; i++)
+            {
+                Projectile proj = Main.projectile[i];
+                if (proj.active && proj.type == type && proj.owner == whoAmI && proj.ai[1] == 1)
+                {
+                    makeInvincible = true;
+                }
+            }
+            float speed = makeInvincible ? HighSpeed : LowSpeed;
+            Vector2 deltaPos = dir * speed * decelerate;
+            return deltaPos;
         }
         void AtLeastOneIframes()
         {

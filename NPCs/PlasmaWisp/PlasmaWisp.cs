@@ -159,6 +159,9 @@ namespace KirboMod.NPCs.PlasmaWisp
             }
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true; //immune to not mess up movement
         }
+        public static int PlasmaBlastDropStarDamage => 150;
+        public static int PlasmaLaserDropStarDamage => 100;
+        public static int PlasmaZapDropStarDamage => 100;
         List<PlasmaWispFlame> flames = null;
         public override void SetDefaults()
         {

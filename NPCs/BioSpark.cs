@@ -1,5 +1,6 @@
 using KirboMod.Items;
 using KirboMod.Projectiles;
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
@@ -18,6 +19,8 @@ namespace KirboMod.NPCs
         int WalkTimer { get => (int)NPC.ai[1]; set => NPC.ai[1] = value; }
         int WalkDirection { get => (int)NPC.ai[2]; set => NPC.ai[2] = value; } //determines whether the enemy will walk forward or backward
         private int Attacktype { get => (int)NPC.ai[3]; set => NPC.ai[3] = value; }
+        public static int DaggerDropStarDamage => 80;
+        public static int SlashDropStarDamage => 200;
         public override void SetStaticDefaults()
         {
             // DisplayName.SetDefault("Bio Spark");
@@ -246,6 +249,7 @@ namespace KirboMod.NPCs
                 {
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
+                        KirbyTransformationModCompatibilityHelper.SpawnSingleDropStar(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 20, 0), SlashDropStarDamage);
                         //hitbox
                         Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<BioSparkSlashHitbox>(), 55 / 2, 8, Main.myPlayer, NPC.whoAmI, 0);
                     }

@@ -12,6 +12,7 @@ namespace KirboMod.NPCs
 {
     public class Birdon : ModNPC
     {
+        public static int FeatherDropStarDamage => 120;
         public override void SetStaticDefaults()
         {
             // DisplayName.SetDefault("Birdon");

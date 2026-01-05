@@ -1,3 +1,6 @@
+using KirboMod.NPCs;
+using KirboMod.NPCs.PlasmaWisp;
+using KirboMod.Systems;
 using Terraria;
 using Terraria.ModLoader;
 
@@ -23,6 +26,10 @@ namespace KirboMod.Projectiles
         }
         public override void AI()
         {
+            if (Projectile.timeLeft % (20 * Projectile.MaxUpdates) == (3 + Projectile.whoAmI) % 20)
+            {
+                KirbyTransformationModCompatibilityHelper.SpawnSingleDropStar(Projectile.GetSource_FromAI(), Projectile.Center, BioSpark.DaggerDropStarDamage);
+            }
             Projectile.rotation = Projectile.velocity.ToRotation();
         }
     }

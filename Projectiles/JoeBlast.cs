@@ -1,4 +1,5 @@
 using KirboMod.NPCs;
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
@@ -27,6 +28,10 @@ namespace KirboMod.Projectiles
 		{
 			Projectile.rotation = Projectile.velocity.ToRotation();
 
+			if(Projectile.timeLeft == 2)
+			{
+				KirbyTransformationModCompatibilityHelper.Spawn5Drop(Projectile.GetSource_Death(), Projectile.Center, KnuckleJoe.SmashPunchDropStarDamage);
+			}
 			if (Main.rand.NextBool(2)) // happens 1/2 times
 			{
 				int dustnumber = Dust.NewDust(Projectile.position, 50, 50, DustID.BlueTorch, 0f, 0f, 200, Color.White, 1f); //dust

@@ -86,6 +86,7 @@ namespace KirboMod.Items.Weapons
 				Item.shoot = ModContent.ProjectileType<Projectiles.HardenedFighterUppercut>();
 				Item.shootSpeed = 0.0001f; //make it very small but not immobile
                 Item.useStyle = ItemUseStyleID.HoldUp;
+                player.GetModPlayer<KirbPlayer>().TriggerHardenedUppercut();
             }
             else //left click
 			{

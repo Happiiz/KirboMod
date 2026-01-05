@@ -29,6 +29,8 @@ namespace KirboMod.NPCs
         const int StateIDSideStep = 1;
         const int StateIDVulcanJab = 2;
         const int StateIDBlast = 3;
+        public static int VolcanJabDropStarDamage => 3;
+        public static int SmashPunchDropStarDamage => 100;
         public override void SetDefaults()
         {
             NPC.width = 44;

@@ -1,3 +1,4 @@
+using KirboMod.NPCs.PlasmaWisp;
 using KirboMod.Particles;
 using KirboMod.Systems;
 using Microsoft.Xna.Framework;
@@ -13,7 +14,8 @@ namespace KirboMod.Projectiles
 {
 	public class BadPlasmaBlast : ModProjectile
 	{
-		public override void SetStaticDefaults()
+        bool[] playersCreatedDropStarsForInTransformationMod;
+        public override void SetStaticDefaults()
 		{
             ProjectileID.Sets.TrailCacheLength[Projectile.type] = 30; // The length of old position to be recorded
             ProjectileID.Sets.TrailingMode[Projectile.type] = 2; // The recording mode
@@ -49,10 +51,12 @@ namespace KirboMod.Projectiles
 				Main.dust[dustnumber].velocity *= 0.3f;
 				Main.dust[dustnumber].noGravity = true;
 			}
+			KirbyTransformationModCompatibilityHelper.SpawnDroppedStarWhenProjectilesGoesPastPlayer(PlasmaWisp.PlasmaBlastDropStarDamage, Projectile, ref playersCreatedDropStarsForInTransformationMod);
 		}
 
 		public override void OnKill(int timeLeft)
 		{
+			KirbyTransformationModCompatibilityHelper.Spawn5Drop(Projectile.GetSource_Death(), Projectile.Center, 300);
 			//Projectile.Hitbox = Utils.CenteredRectangle(Projectile.Center, Projectile.Size * 1.75f);
 			for (int i = 0; i < 80; i++) //first semicolon makes inital statement once //second declares the conditional they must follow // third declares the loop
 			{
@@ -69,7 +73,7 @@ namespace KirboMod.Projectiles
         public override bool PreDraw(ref Color lightColor)
 		{
 
-			TrailSystem.Trail.AddAdditive(Projectile, 100, Color.Cyan * Projectile.Opacity, Color.LimeGreen * Projectile.Opacity);
+			TrailSystem.Trail.AddAdditive(Projectile, 100, Color.Cyan * Projectile.Opacity,  Color.LimeGreen * Projectile.Opacity);
 			TrailSystem.Trail.AddAdditive(Projectile, 50, Color.White * Projectile.Opacity, Color.White * Projectile.Opacity);
 			float rotation = Projectile.rotation;
 			Projectile.rotation = 0;

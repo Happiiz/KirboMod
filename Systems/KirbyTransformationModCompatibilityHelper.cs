@@ -24,7 +24,36 @@ namespace KirboMod.Systems
             ModLoader.TryGetMod("SmallPinkCreature", out transfMod);
             CacheDroppedStarProjIDIfNeeded();
         }
+        public static void SpawnDroppedStarWhenProjectilesGoesPastPlayer(int droppedStarDamage, Projectile Projectile, ref bool[] playersCreatedDropStarsFor)
+        {
+            if (!IsTransformationModEnabled())
+            {
+                return;
+            }
+            Vector2 center = Projectile.Center;
+            Vector2 travelDir = Projectile.velocity.Normalized();
+            if (playersCreatedDropStarsFor == null)
+            {
+                playersCreatedDropStarsFor = new bool[Main.maxPlayers];
+            }
+            for (int i = 0; i < playersCreatedDropStarsFor.Length; i++)
+            {
+                Player check = Main.player[i];
+                bool createdDropStar = playersCreatedDropStarsFor[i];
+                if (!check.active || check.dead || createdDropStar)
+                {
+                    continue;
+                }
+                Vector2 toPlayer = center.DirectionTo(check.Center);
 
+                //if went past player once 
+                if (Vector2.Dot(travelDir, toPlayer) < 0)
+                {
+                    playersCreatedDropStarsFor[i] = true;
+                    SpawnSingleDropStar(Projectile.GetSource_FromAI(), Projectile.Center, droppedStarDamage);
+                }
+            }
+        }
         private static void CacheDroppedStarProjIDIfNeeded()
         {
             //already got proj id
@@ -95,6 +124,11 @@ namespace KirboMod.Systems
                 Vector2 offset = Utils.Remap(i, 0, 4, 0, MathF.Tau).ToRotationVector2() * 20;
                 SpawnSingleDropStar(source, pos + offset, ai2);
             }
+        }
+
+        internal static bool IsTransformationModEnabled()
+        {
+            return transfMod != null;
         }
     }
 }

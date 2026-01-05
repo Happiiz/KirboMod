@@ -16,6 +16,7 @@ namespace KirboMod.Projectiles
         public override Color InnerStartColor => Color.Black with { A = 0 };
         public override Color InnerEndColor => Color.White;
         public override float YMult => 3f;
+        new public static HardenedFighterUppercut SampleInstance => ContentSamples.ProjectilesByType[ModContent.ProjectileType<HardenedFighterUppercut>()].ModProjectile as HardenedFighterUppercut;
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             base.OnHitNPC(target, hit, damageDone);

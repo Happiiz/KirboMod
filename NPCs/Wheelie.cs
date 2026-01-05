@@ -2,6 +2,7 @@ using KirboMod.Bestiary;
 using KirboMod.Items;
 using KirboMod.Items.Accesories;
 using KirboMod.Items.Ammo;
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -30,7 +31,7 @@ namespace KirboMod.NPCs
 
         ref float turnCounter => ref NPC.localAI[0];
         ref float wallTimer => ref NPC.localAI[1];
-
+        ref float DropStarTimer => ref NPC.localAI[2];
         public override void SetDefaults() {
 			NPC.width = 30;
 			NPC.height = 28;
@@ -74,6 +75,11 @@ namespace KirboMod.NPCs
 
         public override void AI()
         {
+            DropStarTimer++;
+            if (DropStarTimer % 20 == 0)
+            {
+                KirbyTransformationModCompatibilityHelper.SpawnSingleDropStar(NPC.GetSource_FromAI(), NPC.Center, 150);
+            }
             NPC.spriteDirection = NPC.direction;
             Player player = Main.player[NPC.target];
 

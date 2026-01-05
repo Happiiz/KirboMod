@@ -1,3 +1,4 @@
+using KirboMod.NPCs.PlasmaWisp;
 using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using System;
@@ -10,6 +11,7 @@ namespace KirboMod.Projectiles
 {
     public class BadPlasmaZap : ModProjectile
     {
+        bool[] playersCreatedDropStarsForInTransformationMod;
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.TrailCacheLength[Type] = 40;
@@ -37,6 +39,10 @@ namespace KirboMod.Projectiles
         Vector2 KeyPos { get => new Vector2(Projectile.localAI[1], Projectile.localAI[2]); set { Projectile.localAI[1] = value.X; Projectile.localAI[2] = value.Y; } }
         public override void AI()
         {
+            if(Projectile.timeLeft % Projectile.MaxUpdates != 0)
+            {
+                KirbyTransformationModCompatibilityHelper.SpawnDroppedStarWhenProjectilesGoesPastPlayer(PlasmaWisp.PlasmaZapDropStarDamage, Projectile, ref playersCreatedDropStarsForInTransformationMod);
+            }
             if (Timer % KeyPosRandomizationInterval == 0)
             {
                 if (Timer == 0)

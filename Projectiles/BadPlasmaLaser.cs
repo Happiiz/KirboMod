@@ -1,4 +1,6 @@
+using KirboMod.NPCs.PlasmaWisp;
 using KirboMod.Particles;
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -39,7 +41,7 @@ namespace KirboMod.Projectiles
         }
         Color PlasmaColor(float progress)
         {
-            return Color.Lerp(Color.DarkGreen, Color.DarkKhaki, (progress + Main.GlobalTimeWrappedHourly * 3) % 1);
+            return (Color.Lerp(Color.DarkGreen, Color.DarkKhaki, (progress + Main.GlobalTimeWrappedHourly * 3) % 1)) * progress;
         }
         public override bool PreDraw(ref Color lightColor)
         {
@@ -67,10 +69,14 @@ namespace KirboMod.Projectiles
 
         public override void AI()
 		{
-            if(Projectile.timeLeft % 4 == 0)
+            if(Projectile.timeLeft % 5 == 0)
             {
                 Ring ring = Ring.ShotRing(Projectile.Center, Color.LimeGreen, Projectile.velocity);
                 ring.shineBrightness = .35f;
+            }
+            if(Projectile.timeLeft % (10 * Projectile.MaxUpdates) == 0)
+            {
+                KirbyTransformationModCompatibilityHelper.SpawnSingleDropStar(Projectile.GetSource_FromAI(), Projectile.Center, PlasmaWisp.PlasmaLaserDropStarDamage);
             }
             Projectile.Opacity += 0.1f;
 			Projectile.rotation = Projectile.velocity.ToRotation();

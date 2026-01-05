@@ -1,3 +1,5 @@
+using KirboMod.NPCs;
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
@@ -25,6 +27,11 @@ namespace KirboMod.Projectiles
 		}
 		public override void AI()
 		{
+			int dropStarInterval = 60;
+			if(Projectile.timeLeft % dropStarInterval == (dropStarInterval - 1))
+			{
+				KirbyTransformationModCompatibilityHelper.SpawnSingleDropStar(Projectile.GetSource_FromAI(), Projectile.Center, Birdon.FeatherDropStarDamage);
+			}
 			Projectile.rotation = Projectile.velocity.ToRotation();
 
 			/*if (Main.rand.Next(5) == 1) // happens 1/5 times

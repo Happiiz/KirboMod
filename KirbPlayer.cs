@@ -1050,15 +1050,16 @@ namespace KirboMod
         }
         public void UpdateFighterManeuvers()
         {
-            if (fighterKickAndUppercutTimer > 0)
+            if (fighterKickAndUppercutTimer > 0) //make >= 0
             {
                 switch (fighterKickAndUppercutType)
                 {
                     case KickAndUppercutIDFighterGloveUppercut:
+                        UpdateFighterUppercut();
                         break;
                     case KickAndUppercutIDHardenedFighterUppercut:
+                        UpdateHardenedFighterUppercut();
                         break;
-
                     case KickAndUppercutIDMetalFighterUppercut:
                         UpdateMetalUppercut();
                         break;
@@ -1072,11 +1073,44 @@ namespace KirboMod
             }
         }
 
+        private void UpdateFighterUppercut()
+        {
+            Player.mount.Dismount(Player);
+            Player.velocity = FighterUppercut.SampleInstance.GetSpeed(Player.direction, fighterKickAndUppercutTimer - 1, Player.whoAmI);
+        }
+
+        private void UpdateHardenedFighterUppercut()
+        {
+            Player.mount.Dismount(Player);
+            Player.velocity = HardenedFighterUppercut.SampleInstance.GetSpeed(Player.direction, fighterKickAndUppercutTimer - 1, Player.whoAmI);
+        }
+
         private void UpdateMetalUppercut()
         {
+            Player.mount.Dismount(Player);
+            Player.velocity = MetalUppercut.SampleInstance.GetSpeed(Player.direction, fighterKickAndUppercutTimer - 1, Player.whoAmI);
+        }
+        public void TriggerMetalUppercut()
+        {
+            Player.mount.Dismount(Player);
+            fighterKickAndUppercutTimer = (byte)MetalUppercut.SampleInstance.AnimationDuration;
+            fighterKickAndUppercutType = KickAndUppercutIDMetalFighterUppercut;
+        }
+        public void TriggerHardenedUppercut()
+        {
+            Player.mount.Dismount(Player);
+            fighterKickAndUppercutTimer = (byte)HardenedFighterUppercut.SampleInstance.AnimationDuration;
+            fighterKickAndUppercutType = KickAndUppercutIDHardenedFighterUppercut;
+        }
+        public void TriggerFighterUppercut()
+        {
+            Player.mount.Dismount(Player);
+            fighterKickAndUppercutTimer = (byte)HardenedFighterUppercut.SampleInstance.AnimationDuration;
+            fighterKickAndUppercutType = KickAndUppercutIDFighterGloveUppercut;
         }
         public void TriggerMetalKick()
         {
+            Player.mount.Dismount(Player);
             fighterKickAndUppercutTimer = (byte)MetalKick.SampleInstance.AnimationDuration;
             fighterKickAndUppercutType = KickAndUppercutIDMetalFighterKick;
         }

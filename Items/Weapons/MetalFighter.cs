@@ -104,8 +104,10 @@ namespace KirboMod.Items.Weapons
                     Item.useAnimation = 60;
                     Item.shoot = ModContent.ProjectileType<Projectiles.MetalUppercut>();
                     Item.useStyle = ItemUseStyleID.HoldUp;
-				}
-				return true;
+                    player.GetModPlayer<KirbPlayer>().TriggerMetalUppercut();
+
+                }
+                return true;
 			}
 			else //left click
 			{

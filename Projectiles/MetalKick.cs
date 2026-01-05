@@ -34,7 +34,7 @@ namespace KirboMod.Projectiles
                 ClampIframes(player);
             }
         }
-        public static MetalKick SampleInstance => ContentSamples.ProjectilesByType[ModContent.ProjectileType<MetalKick>()].ModProjectile as MetalKick;
+        new public static MetalKick SampleInstance => ContentSamples.ProjectilesByType[ModContent.ProjectileType<MetalKick>()].ModProjectile as MetalKick;
         public static Vector2 GetSpeed(Player player, bool touchingTiles, MetalKick sampleInstance, float timer)
         {
             float angle = .8f;

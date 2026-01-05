@@ -14,7 +14,8 @@ namespace KirboMod.NPCs
 	{
         public ref float AttackTimer => ref NPC.ai[0]; //Use NPC.ai[] as it makes your life easier with multiplayer
         public ref float Ranan => ref NPC.ai[1]; 
-        public static float MoveSpeed { get => Main.expertMode ? 11 : 6; } 
+        public static float MoveSpeed { get => Main.expertMode ? 11 : 6; }
+        public static int DustCloudDropStarDamage => 20;
         public override void SetStaticDefaults() {
 			// DisplayName.SetDefault("Broom Hatter");
 			Main.npcFrameCount[NPC.type] = 9;

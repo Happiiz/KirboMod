@@ -1,4 +1,5 @@
 using KirboMod.NPCs;
+using KirboMod.Systems;
 using System;
 using Terraria;
 using Terraria.ID;
@@ -26,6 +27,10 @@ namespace KirboMod.Projectiles
 		}
 		public override void AI()
 		{
+			if(Projectile.timeLeft == 2)
+			{
+				KirbyTransformationModCompatibilityHelper.SpawnSingleDropStar(Projectile.GetSource_Death(), Projectile.Center, KnuckleJoe.VolcanJabDropStarDamage);
+			}
 			//projectile.spriteDirection = projectile.direction;
 			Projectile.rotation = Projectile.velocity.ToRotation();
 		}

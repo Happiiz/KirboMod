@@ -1,3 +1,5 @@
+using KirboMod.NPCs;
+using KirboMod.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -35,7 +37,10 @@ namespace KirboMod.Projectiles
 			{
 				direction = -1;
 			}
-
+			if(Projectile.timeLeft == 2)
+			{
+				KirbyTransformationModCompatibilityHelper.SpawnSingleDropStar(Projectile.GetSource_Death(), Projectile.Center, BroomHatter.DustCloudDropStarDamage);
+			}
 			Projectile.ai[0]++;
 			if (Projectile.ai[0] == 1)
 			{
