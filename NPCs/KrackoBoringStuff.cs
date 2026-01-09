@@ -65,18 +65,50 @@ namespace KirboMod.NPCs
         }
         public void PlayDash1SFX()
         {
+            if (Main.dedServ)
+            {
+                return;
+            }
+            if (soundsOnKracko == null)
+            {
+                soundsOnKracko = new();
+            }
             soundsOnKracko.Add(SoundEngine.PlaySound(Dash1SFX, NPC.Center));
         }
         public void PlayDash2SFX()
         {
+            if (Main.dedServ)
+            {
+                return;
+            }
+            if (soundsOnKracko == null)
+            {
+                soundsOnKracko = new();
+            }
             soundsOnKracko.Add(SoundEngine.PlaySound(Dash2SFX, NPC.Center));
         }
         public void PlayDash3SFX()
         {
+            if (Main.dedServ)
+            {
+                return;
+            }
+            if (soundsOnKracko == null)
+            {
+                soundsOnKracko = new();
+            }
             soundsOnKracko.Add(SoundEngine.PlaySound(Dash3SFX, NPC.Center));
         }
         public void PlayFlyDOwnAfterDashToScreenSFX()
         {
+            if (Main.dedServ)
+            {
+                return;
+            }
+            if (soundsOnKracko == null)
+            {
+                soundsOnKracko = new();
+            }
             soundsOnKracko.Add(SoundEngine.PlaySound(FlyDownDashToScreenSFX, NPC.Center));
         }
         public override void FindFrame(int frameHeight) // animation

@@ -206,7 +206,15 @@ namespace KirboMod.NPCs
         }
         void PlayDashChargeSFXSlow()
         {
-            SoundEngine.PlaySound(DashChargeSFXSlow, NPC.Center, ChargeUpdateCallback);
+            if(Main.dedServ)
+            {
+                return;
+            }
+            if(soundsOnNightmareOrb == null)
+            {
+                soundsOnNightmareOrb = new();
+            }
+            soundsOnNightmareOrb.Add(SoundEngine.PlaySound(DashChargeSFXSlow, NPC.Center, ChargeUpdateCallback));
         }
         bool ChargeUpdateCallback(ActiveSound soundInstance)
         {

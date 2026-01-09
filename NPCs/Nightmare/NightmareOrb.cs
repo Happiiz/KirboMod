@@ -1,8 +1,10 @@
 using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
+using ReLogic.Utilities;
 using System;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -44,8 +46,11 @@ namespace KirboMod.NPCs
         int AttacksPerformedSinceSpawn { get => (int)NPC.ai[1]; set => NPC.ai[1] = value; }
         public bool Frenzy { get => NPC.ai[3] == 1f; set => NPC.ai[3] = value ? 1f : 0f; }
         static int DashSFXTimeOffset => 80;
+        List<SlotId> soundsOnNightmareOrb;
         public override void AI() //constantly cycles each time
         {
+            ManageTrackedSFX();
+
             Player player = Main.player[NPC.target];
 
             NPC.TargetClosest(true);
@@ -315,6 +320,41 @@ namespace KirboMod.NPCs
             if (NPC.ai[0] == dashTime - DashSFXTimeOffset)
             {
                 PlayDashChargeSFXSlow();
+            }
+        }
+        void ManageTrackedSFX()
+        {
+            if (Main.dedServ)
+            {
+                return;
+            }
+
+            if (soundsOnNightmareOrb == null)
+            {
+                soundsOnNightmareOrb = new();
+            }
+            if (soundsOnNightmareOrb.Count > 0)
+            {
+                for (int i = 0; i < soundsOnNightmareOrb.Count; i++)
+                {
+                    SlotId slot = soundsOnNightmareOrb[i];
+                    if (!slot.IsValid)
+                    {
+                        soundsOnNightmareOrb.RemoveAt(i);
+                        i--;
+                        continue;
+                    }
+
+                    if (SoundEngine.TryGetActiveSound(slot, out ActiveSound result))
+                    {
+                        result.Position = NPC.Center;
+                    }
+                    else
+                    {
+                        soundsOnNightmareOrb.RemoveAt(i);
+                        i--;
+                    }
+                }
             }
         }
         private void AttackDash()

@@ -420,8 +420,11 @@ namespace KirboMod.NPCs
         }
         public override bool CheckDead()
         {
-            int boss = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y + 3, ModContent.NPCType<NPCs.Kracko>(), 0, 0, 0, 0, 0, NPC.target);
-            //TEST IF NEEDS SYNCNPC MESSAGE TO WORK ON MP
+            int boss = 0;
+            if (Main.netMode != NetmodeID.MultiplayerClient)
+            {
+                boss = NPC.NewNPC(NPC.GetSource_Death(), (int)NPC.Center.X, (int)NPC.Center.Y + 3, ModContent.NPCType<NPCs.Kracko>(), 0, 0, 0, 0, 0, NPC.target);
+            }
             if (Main.netMode == NetmodeID.SinglePlayer)
             {
                 Main.NewText(Language.GetTextValue("Announcement.HasAwoken", Main.npc[boss].TypeName), 175, 75);

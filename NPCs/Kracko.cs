@@ -122,6 +122,11 @@ namespace KirboMod.NPCs
         }
         void ManageTrackedSFX()
         {
+            if (Main.dedServ)
+            {
+                return;
+            }
+
             if (soundsOnKracko == null)
             {
                 soundsOnKracko = new();
@@ -135,7 +140,9 @@ namespace KirboMod.NPCs
                     {
                         soundsOnKracko.RemoveAt(i);
                         i--;
+                        continue;
                     }
+
                     if (SoundEngine.TryGetActiveSound(slot, out ActiveSound result))
                     {
                         result.Position = NPC.Center;
