@@ -50,12 +50,11 @@ namespace KirboMod.NPCs
 		{
             //if player is in snow biome and daytime or underground and not in water
             if (spawnInfo.Player.ZoneTowerVortex || spawnInfo.Player.ZoneTowerSolar
-                || spawnInfo.Player.ZoneTowerNebula || spawnInfo.Player.ZoneTowerStardust || spawnInfo.PlayerInTown || spawnInfo.Invasion || Main.eclipse)
+                || spawnInfo.Player.ZoneTowerNebula || spawnInfo.Player.ZoneTowerStardust || spawnInfo.PlayerInTown || spawnInfo.Invasion)
             {
                 return 0f;
             }
-            else if (spawnInfo.Player.ZoneSnow && (Main.dayTime || spawnInfo.Player.ZoneRockLayerHeight) && !spawnInfo.Water && !spawnInfo.Sky
-                && !Main.eclipse)
+            else if (spawnInfo.Player.ZoneSnow && ((Main.dayTime && !Main.eclipse) || spawnInfo.Player.ZoneRockLayerHeight) && !spawnInfo.Water && !spawnInfo.Sky)
 			{
                 return spawnInfo.SpawnTileType == TileID.SnowBlock || spawnInfo.SpawnTileType == TileID.IceBlock ? .25f : 0f; //functions like a mini if else statement
 			}

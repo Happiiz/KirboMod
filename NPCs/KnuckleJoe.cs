@@ -52,10 +52,16 @@ namespace KirboMod.NPCs
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
+            //don't check eclipse cuz not surface enemy
+            if (spawnInfo.Player.ZoneTowerVortex || spawnInfo.Player.ZoneTowerSolar
+            || spawnInfo.Player.ZoneTowerNebula || spawnInfo.Player.ZoneTowerStardust || spawnInfo.PlayerInTown || spawnInfo.Invasion)
+            {
+                return 0f;
+            }
 
             if (spawnInfo.Player.ZoneRockLayerHeight) //if player is within cave height
             {
-                return spawnInfo.SpawnTileType == TileID.Stone || spawnInfo.SpawnTileType == TileID.Dirt ? (SpawnCondition.Cavern.Chance *.06f) : 0f; //functions like a mini if else statement
+                return spawnInfo.SpawnTileType == TileID.Stone || spawnInfo.SpawnTileType == TileID.Dirt ? (.03f) : 0f; //functions like a mini if else statement
             }
             else
             {

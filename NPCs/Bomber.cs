@@ -50,11 +50,17 @@ namespace KirboMod.NPCs
 
 		public override float SpawnChance(NPCSpawnInfo spawnInfo) 
 		{
+            if (spawnInfo.Player.ZoneTowerVortex || spawnInfo.Player.ZoneTowerSolar
+            || spawnInfo.Player.ZoneTowerNebula || spawnInfo.Player.ZoneTowerStardust || spawnInfo.PlayerInTown || spawnInfo.Invasion)
+            {
+                return 0f;
+            }
+
             if (Main.hardMode)
             {
                 if (spawnInfo.Player.ZoneRockLayerHeight) //if player is within cave height
                 {
-                    return SpawnCondition.Cavern.Chance * 0.01f;
+                    return 0.01f;
                 }
                 else
                 {

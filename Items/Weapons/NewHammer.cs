@@ -38,6 +38,8 @@ namespace KirboMod.Items.Weapons
             Item.shoot = ProjectileID.None;
             Item.shootSpeed = 14;
             Item.noUseGraphic = false; //use sprite
+            Item.scale = 1f;
+            Item.crit = 0;
         }
 
         public override bool AltFunctionUse(Player player)
@@ -48,6 +50,9 @@ namespace KirboMod.Items.Weapons
 
         public override bool CanUseItem(Player player)
         {
+            //reset so prefix benefits don't stack over and over
+            SetDefaults();
+
             if (player.altFunctionUse == 2)
             {
                 Item.useStyle = ItemUseStyleID.HoldUp;
@@ -80,6 +85,7 @@ namespace KirboMod.Items.Weapons
             //velocity.Y = Main.rand.Next(-3, 3);
             position.Y = player.Center.Y - 46;
             position.X += player.direction * 30;
+            velocity = (position.DirectionTo(Main.MouseWorld) * velocity.Length());
             if (player.altFunctionUse == 2)
             {
                 damage = (int)(damage * 3f);

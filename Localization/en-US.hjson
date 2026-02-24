@@ -1080,6 +1080,8 @@ Mods: {
 					Swing on the ground to cause shockwaves and right click to fire homing missiles
 					Shockwaves deal 2x the damage and missiles deal 3x the damage
 					'Now with 2x the clobbering power!'
+					Reforge bonus text does not like right click abilities with different use time
+					But trust me it's (probably) working correctly, even if it doesn't look like it
 					'''
 			}
 
