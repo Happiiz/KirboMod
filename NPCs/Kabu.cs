@@ -6,6 +6,7 @@ using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Utilities;
 
 namespace KirboMod.NPCs
 {
@@ -41,9 +42,15 @@ namespace KirboMod.NPCs
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
+            if (spawnInfo.Player.ZoneTowerVortex || spawnInfo.Player.ZoneTowerSolar
+              || spawnInfo.Player.ZoneTowerNebula || spawnInfo.Player.ZoneTowerStardust || spawnInfo.PlayerInTown)
+            {
+                return 0f;
+            }
+
             if (spawnInfo.Player.ZoneRockLayerHeight) //if player is within cave height
             {
-                return spawnInfo.SpawnTileType == TileID.Stone || spawnInfo.SpawnTileType == TileID.Dirt ? .1f : 0f; //functions like a mini if else statement
+                return spawnInfo.SpawnTileType == TileID.Stone || spawnInfo.SpawnTileType == TileID.Dirt ? (SpawnCondition.Cavern.Chance * .25f) : 0f; //functions like a mini if else statement
             }
             else
             {

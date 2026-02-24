@@ -1076,8 +1076,9 @@ Mods: {
 				DisplayName: Brand-New Dedede Hammer
 				Tooltip:
 					'''
+					Projectile fire rate affected by melee speed
 					Swing on the ground to cause shockwaves and right click to fire homing missiles
-					Shockwaves deal 2x the damage and missiles deal 4.5x the damage
+					Shockwaves deal 2x the damage and missiles deal 3x the damage
 					'Now with 2x the clobbering power!'
 					'''
 			}

@@ -23,14 +23,14 @@ namespace KirboMod.Items.Weapons
 
         public override void SetDefaults()
         {
-            Item.damage = 54;
+            Item.damage = 50;
             Item.DamageType = DamageClass.Melee/* tModPorter Suggestion: Consider MeleeNoSpeed for no attack speed scaling */;
             Item.width = 53; //world dimensions
             Item.height = 53; //world dimensions
             Item.useTime = 15;
             Item.useAnimation = 15;
             Item.useStyle = ItemUseStyleID.Swing;
-            Item.knockBack = 9;
+            Item.knockBack = 2;
             Item.value = Item.buyPrice(0, 0, 25, 0);
             Item.rare = ItemRarityID.Orange;
             Item.UseSound = SoundID.Item1;
@@ -43,6 +43,7 @@ namespace KirboMod.Items.Weapons
         public override bool AltFunctionUse(Player player)
         {
             return true;
+
         }
 
         public override bool CanUseItem(Player player)
@@ -51,8 +52,9 @@ namespace KirboMod.Items.Weapons
             {
                 Item.useStyle = ItemUseStyleID.HoldUp;
                 Item.noMelee = true;
-                Item.useTime = 45;
-                Item.useAnimation = 45;
+
+                Item.useTime = Item.useAnimation = 45;
+                Item.Prefix(Item.prefix);
                 Item.shoot = ModContent.ProjectileType<NewHammerMissile>();
                 Item.noUseGraphic = true; //dont use sprite
                 Item.UseSound = SoundID.Item11; //gun
@@ -63,6 +65,7 @@ namespace KirboMod.Items.Weapons
                 Item.noMelee = false;
                 Item.useTime = 15;
                 Item.useAnimation = 15;
+                Item.Prefix(Item.prefix);
                 Item.shoot = ProjectileID.None;
                 Item.noUseGraphic = false; //use sprite
                 Item.UseSound = SoundID.Item1;
@@ -79,7 +82,7 @@ namespace KirboMod.Items.Weapons
             position.X += player.direction * 30;
             if (player.altFunctionUse == 2)
             {
-                damage = (int)(damage * 4.5f);
+                damage = (int)(damage * 3f);
             }
         }
 
@@ -119,6 +122,7 @@ namespace KirboMod.Items.Weapons
 
         public override bool? UseItem(Player player)/* tModPorter Suggestion: Return null instead of false */
         {
+            //this is once every 4 uses as timer resets back to 0 and not 1
             if (uses >= 3 & player.velocity.Y == 0 && player.altFunctionUse != 2)
             {
                 SoundEngine.PlaySound(SoundID.Item94, player.Center); // electrosphere stop

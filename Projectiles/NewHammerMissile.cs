@@ -68,6 +68,19 @@ namespace KirboMod.Projectiles
             }
             Projectile.rotation = Projectile.velocity.ToRotation();
             //todo make ring flamey dust in regular interval
+            if(Projectile.timeLeft % 10 == 0)
+            {
+                int dustInRing = 15;
+                float radius = 6;
+                Vector2 center = Projectile.Center;
+                for (int i = 0; i < dustInRing; i++)
+                {
+                    Vector2 offset = Utils.Remap(i, 0, dustInRing, 0, MathF.Tau).ToRotationVector2() * radius;
+                    offset.X *= 0.5f;
+                    offset = offset.RotatedBy(Projectile.rotation);
+                    Dust.NewDustPerfect(center + offset, DustID.Torch, -Projectile.velocity * .25f + offset * .5f, Scale: 2f).noGravity = true;
+                }
+            }
             if (Main.rand.NextBool(5)) // happens 1/5 times
             {
                 int spawnBoxSize = 4;

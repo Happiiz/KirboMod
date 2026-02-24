@@ -9,6 +9,7 @@ using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Utilities;
 
 namespace KirboMod.NPCs
 {
@@ -43,15 +44,15 @@ namespace KirboMod.NPCs
             {
                 if (spawnInfo.Player.ZoneJungle)
                 {
-                    return spawnInfo.SpawnTileType == TileID.JungleGrass || spawnInfo.SpawnTileType == TileID.Mud ? 0.075f : 0f;
+                    return spawnInfo.SpawnTileType == TileID.JungleGrass || spawnInfo.SpawnTileType == TileID.Mud ? (SpawnCondition.SurfaceJungle.Chance * 0.1f) : 0f;
                 }
                 else if (spawnInfo.Player.ZoneSnow)
                 {
-                    return spawnInfo.SpawnTileType == TileID.SnowBlock ? 0.075f : 0f;
+                    return spawnInfo.SpawnTileType == TileID.SnowBlock ? (SpawnCondition.Overworld.Chance * 0.075f) : 0f;
                 }
                 else if (spawnInfo.Player.ZoneForest) //if forest
                 {
-                    return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? .15f : 0f;
+                    return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? (SpawnCondition.Overworld.Chance * .2f) : 0f;
                 }
                 else
                 {

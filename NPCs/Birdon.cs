@@ -7,6 +7,7 @@ using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Utilities;
 
 namespace KirboMod.NPCs
 {
@@ -41,7 +42,7 @@ namespace KirboMod.NPCs
         {
             if (spawnInfo.Player.ZoneSkyHeight & Main.hardMode) //if player is within space height and world is in hardmode
             {
-                return 0.4f; //return spawn rate
+                return 0.4f * SpawnCondition.Sky.Chance; //return spawn rate
             }
             else
             {

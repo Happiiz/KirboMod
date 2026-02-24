@@ -11,6 +11,7 @@ using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Utilities;
 using SoundEngine = Terraria.Audio.SoundEngine;
 
 namespace KirboMod.NPCs.PlasmaWisp
@@ -186,7 +187,7 @@ namespace KirboMod.NPCs.PlasmaWisp
         {
             if (spawnInfo.Player.ZoneRockLayerHeight && Main.hardMode) //if player is within cave height
             {
-                return spawnInfo.SpawnTileType == TileID.Dirt || spawnInfo.SpawnTileType == TileID.Stone ? .03f : 0f; //functions like a mini if else statement
+                return spawnInfo.SpawnTileType == TileID.Dirt || spawnInfo.SpawnTileType == TileID.Stone ? MathF.Max(SpawnCondition.Underground.Chance, SpawnCondition.Cavern.Chance) * .05f : 0f; //functions like a mini if else statement
             }
             else
             {

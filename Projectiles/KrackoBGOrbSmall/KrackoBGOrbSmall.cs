@@ -62,10 +62,13 @@ namespace KirboMod.Projectiles.KrackoBGOrbSmall
             }
             if (Timer <= StayStillDuration + ScaleupDuration)
             {
-                NPC kracko = Main.npc[KrackoIndex];
-                if (kracko.type == ModContent.NPCType<Kracko>() && kracko.active)
+                if (KrackoIndex >= 0 && KrackoIndex < Main.maxNPCs)
                 {
-                    Projectile.Center = kracko.Center;
+                    NPC kracko = Main.npc[KrackoIndex];
+                    if (kracko.type == ModContent.NPCType<Kracko>() && kracko.active)
+                    {
+                        Projectile.Center = kracko.Center;
+                    }
                 }
             }
             Projectile.scale = Utils.Remap(Timer, 0f, ScaleupDuration, 0f, 1.5f);

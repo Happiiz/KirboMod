@@ -9,6 +9,7 @@ using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Utilities;
 
 namespace KirboMod.NPCs
 {
@@ -50,17 +51,25 @@ namespace KirboMod.NPCs
         }
 
 		public override float SpawnChance(NPCSpawnInfo spawnInfo)
-		{
-			//if player is in jungle biome and daytime or underground and not in water
-			if (spawnInfo.Player.ZoneTowerVortex || spawnInfo.Player.ZoneTowerSolar 
-				|| spawnInfo.Player.ZoneTowerNebula || spawnInfo.Player.ZoneTowerStardust)
+        {
+          
+            //if player is in jungle biome and daytime or underground and not in water
+            if (spawnInfo.Player.ZoneTowerVortex || spawnInfo.Player.ZoneTowerSolar 
+				|| spawnInfo.Player.ZoneTowerNebula || spawnInfo.Player.ZoneTowerStardust || spawnInfo.PlayerInTown)
 			{
 				return 0f;
 			}
 			else if (spawnInfo.Player.ZoneJungle && (Main.dayTime || spawnInfo.Player.ZoneRockLayerHeight) && !spawnInfo.Water && !spawnInfo.Sky
 				&& !Main.eclipse) 
 			{
-				return spawnInfo.SpawnTileType == TileID.JungleGrass || spawnInfo.SpawnTileType == TileID.Mud ? .1f : 0f; //functions like a mini if else statement
+                float chanceMult = SpawnCondition.UndergroundJungle.Chance;
+                float surfaceChance = SpawnCondition.SurfaceJungle.Chance;
+
+                if (Main.dayTime && surfaceChance > chanceMult)
+				{
+					chanceMult = surfaceChance;
+				}
+				return spawnInfo.SpawnTileType == TileID.JungleGrass || spawnInfo.SpawnTileType == TileID.Mud ? (chanceMult * .12f) : 0f; //functions like a mini if else statement
 			}
 			else
 			{

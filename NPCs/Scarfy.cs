@@ -12,6 +12,7 @@ using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Utilities;
 
 namespace KirboMod.NPCs
 {
@@ -19,6 +20,8 @@ namespace KirboMod.NPCs
     {
         public bool Angry { get => NPC.ai[2] == 1f; set => NPC.ai[2] = value ? 1f : 0f; } //initially set to false because it doesn't start at 1f
 
+        //this was a proposed change to the dev of the kirby transformation mod
+        //leaving it in here just in case he resumes dev
 
         //static List<int> npcIDsToSignalBeingInhaled = new();
         //static List<Func<NPC, Player, bool>> specialNPCInhaleFunctions = new();
@@ -93,7 +96,7 @@ namespace KirboMod.NPCs
             //if player is within underworld height and spawn is not outside of the world
             if (spawnInfo.Player.ZoneUnderworldHeight && spawnInfo.SpawnTileY < Main.maxTilesY && spawnInfo.SpawnTileX < Main.maxTilesX && spawnInfo.SpawnTileX > 0)
             {
-                return .15f; //returns spawn rate
+                return SpawnCondition.Underworld.Chance * .2f; //returns spawn rate
             }
             else
             {

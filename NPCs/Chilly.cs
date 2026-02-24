@@ -9,6 +9,7 @@ using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Utilities;
 
 namespace KirboMod.NPCs
 {
@@ -49,14 +50,14 @@ namespace KirboMod.NPCs
 		{
             //if player is in snow biome and daytime or underground and not in water
             if (spawnInfo.Player.ZoneTowerVortex || spawnInfo.Player.ZoneTowerSolar
-                || spawnInfo.Player.ZoneTowerNebula || spawnInfo.Player.ZoneTowerStardust)
+                || spawnInfo.Player.ZoneTowerNebula || spawnInfo.Player.ZoneTowerStardust || spawnInfo.PlayerInTown || spawnInfo.Invasion || Main.eclipse)
             {
                 return 0f;
             }
             else if (spawnInfo.Player.ZoneSnow && (Main.dayTime || spawnInfo.Player.ZoneRockLayerHeight) && !spawnInfo.Water && !spawnInfo.Sky
                 && !Main.eclipse)
 			{
-				return spawnInfo.SpawnTileType == TileID.SnowBlock || spawnInfo.SpawnTileType == TileID.IceBlock ? .2f : 0f; //functions like a mini if else statement
+                return spawnInfo.SpawnTileType == TileID.SnowBlock || spawnInfo.SpawnTileType == TileID.IceBlock ? .25f : 0f; //functions like a mini if else statement
 			}
 			else
             {

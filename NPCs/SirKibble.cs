@@ -9,6 +9,7 @@ using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Utilities;
 
 namespace KirboMod.NPCs
 {
@@ -49,11 +50,20 @@ namespace KirboMod.NPCs
 
 		public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
-            if (spawnInfo.Player.ZoneOverworldHeight && Main.dayTime && !spawnInfo.Invasion && !Main.eclipse) //if player is within surface height & daytime
+			if(spawnInfo.PlayerInTown || spawnInfo.Invasion || Main.eclipse)
+			{
+				return 0f;
+			}
+            if (spawnInfo.Player.ZoneTowerVortex || spawnInfo.Player.ZoneTowerSolar
+             || spawnInfo.Player.ZoneTowerNebula || spawnInfo.Player.ZoneTowerStardust)
+            {
+                return 0f;
+            }
+            if (spawnInfo.Player.ZoneOverworldHeight && Main.dayTime) //if player is within surface height & daytime
             {
                 if (spawnInfo.Player.ZoneJungle)
                 {
-                    return spawnInfo.SpawnTileType == TileID.JungleGrass || spawnInfo.SpawnTileType == TileID.Mud ? 0.075f : 0f;
+                    return spawnInfo.SpawnTileType == TileID.JungleGrass || spawnInfo.SpawnTileType == TileID.Mud ? (MathF.Max(SpawnCondition.SurfaceJungle.Chance, SpawnCondition.UndergroundJungle.Chance) * 0.1f) : 0f;
                 }
                 else if (spawnInfo.Player.ZoneSnow)
                 {
@@ -61,7 +71,7 @@ namespace KirboMod.NPCs
                 }
                 else if (spawnInfo.Player.ZoneForest) //if forest
                 {
-                    return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? 0.15f : 0f;
+                    return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? (SpawnCondition.Overworld.Chance * 0.2f) : 0f;
                 }
                 else
                 {

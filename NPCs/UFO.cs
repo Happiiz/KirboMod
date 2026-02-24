@@ -57,7 +57,12 @@ namespace KirboMod.NPCs
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo) 
 		{
-			if (spawnInfo.Player.ZoneSkyHeight && Main.hardMode) //if player is within space height and world is in hardmode
+            if (spawnInfo.Player.ZoneTowerVortex || spawnInfo.Player.ZoneTowerSolar
+              || spawnInfo.Player.ZoneTowerNebula || spawnInfo.Player.ZoneTowerStardust || spawnInfo.PlayerInTown)
+            {
+                return 0f;
+            }
+            if (spawnInfo.Player.ZoneSkyHeight && Main.hardMode) //if player is within space height and world is in hardmode
 			{	
 				return 0.025f; //return spawn rate
 			}

@@ -100,11 +100,15 @@ namespace KirboMod.NPCs.MidBosses
         public override void AI() //constantly cycles each time
 		{
 			NPC.spriteDirection = NPC.direction;
+            if (!NPC.HasValidTarget)
+            {
+                NPC.TargetClosest();
+            }
 			Player player = Main.player[NPC.target];
-
+            
             NPC.ai[0]++; //attack delay timer
 
-            if (player.dead)
+            if (!NPC.HasValidTarget)
             {
                 attacktype = 0; //walk
                 NPC.ai[0] = 0;

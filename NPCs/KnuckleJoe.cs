@@ -8,6 +8,7 @@ using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Utilities;
 using SoundEngine = Terraria.Audio.SoundEngine;
 
 namespace KirboMod.NPCs
@@ -51,9 +52,10 @@ namespace KirboMod.NPCs
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
+
             if (spawnInfo.Player.ZoneRockLayerHeight) //if player is within cave height
             {
-                return spawnInfo.SpawnTileType == TileID.Stone || spawnInfo.SpawnTileType == TileID.Dirt ? .015f : 0f; //functions like a mini if else statement
+                return spawnInfo.SpawnTileType == TileID.Stone || spawnInfo.SpawnTileType == TileID.Dirt ? (SpawnCondition.Cavern.Chance *.06f) : 0f; //functions like a mini if else statement
             }
             else
             {

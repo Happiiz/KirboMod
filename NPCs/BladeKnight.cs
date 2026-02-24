@@ -2,63 +2,62 @@ using KirboMod.Bestiary;
 using KirboMod.Items;
 using KirboMod.Projectiles;
 using Microsoft.Xna.Framework;
-using System;
 using System.IO;
 using Terraria;
-using Terraria.Audio;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Utilities;
 using SoundEngine = Terraria.Audio.SoundEngine;
 
 namespace KirboMod.NPCs
 {
-	public class BladeKnight : ModNPC
-	{
-		int AttackTimeDecrease { get => Main.expertMode ? 20 : 0; }
+    public class BladeKnight : ModNPC
+    {
+        int AttackTimeDecrease { get => Main.expertMode ? 20 : 0; }
 
-		private byte attacktype = 0;
-		private bool jumped = false;
-		public override void SetStaticDefaults()
-		{
-			// DisplayName.SetDefault("Blade Knight");
-			Main.npcFrameCount[NPC.type] = 13;
-		}
-		public override void SetDefaults()
-		{
-			NPC.width = 33;
-			NPC.height = 33;
-			DrawOffsetY = 6;
-			NPC.damage = 10;
-			NPC.defense = 4;
-			NPC.lifeMax = 30;
-			NPC.HitSound = SoundID.NPCHit1;
-			NPC.DeathSound = SoundID.NPCDeath1;
-			NPC.value = Item.buyPrice(0, 0, 0, 75);
-			NPC.knockBackResist = .3f;
-			Banner = NPC.type;
-			BannerItem = ModContent.ItemType<Items.Banners.BladeKnightBanner>();
-			NPC.aiStyle = -1; 
-			NPC.friendly = false;
-			NPC.noGravity = false;
-		}
-		public override float SpawnChance(NPCSpawnInfo spawnInfo)
-		{
+        private byte attacktype = 0;
+        private bool jumped = false;
+        public override void SetStaticDefaults()
+        {
+            // DisplayName.SetDefault("Blade Knight");
+            Main.npcFrameCount[NPC.type] = 13;
+        }
+        public override void SetDefaults()
+        {
+            NPC.width = 33;
+            NPC.height = 33;
+            DrawOffsetY = 6;
+            NPC.damage = 10;
+            NPC.defense = 4;
+            NPC.lifeMax = 30;
+            NPC.HitSound = SoundID.NPCHit1;
+            NPC.DeathSound = SoundID.NPCDeath1;
+            NPC.value = Item.buyPrice(0, 0, 0, 75);
+            NPC.knockBackResist = .3f;
+            Banner = NPC.type;
+            BannerItem = ModContent.ItemType<Items.Banners.BladeKnightBanner>();
+            NPC.aiStyle = -1;
+            NPC.friendly = false;
+            NPC.noGravity = false;
+        }
+        public override float SpawnChance(NPCSpawnInfo spawnInfo)
+        {
             if (spawnInfo.Player.ZoneOverworldHeight && Main.dayTime && !spawnInfo.Invasion && !Main.eclipse) //if player is within surface height & daytime
             {
                 if (spawnInfo.Player.ZoneJungle)
                 {
-                    return spawnInfo.SpawnTileType == TileID.JungleGrass || spawnInfo.SpawnTileType == TileID.Mud ? 0.075f : 0f;
+                    return spawnInfo.SpawnTileType == TileID.JungleGrass || spawnInfo.SpawnTileType == TileID.Mud ? (SpawnCondition.OverworldDay.Chance * 0.075f) : 0f;
                 }
                 else if (spawnInfo.Player.ZoneSnow)
                 {
-                    return spawnInfo.SpawnTileType == TileID.SnowBlock ? 0.075f : 0f;
+                    return spawnInfo.SpawnTileType == TileID.SnowBlock ? (SpawnCondition.OverworldDay.Chance * 0.075f) : 0f;
                 }
                 else if (spawnInfo.Player.ZoneForest) //if forest
                 {
-                    return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? .13f : 0f;
+                    return spawnInfo.SpawnTileType == TileID.Grass || spawnInfo.SpawnTileType == TileID.Dirt ? (SpawnCondition.OverworldDay.Chance * .13f) : 0f;
                 }
                 else
                 {
@@ -69,7 +68,7 @@ namespace KirboMod.NPCs
             {
                 return 0f; //no spawn rate
             }
-		}
+        }
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
             //uses AddRange to add multiple things instead of Add for simplicity
@@ -95,49 +94,49 @@ namespace KirboMod.NPCs
             attacktype = reader.ReadByte(); //sync in multiplayer
         }
         public override void AI() //constantly cycles each time
-		{
-			NPC.spriteDirection = NPC.direction;
-			Player player = Main.player[NPC.target];
-			Vector2 distance = player.Center - NPC.Center;
-			bool lineOfSight = Collision.CanHitLine(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height);
-			float rangeX = 100;
-			float rangeY = 60;
-			if (distance.X < rangeX & distance.X > -rangeX & distance.Y > -rangeY & distance.Y < rangeY && lineOfSight && !player.dead) //checks if the knight is in range
-			{
-				NPC.ai[1] = 1; //starts attacking if in range
-			}
-			if (NPC.ai[0] >= 60 - AttackTimeDecrease)
-			{
-				attacktype = 2;
-			}
-			else
-			{
-				attacktype = 1;
-			}
-			if (NPC.ai[1] == 0) //checks if not slash and in range
-			{
-				attacktype = 0;
-			}
-			//declaring attacktype values
-			if (attacktype == 0)
-			{
-				Walk();
-			}
-			if (attacktype == 1)
-			{
-				Stance();
-			}
-			if (attacktype == 2)
+        {
+            NPC.spriteDirection = NPC.direction;
+            Player player = Main.player[NPC.target];
+            Vector2 distance = player.Center - NPC.Center;
+            bool lineOfSight = Collision.CanHitLine(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height);
+            float rangeX = 100;
+            float rangeY = 60;
+            if (distance.X < rangeX & distance.X > -rangeX & distance.Y > -rangeY & distance.Y < rangeY && lineOfSight && !player.dead) //checks if the knight is in range
             {
-				Slash();
+                NPC.ai[1] = 1; //starts attacking if in range
+            }
+            if (NPC.ai[0] >= 60 - AttackTimeDecrease)
+            {
+                attacktype = 2;
+            }
+            else
+            {
+                attacktype = 1;
+            }
+            if (NPC.ai[1] == 0) //checks if not slash and in range
+            {
+                attacktype = 0;
+            }
+            //declaring attacktype values
+            if (attacktype == 0)
+            {
+                Walk();
+            }
+            if (attacktype == 1)
+            {
+                Stance();
+            }
+            if (attacktype == 2)
+            {
+                Slash();
             }
 
-			//for stepping up tiles
-			Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
-		}
+            //for stepping up tiles
+            Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
+        }
 
-		public override void FindFrame(int frameHeight) // animation
-		{
+        public override void FindFrame(int frameHeight) // animation
+        {
             if (attacktype == 0) //walk cycle
             {
                 NPC.frameCounter += 1.0;
@@ -204,65 +203,65 @@ namespace KirboMod.NPCs
             }
         }
 
-		private void Walk() //walk towards player
-		{
-			Player player = Main.player[NPC.target];
-			NPC.TargetClosest(true);
+        private void Walk() //walk towards player
+        {
+            Player player = Main.player[NPC.target];
+            NPC.TargetClosest(true);
 
             float speed = 1f; //top speed
             if (Main.expertMode)
-				speed *= 1.3334f;
-			float inertia = 10f; //resistence
-			float jumpSpeed = 7;
+                speed *= 1.3334f;
+            float inertia = 10f; //resistence
+            float jumpSpeed = 7;
 
-			if (NPC.velocity.Y == 0 || jumped == true) //walking/jumping (so it doesn't interfere with knockback)
-			{
+            if (NPC.velocity.Y == 0 || jumped == true) //walking/jumping (so it doesn't interfere with knockback)
+            {
                 Helper.BasicEnemyWalk(ref NPC.velocity.X, speed, inertia, NPC.direction);
             }
 
             if (NPC.collideX && NPC.velocity.Y == 0) //hop if touching wall
             {
                 NPC.velocity.Y = -jumpSpeed;
-				jumped = true; 
+                jumped = true;
             }
 
-			if (NPC.velocity.Y == 0) //on ground
-			{
-				jumped = false;
-			}
+            if (NPC.velocity.Y == 0) //on ground
+            {
+                jumped = false;
+            }
         }
 
-		private void Stance() //readies attack
+        private void Stance() //readies attack
         {
-			if (NPC.ai[1] == 1)
-			{
-				NPC.ai[0]++;
-				NPC.TargetClosest(true); //face player
-				NPC.velocity.X *= 0.9f; //slow
-			}
+            if (NPC.ai[1] == 1)
+            {
+                NPC.ai[0]++;
+                NPC.TargetClosest(true); //face player
+                NPC.velocity.X *= 0.9f; //slow
+            }
         }
 
-		private void Slash() //attacks
+        private void Slash() //attacks
         {
-			Player player = Main.player[NPC.target];
+            Player player = Main.player[NPC.target];
             NPC.ai[0]++;
 
             NPC.velocity.X *= 0.9f; //slow
 
-			if (NPC.ai[0] == 61 - AttackTimeDecrease) //unleash slash
-			{
+            if (NPC.ai[0] == 61 - AttackTimeDecrease) //unleash slash
+            {
                 NPC.frameCounter = 0; //reset frame counter
 
-				if (Main.netMode != NetmodeID.MultiplayerClient)
-				{
-					Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + (NPC.direction * 20), NPC.Center.Y, NPC.direction * 0.01f, 0, ModContent.ProjectileType<BioSparkSlashHitbox>(), 16 / 2, 5f, Main.myPlayer, NPC.whoAmI, 0);
-				}
-				SoundEngine.PlaySound(SoundID.Item1, NPC.Center); 
-			}
-			if (NPC.ai[0] >= 120 - AttackTimeDecrease) //restart
+                if (Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + (NPC.direction * 20), NPC.Center.Y, NPC.direction * 0.01f, 0, ModContent.ProjectileType<BioSparkSlashHitbox>(), 16 / 2, 5f, Main.myPlayer, NPC.whoAmI, 0);
+                }
+                SoundEngine.PlaySound(SoundID.Item1, NPC.Center);
+            }
+            if (NPC.ai[0] >= 120 - AttackTimeDecrease) //restart
             {
-				NPC.ai[0] = 0;
-				NPC.ai[1] = 0;
+                NPC.ai[0] = 0;
+                NPC.ai[1] = 0;
             }
         }
 

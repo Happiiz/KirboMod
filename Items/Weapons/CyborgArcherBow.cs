@@ -87,14 +87,13 @@ namespace KirboMod.Items.Weapons
                return true;
 		}
 
-        public override void HoldItem(Player player)
-        {
-			//Create probes
-			Projectile.NewProjectile(player.GetSource_ItemUse(player.HeldItem), player.Center.X, player.Center.Y - 60, 0, 0, ModContent.ProjectileType<Projectiles.CyborgArcherProbe>(), -1, 0, Main.myPlayer);
-			Projectile.NewProjectile(player.GetSource_ItemUse(player.HeldItem), player.Center.X, player.Center.Y + 60, 0, 0, ModContent.ProjectileType<Projectiles.CyborgArcherProbe>(), -1, 0, Main.myPlayer);
-			Projectile.NewProjectile(player.GetSource_ItemUse(player.HeldItem), player.Center.X - 60, player.Center.Y, 0, 0, ModContent.ProjectileType<Projectiles.CyborgArcherProbe>(), -1, 0, Main.myPlayer);
-			Projectile.NewProjectile(player.GetSource_ItemUse(player.HeldItem), player.Center.X + 60, player.Center.Y, 0, 0, ModContent.ProjectileType<Projectiles.CyborgArcherProbe>(), -1, 0, Main.myPlayer);
-        }
+		public override void HoldItem(Player player)
+		{
+			//single projectile that draws all 4 probes to reduce the amount of projectile spam this has
+			int probeProjID = ModContent.ProjectileType<Projectiles.CyborgArcherProbe>();
+			Vector2 targetPos = Main.MouseWorld;
+			Projectile.NewProjectile(player.GetSource_ItemUse(player.HeldItem), player.Center.X, player.Center.Y, 0, 0, probeProjID, -1, 0, Main.myPlayer, targetPos.X, targetPos.Y);
+		}
 
         public override void AddRecipes()
 		{

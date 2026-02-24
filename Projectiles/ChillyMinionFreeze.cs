@@ -35,7 +35,7 @@ namespace KirboMod.Projectiles
 
 		public override void AI()
 		{
-			Projectile chillyOwner = Main.projectile.FirstOrDefault(i => i.identity == Projectile.ai[1]);
+			Projectile chillyOwner = Main.projectile.FirstOrDefault(i => i.active && i.owner == Projectile.owner && i.identity == Projectile.ai[1]);
 			if (chillyOwner == null || chillyOwner == default)
 			{
 				Projectile.Kill();
