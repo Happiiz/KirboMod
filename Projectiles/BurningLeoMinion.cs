@@ -1,3 +1,4 @@
+using KirboMod.Buffs.MinionBuffs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -23,6 +24,8 @@ namespace KirboMod.Projectiles
         public static float Speed => 15f;
         public static float Inertia => 3f;
         public static int FireRate => 13;
+        //we make this so we can reference it in duo burning leo 
+        public virtual int BuffID => ModContent.BuffType<BurningLeoBuff>();
         public override void SetStaticDefaults()
         {
             // DisplayName.SetDefault("Burning Leo");
@@ -74,8 +77,7 @@ namespace KirboMod.Projectiles
             return false;
         }
 
-        //we make this so we can reference it in duo burning leo 
-        public virtual string Buff => "BurningLeoBuff";
+
 
         public override void AI()
         {
@@ -86,9 +88,9 @@ namespace KirboMod.Projectiles
             // This is the "active check", makes sure the minion is alive while the player is alive, and despawns if not
             if (player.dead || !player.active)
             {
-                player.ClearBuff(Mod.Find<ModBuff>(Buff).Type);
+                player.ClearBuff(BuffID);
             }
-            if (player.HasBuff(Mod.Find<ModBuff>(Buff).Type))
+            if (player.HasBuff(BuffID))
             {
                 Projectile.timeLeft = 2;
             }

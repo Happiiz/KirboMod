@@ -1,3 +1,4 @@
+using KirboMod.Buffs.MinionBuffs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -23,6 +24,8 @@ namespace KirboMod.Projectiles
         public static float Speed => 16f;
         public static float Inertia => 4f;
         public static int FireRate => 13;
+        //we make this so we can reference it in duo chilly 
+        public virtual int BuffID => ModContent.BuffType<ChillyBuff>();
         public override void SetStaticDefaults()
         {
             // DisplayName.SetDefault("Chilly");
@@ -73,8 +76,6 @@ namespace KirboMod.Projectiles
             return false;
         }
 
-        //we make this so we can reference it in duo chilly 
-        public virtual string Buff => "ChillyBuff";
 
         public override void AI()
         {
@@ -85,9 +86,9 @@ namespace KirboMod.Projectiles
             // This is the "active check", makes sure the minion is alive while the player is alive, and despawns if not
             if (player.dead || !player.active)
             {
-                player.ClearBuff(Mod.Find<ModBuff>(Buff).Type);
+                player.ClearBuff(BuffID);
             }
-            if (player.HasBuff(Mod.Find<ModBuff>(Buff).Type))
+            if (player.HasBuff(BuffID))
             {
                 Projectile.timeLeft = 2;
             }
@@ -334,13 +335,14 @@ namespace KirboMod.Projectiles
                 Projectile.velocity.Normalize();
                 Projectile.velocity *= Speed;
             }
-            if (attack % FireRate == 1) //every 10th tick
+            if (attack % FireRate == 1) //every 13th tick
             {
-                Player player = Main.player[Projectile.owner];
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, new Vector2(0.01f * Projectile.direction, 1),
-                    ModContent.ProjectileType<ChillyMinionFreeze>(), Projectile.damage, Projectile.knockBack, player.whoAmI, 0, Projectile.identity);//should've used Porjectile.identity not whoAmI
-                //aggroTarget.SimpleStrikeNPC(Projectile.damage, NPC)
-
+                if (Main.myPlayer == Projectile.owner)
+                {
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, new Vector2(0.01f * Projectile.direction, 1),
+                        ModContent.ProjectileType<ChillyMinionFreeze>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0, Projectile.identity);//should've used Porjectile.identity not whoAmI
+                                                                                                                                                         //aggroTarget.SimpleStrikeNPC(Projectile.damage, NPC)
+                }
             }
 
             //animation for freezing

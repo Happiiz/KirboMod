@@ -94,9 +94,13 @@ namespace KirboMod.NPCs
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
             //if player is within underworld height and spawn is not outside of the world
+            if (spawnInfo.PlayerInTown)
+            {
+                return 0f;
+            }
             if (spawnInfo.Player.ZoneUnderworldHeight && spawnInfo.SpawnTileY < Main.maxTilesY && spawnInfo.SpawnTileX < Main.maxTilesX && spawnInfo.SpawnTileX > 0)
             {
-                return SpawnCondition.Underworld.Chance * .2f; //returns spawn rate
+                return .15f; //returns spawn rate
             }
             else
             {
@@ -136,7 +140,7 @@ namespace KirboMod.NPCs
             NPC.spriteDirection = NPC.direction;
             CheckPlatform();
 
-            if (Angry == false) //if neutral
+            if (!Angry) //if neutral
             {
                 //float
                 NPC.ai[0]++;
@@ -213,7 +217,7 @@ namespace KirboMod.NPCs
                     direction.Normalize();
                     direction *= speed;
 
-                    if (player.dead == false) //only go towards player if alive
+                    if (!player.dead) //only go towards player if alive
                     {
                         NPC.velocity = (NPC.velocity * (inertia - 1) + direction) / inertia; //follow player
                     }
@@ -279,25 +283,6 @@ namespace KirboMod.NPCs
             }
 
         }
-
-        public override void OnHitByItem(Player player, Item item, NPC.HitInfo hit, int damageDone)
-        {
-            if (!Angry)
-            {
-                NPC.ai[0] = 0; //reset
-                Angry = true;
-            }
-        }
-
-        public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone)
-        {
-            if (!Angry)
-            {
-                NPC.ai[0] = 0; //reset
-                Angry = true;
-            }
-        }
-
         private void CheckPlatform() //trust me this is totally unique and original code and definitely not stolen from Spirit Mod's public source code(thx so much btw you don't know the hell I went through with this)
         {
             bool onplatform = true;
@@ -358,6 +343,11 @@ namespace KirboMod.NPCs
 
         public override void HitEffect(NPC.HitInfo hit)
         {
+            if (!Angry)
+            {
+                NPC.ai[0] = 0; //reset
+                Angry = true;
+            }
             if (NPC.life <= 0)
             {
                 for (int i = 0; i < 10; i++)

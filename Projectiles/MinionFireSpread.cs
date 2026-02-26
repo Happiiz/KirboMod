@@ -38,7 +38,7 @@ namespace KirboMod.Projectiles
         public override void SetDefaults()
         {
             base.SetDefaults();
-
+            Projectile.tileCollide = false;
             Projectile.friendly = true;
         }
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)

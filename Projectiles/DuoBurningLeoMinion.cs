@@ -1,3 +1,4 @@
+using KirboMod.Buffs.MinionBuffs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -16,7 +17,7 @@ namespace KirboMod.Projectiles
     {
         public override string Texture => "KirboMod/Projectiles/BurningLeoMinion";
 
-        public override string Buff => "LeoAndChillyBuff";
+        public override int BuffID => ModContent.BuffType<LeoAndChillyBuff>();
 
         public override float fireType => 1;
 
