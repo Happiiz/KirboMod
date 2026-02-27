@@ -72,7 +72,7 @@ namespace KirboMod.NPCs.DarkMatter
 
                 NPC.ai[0] = 0;
 
-                if (NPC.timeLeft > 60)
+                if (!NPC.HasValidTarget && NPC.timeLeft > 60)
                 {
                     NPC.timeLeft = 60;
                     return;
@@ -360,7 +360,8 @@ namespace KirboMod.NPCs.DarkMatter
 
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, default, 0, player.whoAmI);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, Main.myPlayer, 0, player.whoAmI);
+
                     }
                     PlayBallChargeSoundEffect(NPC.Center + Yoffset);
                 }
@@ -381,7 +382,7 @@ namespace KirboMod.NPCs.DarkMatter
                         Vector2 Yoffset = new(0, -170);
                         if (Main.netMode != NetmodeID.MultiplayerClient)
                         {
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, default, 0, player.whoAmI, NPC.whoAmI);
+                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, Main.myPlayer, 0, player.whoAmI);
                         }
                         PlayBallChargeSoundEffect(NPC.Center + Yoffset);
                     }
@@ -559,7 +560,7 @@ namespace KirboMod.NPCs.DarkMatter
                     Vector2 Yoffset = new(0, -150);
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, default, 0, player.whoAmI, 0);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + Yoffset, Vector2.Zero, ModContent.ProjectileType<DarkOrb>(), 80 / 2, 6, Main.myPlayer, 0, player.whoAmI, 0);
                     }
                     PlayBallChargeSoundEffect(NPC.Center + Yoffset);
                 }

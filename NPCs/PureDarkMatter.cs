@@ -364,7 +364,7 @@ namespace KirboMod.NPCs
                 {
                     LightningProj.GetSpawningStats(turned, out float ai0, out float ai1);
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + posOffset, turned,
-                        ModContent.ProjectileType<DarkMatterLaser>(), 60 / 2, 4, default, ai0, ai1);
+                        ModContent.ProjectileType<DarkMatterLaser>(), 60 / 2, 4, Main.myPlayer, ai0, ai1);
                 }
                 SoundEngine.PlaySound(LaserSFX, NPC.Center); //boss laser
             }
@@ -455,7 +455,7 @@ namespace KirboMod.NPCs
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
                         Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero,
-                        ModContent.ProjectileType<Projectiles.MatterOrbVertical>(), 60 / 2, 4, default, 0, NPC.ai[1] % 2 == 0 ? 0 : 1);
+                        ModContent.ProjectileType<Projectiles.MatterOrbVertical>(), 60 / 2, 4, Main.myPlayer, 0, NPC.ai[1] % 2 == 0 ? 0 : 1);
                     }
                     //SoundEngine.PlaySound(SoundID.SplashWeak, NPC.Center); //blub blub blub
                 }
