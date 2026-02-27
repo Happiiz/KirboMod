@@ -54,7 +54,6 @@ namespace KirboMod.Projectiles
                     }
                 }
                 move *= shootSpeed;
-                Main.NewText(move);
                 Projectile.hostile = true; //hurt
                 Projectile.velocity = move; //move
                 SoundEngine.PlaySound(DarkMatter.OrbShoot, Projectile.Center);

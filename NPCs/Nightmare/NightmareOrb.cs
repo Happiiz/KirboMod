@@ -54,30 +54,30 @@ namespace KirboMod.NPCs
             Player player = Main.player[NPC.target];
 
             NPC.TargetClosest(true);
+
+            if (NPC.target < 0 || NPC.target == 255 || player.dead || !player.active || Main.dayTime == true)
             {
-                if (NPC.target < 0 || NPC.target == 255 || player.dead || !player.active || Main.dayTime == true)
+                if (!NPC.HasValidTarget && NPC.timeLeft > 60)
                 {
                     NPC.ai[0] = 0;
 
                     NPC.velocity.Y = NPC.velocity.Y - 0.4f;
-                    if (NPC.timeLeft > 60)
-                    {
-                        NPC.timeLeft = 60;
-                        return;
-                    }
-                }
-                else //regular attack stuff
-                {
-                    //checks if should go frenzy (expert mode special phase)
-                    if ((Main.getGoodWorld) || (Main.expertMode && NPC.GetLifePercent() <= 0.4f && AttackType == NightmareOrbAtkType.DecideNext))
-                    {
-                        Frenzy = true;
-                    }
-
-                    DecideNextAttack();
-                    AttackPattern();
+                    NPC.timeLeft = 60;
+                    return;
                 }
             }
+            else //regular attack stuff
+            {
+                //checks if should go frenzy (expert mode special phase)
+                if ((Main.getGoodWorld) || (Main.expertMode && NPC.GetLifePercent() <= 0.4f && AttackType == NightmareOrbAtkType.DecideNext))
+                {
+                    Frenzy = true;
+                }
+
+                DecideNextAttack();
+                AttackPattern();
+            }
+
         }
         NightmareOrbAtkType[] GetAttackOrder()
         {
@@ -99,7 +99,7 @@ namespace KirboMod.NPCs
             {
                 NightmareOrbAtkType[] atkOrder = GetAttackOrder();
                 NightmareOrbAtkType nextAtkType = atkOrder[AttacksPerformedSinceSpawn % atkOrder.Length];
-                if(nextAtkType == NightmareOrbAtkType.Dash)
+                if (nextAtkType == NightmareOrbAtkType.Dash)
                 {
                     CheckToPlayDashSFX();
                 }
@@ -114,7 +114,7 @@ namespace KirboMod.NPCs
             Player player = Main.player[NPC.target];
 
             NPC.ai[0]++;
-            if(AttackType == NightmareOrbAtkType.Spawn)
+            if (AttackType == NightmareOrbAtkType.Spawn)
             {
                 Intro();
                 return;
@@ -210,7 +210,7 @@ namespace KirboMod.NPCs
             int startTime = GetValueDividedDependingOnPhaseAndDifficulty(60, 1.5f, 1.5f);
             int fireRate = Frenzy ? 20 : 35;
             fireRate = GetValueDividedDependingOnPhaseAndDifficulty(fireRate);
-          
+
             int numberOfShots = 4;
             if (Main.getGoodWorld)
             {

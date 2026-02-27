@@ -43,12 +43,13 @@ namespace KirboMod.NPCs
             {
                 NPC.TargetClosest(false);
 
-                NPC.velocity.Y = NPC.velocity.Y - 0.2f;
+              
 
-                NPC.ai[0] = 0;
-
-                if (NPC.timeLeft > 60)
+                if (!NPC.HasValidTarget && NPC.timeLeft > 60)
                 {
+                    NPC.velocity.Y = NPC.velocity.Y - 0.2f;
+
+                    NPC.ai[0] = 0;
                     NPC.timeLeft = 60;
                     return;
                 }

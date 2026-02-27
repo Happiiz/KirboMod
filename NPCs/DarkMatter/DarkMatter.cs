@@ -66,14 +66,12 @@ namespace KirboMod.NPCs.DarkMatter
             //DESPAWNING
             else if (NPC.target < 0 || NPC.target == 255 || player.dead || !player.active)
             {
-                NPC.TargetClosest(false);
-
-                NPC.velocity.Y = NPC.velocity.Y - 0.2f; //rise
-
-                NPC.ai[0] = 0;
+                NPC.TargetClosest(false);          
 
                 if (!NPC.HasValidTarget && NPC.timeLeft > 60)
                 {
+                    NPC.velocity.Y = NPC.velocity.Y - 0.2f; //rise
+                    NPC.ai[0] = 0;
                     NPC.timeLeft = 60;
                     return;
                 }

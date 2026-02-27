@@ -180,13 +180,14 @@ namespace KirboMod.NPCs
             if (NPC.target < 0 || NPC.target == 255 || playerstate.dead || !playerstate.active)
             {
                 NPC.TargetClosest(false);
-
-                NPC.velocity.Y -= 0.2f;
-
-                if (NPC.timeLeft > 60)
+                if (!NPC.HasValidTarget)
                 {
-                    NPC.timeLeft = 60;
-                    return;
+                    NPC.velocity.Y -= 0.2f;
+                    if (NPC.timeLeft > 60)
+                    {
+                        NPC.timeLeft = 60;
+                        return;
+                    }
                 }
             }
             else if (deathcounter > 0)

@@ -56,25 +56,9 @@ namespace KirboMod.NPCs
             else if (NPC.target < 0 || NPC.target == 255 || player.dead || !player.active || Main.dayTime) //Despawn
             {
                 NPC.TargetClosest(false);
-                animation = 8; //despawn
-                NPC.velocity *= 0.01f;
-
-                if (despawntimer == 0) //reset animation
+                if (!NPC.HasValidTarget)
                 {
-                    NPC.frameCounter = 0;
-                }
-
-                despawntimer++;
-
-                if (despawntimer > 12)//teleport away
-                {
-                    NPC.Center += new Vector2(0, -2000);
-                }
-
-                if (NPC.timeLeft > 12)
-                {
-                    NPC.timeLeft = 12;
-                    return;
+                    Despawning();
                 }
             }
             else //regular attack
@@ -83,6 +67,30 @@ namespace KirboMod.NPCs
                 despawntimer = 0;
             }
         }
+
+        private void Despawning()
+        {
+            animation = 8; //despawn
+            NPC.velocity *= 0.01f;
+
+            if (despawntimer == 0) //reset animation
+            {
+                NPC.frameCounter = 0;
+            }
+
+            despawntimer++;
+
+            if (despawntimer > 12)//teleport away
+            {
+                NPC.Center += new Vector2(0, -2000);
+            }
+
+            if (NPC.timeLeft > 12)
+            {
+                NPC.timeLeft = 12;
+            }
+        }
+
         void AttackDecideNext()
         {
             //have duplicates of every attack except pentagon orbs to make pentagon orbs less common

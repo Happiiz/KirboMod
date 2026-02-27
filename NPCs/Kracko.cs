@@ -60,14 +60,16 @@ namespace KirboMod.NPCs
             if (NPC.target < 0 || NPC.target >= 255 || Main.player[NPC.target].dead || !Main.player[NPC.target].active)
             {
                 NPC.TargetClosest(false);
-
-                NPC.velocity.Y = NPC.velocity.Y - 0.2f;
-                NPC.ai[0] = 0;
-
-                if (NPC.timeLeft > 60)
+                if (!NPC.HasValidTarget)
                 {
-                    NPC.timeLeft = 60;
-                    return;
+                    zPos *= 0.97f;
+                    NPC.velocity.Y = NPC.velocity.Y - 0.2f;
+                    NPC.ai[0] = 0;
+                    if (NPC.timeLeft > 60)
+                    {
+                        NPC.timeLeft = 60;
+                        return;
+                    }
                 }
             }
             else if (NPC.ai[1] <= 60) //attack delay

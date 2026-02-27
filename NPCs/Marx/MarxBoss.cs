@@ -112,8 +112,9 @@ namespace KirboMod.NPCs.Marx
                     EndState();
                 }
             }
-            else if ((NPC.target < 0 || NPC.target == 255 || player.dead || !player.active) && AttackTimer == 1) //Despawn
+            else if ((NPC.target < 0 || NPC.target == 255 || player.dead || !player.active) && AttackTimer == 1)
             {
+                //don't need to target closest again because already did it this frame
                 Despawn();
             }
             else //regular attack
