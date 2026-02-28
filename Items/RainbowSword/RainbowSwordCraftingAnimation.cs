@@ -21,6 +21,8 @@ namespace KirboMod.Items.RainbowSword
         {
             Projectile.tileCollide = false;
             Projectile.ignoreWater = true;
+
+            Projectile.width = Projectile.height = 2;
         }
         static float Easing(float progress)
         {
@@ -31,6 +33,7 @@ namespace KirboMod.Items.RainbowSword
         {
             if (Timer == 0)
             {
+                Console.WriteLine("rainbow sword crafting animation appeared");
                 Vector2 targetPos = Main.myPlayer == Projectile.owner ? Main.MouseWorld : Main.player[Projectile.owner].Center;
 
                 float dist = targetPos.Distance(Projectile.Center);
@@ -114,9 +117,9 @@ namespace KirboMod.Items.RainbowSword
         }
         static float GetRainbowDropAngle(int index)
         {
-            float progress = index / rainbowDrops.Length;
-            progress *= MathF.Tau + (progress / 2);
-            return progress;
+            //float progress = index / rainbowDrops.Length;
+            //progress *= MathF.Tau + (progress / 2);
+            //return progress;
             return (index % 6) switch
             {
                 0 => 0,
@@ -155,7 +158,7 @@ namespace KirboMod.Items.RainbowSword
             {
                 SoundEngine.PlaySound(SoundID.Item4);
                 SoundEngine.PlaySound(SoundID.DD2_WinScene);
-                Projectile.NewProjectile(new JustSoItsNotNull(), Main.LocalPlayer.Center - new Vector2(0, 150), Vector2.Zero, ModContent.ProjectileType<RainbowSwordCraftingAnimation>(), -1, 0, 255);
+                Projectile.NewProjectile(new RainbowSwordCraftAnimationSource(), Main.LocalPlayer.Center - new Vector2(0, 150), Vector2.Zero, ModContent.ProjectileType<RainbowSwordCraftingAnimation>(), -1, 0, Main.myPlayer);
                 Main.mouseItem.TurnToAir();
             }
         }
@@ -190,13 +193,13 @@ namespace KirboMod.Items.RainbowSword
                 SoundEngine.PlaySound(SoundID.Item4);
                 SoundEngine.PlaySound(SoundID.DD2_WinScene);
                 Recipe.FindRecipes();
-                Projectile.NewProjectile(new JustSoItsNotNull(), Main.LocalPlayer.Center - new Vector2(0, 150), Vector2.Zero, ModContent.ProjectileType<RainbowSwordCraftingAnimation>(), -1, 0, 255);
+                Projectile.NewProjectile(new RainbowSwordCraftAnimationSource(), Main.LocalPlayer.Center - new Vector2(0, 150), Vector2.Zero, ModContent.ProjectileType<RainbowSwordCraftingAnimation>(), -1, 0, 255);
                 return true;
             }
             return false;
         }
 
-        private class JustSoItsNotNull : IEntitySource
+        private class RainbowSwordCraftAnimationSource : IEntitySource
         {
             public string Context => "RainbowSwordCraftingAnimation";
         }
