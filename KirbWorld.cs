@@ -2,6 +2,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 
 namespace KirboMod
 {
@@ -9,6 +10,11 @@ namespace KirboMod
     {
         public int frameYoffset = 0;
         public int frameCounter = 0;
+        /// <summary>
+        /// should be set when the totem projectile disappears
+        /// </summary>
+        public static bool summonedDarkMatterRematchBefore = false;
+        public const string SummonedDarkMatterRematchBeforeKey = "dmRematchSummon";
         public override void PostUpdateDusts() //for meta bats
         {
             frameCounter++;
@@ -24,7 +30,20 @@ namespace KirboMod
                 frameYoffset = 0; //reset
             }
         }
-
+        public override void SaveWorldData(TagCompound tag)
+        {
+           if(!tag.ContainsKey(SummonedDarkMatterRematchBeforeKey))
+            {
+                summonedDarkMatterRematchBefore = false;
+            }
+            else
+            {
+                summonedDarkMatterRematchBefore = tag.Get<bool>(SummonedDarkMatterRematchBeforeKey);
+            }
+        }
+        public override void LoadWorldData(TagCompound tag)
+        {
+        }
         public override void AddRecipeGroups()
         {
             //"Any Gold" - makes a recipe groupd containing gold and platinum bars

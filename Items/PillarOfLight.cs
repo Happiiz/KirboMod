@@ -27,8 +27,8 @@ namespace KirboMod.Items
 		{
 			Item.width = 20;
 			Item.height = 20;
-			Item.useTime = 30;
-			Item.useAnimation = 30;
+			Item.useTime = 18;
+			Item.useAnimation = 18;
 			Item.useStyle = ItemUseStyleID.HoldUp;
 			Item.value = Item.buyPrice(0, 0, 0, 5);
 			Item.rare = ItemRarityID.Red;
@@ -39,6 +39,18 @@ namespace KirboMod.Items
 			Item.shoot = ModContent.ProjectileType<FlyingPillarOfLight>();
 		}
 
+        public override bool AltFunctionUse(Player player)
+        {
+			return player.ItemTimeIsZero;
+        }
+        public override bool? UseItem(Player player)
+        {
+			if(player.altFunctionUse == 2)
+			{
+				KirboWorld.summonedDarkMatterRematchBefore = false;
+			}
+			return true;
+        }
         public override bool CanUseItem(Player player)
         {
 			//can use item if no Pure Dark Matter, Zero, Eye of Zero or Totem proj

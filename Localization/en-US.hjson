@@ -585,7 +585,13 @@ Mods: {
 
 			PillarOfLight: {
 				DisplayName: Totem Of Light
-				Tooltip: Summons a great darkness upon your world
+				Tooltip:
+					'''
+					Summons a great darkness upon your world
+
+					After using this item for the first time, the following uses will have a sped up animation
+					Right click to use the item without the sped up animation
+					'''
 			}
 
 			DarkMatterRelic: {

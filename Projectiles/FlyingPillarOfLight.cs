@@ -25,20 +25,22 @@ namespace KirboMod.Projectiles
 			Projectile.height = 94;
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
-			Projectile.timeLeft = 360 + 389;
+									//why did I add + 389 here??????
+			Projectile.timeLeft = BossSpawnTime + (KirboWorld.summonedDarkMatterRematchBefore ? 0 : 389);
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = 10;
 		}
-
+		public static int BossSpawnTime =>  KirboWorld.summonedDarkMatterRematchBefore? 20 : 360;
+		public static float BlackBallBuildupDuration => KirboWorld.summonedDarkMatterRematchBefore ? 10f : 60f;
 		public override void AI()
 		{
 			Player player = Main.player[Projectile.owner];
+			float bossSpawnTime = BossSpawnTime;
+            Projectile.ai[0]++;
 
-			Projectile.ai[0]++;
-
-			if (Projectile.ai[0] < 180)
+			if (Projectile.ai[0] < bossSpawnTime / 2f)
 			{
-				Projectile.velocity.Y *= 0.96f;
+				Projectile.velocity.Y *= KirboWorld.summonedDarkMatterRematchBefore ? 0.89f : 0.96f;
 
 				Vector2 speed = Main.rand.NextVector2Circular(10, 10);
 				Dust d = Dust.NewDustPerfect(Projectile.Center, ModContent.DustType<Dusts.RainbowSparkle>(), speed, 0); //Makes dust in a messy circle
@@ -47,7 +49,7 @@ namespace KirboMod.Projectiles
 				if (Projectile.ai[0] % 10 == 0)
 					SoundEngine.PlaySound(SoundID.Pixie, Projectile.Center); //pixie noises
 			}
-			else if (Projectile.ai[0] <= 360)
+			else if (Projectile.ai[0] <= bossSpawnTime)
 			{
 				Projectile.velocity.Y = 0;
 
@@ -56,14 +58,16 @@ namespace KirboMod.Projectiles
 				d.noGravity = true;
 			}
 
-			float bossSpawnTime = 360;
 			float bossIntroDuration = 10;
 			if (Projectile.ai[0] == bossSpawnTime)
 			{
-				if (Main.netMode != NetmodeID.MultiplayerClient) // If not a client
+
+                if (Main.netMode != NetmodeID.MultiplayerClient) // If not a client
 				{
 					//-300 to compensate for zero spawning above for some reason
-					NPC.SpawnBoss((int)Projectile.Center.X, (int)Projectile.Center.Y + 300, ModContent.NPCType<NPCs.PureDarkMatterRematch.PureDarkMatterRematch>(), player.whoAmI);
+					int yOffset = KirboWorld.summonedDarkMatterRematchBefore ? 20 : 300;
+					int xOffset = 20; 
+					NPC.SpawnBoss((int)Projectile.Center.X + xOffset, (int)Projectile.Center.Y + yOffset, ModContent.NPCType<NPCs.PureDarkMatterRematch.PureDarkMatterRematch>(), player.whoAmI);
 				}
 
 				SoundEngine.PlaySound(SoundID.Item74, Projectile.Center); //inferno explosion
@@ -75,29 +79,35 @@ namespace KirboMod.Projectiles
 					d.noGravity = true;
 				}
 			}
-            //float progress = Easings.RemapProgress(0, 30, bossSpawnTime + 389 - 20, bossSpawnTime + 389, Projectile.ai[0]);
-            float progress = Easings.RemapProgress(0, 30, bossSpawnTime + bossIntroDuration - 20, bossSpawnTime + bossIntroDuration, Projectile.ai[0]);
-			progress = Easings.EaseInOutSine(progress);
-			CameraScrollToZero.cameraCenter = Vector2.Lerp(Main.LocalPlayer.Center, Projectile.Center, progress);
+			//float progress = Easings.RemapProgress(0, 30, bossSpawnTime + 389 - 20, bossSpawnTime + 389, Projectile.ai[0]);
+			if (!KirboWorld.summonedDarkMatterRematchBefore)
+			{
+				float progress = Easings.RemapProgress(0, 30, bossSpawnTime + bossIntroDuration - 20, bossSpawnTime + bossIntroDuration, Projectile.ai[0]);
+				progress = Easings.EaseInOutSine(progress);
+				CameraScrollToZero.cameraCenter = Vector2.Lerp(Main.LocalPlayer.Center, Projectile.Center, progress);
+			}
 		}
 		public static Asset<Texture2D> Flash;
         public override void OnKill(int timeLeft)
         {
+            KirboWorld.summonedDarkMatterRematchBefore = true;
             CameraScrollToZero.cameraCenter = null;//just in case
         }
         public override void PostDraw(Color lightColor)
 		{
 			Flash = ModContent.Request<Texture2D>("KirboMod/Projectiles/FlyingPillarOfLightFlash");
+           float bossSpawnTime = BossSpawnTime;
 
-			if (Projectile.ai[0] >= 300 && Projectile.ai[0] <= 360)
+			float blackBallProgress = Utils.GetLerpValue(bossSpawnTime - BlackBallBuildupDuration, bossSpawnTime, Projectile.ai[0]);
+			if (blackBallProgress >= 0 && blackBallProgress <= 1f)
 			{
-				Main.EntitySpriteDraw(Flash.Value, Projectile.Center - Main.screenPosition, null, Color.White, 0, Flash.Size() / 2, 0.1f + (Projectile.ai[0] - 300) / 50, SpriteEffects.None);
+				Main.EntitySpriteDraw(Flash.Value, Projectile.Center - Main.screenPosition, null, Color.White, 0, Flash.Size() / 2, MathHelper.Lerp(0.01f, KirboWorld.summonedDarkMatterRematchBefore ? 0.3f : 1.2f, blackBallProgress), SpriteEffects.None);
 			}
 		}
 
 		public override Color? GetAlpha(Color lightColor)
 		{
-			return Projectile.ai[0] <= 360 ? Color.White : default; // Makes it uneffected by light, and invisible after 360 frames
+			return Projectile.ai[0] <= BossSpawnTime ? Color.White : default; // Makes it uneffected by light, and invisible after 360 frames
 		}
 		private class CameraScrollToZero : ModSystem
 		{

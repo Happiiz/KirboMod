@@ -29,12 +29,12 @@ namespace KirboMod.Biomes
             FlyingPillarOfLightExists = false;
         }
 
-        private bool AnyProjs(int v)
+        private static bool AnyProjs(int v)
         {
             for (int i = 0; i < Main.maxProjectiles; i++)
             {
                 Projectile p = Main.projectile[i];
-                if(p.active && p.type == v && p.ai[0] > 50)
+                if(p.active && p.type == v && (KirboWorld.summonedDarkMatterRematchBefore || p.ai[0] > 50))
                 {
                     return true;
                 }

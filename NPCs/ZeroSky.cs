@@ -18,7 +18,7 @@ namespace KirboMod.NPCs
         private static float bgOffset = 0;
         static float fgOffset = 0;
         public const float slideSpeed = 5;
-        public static float FadeInSpeed => 1f / 300f;// 1f / 40f;
+        public static float FadeInSpeed => KirboWorld.summonedDarkMatterRematchBefore ? 1f / 30f : 1f / 300f;// 1f / 40f;
         public static float FadeOutSpeed => 1f / 300f;
         public override void Update(GameTime gameTime)
         {

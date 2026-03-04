@@ -221,15 +221,20 @@ namespace KirboMod.Projectiles.ZeroOrbs
                         //so it starts with some opacity already, instead of the first frame being 0% opacity
                         float opacity = Utils.GetLerpValue(0, FadeInDuration, timer + 1, true);
                         // mult by 2 because sprite is not upscaled
+                        opacity *= Draw3D.NearClipPlaneFade(scale3D); //fade out if too close to the screen
+                        if (opacity <= 0)
+                        {
+                            continue;
+                        }
                         Main.EntitySpriteDraw(texture, drawPos, frame, color * opacity, Projectile.rotation, origin, Projectile.scale * scale3D * 2f, SpriteEffects.None);
                     }
                 }
             }
             DrawPassCounter++;
-            if (CurrentDrawPassIsBehindNPCsAndTiles)
-            {
+           // if (CurrentDrawPassIsBehindNPCsAndTiles)
+           // {
           //      PreviewHitboxes();
-            }
+           // }
             return false;
         }
     }

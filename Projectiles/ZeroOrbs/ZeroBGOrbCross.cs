@@ -188,6 +188,11 @@ namespace KirboMod.Projectiles.ZeroOrbs
                         Vector2 drawPos = Vector2.Lerp(screenCenter, orbPositions[j] - Main.screenPosition, scale3D);
                         //so it starts with some opacity already, instead of the first frame being 0% opacity
                         float opacity = Utils.GetLerpValue(0, FadeInDuration, timer + 1, true);
+                        opacity *= Draw3D.NearClipPlaneFade(scale3D); //fade out if too close to the screen
+                        if(opacity <= 0)
+                        {
+                            continue;
+                        }
                         // mult by 2 because sprite is not upscaled
                         Main.EntitySpriteDraw(texture, drawPos, frame, color * opacity, Projectile.rotation, origin, Projectile.scale * scale3D * 2f, SpriteEffects.None);
                     }

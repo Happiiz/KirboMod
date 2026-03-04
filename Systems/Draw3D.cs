@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using Terraria;
 
 namespace KirboMod.Systems
@@ -37,6 +38,11 @@ namespace KirboMod.Systems
             Vector2 screenCenter = ScreenCenter;
             scale = GetScaleFor3D(zPos);
             return Vector2.Lerp(screenCenter, worldPos, scale) - Main.screenPosition;
+        }
+
+        public static float NearClipPlaneFade(float curScale3D, float scaleFadeEnd = 10f, float scaleFadeStart = 2f)
+        {
+           return Utils.GetLerpValue(scaleFadeEnd, scaleFadeStart, curScale3D, true);
         }
     }
 }
