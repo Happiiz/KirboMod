@@ -33,7 +33,6 @@ namespace KirboMod.Items.RainbowSword
         {
             if (Timer == 0)
             {
-                Console.WriteLine("rainbow sword crafting animation appeared");
                 Vector2 targetPos = Main.myPlayer == Projectile.owner ? Main.MouseWorld : Main.player[Projectile.owner].Center;
 
                 float dist = targetPos.Distance(Projectile.Center);
