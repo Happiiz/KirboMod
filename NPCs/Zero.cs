@@ -22,6 +22,7 @@ namespace KirboMod.NPCs
     [AutoloadBossHead]
     public class Zero : ModNPC
     {
+        public static float GlobalDamageMult => 0.85f;
         public enum ZeroAttackType : byte
         {
             JustSpawned = 0,
@@ -47,12 +48,12 @@ namespace KirboMod.NPCs
 
         //so that the music box can update automatically whenever the song is changed
         public static string MusicPath => "Music/02NewerWithMetadata";
-        static int BloodDamage => (calamityEnabled ? 180 : 100) / 2;
-        static int DarkMatterDamage => (calamityEnabled ? 180 : 100) / 2;
-        public static int SparkDamage => (calamityEnabled ? 180 : 100) / 2;
-        static int ThornDamage => (calamityEnabled ? 180 : 100) / 2;
-        public static int BGShotDamage => (calamityEnabled ? 180 : 100) / 2;
-        public static int DashDamage => (calamityEnabled ? 180 : 100) / 2;
+        static int BloodDamage => (int)(GlobalDamageMult * ((calamityEnabled ? 180 : 100) / 2));
+        static int DarkMatterDamage => (int)(GlobalDamageMult * (calamityEnabled ? 180 : 100) / 2);
+        public static int SparkDamage => (int)(GlobalDamageMult * (calamityEnabled ? 180 : 100) / 2);
+        static int ThornDamage => (int)(GlobalDamageMult * (calamityEnabled ? 180 : 100) / 2);
+        public static int BGShotDamage => (int)(GlobalDamageMult * (calamityEnabled ? 180 : 100) / 2);
+        public static int DashDamage => (int)(GlobalDamageMult * (calamityEnabled ? 180 : 100) / 2);
 
         private int deathcounter = 0; //for death animation
 

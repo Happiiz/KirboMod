@@ -303,7 +303,8 @@ namespace KirboMod.Projectiles
                 float progress = (float)index / Projectile.oldPos.Length;
                 Color c = Color.White;
                 c *= 1 - progress;
-                Main.EntitySpriteDraw(main, oldPos - Main.screenPosition, frame, c, 0, frame.Size() / 2, 1f, SpriteEffects.None, 0f);
+                c *= Projectile.Opacity;
+                Main.EntitySpriteDraw(main, oldPos - Main.screenPosition, frame, c, 0, frame.Size() / 2, Projectile.scale, SpriteEffects.None, 0f);
             }
             return Projectile.DrawSelf(Color.White);
         }

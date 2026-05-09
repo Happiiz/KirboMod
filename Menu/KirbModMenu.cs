@@ -18,12 +18,13 @@ namespace KirboMod.Menu
 
 		public override Asset<Texture2D> MoonTexture => ModContent.Request<Texture2D>($"{menuAssetPath}/Moon");
 
-		public override int Music => MusicLoader.GetMusicSlot(Mod, "Music/Happiz_MilkyWayWishesRemix");
+		public override int Music => MusicLoader.GetMusicSlot(Mod, "Music/Photonic0_MilkywayWishes_WithLoopMetadata");
 
 		public override string DisplayName => "Kirby's Terraria Mod";
 
 		public override void OnSelected() 
 		{
+
             SoundStyle menuSound = new SoundStyle("KirboMod/Menu/1up");
             SoundEngine.PlaySound(menuSound); // Plays a Kirby Super Star 1up sound when this ModMenu is selected
 		}

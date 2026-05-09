@@ -44,6 +44,7 @@ namespace KirboMod.Projectiles
 
 				Projectile.Center = player.Center + distance;
 				Projectile.velocity = distance * 0.001f; //very small
+                Projectile.netUpdate = true;
 			}
 			Projectile.rotation = Projectile.velocity.ToRotation();
 

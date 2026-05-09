@@ -542,7 +542,11 @@ Mods: {
 
 			MiracleMatter: {
 				DisplayName: Miracle Matter
-				Tooltip: Matter straight from a fallen angel
+				Tooltip:
+					'''
+					Matter straight from a fallen angel
+					Use the item for a funny sound (it won't be consumed)
+					'''
 			}
 
 			NightCloth: {

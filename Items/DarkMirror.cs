@@ -44,6 +44,15 @@ namespace KirboMod.Items
         }
         public override bool? UseItem(Player player)
         {
+			int musicSlot = MusicLoader.GetMusicSlot(NPCs.DarkMatter.DarkMatter.MusicPath);
+			if (!KirboMod.DEBUG_NoMusicFadeSkip)
+			{
+				for (int i = 0; i < Main.musicFade.Length; i++)
+				{
+					Main.musicFade[i] = 0;
+				}
+			}
+			Main.musicFade[musicSlot] = 1;
             if (player.whoAmI == Main.myPlayer) //if the player using the item is the client
             {
                 if (Main.netMode != NetmodeID.MultiplayerClient) // If the player is not in multiplayer, spawn directly
@@ -55,7 +64,7 @@ namespace KirboMod.Items
                     //this will only work if NPCID.Sets.MPAllowedEnemies[type] is set in boss
                     NetMessage.SendData(MessageID.SpawnBossUseLicenseStartEvent, number: player.whoAmI, number2: ModContent.NPCType<NPCs.DarkMatter.DarkMatter>());
                 }
-                SoundEngine.PlaySound(SoundID.Roar, player.position);
+                //SoundEngine.PlaySound(SoundID.Roar, player.position);
             }
             return true;
         }

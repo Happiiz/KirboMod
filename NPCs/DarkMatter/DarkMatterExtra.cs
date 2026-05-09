@@ -15,6 +15,7 @@ namespace KirboMod.NPCs.DarkMatter
 {
     public partial class DarkMatter : ModNPC
     {
+        public static string MusicPath => "KirboMod/Music/DeathZ_DarkMatterSwordsman_WithLoopMetadata";
         enum DarkMatterAttackType : byte
         {
             DarkBeams,//1
@@ -75,7 +76,7 @@ namespace KirboMod.NPCs.DarkMatter
             NPC.lavaImmune = true;
             if (!Main.dedServ)//if not dedicated server
             {
-                int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/DeathZ_DarkMatterSwordsman");
+                int musicSlot = MusicLoader.GetMusicSlot(MusicPath);
                 Music = musicSlot;
                 if (!KirboMod.DEBUG_NoMusicFadeSkip)
                 {

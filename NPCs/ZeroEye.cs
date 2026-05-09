@@ -21,6 +21,8 @@ namespace KirboMod.NPCs
     {
         private int deathcounter = 0; //for death animation
 
+        public static int BloodTrailDamage => 120;
+        public static int ContactDamage => 120;
         ref float Phase => ref NPC.ai[2];
 
         SoundStyle Death = new("KirboMod/Sounds/NPC/ZeroDeathSound");
@@ -52,14 +54,14 @@ namespace KirboMod.NPCs
 
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true; //immune to not mess up movement
         }
-
         public override void SetDefaults()
         {
             NPC.width = 110;
             NPC.height = 110;
             NPC.defense = 60;
             NPC.lifeMax = 40000;
-            NPC.damage = Zero.calamityEnabled ? 360 : 200;
+            NPC.damage = Zero.calamityEnabled ? 360 : ContactDamage;
+            NPC.damage = (int)(NPC.damage * Zero.GlobalDamageMult);
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = Death;
             NPC.value = Item.buyPrice(1, 0, 0, 0); // money it drops
@@ -264,7 +266,7 @@ namespace KirboMod.NPCs
         {
             if (Main.netMode != NetmodeID.MultiplayerClient)
             {
-                return Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<ZeroEyeBlood>(), NPC.damage / 4, 2f, Main.myPlayer);
+                return Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<ZeroEyeBlood>(), (int)(BloodTrailDamage * Zero.GlobalDamageMult), 2f, Main.myPlayer);
             }
 
             return null;

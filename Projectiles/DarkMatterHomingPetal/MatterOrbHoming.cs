@@ -54,6 +54,11 @@ namespace KirboMod.Projectiles.DarkMatterHomingOrb
         }
         public override void AI()
         {
+            if(Main.myPlayer != TargetPlayerIndex)
+            {
+                Projectile.Opacity = 0.2f;
+            }
+
             //why this??? investigate later
             if(Timer < 30)
             {

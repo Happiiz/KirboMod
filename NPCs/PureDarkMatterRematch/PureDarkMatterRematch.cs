@@ -25,9 +25,9 @@ namespace KirboMod.NPCs.PureDarkMatterRematch
         ref float Phase => ref NPC.localAI[0];
         //phase 1 is 0
         bool Phase2 { get => Phase >= 1; set => Phase = value ? 1 : Phase; }
-        static int LaserDamage => 100 / 2;
-        static int PetalDamage => 100 / 2;
-        static int BeamDamage => 100 / 2;
+        static int LaserDamage => (int)(Zero.GlobalDamageMult * 100 / 2);
+        static int PetalDamage => (int)(Zero.GlobalDamageMult * 100 / 2);
+        static int BeamDamage => (int)(Zero.GlobalDamageMult * 100 / 2);
         enum AtkType : byte
         {
             Intro = 0,
@@ -57,7 +57,7 @@ namespace KirboMod.NPCs.PureDarkMatterRematch
         {
             NPC.width = 130;
             NPC.height = 130;
-            NPC.damage = 100;
+            NPC.damage = (int)(100 * Zero.GlobalDamageMult);
             NPC.noTileCollide = true;
             NPC.defense = 86;
             NPC.lifeMax = 80000;
@@ -102,23 +102,23 @@ namespace KirboMod.NPCs.PureDarkMatterRematch
         }
         public override void AI() //constantly cycles each time
         {
-            if (!NPC.HasPlayerTarget)
+            if (!NPC.HasValidTarget)
             {
                 NPC.TargetClosest();
                 FacePlayerOrRight();
             }
-            if (!NPC.HasPlayerTarget)
+            if (!NPC.HasValidTarget)
             {
                 FleeAndDespawn();
 
                 return;
             }
-            Player plr = Main.player[NPC.target];
-            if (!plr.active || plr.dead)
-            {
-                FleeAndDespawn();
-                return;
-            }
+            //Player plr = Main.player[NPC.target];
+            //if (!plr.active || plr.dead)
+            //{
+            //    FleeAndDespawn();
+            //    return;
+            //}
             AttackPattern();
         }
 

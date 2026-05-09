@@ -42,7 +42,7 @@ namespace KirboMod.Projectiles
 
         public override void OnHitPlayer(Player target, Player.HurtInfo info)
         {
-			target.AddBuff(BuffID.Poisoned, 300); //poisoned for 5 seconds
+			//target.AddBuff(BuffID.Poisoned, 300); //poisoned for 5 seconds
 			Projectile.Kill();
         }
 

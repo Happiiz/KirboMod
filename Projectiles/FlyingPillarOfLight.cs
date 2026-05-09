@@ -26,7 +26,7 @@ namespace KirboMod.Projectiles
 			Projectile.tileCollide = false;
 			Projectile.penetrate = -1;
 									//why did I add + 389 here??????
-			Projectile.timeLeft = BossSpawnTime + (KirboWorld.summonedDarkMatterRematchBefore ? 0 : 389);
+			Projectile.timeLeft = BossSpawnTime + (KirboWorld.summonedDarkMatterRematchBefore ? 10 : 389);
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = 10;
 		}
