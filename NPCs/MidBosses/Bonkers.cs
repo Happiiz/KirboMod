@@ -42,15 +42,17 @@ namespace KirboMod.NPCs.MidBosses
 
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true; //immune because of boss-like behavior
         }
+        public static int ProjDamage => Main.hardMode ? (NPC.downedGolemBoss ? 70 : 50) : 30;
 
-		public override void SetDefaults()
+        public override void SetDefaults()
 		{
 			NPC.width = 100;
 			NPC.height = 100;
 			DrawOffsetY = 70;
-			NPC.damage = Main.hardMode ? (NPC.downedGolemBoss ? 150 : 100) : 50;
+            NPC.damage = Main.hardMode ? (NPC.downedGolemBoss ? 70 : 50) : 30;
             NPC.defense = Main.hardMode ? 30 : 15;
-            NPC.lifeMax = Main.hardMode ? (NPC.downedGolemBoss ? 32000 : 10000) : 1000;
+            NPC.lifeMax = Main.hardMode ? (NPC.downedGolemBoss ? 30000 : 10000) : 1000;
+            Helper.BossHpScalingForHigherDifficulty(ref NPC.lifeMax, 1f);
             NPC.HitSound = SoundID.NPCHit1;
 			NPC.DeathSound = SoundID.NPCDeath1;
             NPC.value = Main.hardMode ? (NPC.downedGolemBoss ? 200000 : 50000) : 5000; // money it drops (20 gold / 5 gold / 50 silver)
@@ -317,7 +319,7 @@ namespace KirboMod.NPCs.MidBosses
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
                         Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + new Vector2(NPC.direction * 130, -10), default, 
-							ModContent.ProjectileType<BonkersSmash>(), (Main.hardMode ? (NPC.downedGolemBoss ? 150 : 100) : 50) / 2, 
+							ModContent.ProjectileType<BonkersSmash>(), ProjDamage / 2, 
                             8f, Main.myPlayer, 0, NPC.whoAmI); 
                     }
 
@@ -362,7 +364,7 @@ namespace KirboMod.NPCs.MidBosses
                     float shootSpeed = Main.hardMode ? 20f: 15f;
                     Vector2 projVel = PredictForAcceleratingProj(player, shootSpeed, new Vector2(0, Projectiles.ExplosiveCoconut.yAcceleration), player.Center, shootFrom);
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), shootFrom, projVel, 
-                        ModContent.ProjectileType<ExplosiveCoconut>(), (Main.hardMode ? (NPC.downedGolemBoss ? 75 : 50) : 25) / 2, 0f, Main.myPlayer, 0, 0, projVel.Y); 
+                        ModContent.ProjectileType<ExplosiveCoconut>(), ProjDamage / 2, 0f, Main.myPlayer, 0, 0, projVel.Y); 
                 }
                 SoundEngine.PlaySound(SoundID.Item1, NPC.Center);
 

@@ -38,9 +38,11 @@ namespace KirboMod.NPCs.MidBosses
             NPC.width = 100;
             NPC.height = 100;
             DrawOffsetY = 70;
-            NPC.damage = Main.hardMode ? (NPC.downedGolemBoss ? 150 : 100) : 50; //all stats scale with progression
+            //batafire damage stats should be lower to compensate for on fire debuff
+            NPC.damage = Main.hardMode ? (NPC.downedGolemBoss ? 60 : 45) : 30; //all stats scale with progression
             NPC.defense = Main.hardMode ? 30 : 15;
-            NPC.lifeMax = Main.hardMode ? (NPC.downedGolemBoss ? 32000 : 5000) : 1500;
+            NPC.lifeMax = Main.hardMode ? (NPC.downedGolemBoss ? 30000 : 5000) : 1500;
+            Helper.BossHpScalingForHigherDifficulty(ref NPC.lifeMax, 1f);
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath4;
             NPC.knockBackResist = 0f;
@@ -67,6 +69,11 @@ namespace KirboMod.NPCs.MidBosses
             new FlavorTextBestiaryInfoElement(Language.GetTextValue("Mods.KirboMod.NPCs.Bestiary.Batafire")),
             ]);
         }
+
+        //batafire will divide this by 2 before passing it to NewProjectile to compensate for redcode
+        //this damage is pre division
+        readonly int projDamage = Main.hardMode ? (NPC.downedGolemBoss ? 60 : 45) : 30;
+
         public static int PostGolemShootTime => 40;
         public static int HardmodeShootTime => 80;
         public static int PreHardmodeShootTime => 80;
@@ -100,7 +107,7 @@ namespace KirboMod.NPCs.MidBosses
         public static float PrehardmodeDiveEndTime => 120;
         static float DashThreshold => 300;
 
-        readonly int projDamage = Main.hardMode ? (NPC.downedGolemBoss ? 60 : 30) : 15;
+
 
         public override void AI()
         {

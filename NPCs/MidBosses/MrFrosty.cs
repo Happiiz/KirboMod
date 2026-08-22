@@ -22,8 +22,9 @@ namespace KirboMod.NPCs.MidBosses
 	{
         private int attacktype = -1;
         private int lastattack = 2;
+        public static int IceTossDAmage => Main.hardMode ? (NPC.downedGolemBoss ? 70 : 50) : 30;
 
-		public override void SetStaticDefaults()
+        public override void SetStaticDefaults()
 		{
 			// DisplayName.SetDefault("Mr. Frosty");
 			Main.npcFrameCount[NPC.type] = 15;
@@ -44,12 +45,14 @@ namespace KirboMod.NPCs.MidBosses
 		{
 			NPC.width = 100;
 			NPC.height = 136;
-            NPC.damage = Main.hardMode ? (NPC.downedGolemBoss ? 150 : 100) : 50;
+            NPC.damage = Main.hardMode ? (NPC.downedGolemBoss ? 70 : 50) : 30;
 			NPC.width = 80;
 			NPC.height = 100;
             DrawOffsetY = 28;
             NPC.defense = Main.hardMode ? 30 : 15;
-            NPC.lifeMax = Main.hardMode ? (NPC.downedGolemBoss ? 32000 : 10000) : 1000;
+            NPC.lifeMax = Main.hardMode ? (NPC.downedGolemBoss ? 30000 : 10000) : 1000;
+            Helper.BossHpScalingForHigherDifficulty(ref NPC.lifeMax, 1f);
+
             NPC.HitSound = SoundID.NPCHit14; //fishron squeal
 			NPC.DeathSound = SoundID.NPCDeath8; //grunt
 			NPC.value = Main.hardMode ? (NPC.downedGolemBoss ? 200000 : 50000) : 5000; // money it drops (20 gold / 5 gold / 50 silver)
@@ -353,7 +356,7 @@ namespace KirboMod.NPCs.MidBosses
 			}
         }
 
-		private void IceToss() //toss a cold block of ice
+        private void IceToss() //toss a cold block of ice
         {
             if (NPC.ai[0] < 90)
             {
@@ -383,11 +386,11 @@ namespace KirboMod.NPCs.MidBosses
                     float velY = Main.hardMode ? -8 : -5;
 
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + offset.X, NPC.Center.Y + offset.Y, velX, velY, 
-                        ModContent.ProjectileType<BadIceChunk>(), (Main.hardMode ? (NPC.downedGolemBoss ? 120 : 80) : 40) / 2, 5f, Main.myPlayer, 0, 0);
+                        ModContent.ProjectileType<BadIceChunk>(), IceTossDAmage / 2, 5f, Main.myPlayer, 0, 0);
                     if (Main.hardMode)
                     {
                         Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X + offset.X, NPC.Center.Y + offset.Y, -velX, velY,
-                        ModContent.ProjectileType<BadIceChunk>(), (Main.hardMode ? (NPC.downedGolemBoss ? 120 : 80) : 40) / 2, 5f, Main.myPlayer, 0, 0);
+                        ModContent.ProjectileType<BadIceChunk>(), IceTossDAmage / 2, 5f, Main.myPlayer, 0, 0);
                     }
                 }
                 SoundEngine.PlaySound(SoundID.Item1 with { Volume = 2 }, NPC.Center);
