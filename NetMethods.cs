@@ -103,6 +103,10 @@ namespace KirboMod
             /// byte = player whoAmI that is using the sword
             /// </summary>
             RainbowSwordHit = 18,
+            /// <summary>
+            /// vector2: position to spawn the item
+            /// </summary>
+            WorkaroundSpawnRainbowSword = 19
         }
         //initially called on the client that owns the projectile
         public static void SyncProjPosition(Projectile proj, byte playerWhoAmI)
@@ -305,6 +309,9 @@ namespace KirboMod
                     break;
                 case ModPacketType.RainbowSwordHit:
                     ReadRainbowSwordHit(reader);
+                    break;
+                case ModPacketType.WorkaroundSpawnRainbowSword:
+                    ReadWorkaroundSpawnRainbowSword(reader);
                     break;
             }
         }
@@ -523,6 +530,20 @@ namespace KirboMod
                 SendRainbowSwordHit(targetPos, swingDir, projOwner, progress);
             } 
             RainbowSwordHeld.HitEffect(targetPos, swingDir, projOwner, progress);
+        }
+
+        public static void SendWorkaroundSpawnRainbowSword(Vector2 center)
+        {
+            ModPacket p = KirboMod.instance.GetPacket();
+            p.Write((byte)ModPacketType.WorkaroundSpawnRainbowSword);
+            p.WriteVector2(center);
+            p.Send();
+        }
+        static void ReadWorkaroundSpawnRainbowSword(BinaryReader reader)
+        {
+           Vector2 itemSpawnPos = reader.ReadVector2();
+            //don't need to re-send packet if on server because server will spawn the item
+            Item.NewItem(new RainbowSword.RainbowSwordCraftAnimationSource(), itemSpawnPos, ModContent.ItemType<RainbowSword>());
         }
     }
 }

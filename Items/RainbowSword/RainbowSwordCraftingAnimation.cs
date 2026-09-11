@@ -64,8 +64,11 @@ namespace KirboMod.Items.RainbowSword
             }
             if (Timer > 590)
             {
-                if (Main.netMode != NetmodeID.MultiplayerClient)
-                    Item.NewItem(Projectile.GetSource_Death(), Projectile.Center, ModContent.ItemType<RainbowSword>());
+                if (Main.myPlayer == Projectile.owner)
+                {
+                    NetMethods.SendWorkaroundSpawnRainbowSword(Projectile.Center);
+                }
+                    //Item.NewItem(Projectile.GetSource_Death(), Projectile.Center, ModContent.ItemType<RainbowSword>());
                 Array.ForEach(Main.dust, dust => dust.active = false);
                 for (int i = 0; i < 400; i++)
                 {
@@ -198,7 +201,7 @@ namespace KirboMod.Items.RainbowSword
             return false;
         }
 
-        private class RainbowSwordCraftAnimationSource : IEntitySource
+        public class RainbowSwordCraftAnimationSource : IEntitySource
         {
             public string Context => "RainbowSwordCraftingAnimation";
         }

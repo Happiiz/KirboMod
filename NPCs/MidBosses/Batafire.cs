@@ -302,7 +302,7 @@ namespace KirboMod.NPCs.MidBosses
         }
         void IdleFireballBurst()
         {
-            if (Main.netMode == NetmodeID.MultiplayerClient || !Main.hardMode)
+            if (Main.netMode == NetmodeID.MultiplayerClient || !Main.hardMode || !Main.getGoodWorld)
             {
                 return;
             }
