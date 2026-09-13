@@ -47,7 +47,7 @@ namespace KirboMod.NPCs
         private float backupoffset = 0; //offset goto position when backing up
 
         //so that the music box can update automatically whenever the song is changed
-        public static string MusicPath => "Music/02NewerWithMetadata";
+        public static string MusicPath => "Music/02NewerWithLoopMetadata";
         static int BloodDamage => (int)(GlobalDamageMult * ((calamityEnabled ? 180 : 100) / 2));
         static int DarkMatterDamage => (int)(GlobalDamageMult * (calamityEnabled ? 180 : 100) / 2);
         public static int SparkDamage => (int)(GlobalDamageMult * (calamityEnabled ? 180 : 100) / 2);
