@@ -1,4 +1,5 @@
 using KirboMod.Items;
+using KirboMod.NPCs.NPCConfusionHelper;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -158,7 +159,6 @@ namespace KirboMod.NPCs.PlasmaWisp
             {
                 hand = ModContent.Request<Texture2D>("KirboMod/NPCs/PlasmaWisp/PlasmaWispHand", AssetRequestMode.ImmediateLoad);
             }
-            NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true; //immune to not mess up movement
         }
         public static int PlasmaBlastDropStarDamage => 150;
         public static int PlasmaLaserDropStarDamage => 100;
@@ -223,9 +223,13 @@ namespace KirboMod.NPCs.PlasmaWisp
 
             Particles();
 
-            NPC.spriteDirection = NPC.direction;
             Player player = Main.player[NPC.target];
             NPC.TargetClosest(true);
+            if (NPC.confused)
+            {
+                NPC.direction *= -1;
+            }
+            NPC.spriteDirection = NPC.direction;
 
             if (Main.rand.NextBool(4)) //1/4 chance
             {
@@ -248,6 +252,10 @@ namespace KirboMod.NPCs.PlasmaWisp
                 else
                 {
                     direction = Vector2.Zero;
+                }
+                if (NPC.confused)
+                {
+                    direction *= -1;
                 }
                 NPC.velocity = (NPC.velocity * (inertia - 1) + direction) / inertia; //move
             }
@@ -346,6 +354,10 @@ namespace KirboMod.NPCs.PlasmaWisp
                 type = ModContent.ProjectileType<Projectiles.BadPlasmaBlast>();
             }
             velocity /= ContentSamples.ProjectilesByType[type].MaxUpdates;
+            if (NPC.confused)
+            {
+                velocity *= -1;
+            }
         }
 
         static Asset<Texture2D> eyes;
@@ -359,6 +371,8 @@ namespace KirboMod.NPCs.PlasmaWisp
             Main.EntitySpriteDraw(eyes.Value, NPC.Center - screenPos + offset, null, Color.White * NPC.Opacity, NPC.rotation, eyes.Size() / 2, NPC.scale, NPC.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
             Main.EntitySpriteDraw(hand.Value, NPC.Center - screenPos + rightHand, null, Color.White * NPC.Opacity, NPC.rotation + rotRightHand, eyes.Size() / 2, NPC.scale, rightHandFx);
             Main.EntitySpriteDraw(hand.Value, NPC.Center - screenPos + leftHand, null, Color.White * NPC.Opacity, NPC.rotation + rotLeftHand, eyes.Size() / 2, NPC.scale, leftHandFx);
+
+            Confusion.DrawConfusedIndicator(NPC, screenPos, spriteBatch, -60);
             return false;
         }
         static void Easing(ref float t)
@@ -381,6 +395,11 @@ namespace KirboMod.NPCs.PlasmaWisp
                     toPlayer = Vector2.Lerp(toPlayer, Vector2.Normalize(Utils.GetChaseResults(NPC.Center, 13, plr.Center, plr.velocity).ChaserVelocity), timerToPredictive);
                 }
                 xOffset = MathHelper.Clamp((plr.Center.X - NPC.Center.X) * .2f, -16, 16);
+            }
+            if (NPC.confused)
+            {
+                toPlayer *= -1;
+                xOffset *= -1;
             }
             Vector2 xOffsetVector = new Vector2(xOffset, 0);
             float time = (float)Main.timeForVisualEffects * .11f + NPC.whoAmI * 20392;

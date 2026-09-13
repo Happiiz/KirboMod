@@ -43,7 +43,6 @@ namespace KirboMod.NPCs
 			NPC.noGravity = false;
             NPC.rarity = 5;
 
-            NPC.direction = Main.rand.NextBool() ? 1 : -1;
             NPC.netUpdate = true;
             NPC.GravityIgnoresLiquid = true;
         }
@@ -86,6 +85,15 @@ namespace KirboMod.NPCs
 
         public override void AI() //constantly cycles each time
         {
+            if (NPC.ai[1] == 0)
+            {
+                NPC.ai[1] = 1;
+                if(Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    NPC.direction = Main.rand.NextBool() ? 1 : -1;
+                    NPC.netUpdate = true;
+                }
+            }
             NPC.damage = NPC.defDamage / 20;
             NPC.spriteDirection = NPC.direction;
             NPC.TargetClosest(false);
@@ -195,7 +203,7 @@ namespace KirboMod.NPCs
                 NPC npc = Main.npc[i];
                 if (npc.active && npc.Hitbox.Intersects(NPC.Hitbox))
                 {
-                    npc.SimpleStrikeNPC(NPC.defDamage, NPC.direction, false, 9, noPlayerInteraction: true);
+                    npc.SimpleStrikeNPC(NPC.defDamage * 5, NPC.direction, false, 9, noPlayerInteraction: true);
                 }
             }
             for (int k = 0; k < Main.maxPlayers; k++)

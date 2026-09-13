@@ -1,4 +1,5 @@
 using KirboMod.Items;
+using KirboMod.NPCs.NPCConfusionHelper;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -189,7 +190,7 @@ namespace KirboMod.NPCs.Twister
                     Main.EntitySpriteDraw(lilHandBallThing.Value, drawPos + handOffset, null, drawColor, rotation, lilHandBallThing.Size() / 2, 1, default);
                 }
             }
-
+            Confusion.DrawConfusedIndicator(NPC, screenPos, spriteBatch);
             return false;
         }
         public override void Unload()

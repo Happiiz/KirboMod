@@ -40,11 +40,15 @@ namespace KirboMod.Projectiles
             Projectile.ai[0]++;
             Projectile.scale = Easings.EaseInOutSine(Scale);
             float shootSpeed = 30;
+            if (Predictive || !Main.getGoodWorld)
+            {
+                shootSpeed = 25;
+            }
             if (Projectile.ai[0] == TimeBeforeShoot) //Start hurtin'
             {
 
                 Vector2 move = Projectile.DirectionTo(player.Center + player.velocity * 10); //aims ahead of player
-
+                move *= shootSpeed;
                 if (Predictive)
                 {
                     Utils.ChaseResults results = Utils.GetChaseResults(Projectile.Center, shootSpeed, player.Center, player.velocity);
@@ -53,7 +57,6 @@ namespace KirboMod.Projectiles
                         move = results.ChaserVelocity;
                     }
                 }
-                move *= shootSpeed;
                 Projectile.hostile = true; //hurt
                 Projectile.velocity = move; //move
                 SoundEngine.PlaySound(DarkMatter.OrbShoot, Projectile.Center);
