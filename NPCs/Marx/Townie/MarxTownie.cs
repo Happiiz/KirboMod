@@ -144,7 +144,7 @@ namespace KirboMod.NPCs.Marx.Townie
         public override bool CanTownNPCSpawn(int numTownNPCs)
         {
             return MarxSpawningSystem.UnlockedMarx && !NPC.AnyNPCs(ModContent.NPCType<MarxBoss>())
-                && !NPC.AnyNPCs(ModContent.NPCType<MarxPrelude>()) && !MarxSpawningSystem.MarxActive;
+                && !NPC.AnyNPCs(ModContent.NPCType<MarxPrelude>()) && !MarxSpawningSystem.MarxActive && !NPC.AnyNPCs(ModContent.NPCType<MarxTownieDown>());
         }
 
         public override ITownNPCProfile TownNPCProfile()
