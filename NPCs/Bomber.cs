@@ -2,6 +2,7 @@ using KirboMod.Bestiary;
 using KirboMod.Items;
 using KirboMod.Items.Ammo;
 using KirboMod.NPCs.Marx.SpecialFX;
+using KirboMod.NPCs.NPCConfusionHelper;
 using KirboMod.Particles;
 using KirboMod.Systems;
 using Microsoft.Xna.Framework;
@@ -85,18 +86,34 @@ namespace KirboMod.NPCs
 
         public override void AI() //constantly cycles each time
         {
+
+            if (!NPC.confused)
+            {
+                NPC.TargetClosest(false);
+            }
             if (NPC.ai[1] == 0)
             {
                 NPC.ai[1] = 1;
                 if(Main.netMode != NetmodeID.MultiplayerClient)
                 {
                     NPC.direction = Main.rand.NextBool() ? 1 : -1;
+                    if (NPC.HasPlayerTarget)
+                    {
+                        NPC.direction = -MathF.Sign(NPC.Center.X - Main.player[NPC.target].Center.X);
+                    }
                     NPC.netUpdate = true;
                 }
             }
+            bool prevConfused = NPC.ai[1] == 2;
+            NPC.ai[1] = NPC.confused ? 2 : 1;
+            if(NPC.confused ^ prevConfused)
+            {
+                NPC.direction *= -1;
+                NPC.spriteDirection *= -1;
+            }
+
             NPC.damage = NPC.defDamage / 20;
             NPC.spriteDirection = NPC.direction;
-            NPC.TargetClosest(false);
 
             bool falling = false;
 

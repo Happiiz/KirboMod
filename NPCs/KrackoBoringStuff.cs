@@ -236,7 +236,7 @@ namespace KirboMod.NPCs
         {
             // DisplayName.SetDefault("Kracko");
             Main.npcFrameCount[NPC.type] = 2;
-            if (!KirboMod.DEBUG_NoMusicFadeSkip)
+            if (!KirboMod.NoMusicFadeSkip)
             {
                 int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Evobyte_KdlBoss");
                 Main.musicNoCrossFade[musicSlot] = true;
@@ -270,7 +270,7 @@ namespace KirboMod.NPCs
             {
                 int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Evobyte_KdlBoss");
                 Music = musicSlot;
-                if (!KirboMod.DEBUG_NoMusicFadeSkip)
+                if (!KirboMod.NoMusicFadeSkip)
                 {
                     Main.musicFade[musicSlot] = 1;
                     Main.musicNoCrossFade[musicSlot] = true;

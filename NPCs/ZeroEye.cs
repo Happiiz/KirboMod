@@ -74,7 +74,7 @@ namespace KirboMod.NPCs
 
             NPC.lavaImmune = true;
 
-            Music = MusicLoader.GetMusicSlot(Mod, "Music/02NewerWithMetadata");
+            Music = MusicLoader.GetMusicSlot(Mod, Zero.MusicPath);
             SceneEffectPriority = SceneEffectPriority.BossHigh; // By default, musicPriority is BossLow
         }
 

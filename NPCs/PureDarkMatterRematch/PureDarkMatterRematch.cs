@@ -75,7 +75,7 @@ namespace KirboMod.NPCs.PureDarkMatterRematch
                 string musicPath = "KirboMod/Music/Photonic0_DarkMatterRematch_WithLoopMetadata";
                 int musicSlot = MusicLoader.GetMusicSlot(musicPath);
                 Music = musicSlot;
-                if (!KirboMod.DEBUG_NoMusicFadeSkip)
+                if (!KirboMod.NoMusicFadeSkip)
                 {
 
                     Main.musicFade[musicSlot] = 1;

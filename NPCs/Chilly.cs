@@ -175,8 +175,8 @@ namespace KirboMod.NPCs
 
 		private void Walk() //walk towards player
 		{
-			Player player = Main.player[NPC.target];
 			NPC.TargetClosest(true);
+			Player player = Main.player[NPC.target];
 
 			float speed = 1f; //top speed
 			float inertia = 10f; //resistence

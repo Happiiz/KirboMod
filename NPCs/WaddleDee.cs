@@ -83,7 +83,10 @@ namespace KirboMod.NPCs
 
         public override void AI() //constantly cycles each time
         {
-            NPC.TargetClosest(false);
+            if (!NPC.confused)
+            {
+                NPC.TargetClosest(false);
+            }
             if (NPC.localAI[0] == 0)
             {
                 if (NPC.HasValidTarget)
@@ -140,6 +143,16 @@ namespace KirboMod.NPCs
 				NPC.ai[1] = 0;
 			}
 
+            bool prevConfused = NPC.ai[2] == 2;
+            NPC.ai[2] = NPC.confused ? 2 : 1;
+            //switch directions when start or stop being confused
+            if (NPC.confused ^ prevConfused)
+            {
+                NPC.direction *= -1;
+                NPC.spriteDirection *= -1;
+
+            }
+
             //movement
             float speed = 0.7f;
 			float inertia = 20f;
@@ -149,8 +162,10 @@ namespace KirboMod.NPCs
                 Helper.BasicEnemyWalk(ref NPC.velocity.X, speed, inertia, NPC.direction);
             }
 
-			//for stepping up tiles
-			Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
+            
+
+            //for stepping up tiles
+            Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
 		}
 
         public override void FindFrame(int frameHeight) // animation

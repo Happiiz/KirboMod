@@ -78,7 +78,7 @@ namespace KirboMod.NPCs.DarkMatter
             {
                 int musicSlot = MusicLoader.GetMusicSlot(MusicPath);
                 Music = musicSlot;
-                if (!KirboMod.DEBUG_NoMusicFadeSkip)
+                if (!KirboMod.NoMusicFadeSkip)
                 {
 
                     Main.musicFade[musicSlot] = 1;

@@ -84,7 +84,10 @@ namespace KirboMod.NPCs
 
         public override void AI() //constantly cycles each time
         {
-            NPC.TargetClosest(false);
+            if (!NPC.confused)
+            {
+                NPC.TargetClosest(false);
+            }
             if (NPC.localAI[0] == 0)
             {
                 if (NPC.HasValidTarget)
@@ -149,17 +152,26 @@ namespace KirboMod.NPCs
             float speed = 0.7f;
             if (Main.expertMode)
                 speed = 1;
-            if (NPC.confused)
-            {
-                speed *= -1;
-            }
+        
             float inertia = 20f;
-            Confusion.InvertDirection(NPC);
+
+            bool prevConfused = NPC.ai[2] == 2;
+            NPC.ai[2] = NPC.confused ? 2 : 1;
+            //switch directions when start or stop being confused
+            if (NPC.confused ^ prevConfused)
+            {
+                NPC.direction *= -1;
+                NPC.spriteDirection *= -1;
+
+            }
 
             if (NPC.velocity.Y == 0) //on ground (so it doesn't interfere with knockback)
             {
                 Helper.BasicEnemyWalk(ref NPC.velocity.X, speed, inertia, NPC.direction);
             }
+
+
+
             //for stepping up tiles
             Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
         }

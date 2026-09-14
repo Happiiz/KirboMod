@@ -75,7 +75,7 @@ namespace KirboMod.NPCs
             if (!Main.dedServ)//if not dedicated server
             {
                 int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Photonic0_NightmareOrb");
-                if (!KirboMod.DEBUG_NoMusicFadeSkip)
+                if (!KirboMod.NoMusicFadeSkip)
                 {
                     for (int i = 0; i < Main.maxMusic; i++)
                     {

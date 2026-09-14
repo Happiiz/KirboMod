@@ -114,7 +114,7 @@ namespace KirboMod.NPCs
             {
                 int slot = MusicLoader.GetMusicSlot(Mod, "Music/Photonic0_DededeStarStackerWithLoopMetadata");
                 Music = slot;
-                if (!KirboMod.DEBUG_NoMusicFadeSkip)
+                if (!KirboMod.NoMusicFadeSkip)
                 {
                     Main.musicFade[slot] = 1f;
                 }

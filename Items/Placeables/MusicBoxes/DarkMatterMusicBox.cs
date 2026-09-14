@@ -10,7 +10,7 @@ namespace KirboMod.Items.Placeables.MusicBoxes
 			ItemID.Sets.CanGetPrefixes[Type] = false; // music boxes can't get prefixes in vanilla
 			ItemID.Sets.ShimmerTransformToItem[Type] = ItemID.MusicBox; // recorded music boxes transform into the basic form in shimmer
 
-			MusicLoader.AddMusicBox(Mod, MusicLoader.GetMusicSlot(Mod, "Music/DeathZ_DarkMatterSwordsman"), ModContent.ItemType<DarkMatterMusicBox>(), ModContent.TileType<DarkMatterMusicBoxTile>());
+			MusicLoader.AddMusicBox(Mod, MusicLoader.GetMusicSlot(Mod, "Music/DeathZ_DarkMatterSwordsman_WithLoopMetadata"), ModContent.ItemType<DarkMatterMusicBox>(), ModContent.TileType<DarkMatterMusicBoxTile>());
 		}
 
 		public override void SetDefaults() {

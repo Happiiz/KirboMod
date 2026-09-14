@@ -37,7 +37,7 @@ namespace KirboMod.NPCs.MidBosses
         }
         void ChangeMusicTo(int musicSlot)
         {
-            if (KirboMod.DEBUG_NoMusicFadeSkip)
+            if (KirboMod.NoMusicFadeSkip)
             {
                 return;
             }

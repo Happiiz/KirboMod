@@ -76,7 +76,10 @@ namespace KirboMod.NPCs
 
         public override void AI() //constantly cycles each time
         {
-            NPC.TargetClosest(false);
+            if (!NPC.confused)
+            {
+                NPC.TargetClosest(false);
+            }
             if (NPC.localAI[0] == 0)
             {
                 if (NPC.HasValidTarget)
@@ -92,6 +95,16 @@ namespace KirboMod.NPCs
             }
             NPC.spriteDirection = NPC.direction;
             CheckPlatform();
+
+
+            bool prevConfused = NPC.ai[2] == 2;
+            NPC.ai[2] = NPC.confused ? 2 : 1;
+            //switch directions when start or stop being confused
+            if (NPC.confused ^ prevConfused)
+            {
+                NPC.direction *= -1;
+                NPC.spriteDirection *= -1;
+            }
 
             NPC.ai[0]++;
 

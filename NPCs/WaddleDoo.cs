@@ -102,7 +102,10 @@ namespace KirboMod.NPCs
         public bool SpawnedFromKracko { get => NPC.ai[1] == 1; }
         public override void AI() //constantly cycles each time
         {
-            NPC.TargetClosest(false);
+            if (!NPC.confused)
+            {
+                NPC.TargetClosest(false);
+            }
             if (NPC.localAI[0] == 0)
             {
                 if (NPC.HasValidTarget)
@@ -117,10 +120,23 @@ namespace KirboMod.NPCs
                 NPC.localAI[0] = 1;
             }
             NPC.spriteDirection = NPC.direction; Player player = Main.player[NPC.target];
+
+
+            bool prevConfused = NPC.ai[3] == 2;
+            NPC.ai[3] = NPC.confused ? 2 : 1;
+            //switch directions when start or stop being confused
+            if (NPC.confused ^ prevConfused)
+            {
+                NPC.direction *= -1;
+                NPC.spriteDirection *= -1;
+
+            }
+
             Vector2 distance = player.Center - NPC.Center;
 
             if (SpawnedFromKracko) //kracko doo
             {
+
                 NPC.value = Item.buyPrice(0, 0, 0, 0); // money it dro- oh wait!
             }
 
@@ -258,6 +274,10 @@ namespace KirboMod.NPCs
             if (SpawnedFromKracko)
                 beamRange *= 1.2f;
             Vector2 projshoot = NPC.DirectionTo(player.Center) * beamRange;
+            if (NPC.confused)
+            {
+                projshoot *= -1;
+            }
             Vector2 startOffset = new(NPC.direction * 8, 0);
 
             if (NPC.ai[0] >= BeamStart & NPC.ai[0] <= BeamStart + AttackCycleDuration) //attack window
@@ -309,8 +329,10 @@ namespace KirboMod.NPCs
             }
             else
             {
-                NPC.TargetClosest(false);
-
+                if (!NPC.confused)
+                {
+                    NPC.TargetClosest(false);
+                }
                 //reroll direction
                 ++NPC.ai[0];
 

@@ -263,6 +263,10 @@ namespace KirboMod.NPCs
 
                     float timeToReach = TimeToReachYPoint(NPC.Center.Y, player.Center.Y, Projectiles.PoppyBomb.BombAcceleration, BombYLaunchVelocity);
                     Xprojshoot /= timeToReach;
+                    if (NPC.confused)
+                    {
+                        Xprojshoot *= -1;
+                    }
                     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center.X, NPC.Center.Y, Xprojshoot, 0, ModContent.ProjectileType<PoppyBomb>(), 20 / 2, 0, Main.myPlayer, 0, BombYLaunchVelocity);
                 }
             }
@@ -310,9 +314,9 @@ namespace KirboMod.NPCs
                 Texture2D bomb = poppyBomb.Value;
                 Vector2 origin = new Vector2(bomb.Width / 2, bomb.Height / 2); //center
                 Vector2 offset = new Vector2(-14, -30);
-                float rotation = NPC.direction * MathHelper.ToRadians(-45);
+                float rotation = NPC.spriteDirection * MathHelper.ToRadians(-45);
 
-                if (NPC.direction == -1)
+                if (NPC.spriteDirection == -1)
                 {
                     offset = new Vector2(14, -30); //sprite isn't evenly balanced so we have to offset it differently
                 }

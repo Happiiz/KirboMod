@@ -16,8 +16,10 @@ namespace KirboMod
         internal FighterComboMeter fighterComboMeter;
         internal UserInterface fighterComboMeterInterface;
         //if overhaul is enabled, the music fade skip implementation will cause a really bad noise when loading the mod
-        //and (allegedly) also when loading into the world also
-        public static bool DEBUG_NoMusicFadeSkip => ModLoader.TryGetMod("TerrariaOverhaul", out _);
+        //and (allegedly) also when loading into the world
+        //besides that, also skip during mod loading normally as to not mess with music volume during mod loading sequence
+        //(setdefaults of all NPCs is called during mod loading)
+        public static bool NoMusicFadeSkip => ModLoader.TryGetMod("TerrariaOverhaul", out _) || !KirboWorld.WorldIsLoaded;
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
             NetMethods.HandlePacket(reader);

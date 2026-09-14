@@ -8,6 +8,7 @@ namespace KirboMod
 {
     public class KirboWorld : ModSystem
     {
+        public static bool WorldIsLoaded {  get; private set; }
         public int frameYoffset = 0;
         public int frameCounter = 0;
         /// <summary>
@@ -43,6 +44,19 @@ namespace KirboMod
         }
         public override void LoadWorldData(TagCompound tag)
         {
+        }
+        public override void OnWorldLoad()
+        {
+            WorldIsLoaded = true; 
+        }
+        public override void OnWorldUnload()
+        {
+            WorldIsLoaded = false;
+
+        }
+        public override void Load()
+        {
+            WorldIsLoaded = false;
         }
         public override void AddRecipeGroups()
         {

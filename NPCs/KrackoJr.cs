@@ -84,7 +84,7 @@ namespace KirboMod.NPCs
             {
                 int musicSlot = MusicLoader.GetMusicSlot("KirboMod/Music/Evobyte_KrackoJr");
                 Music = musicSlot;
-                if (!KirboMod.DEBUG_NoMusicFadeSkip)
+                if (!KirboMod.NoMusicFadeSkip)
                 {
                     Main.musicFade[musicSlot] = 1;
                     Main.musicNoCrossFade[musicSlot] = true;

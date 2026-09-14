@@ -45,7 +45,7 @@ namespace KirboMod.Items
         public override bool? UseItem(Player player)
         {
 			int musicSlot = MusicLoader.GetMusicSlot(NPCs.DarkMatter.DarkMatter.MusicPath);
-			if (!KirboMod.DEBUG_NoMusicFadeSkip)
+			if (!KirboMod.NoMusicFadeSkip)
 			{
 				for (int i = 0; i < Main.musicFade.Length; i++)
 				{
